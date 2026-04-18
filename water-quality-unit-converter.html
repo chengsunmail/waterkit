@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>水质单位换算器 | 水处理工具箱</title>
+<style>
+  :root {
+    --brand: #0891b2;
+    --brand-dark: #0e7490;
+    --brand-light: #ecfeff;
+    --brand-border: #67e8f9;
+    --ink: #0f172a;
+    --text: #334155;
+    --text-muted: #64748b;
+    --text-faint: #94a3b8;
+    --bg: #ffffff;
+    --bg-soft: #f8fafc;
+    --bg-section: #f1f5f9;
+    --border: #e2e8f0;
+    --border-soft: #f1f5f9;
+  }
+  body {
+    background: var(--bg) !important;
+    padding: 0 !important;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* 统一顶部导航 */
+  .topbar {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .topbar-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none; color: var(--ink);
+  }
+  .brand-mark {
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+    border-radius: 8px;
+    display: grid; place-items: center;
+    color: #fff; font-weight: 700; font-size: 16px;
+    letter-spacing: -1px;
+    box-shadow: 0 2px 6px rgba(8, 145, 178, 0.25);
+  }
+  .brand-name {
+    font-weight: 600; font-size: 16.5px;
+    color: var(--ink); letter-spacing: -0.2px;
+  }
+  .brand-sub {
+    font-size: 11px; color: var(--text-faint); margin-top: 1px;
+  }
+  .nav-links {
+    display: flex; gap: 24px; font-size: 14px; align-items: center;
+  }
+  .nav-links a {
+    color: var(--text); text-decoration: none;
+    transition: color 0.15s; font-weight: 500;
+  }
+  .nav-links a:hover { color: var(--brand); }
+  .nav-links a.back::before {
+    content: "←"; margin-right: 4px; color: var(--brand);
+  }
+  @media (max-width: 640px) {
+    .nav-links { gap: 16px; font-size: 13px; }
+    .nav-links a:not(.back) { display: none; }
+    .topbar-inner { padding: 12px 20px; }
+    .brand-name { font-size: 15px; }
+    .brand-sub { display: none; }
+  }
+
+  /* 面包屑 */
+  .breadcrumb {
+    max-width: 820px; margin: 0 auto;
+    padding: 20px 16px 0;
+    font-size: 12.5px; color: var(--text-muted);
+  }
+  .breadcrumb a {
+    color: var(--text-muted); text-decoration: none;
+    transition: color 0.15s;
+  }
+  .breadcrumb a:hover { color: var(--brand); }
+  .breadcrumb .sep { margin: 0 8px; color: var(--text-faint); }
+  .breadcrumb .current { color: var(--ink); font-weight: 500; }
+
+  /* 主体外壳 */
+  .main-wrap { flex: 1; padding: 16px; }
+
+  /* 统一页脚 */
+  .site-footer {
+    background: var(--bg-section);
+    border-top: 1px solid var(--border);
+    padding: 56px 32px 32px;
+    margin-top: 40px;
+  }
+  .footer-inner { max-width: 1280px; margin: 0 auto; }
+  .footer-main {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
+    gap: 40px;
+    padding-bottom: 32px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  @media (max-width: 720px) {
+    .footer-main { grid-template-columns: 1fr 1fr; gap: 28px; }
+  }
+  .footer-about-col .brand { margin-bottom: 14px; }
+  .footer-col h4 {
+    font-size: 11.5px; letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-muted); font-weight: 600;
+    margin-bottom: 14px;
+  }
+  .footer-col ul {
+    list-style: none; display: flex;
+    flex-direction: column; gap: 8px;
+  }
+  .footer-col li { font-size: 13px; color: var(--text); }
+  .footer-col a {
+    font-size: 13px; color: var(--text);
+    text-decoration: none; transition: color 0.15s;
+  }
+  .footer-col a:hover { color: var(--brand); }
+  .footer-about {
+    font-size: 13px; color: var(--text-muted);
+    line-height: 1.7; max-width: 340px;
+  }
+  .footer-bottom {
+    display: flex; justify-content: space-between;
+    align-items: center; font-size: 12px;
+    color: var(--text-muted);
+    flex-wrap: wrap; gap: 10px;
+  }
+  .footer-bottom a {
+    color: inherit; text-decoration: underline;
+    text-decoration-color: var(--border);
+    text-underline-offset: 2px;
+  }
+  .footer-bottom a:hover { color: var(--brand); }
+
+  /* 工具内部的小footer */
+  .tool-inner-footer {
+    text-align: center;
+    padding: 16px;
+    font-size: 12px;
+    color: #9ca3af;
+  }
+
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f5f7fa;
+    color: #1f2937;
+    line-height: 1.6;
+    padding: 16px;
+  }
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    overflow: hidden;
+  }
+  header.tool-header {
+    background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
+    color: #fff;
+    padding: 24px 24px 20px;
+  }
+  header.tool-header h1 { font-size: 22px; margin-bottom: 6px; }
+  header.tool-header p { font-size: 13px; opacity: 0.9; }
+  .body { padding: 24px; }
+
+  /* 顶部分类导航 */
+  .tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 20px;
+    padding: 4px;
+    background: #f1f5f9;
+    border-radius: 10px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    flex: 1;
+    min-width: 90px;
+    padding: 10px 8px;
+    text-align: center;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    color: #64748b;
+    transition: all 0.15s;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .tab.active {
+    background: #fff;
+    color: #0891b2;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .tab .icon { font-size: 15px; display: block; margin-bottom: 2px; }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .panel-intro {
+    background: #eff6ff;
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #1e40af;
+    border-left: 3px solid #3b82f6;
+    margin-bottom: 16px;
+  }
+
+  /* 换算输入行 */
+  .conv-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 14px;
+    align-items: center;
+    padding: 12px 14px;
+    background: #f8fafc;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    transition: background 0.15s;
+  }
+  .conv-row:hover { background: #f1f5f9; }
+  .conv-row.source {
+    background: #ecfeff;
+    border: 1px solid #67e8f9;
+  }
+  .conv-label {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .conv-label .name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #334155;
+  }
+  .conv-label .desc {
+    font-size: 11.5px;
+    color: #94a3b8;
+  }
+  .conv-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .conv-input input {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+    background: #fff;
+    transition: all 0.15s;
+  }
+  .conv-input input:focus {
+    outline: none;
+    border-color: #0891b2;
+    box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
+  }
+  .conv-input .unit {
+    font-size: 13px;
+    color: #64748b;
+    min-width: 70px;
+    text-align: left;
+  }
+
+  /* 辅助参数区 */
+  .params-box {
+    background: #fefce8;
+    padding: 14px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    border-left: 3px solid #eab308;
+  }
+  .params-box .title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #854d0e;
+    margin-bottom: 10px;
+  }
+  .params-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+  }
+  .params-grid .field {
+    display: flex;
+    flex-direction: column;
+  }
+  .params-grid label {
+    font-size: 12px;
+    color: #713f12;
+    margin-bottom: 4px;
+  }
+  .params-grid input, .params-grid select {
+    padding: 7px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 13.5px;
+    background: #fff;
+  }
+
+  /* 硬度分级颜色 */
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    margin-left: 8px;
+  }
+  .badge-soft { background: #dcfce7; color: #166534; }
+  .badge-medium { background: #fef3c7; color: #92400e; }
+  .badge-hard { background: #fee2e2; color: #991b1b; }
+  .badge-info { background: #e0f2fe; color: #075985; }
+
+  /* pH 可视化 */
+  .ph-scale {
+    margin-top: 12px;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 8px;
+  }
+  .ph-bar {
+    height: 26px;
+    border-radius: 6px;
+    background: linear-gradient(to right,
+      #dc2626 0%, #f97316 14%, #eab308 28%,
+      #22c55e 42%, #06b6d4 57%,
+      #3b82f6 71%, #8b5cf6 85%, #7c3aed 100%);
+    position: relative;
+    margin: 8px 0;
+  }
+  .ph-pointer {
+    position: absolute;
+    top: -4px;
+    width: 4px;
+    height: 34px;
+    background: #111827;
+    border-radius: 2px;
+    transition: left 0.2s;
+    box-shadow: 0 0 0 2px #fff;
+  }
+  .ph-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 4px;
+  }
+
+  /* 底部按钮与参考表 */
+  .buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    flex: 1;
+    min-width: 120px;
+    padding: 11px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 500;
+  }
+  .btn-primary { background: #0891b2; color: #fff; }
+  .btn-primary:hover { background: #0e7490; }
+  .btn-secondary { background: #e5e7eb; color: #374151; }
+  .btn-secondary:hover { background: #d1d5db; }
+
+  .ref-box {
+    margin-top: 20px;
+    padding: 16px;
+    background: #fafafa;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #4b5563;
+  }
+  .ref-box h3 { font-size: 14px; color: #374151; margin: 12px 0 8px; }
+  .ref-box h3:first-child { margin-top: 0; }
+  .ref-box table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12px; }
+  .ref-box th, .ref-box td {
+    padding: 6px 10px; text-align: left; border-bottom: 1px solid #e5e7eb;
+  }
+  .ref-box th { background: #f1f5f9; color: #374151; }
+
+  .note {
+    margin-top: 16px;
+    padding: 12px;
+    background: #fef3c7;
+    border-radius: 8px;
+    font-size: 12.5px;
+    color: #92400e;
+    border-left: 3px solid #f59e0b;
+  }
+  footer {
+    text-align: center;
+    padding: 16px;
+    font-size: 12px;
+    color: #9ca3af;
+  }
+  @media (max-width: 480px) {
+    .main-wrap { padding: 8px; }
+    ..main-wrap { padding: 16px; }
+    header.tool-header { padding: 18px; }
+    header.tool-header h1 { font-size: 19px; }
+    .conv-row {
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+    .tab { font-size: 11.5px; min-width: 72px; padding: 8px 4px; }
+  }
+</style>
+</head>
+<body>
+
+
+<!-- 统一顶部导航 -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="brand">
+      <div class="brand-mark">W</div>
+      <div>
+        <div class="brand-name">水处理工具箱</div>
+        <div class="brand-sub">WaterKit · by 登登科技</div>
+      </div>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html" class="back">返回首页</a>
+      <a href="index.html#cat-utilities">基础换算</a>
+      <a href="https://dengdengtech.cn" target="_blank" rel="noopener">登登科技</a>
+    </nav>
+  </div>
+</header>
+
+<!-- 面包屑 -->
+<div class="breadcrumb">
+  <a href="index.html">首页</a>
+  <span class="sep">/</span>
+  <a href="index.html#cat-utilities">基础换算</a>
+  <span class="sep">/</span>
+  <span class="current">水质单位换算</span>
+</div>
+
+<main class="main-wrap">
+
+<div class="container">
+  <header class="tool-header">
+    <h1>🧪 水质单位换算器</h1>
+    <p>硬度 · 碱度 · pH/H⁺ · 氮磷 · 盐度/电导 · 常见离子  六大模块，改任意一格实时联动</p>
+  </header>
+
+  <div class="body">
+
+    <div class="tabs">
+      <button class="tab active" data-panel="hardness" onclick="setTab('hardness')">
+        <span class="icon">💎</span>硬度
+      </button>
+      <button class="tab" data-panel="alkalinity" onclick="setTab('alkalinity')">
+        <span class="icon">🧂</span>碱度
+      </button>
+      <button class="tab" data-panel="ph" onclick="setTab('ph')">
+        <span class="icon">⚗️</span>pH/H⁺
+      </button>
+      <button class="tab" data-panel="nitrogen" onclick="setTab('nitrogen')">
+        <span class="icon">🌿</span>氮磷
+      </button>
+      <button class="tab" data-panel="salinity" onclick="setTab('salinity')">
+        <span class="icon">💧</span>盐度/电导
+      </button>
+      <button class="tab" data-panel="ion" onclick="setTab('ion')">
+        <span class="icon">⚛️</span>离子换算
+      </button>
+    </div>
+
+    <!-- ============ 硬度 ============ -->
+    <div class="panel active" id="panel-hardness">
+      <div class="panel-intro">💎 硬度表示水中 Ca²⁺、Mg²⁺ 的总量。国标常用 mg/L（以 CaCO₃ 计），德国用 °dH，美国用 gpg。修改任意一个输入框，其他自动同步。</div>
+
+      <div class="conv-row" data-group="hardness" data-unit="mgL_CaCO3">
+        <div class="conv-label">
+          <span class="name">mg/L（以 CaCO₃ 计）</span>
+          <span class="desc">中国国标常用，GB 5749</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="any" value="150" oninput="convertHardness('mgL_CaCO3', this.value)">
+          <span class="unit">mg/L</span>
+        </div>
+      </div>
+
+      <div class="conv-row" data-group="hardness" data-unit="mmolL">
+        <div class="conv-label">
+          <span class="name">mmol/L（以 1/2 Ca²⁺ 计）</span>
+          <span class="desc">化学式计量常用</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="any" value="1.5" oninput="convertHardness('mmolL', this.value)">
+          <span class="unit">mmol/L</span>
+        </div>
+      </div>
+
+      <div class="conv-row" data-group="hardness" data-unit="dH">
+        <div class="conv-label">
+          <span class="name">°dH（德国度）</span>
+          <span class="desc">欧洲/工业锅炉水</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="any" value="8.4" oninput="convertHardness('dH', this.value)">
+          <span class="unit">°dH</span>
+        </div>
+      </div>
+
+      <div class="conv-row" data-group="hardness" data-unit="fH">
+        <div class="conv-label">
+          <span class="name">°fH（法国度）</span>
+          <span class="desc">1°fH = 10 mg/L CaCO₃</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="any" value="15" oninput="convertHardness('fH', this.value)">
+          <span class="unit">°fH</span>
+        </div>
+      </div>
+
+      <div class="conv-row" data-group="hardness" data-unit="gpg">
+        <div class="conv-label">
+          <span class="name">gpg（美国度）</span>
+          <span class="desc">grains per gallon</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="any" value="8.77" oninput="convertHardness('gpg', this.value)">
+          <span class="unit">gpg</span>
+        </div>
+      </div>
+
+      <div class="conv-row" data-group="hardness" data-unit="meqL">
+        <div class="conv-label">
+          <span class="name">meq/L</span>
+          <span class="desc">毫克当量浓度</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="any" value="3" oninput="convertHardness('meqL', this.value)">
+          <span class="unit">meq/L</span>
+        </div>
+      </div>
+
+      <div id="hardness_level" style="margin-top:14px;font-size:14px;color:#374151;">
+        硬度等级：<span class="badge badge-soft" id="hardness_badge">软水</span>
+      </div>
+    </div>
+
+    <!-- ============ 碱度 ============ -->
+    <div class="panel" id="panel-alkalinity">
+      <div class="panel-intro">🧂 碱度反映水的缓冲能力，主要由 HCO₃⁻、CO₃²⁻、OH⁻ 组成。锅炉水、生物处理、消毒工艺都要看碱度。</div>
+
+      <div class="conv-row" data-group="alk" data-unit="mgL_CaCO3">
+        <div class="conv-label">
+          <span class="name">mg/L（以 CaCO₃ 计）</span>
+          <span class="desc">国标/工业常用</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="any" value="200" oninput="convertAlk('mgL_CaCO3', this.value)">
+          <span class="unit">mg/L</span>
+        </div>
+      </div>
+
+      <div class="conv-row" data-group="alk" data-unit="mmolL">
+        <div class="conv-label">
+          <span class="name">mmol/L（碱度 1价）</span>
+          <span class="desc">1 mmol/L ≈ 50 mg/L CaCO₃</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="any" value="4" oninput="convertAlk('mmolL', this.value)">
+          <span class="unit">mmol/L</span>
+        </div>
+      </div>
+
+      <div class="conv-row" data-group="alk" data-unit="mgL_HCO3">
+        <div class="conv-label">
+          <span class="name">mg/L（以 HCO₃⁻ 计）</span>
+          <span class="desc">水质分析报告常用</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="any" value="244" oninput="convertAlk('mgL_HCO3', this.value)">
+          <span class="unit">mg/L</span>
+        </div>
+      </div>
+
+      <div class="conv-row" data-group="alk" data-unit="meqL">
+        <div class="conv-label">
+          <span class="name">meq/L</span>
+          <span class="desc">与 mmol/L 等值（1价）</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="any" value="4" oninput="convertAlk('meqL', this.value)">
+          <span class="unit">meq/L</span>
+        </div>
+      </div>
+
+      <div class="conv-row" data-group="alk" data-unit="dH">
+        <div class="conv-label">
+          <span class="name">°dH（德国碱度）</span>
+          <span class="desc">与硬度换算系数相同</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="any" value="11.2" oninput="convertAlk('dH', this.value)">
+          <span class="unit">°dH</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ pH/H+ ============ -->
+    <div class="panel" id="panel-ph">
+      <div class="panel-intro">⚗️ pH 与 H⁺ 浓度互换。pH = -log[H⁺]，每差 1 个单位 H⁺ 浓度差 10 倍。</div>
+
+      <div class="conv-row" data-group="ph" data-unit="pH">
+        <div class="conv-label">
+          <span class="name">pH 值</span>
+          <span class="desc">0-14，中性=7</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="0.01" min="0" max="14" value="7.0" oninput="convertPH('pH', this.value)">
+          <span class="unit">—</span>
+        </div>
+      </div>
+
+      <div class="conv-row" data-group="ph" data-unit="H_molL">
+        <div class="conv-label">
+          <span class="name">[H⁺] 浓度</span>
+          <span class="desc">mol/L</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="any" value="1e-7" oninput="convertPH('H_molL', this.value)">
+          <span class="unit">mol/L</span>
+        </div>
+      </div>
+
+      <div class="conv-row" data-group="ph" data-unit="H_mgL">
+        <div class="conv-label">
+          <span class="name">[H⁺] 质量浓度</span>
+          <span class="desc">mg/L</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="any" value="1e-4" oninput="convertPH('H_mgL', this.value)">
+          <span class="unit">mg/L</span>
+        </div>
+      </div>
+
+      <div class="conv-row" data-group="ph" data-unit="OH_molL">
+        <div class="conv-label">
+          <span class="name">[OH⁻] 浓度（25℃）</span>
+          <span class="desc">[OH⁻]=10⁻¹⁴/[H⁺]</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="any" value="1e-7" oninput="convertPH('OH_molL', this.value)">
+          <span class="unit">mol/L</span>
+        </div>
+      </div>
+
+      <div class="conv-row" data-group="ph" data-unit="pOH">
+        <div class="conv-label">
+          <span class="name">pOH 值</span>
+          <span class="desc">pH + pOH = 14</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="0.01" value="7.0" oninput="convertPH('pOH', this.value)">
+          <span class="unit">—</span>
+        </div>
+      </div>
+
+      <div class="ph-scale">
+        <div style="font-size:13px;color:#475569;margin-bottom:6px;">
+          水质定性：<span class="badge badge-soft" id="ph_badge">中性</span>
+        </div>
+        <div class="ph-bar">
+          <div class="ph-pointer" id="ph_pointer" style="left: 50%;"></div>
+        </div>
+        <div class="ph-labels">
+          <span>0 强酸</span><span>3</span><span>5</span><span>7 中性</span><span>9</span><span>11</span><span>14 强碱</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 氮磷 ============ -->
+    <div class="panel" id="panel-nitrogen">
+      <div class="panel-intro">🌿 氮的形态互换：NH₃-N、NO₂⁻-N、NO₃⁻-N、TKN、TN。水质报告经常出现"以 N 计"与"以离子计"两种口径，搞错换算差十几倍很常见。</div>
+
+      <div class="params-box">
+        <div class="title">选择形态</div>
+        <div class="params-grid">
+          <div class="field">
+            <label>氮形态</label>
+            <select id="n_form" onchange="convertN()">
+              <option value="NH3" selected>氨氮 NH₃-N（M_ion=18, M_N=14）</option>
+              <option value="NO2">亚硝酸盐 NO₂⁻-N（M_ion=46, M_N=14）</option>
+              <option value="NO3">硝酸盐 NO₃⁻-N（M_ion=62, M_N=14）</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="conv-row" data-group="n" data-unit="mgL_N">
+        <div class="conv-label">
+          <span class="name">mg/L（以 N 计）</span>
+          <span class="desc">国标默认，GB 3838/18918</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="any" value="5" oninput="convertN('mgL_N', this.value)">
+          <span class="unit">mg/L as N</span>
+        </div>
+      </div>
+
+      <div class="conv-row" data-group="n" data-unit="mgL_ion">
+        <div class="conv-label">
+          <span class="name">mg/L（以离子计）</span>
+          <span class="desc">欧美水质报告常用</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="any" value="6.43" oninput="convertN('mgL_ion', this.value)">
+          <span class="unit" id="n_ion_unit">mg/L as NH₄⁺</span>
+        </div>
+      </div>
+
+      <div class="conv-row" data-group="n" data-unit="mmolL">
+        <div class="conv-label">
+          <span class="name">mmol/L</span>
+          <span class="desc">摩尔浓度</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="any" value="0.357" oninput="convertN('mmolL', this.value)">
+          <span class="unit">mmol/L</span>
+        </div>
+      </div>
+
+      <hr style="margin:20px 0;border:none;border-top:1px solid #e5e7eb;">
+      <div class="panel-intro" style="margin-top:0;">磷的形态：TP、PO₄³⁻-P、P₂O₅（化肥行业）</div>
+
+      <div class="params-box">
+        <div class="title">磷形态</div>
+        <div class="params-grid">
+          <div class="field">
+            <label>磷形态</label>
+            <select id="p_form" onchange="convertP()">
+              <option value="PO4" selected>正磷酸盐 PO₄³⁻-P（M_ion=95, M_P=31）</option>
+              <option value="P2O5">五氧化二磷 P₂O₅（化肥/岩相）</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="conv-row" data-group="p" data-unit="mgL_P">
+        <div class="conv-label">
+          <span class="name">mg/L（以 P 计）</span>
+          <span class="desc">国标默认</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="any" value="1.0" oninput="convertP('mgL_P', this.value)">
+          <span class="unit">mg/L as P</span>
+        </div>
+      </div>
+
+      <div class="conv-row" data-group="p" data-unit="mgL_ion">
+        <div class="conv-label">
+          <span class="name">mg/L（以离子/化合物计）</span>
+          <span class="desc">分析报告常用</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="any" value="3.065" oninput="convertP('mgL_ion', this.value)">
+          <span class="unit" id="p_ion_unit">mg/L as PO₄³⁻</span>
+        </div>
+      </div>
+
+      <div class="conv-row" data-group="p" data-unit="mmolL">
+        <div class="conv-label">
+          <span class="name">mmol/L</span>
+          <span class="desc">摩尔浓度</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="any" value="0.0323" oninput="convertP('mmolL', this.value)">
+          <span class="unit">mmol/L</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 盐度/电导 ============ -->
+    <div class="panel" id="panel-salinity">
+      <div class="panel-intro">💧 电导率、TDS、盐度之间的估算。电导率-TDS 是估算关系（系数 0.5-0.8 视水质而定），高精度需实测。</div>
+
+      <div class="params-box">
+        <div class="title">换算参数</div>
+        <div class="params-grid">
+          <div class="field">
+            <label>TDS 换算系数 K</label>
+            <select id="tds_K" onchange="convertSalinity()">
+              <option value="0.5">0.5（NaCl 标定）</option>
+              <option value="0.64" selected>0.64（常规淡水）</option>
+              <option value="0.7">0.7（442 标定，含混合盐）</option>
+              <option value="0.8">0.8（硬水/高碳酸盐）</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>水温（电导温补）</label>
+            <input type="number" id="temp" value="25" step="1" oninput="convertSalinity()">
+          </div>
+        </div>
+      </div>
+
+      <div class="conv-row" data-group="sal" data-unit="EC_uS">
+        <div class="conv-label">
+          <span class="name">电导率 EC</span>
+          <span class="desc">25℃ 标定</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="any" value="1000" oninput="convertSalinity('EC_uS', this.value)">
+          <span class="unit">μS/cm</span>
+        </div>
+      </div>
+
+      <div class="conv-row" data-group="sal" data-unit="EC_mS">
+        <div class="conv-label">
+          <span class="name">电导率 EC</span>
+          <span class="desc">毫西门子</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="any" value="1.0" oninput="convertSalinity('EC_mS', this.value)">
+          <span class="unit">mS/cm</span>
+        </div>
+      </div>
+
+      <div class="conv-row" data-group="sal" data-unit="TDS">
+        <div class="conv-label">
+          <span class="name">TDS（估算）</span>
+          <span class="desc">= EC × K</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="any" value="640" oninput="convertSalinity('TDS', this.value)">
+          <span class="unit">mg/L</span>
+        </div>
+      </div>
+
+      <div class="conv-row" data-group="sal" data-unit="salinity">
+        <div class="conv-label">
+          <span class="name">盐度（近似）</span>
+          <span class="desc">PSU 或 ‰</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="any" value="0.64" oninput="convertSalinity('salinity', this.value)">
+          <span class="unit">‰ (PSU)</span>
+        </div>
+      </div>
+
+      <div class="conv-row" data-group="sal" data-unit="resistivity">
+        <div class="conv-label">
+          <span class="name">电阻率</span>
+          <span class="desc">纯水/超纯水用</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="any" value="1000" oninput="convertSalinity('resistivity', this.value)">
+          <span class="unit">Ω·cm</span>
+        </div>
+      </div>
+
+      <div id="salinity_category" style="margin-top:14px;font-size:14px;color:#374151;">
+        水质分类：<span class="badge badge-info" id="salinity_badge">—</span>
+      </div>
+    </div>
+
+    <!-- ============ 通用离子 ============ -->
+    <div class="panel" id="panel-ion">
+      <div class="panel-intro">⚛️ 通用离子的 mg/L ↔ mmol/L ↔ meq/L 换算。选择离子后自动带出摩尔质量与价数。</div>
+
+      <div class="params-box">
+        <div class="title">选择离子</div>
+        <div class="params-grid">
+          <div class="field">
+            <label>离子</label>
+            <select id="ion_sel" onchange="updateIonParams()">
+              <optgroup label="阳离子">
+                <option value="Na">Na⁺（23, 1价）</option>
+                <option value="K">K⁺（39.1, 1价）</option>
+                <option value="Ca">Ca²⁺（40, 2价）</option>
+                <option value="Mg">Mg²⁺（24.3, 2价）</option>
+                <option value="Fe2">Fe²⁺（55.85, 2价）</option>
+                <option value="Fe3">Fe³⁺（55.85, 3价）</option>
+                <option value="Al">Al³⁺（27, 3价）</option>
+                <option value="NH4">NH₄⁺（18, 1价）</option>
+                <option value="Mn">Mn²⁺（54.9, 2价）</option>
+              </optgroup>
+              <optgroup label="阴离子">
+                <option value="Cl" selected>Cl⁻（35.5, 1价）</option>
+                <option value="SO4">SO₄²⁻（96, 2价）</option>
+                <option value="HCO3">HCO₃⁻（61, 1价）</option>
+                <option value="CO3">CO₃²⁻（60, 2价）</option>
+                <option value="NO3">NO₃⁻（62, 1价）</option>
+                <option value="NO2">NO₂⁻（46, 1价）</option>
+                <option value="PO4">PO₄³⁻（95, 3价）</option>
+                <option value="F">F⁻（19, 1价）</option>
+                <option value="OH">OH⁻（17, 1价）</option>
+                <option value="S">S²⁻（32, 2价）</option>
+                <option value="SiO2">SiO₂（60, 按2价当量）</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="field">
+            <label>摩尔质量 (g/mol)</label>
+            <input type="number" id="ion_M" value="35.5" step="0.1" oninput="convertIon()">
+          </div>
+          <div class="field">
+            <label>价数</label>
+            <input type="number" id="ion_v" value="1" step="1" oninput="convertIon()">
+          </div>
+        </div>
+      </div>
+
+      <div class="conv-row" data-group="ion" data-unit="mgL">
+        <div class="conv-label">
+          <span class="name">mg/L（质量浓度）</span>
+          <span class="desc">以离子本身计</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="any" value="100" oninput="convertIon('mgL', this.value)">
+          <span class="unit">mg/L</span>
+        </div>
+      </div>
+
+      <div class="conv-row" data-group="ion" data-unit="mmolL">
+        <div class="conv-label">
+          <span class="name">mmol/L（摩尔浓度）</span>
+          <span class="desc">= mg/L ÷ M</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="any" value="2.82" oninput="convertIon('mmolL', this.value)">
+          <span class="unit">mmol/L</span>
+        </div>
+      </div>
+
+      <div class="conv-row" data-group="ion" data-unit="meqL">
+        <div class="conv-label">
+          <span class="name">meq/L（当量浓度）</span>
+          <span class="desc">= mmol/L × 价数</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="any" value="2.82" oninput="convertIon('meqL', this.value)">
+          <span class="unit">meq/L</span>
+        </div>
+      </div>
+
+      <div class="conv-row" data-group="ion" data-unit="mgL_CaCO3">
+        <div class="conv-label">
+          <span class="name">mg/L（以 CaCO₃ 计）</span>
+          <span class="desc">= meq/L × 50</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="any" value="141" oninput="convertIon('mgL_CaCO3', this.value)">
+          <span class="unit">mg/L as CaCO₃</span>
+        </div>
+      </div>
+
+      <div class="conv-row" data-group="ion" data-unit="ppm">
+        <div class="conv-label">
+          <span class="name">ppm（质量比）</span>
+          <span class="desc">淡水中 ppm ≈ mg/L</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="any" value="100" oninput="convertIon('ppm', this.value)">
+          <span class="unit">ppm</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="buttons">
+      <button class="btn btn-primary" onclick="copyResults()">📋 复制当前结果</button>
+      <button class="btn btn-secondary" onclick="toggleRef()">📖 查看速查表</button>
+    </div>
+
+    <div class="ref-box" id="refBox" style="display:none;">
+      <h3>① 硬度换算系数</h3>
+      <table>
+        <tr><th>单位</th><th>= mg/L CaCO₃</th></tr>
+        <tr><td>1 mmol/L（1/2 Ca）</td><td>100 mg/L</td></tr>
+        <tr><td>1 °dH（德国度）</td><td>17.848 mg/L</td></tr>
+        <tr><td>1 °fH（法国度）</td><td>10 mg/L</td></tr>
+        <tr><td>1 gpg（美国度）</td><td>17.1 mg/L</td></tr>
+        <tr><td>1 meq/L</td><td>50 mg/L</td></tr>
+      </table>
+
+      <h3>② 硬度等级（以 CaCO₃ 计）</h3>
+      <table>
+        <tr><th>分类</th><th>mg/L</th><th>°dH</th></tr>
+        <tr><td>极软水</td><td>0-75</td><td>0-4.2</td></tr>
+        <tr><td>软水</td><td>75-150</td><td>4.2-8.4</td></tr>
+        <tr><td>中硬水</td><td>150-300</td><td>8.4-16.8</td></tr>
+        <tr><td>硬水</td><td>300-450</td><td>16.8-25.2</td></tr>
+        <tr><td>极硬水</td><td>&gt; 450</td><td>&gt; 25.2</td></tr>
+      </table>
+
+      <h3>③ 氮形态换算（以 N 计 ↔ 以离子计）</h3>
+      <table>
+        <tr><th>形态</th><th>换算系数（离子→N）</th></tr>
+        <tr><td>NH₃-N（NH₄⁺）</td><td>× 14/18 = 0.778</td></tr>
+        <tr><td>NO₂⁻-N</td><td>× 14/46 = 0.304</td></tr>
+        <tr><td>NO₃⁻-N</td><td>× 14/62 = 0.226</td></tr>
+      </table>
+
+      <h3>④ 磷形态换算</h3>
+      <table>
+        <tr><th>形态</th><th>换算系数</th></tr>
+        <tr><td>PO₄³⁻ → P</td><td>× 31/95 = 0.326</td></tr>
+        <tr><td>P₂O₅ → P</td><td>× 62/142 = 0.437</td></tr>
+      </table>
+
+      <h3>⑤ 电导率-TDS-盐度</h3>
+      <table>
+        <tr><th>水类型</th><th>EC (μS/cm)</th><th>TDS (mg/L)</th></tr>
+        <tr><td>超纯水</td><td>&lt; 1</td><td>&lt; 0.5</td></tr>
+        <tr><td>纯净水/RO 产水</td><td>1 - 50</td><td>0.5 - 30</td></tr>
+        <tr><td>自来水/地表淡水</td><td>50 - 1500</td><td>30 - 1000</td></tr>
+        <tr><td>微咸水</td><td>1500 - 5000</td><td>1000 - 3000</td></tr>
+        <tr><td>咸水</td><td>5000 - 50000</td><td>3000 - 30000</td></tr>
+        <tr><td>海水</td><td>≈ 50000</td><td>≈ 35000</td></tr>
+      </table>
+
+      <h3>⑥ pH 水质分级</h3>
+      <table>
+        <tr><th>pH 范围</th><th>分级</th></tr>
+        <tr><td>&lt; 4.5</td><td>强酸</td></tr>
+        <tr><td>4.5 - 6.5</td><td>酸性</td></tr>
+        <tr><td>6.5 - 7.5</td><td>中性（饮用水要求 6.5-8.5）</td></tr>
+        <tr><td>7.5 - 9.0</td><td>微碱性</td></tr>
+        <tr><td>9.0 - 10.5</td><td>碱性</td></tr>
+        <tr><td>&gt; 10.5</td><td>强碱</td></tr>
+      </table>
+    </div>
+
+    <div class="note">
+      ⚠️ 本工具用于快速换算与参考，严格分析请以实验数据为准。电导率-TDS、电导率-盐度为估算关系，高精度应用须结合水质特性测定换算系数。
+    </div>
+
+  </div>
+
+  <footer class="tool-inner-footer">水处理工具箱 · 仅供工程估算参考</footer>
+</div>
+</main>
+
+<!-- 统一页脚 -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-main">
+      <div class="footer-col footer-about-col">
+        <a href="index.html" class="brand">
+          <div class="brand-mark">W</div>
+          <div>
+            <div class="brand-name">水处理工具箱</div>
+            <div class="brand-sub">WaterKit · by 登登科技</div>
+          </div>
+        </a>
+        <p class="footer-about">水处理工具箱(WaterKit)是海南登登科技咨询有限公司推出的水处理在线计算工具集合,由一线水处理工艺工程师开发维护。免费、无广告、持续更新。</p>
+      </div>
+      <div class="footer-col">
+        <h4>水力计算</h4>
+        <ul>
+          <li><a href="pipe-hydraulic-calculator.html">管道水力</a></li>
+          <li><a href="open-channel-calculator.html">明渠水力</a></li>
+          <li><a href="weir-flow-calculator.html">堰流计算</a></li>
+          <li><a href="orifice-nozzle-calculator.html">孔口出流</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>工艺与设备</h4>
+        <ul>
+          <li><a href="aeration-calculator.html">曝气量</a></li>
+          <li><a href="sludge-production-calculator.html">污泥产量</a></li>
+          <li><a href="dosing-calculator.html">加药量</a></li>
+          <li><a href="pump-selection-calculator.html">水泵选型</a></li>
+          <li><a href="water-quality-unit-converter.html">水质换算</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="https://dengdengtech.cn" target="_blank" rel="noopener">登登科技官网 ↗</a></li>
+          <li>海南登登科技咨询</li>
+          <li>有限公司</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Open Source</h4>
+        <ul>
+          <li><a href="https://github.com/chengsunmail/waterkit" target="_blank" rel="noopener">GitHub 仓库 ↗</a></li>
+          <li><a href="https://github.com/chengsunmail/waterkit/blob/main/LICENSE" target="_blank" rel="noopener">AGPL-3.0 协议</a></li>
+          <li><a href="https://github.com/chengsunmail/waterkit/issues" target="_blank" rel="noopener">反馈 Issue</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 海南登登科技咨询有限公司 · <a href="https://dengdengtech.cn" target="_blank" rel="noopener">dengdengtech.cn</a></span>
+      <span>WaterKit · V 1.0 · <a href="https://github.com/chengsunmail/waterkit" target="_blank" rel="noopener">开源于 GitHub</a></span>
+    </div>
+  </div>
+</footer>
+
+
+
+<script>
+  const $ = id => document.getElementById(id);
+  let currentTab = 'hardness';
+
+  function setTab(name) {
+    currentTab = name;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelector(`[data-panel="${name}"]`).classList.add('active');
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    $('panel-'+name).classList.add('active');
+  }
+
+  // 标记来源输入框（被编辑的那个）
+  function markSource(group, unit) {
+    document.querySelectorAll(`[data-group="${group}"]`).forEach(r => r.classList.remove('source'));
+    const row = document.querySelector(`[data-group="${group}"][data-unit="${unit}"]`);
+    if (row) row.classList.add('source');
+  }
+
+  // 设置某行的值（不触发事件避免循环）
+  function setVal(group, unit, val, digits = 4) {
+    const row = document.querySelector(`[data-group="${group}"][data-unit="${unit}"]`);
+    if (!row) return;
+    const inp = row.querySelector('input');
+    if (inp === document.activeElement) return;  // 正在编辑的不改
+    let v = Number(val);
+    if (!isFinite(v)) { inp.value = ''; return; }
+    // 格式化：大于 0.01 用固定小数，否则用科学计数
+    if (Math.abs(v) >= 0.001 && Math.abs(v) < 1e6) {
+      inp.value = Number(v.toPrecision(digits+1)).toString();
+    } else if (v === 0) {
+      inp.value = '0';
+    } else {
+      inp.value = v.toExponential(3);
+    }
+  }
+
+  // ======== 硬度 ========
+  // 基准：mg/L CaCO3
+  function convertHardness(fromUnit, val) {
+    markSource('hardness', fromUnit);
+    const v = parseFloat(val);
+    if (!isFinite(v)) return;
+    let caco3;  // mg/L CaCO3
+    switch(fromUnit) {
+      case 'mgL_CaCO3': caco3 = v; break;
+      case 'mmolL':     caco3 = v * 100; break;
+      case 'dH':        caco3 = v * 17.848; break;
+      case 'fH':        caco3 = v * 10; break;
+      case 'gpg':       caco3 = v * 17.118; break;
+      case 'meqL':      caco3 = v * 50; break;
+    }
+    if (fromUnit !== 'mgL_CaCO3') setVal('hardness', 'mgL_CaCO3', caco3);
+    if (fromUnit !== 'mmolL')     setVal('hardness', 'mmolL', caco3/100);
+    if (fromUnit !== 'dH')        setVal('hardness', 'dH', caco3/17.848);
+    if (fromUnit !== 'fH')        setVal('hardness', 'fH', caco3/10);
+    if (fromUnit !== 'gpg')       setVal('hardness', 'gpg', caco3/17.118);
+    if (fromUnit !== 'meqL')      setVal('hardness', 'meqL', caco3/50);
+
+    // 等级分类
+    const b = $('hardness_badge');
+    if (caco3 < 75)       { b.className = 'badge badge-soft';   b.textContent = '极软水'; }
+    else if (caco3 < 150) { b.className = 'badge badge-soft';   b.textContent = '软水'; }
+    else if (caco3 < 300) { b.className = 'badge badge-medium'; b.textContent = '中硬水'; }
+    else if (caco3 < 450) { b.className = 'badge badge-hard';   b.textContent = '硬水'; }
+    else                  { b.className = 'badge badge-hard';   b.textContent = '极硬水'; }
+  }
+
+  // ======== 碱度 ========
+  // 基准：mg/L CaCO3
+  function convertAlk(fromUnit, val) {
+    markSource('alk', fromUnit);
+    const v = parseFloat(val);
+    if (!isFinite(v)) return;
+    let caco3;
+    switch(fromUnit) {
+      case 'mgL_CaCO3': caco3 = v; break;
+      case 'mmolL':     caco3 = v * 50; break;   // 碱度 1价当量
+      case 'mgL_HCO3':  caco3 = v * 50 / 61; break;
+      case 'meqL':      caco3 = v * 50; break;
+      case 'dH':        caco3 = v * 17.848; break;
+    }
+    if (fromUnit !== 'mgL_CaCO3') setVal('alk', 'mgL_CaCO3', caco3);
+    if (fromUnit !== 'mmolL')     setVal('alk', 'mmolL', caco3/50);
+    if (fromUnit !== 'mgL_HCO3')  setVal('alk', 'mgL_HCO3', caco3 * 61 / 50);
+    if (fromUnit !== 'meqL')      setVal('alk', 'meqL', caco3/50);
+    if (fromUnit !== 'dH')        setVal('alk', 'dH', caco3/17.848);
+  }
+
+  // ======== pH ========
+  function convertPH(fromUnit, val) {
+    markSource('ph', fromUnit);
+    const v = parseFloat(val);
+    if (!isFinite(v)) return;
+    let pH;
+    switch(fromUnit) {
+      case 'pH':       pH = v; break;
+      case 'H_molL':   pH = v > 0 ? -Math.log10(v) : 14; break;
+      case 'H_mgL':    pH = v > 0 ? -Math.log10(v/1000) : 14; break;  // H+摩尔质量=1
+      case 'OH_molL':  pH = v > 0 ? 14 + Math.log10(v) : 0; break;
+      case 'pOH':      pH = 14 - v; break;
+    }
+    pH = Math.max(0, Math.min(14, pH));
+    const H_mol = Math.pow(10, -pH);
+    const OH_mol = Math.pow(10, pH - 14);
+    const pOH = 14 - pH;
+
+    if (fromUnit !== 'pH')      setVal('ph', 'pH', pH);
+    if (fromUnit !== 'H_molL')  setVal('ph', 'H_molL', H_mol);
+    if (fromUnit !== 'H_mgL')   setVal('ph', 'H_mgL', H_mol * 1000);
+    if (fromUnit !== 'OH_molL') setVal('ph', 'OH_molL', OH_mol);
+    if (fromUnit !== 'pOH')     setVal('ph', 'pOH', pOH);
+
+    // 指针与标签
+    $('ph_pointer').style.left = `calc(${(pH/14)*100}% - 2px)`;
+    const b = $('ph_badge');
+    if (pH < 4.5)      { b.className = 'badge badge-hard';   b.textContent = '强酸'; }
+    else if (pH < 6.5) { b.className = 'badge badge-medium'; b.textContent = '酸性'; }
+    else if (pH < 7.5) { b.className = 'badge badge-soft';   b.textContent = '中性'; }
+    else if (pH < 9.0) { b.className = 'badge badge-soft';   b.textContent = '微碱性'; }
+    else if (pH <10.5) { b.className = 'badge badge-medium'; b.textContent = '碱性'; }
+    else               { b.className = 'badge badge-hard';   b.textContent = '强碱'; }
+  }
+
+  // ======== 氮磷 ========
+  const N_params = {
+    NH3: {M_ion: 18, M_N: 14, label: 'NH₄⁺'},
+    NO2: {M_ion: 46, M_N: 14, label: 'NO₂⁻'},
+    NO3: {M_ion: 62, M_N: 14, label: 'NO₃⁻'}
+  };
+
+  function convertN(fromUnit, val) {
+    const form = $('n_form').value;
+    const p = N_params[form];
+    $('n_ion_unit').textContent = 'mg/L as ' + p.label;
+
+    if (fromUnit !== undefined) markSource('n', fromUnit);
+    if (val === undefined) {
+      // 只是切换了形态，按当前 mg/L N 重算
+      val = document.querySelector('[data-group="n"][data-unit="mgL_N"] input').value;
+      fromUnit = 'mgL_N';
+    }
+    const v = parseFloat(val);
+    if (!isFinite(v)) return;
+
+    let N_mgL;
+    switch(fromUnit) {
+      case 'mgL_N':   N_mgL = v; break;
+      case 'mgL_ion': N_mgL = v * p.M_N / p.M_ion; break;
+      case 'mmolL':   N_mgL = v * p.M_N; break;
+    }
+    if (fromUnit !== 'mgL_N')   setVal('n', 'mgL_N', N_mgL);
+    if (fromUnit !== 'mgL_ion') setVal('n', 'mgL_ion', N_mgL * p.M_ion / p.M_N);
+    if (fromUnit !== 'mmolL')   setVal('n', 'mmolL', N_mgL / p.M_N);
+  }
+
+  const P_params = {
+    PO4:  {M_ion: 95,  M_P: 31, label: 'PO₄³⁻'},
+    P2O5: {M_ion: 142, M_P: 62, label: 'P₂O₅'}  // 每个P2O5含2个P
+  };
+
+  function convertP(fromUnit, val) {
+    const form = $('p_form').value;
+    const p = P_params[form];
+    $('p_ion_unit').textContent = 'mg/L as ' + p.label;
+
+    if (fromUnit !== undefined) markSource('p', fromUnit);
+    if (val === undefined) {
+      val = document.querySelector('[data-group="p"][data-unit="mgL_P"] input').value;
+      fromUnit = 'mgL_P';
+    }
+    const v = parseFloat(val);
+    if (!isFinite(v)) return;
+
+    let P_mgL;
+    switch(fromUnit) {
+      case 'mgL_P':   P_mgL = v; break;
+      case 'mgL_ion': P_mgL = v * p.M_P / p.M_ion; break;
+      case 'mmolL':   P_mgL = v * 31; break;   // P原子摩尔质量
+    }
+    if (fromUnit !== 'mgL_P')   setVal('p', 'mgL_P', P_mgL);
+    if (fromUnit !== 'mgL_ion') setVal('p', 'mgL_ion', P_mgL * p.M_ion / p.M_P);
+    if (fromUnit !== 'mmolL')   setVal('p', 'mmolL', P_mgL / 31);
+  }
+
+  // ======== 盐度/电导 ========
+  function convertSalinity(fromUnit, val) {
+    const K = parseFloat($('tds_K').value);
+    if (fromUnit !== undefined) markSource('sal', fromUnit);
+    if (val === undefined) {
+      val = document.querySelector('[data-group="sal"][data-unit="EC_uS"] input').value;
+      fromUnit = 'EC_uS';
+    }
+    const v = parseFloat(val);
+    if (!isFinite(v)) return;
+
+    let EC_uS;  // 基准：μS/cm
+    switch(fromUnit) {
+      case 'EC_uS':      EC_uS = v; break;
+      case 'EC_mS':      EC_uS = v * 1000; break;
+      case 'TDS':        EC_uS = K > 0 ? v / K : 0; break;
+      case 'salinity':   EC_uS = K > 0 ? v * 1000 / K : 0; break;
+      case 'resistivity': EC_uS = v > 0 ? 1e6 / v : 0; break;
+    }
+
+    if (fromUnit !== 'EC_uS')       setVal('sal', 'EC_uS', EC_uS);
+    if (fromUnit !== 'EC_mS')       setVal('sal', 'EC_mS', EC_uS / 1000);
+    if (fromUnit !== 'TDS')         setVal('sal', 'TDS', EC_uS * K);
+    if (fromUnit !== 'salinity')    setVal('sal', 'salinity', EC_uS * K / 1000);
+    if (fromUnit !== 'resistivity') setVal('sal', 'resistivity', EC_uS > 0 ? 1e6 / EC_uS : 0);
+
+    const tds = EC_uS * K;
+    const b = $('salinity_badge');
+    if (tds < 0.5)        { b.className='badge badge-info'; b.textContent='超纯水'; }
+    else if (tds < 30)    { b.className='badge badge-info'; b.textContent='纯净水/RO产水'; }
+    else if (tds < 1000)  { b.className='badge badge-soft'; b.textContent='淡水/自来水'; }
+    else if (tds < 3000)  { b.className='badge badge-medium'; b.textContent='微咸水'; }
+    else if (tds < 30000) { b.className='badge badge-hard'; b.textContent='咸水'; }
+    else                  { b.className='badge badge-hard'; b.textContent='海水/卤水'; }
+  }
+
+  // ======== 通用离子 ========
+  const ionLib = {
+    Na:   {M:23, v:1}, K: {M:39.1, v:1}, Ca: {M:40, v:2}, Mg: {M:24.3, v:2},
+    Fe2:  {M:55.85, v:2}, Fe3:{M:55.85, v:3}, Al:{M:27, v:3},
+    NH4:  {M:18, v:1}, Mn:{M:54.9, v:2},
+    Cl:   {M:35.5, v:1}, SO4:{M:96, v:2}, HCO3:{M:61, v:1}, CO3:{M:60, v:2},
+    NO3:  {M:62, v:1}, NO2:{M:46, v:1}, PO4:{M:95, v:3}, F:{M:19, v:1},
+    OH:   {M:17, v:1}, S:{M:32, v:2}, SiO2:{M:60, v:2}
+  };
+
+  function updateIonParams() {
+    const ion = ionLib[$('ion_sel').value];
+    if (ion) {
+      $('ion_M').value = ion.M;
+      $('ion_v').value = ion.v;
+    }
+    convertIon('mgL', document.querySelector('[data-group="ion"][data-unit="mgL"] input').value);
+  }
+
+  function convertIon(fromUnit, val) {
+    const M = parseFloat($('ion_M').value);
+    const z = parseFloat($('ion_v').value);
+    if (fromUnit !== undefined) markSource('ion', fromUnit);
+    if (val === undefined) {
+      val = document.querySelector('[data-group="ion"][data-unit="mgL"] input').value;
+      fromUnit = 'mgL';
+    }
+    const v = parseFloat(val);
+    if (!isFinite(v) || M <= 0) return;
+
+    let mgL;
+    switch(fromUnit) {
+      case 'mgL':        mgL = v; break;
+      case 'mmolL':      mgL = v * M; break;
+      case 'meqL':       mgL = z > 0 ? v * M / z : 0; break;
+      case 'mgL_CaCO3':  mgL = z > 0 ? v * M / z / 50 : 0; break;
+      case 'ppm':        mgL = v; break;
+    }
+    if (fromUnit !== 'mgL')       setVal('ion', 'mgL', mgL);
+    if (fromUnit !== 'mmolL')     setVal('ion', 'mmolL', mgL / M);
+    if (fromUnit !== 'meqL')      setVal('ion', 'meqL', mgL * z / M);
+    if (fromUnit !== 'mgL_CaCO3') setVal('ion', 'mgL_CaCO3', mgL * z * 50 / M);
+    if (fromUnit !== 'ppm')       setVal('ion', 'ppm', mgL);
+  }
+
+  function copyResults() {
+    const panel = $('panel-'+currentTab);
+    const titles = {
+      hardness: '硬度换算', alkalinity: '碱度换算', ph: 'pH/H⁺换算',
+      nitrogen: '氮磷换算', salinity: '盐度/电导换算', ion: '通用离子换算'
+    };
+    let txt = '水质单位换算 - ' + titles[currentTab] + '\n————————————————\n';
+    panel.querySelectorAll('.conv-row').forEach(row => {
+      const name = row.querySelector('.name').innerText.trim();
+      const val = row.querySelector('input').value;
+      const unit = row.querySelector('.unit').innerText.trim();
+      txt += `${name}: ${val} ${unit}\n`;
+    });
+    navigator.clipboard.writeText(txt).then(() => {
+      alert('已复制当前换算结果');
+    }).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = txt;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      alert('已复制');
+    });
+  }
+
+  function toggleRef() {
+    const box = $('refBox');
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  }
+
+  // 初始化
+  convertHardness('mgL_CaCO3', 150);
+  convertAlk('mgL_CaCO3', 200);
+  convertPH('pH', 7.0);
+  convertN('mgL_N', 5);
+  convertP('mgL_P', 1.0);
+  convertSalinity('EC_uS', 1000);
+  convertIon('mgL', 100);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>堰流计算器 | 水处理工具箱</title>
+<style>
+  :root {
+    --brand: #0891b2;
+    --brand-dark: #0e7490;
+    --brand-light: #ecfeff;
+    --brand-border: #67e8f9;
+    --ink: #0f172a;
+    --text: #334155;
+    --text-muted: #64748b;
+    --text-faint: #94a3b8;
+    --bg: #ffffff;
+    --bg-soft: #f8fafc;
+    --bg-section: #f1f5f9;
+    --border: #e2e8f0;
+    --border-soft: #f1f5f9;
+  }
+  body {
+    background: var(--bg) !important;
+    padding: 0 !important;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* 统一顶部导航 */
+  .topbar {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .topbar-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none; color: var(--ink);
+  }
+  .brand-mark {
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+    border-radius: 8px;
+    display: grid; place-items: center;
+    color: #fff; font-weight: 700; font-size: 16px;
+    letter-spacing: -1px;
+    box-shadow: 0 2px 6px rgba(8, 145, 178, 0.25);
+  }
+  .brand-name {
+    font-weight: 600; font-size: 16.5px;
+    color: var(--ink); letter-spacing: -0.2px;
+  }
+  .brand-sub {
+    font-size: 11px; color: var(--text-faint); margin-top: 1px;
+  }
+  .nav-links {
+    display: flex; gap: 24px; font-size: 14px; align-items: center;
+  }
+  .nav-links a {
+    color: var(--text); text-decoration: none;
+    transition: color 0.15s; font-weight: 500;
+  }
+  .nav-links a:hover { color: var(--brand); }
+  .nav-links a.back::before {
+    content: "←"; margin-right: 4px; color: var(--brand);
+  }
+  @media (max-width: 640px) {
+    .nav-links { gap: 16px; font-size: 13px; }
+    .nav-links a:not(.back) { display: none; }
+    .topbar-inner { padding: 12px 20px; }
+    .brand-name { font-size: 15px; }
+    .brand-sub { display: none; }
+  }
+
+  /* 面包屑 */
+  .breadcrumb {
+    max-width: 820px; margin: 0 auto;
+    padding: 20px 16px 0;
+    font-size: 12.5px; color: var(--text-muted);
+  }
+  .breadcrumb a {
+    color: var(--text-muted); text-decoration: none;
+    transition: color 0.15s;
+  }
+  .breadcrumb a:hover { color: var(--brand); }
+  .breadcrumb .sep { margin: 0 8px; color: var(--text-faint); }
+  .breadcrumb .current { color: var(--ink); font-weight: 500; }
+
+  /* 主体外壳 */
+  .main-wrap { flex: 1; padding: 16px; }
+
+  /* 统一页脚 */
+  .site-footer {
+    background: var(--bg-section);
+    border-top: 1px solid var(--border);
+    padding: 56px 32px 32px;
+    margin-top: 40px;
+  }
+  .footer-inner { max-width: 1280px; margin: 0 auto; }
+  .footer-main {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
+    gap: 40px;
+    padding-bottom: 32px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  @media (max-width: 720px) {
+    .footer-main { grid-template-columns: 1fr 1fr; gap: 28px; }
+  }
+  .footer-about-col .brand { margin-bottom: 14px; }
+  .footer-col h4 {
+    font-size: 11.5px; letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-muted); font-weight: 600;
+    margin-bottom: 14px;
+  }
+  .footer-col ul {
+    list-style: none; display: flex;
+    flex-direction: column; gap: 8px;
+  }
+  .footer-col li { font-size: 13px; color: var(--text); }
+  .footer-col a {
+    font-size: 13px; color: var(--text);
+    text-decoration: none; transition: color 0.15s;
+  }
+  .footer-col a:hover { color: var(--brand); }
+  .footer-about {
+    font-size: 13px; color: var(--text-muted);
+    line-height: 1.7; max-width: 340px;
+  }
+  .footer-bottom {
+    display: flex; justify-content: space-between;
+    align-items: center; font-size: 12px;
+    color: var(--text-muted);
+    flex-wrap: wrap; gap: 10px;
+  }
+  .footer-bottom a {
+    color: inherit; text-decoration: underline;
+    text-decoration-color: var(--border);
+    text-underline-offset: 2px;
+  }
+  .footer-bottom a:hover { color: var(--brand); }
+
+  /* 工具内部的小footer */
+  .tool-inner-footer {
+    text-align: center;
+    padding: 16px;
+    font-size: 12px;
+    color: #9ca3af;
+  }
+
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f5f7fa;
+    color: #1f2937;
+    line-height: 1.6;
+    padding: 16px;
+  }
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    overflow: hidden;
+  }
+  header.tool-header {
+    background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
+    color: #fff;
+    padding: 24px 24px 20px;
+  }
+  header.tool-header h1 { font-size: 22px; margin-bottom: 6px; }
+  header.tool-header p { font-size: 13px; opacity: 0.9; }
+  .body { padding: 24px; }
+
+  /* 堰型切换 */
+  .weir-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+    padding: 4px;
+    background: #f1f5f9;
+    border-radius: 10px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .weir-tabs::-webkit-scrollbar { display: none; }
+  .weir-tab {
+    flex: 1;
+    min-width: 100px;
+    padding: 12px 10px;
+    text-align: center;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    color: #64748b;
+    transition: all 0.15s;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .weir-tab.active {
+    background: #fff;
+    color: #0891b2;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+
+  /* 模式切换 */
+  .mode-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 20px;
+    padding: 4px;
+    background: #eff6ff;
+    border: 1px solid #dbeafe;
+    border-radius: 10px;
+  }
+  .mode-tab {
+    flex: 1;
+    padding: 10px 6px;
+    text-align: center;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    font-size: 12.5px;
+    cursor: pointer;
+    color: #64748b;
+    transition: all 0.15s;
+    font-weight: 500;
+  }
+  .mode-tab.active {
+    background: #3b82f6;
+    color: #fff;
+  }
+
+  .section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #0e7490;
+    margin: 18px 0 10px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #e0f2fe;
+  }
+  .section-title:first-child { margin-top: 0; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+  }
+  .field { display: flex; flex-direction: column; }
+  .field label {
+    font-size: 13px;
+    color: #4b5563;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .field .unit { color: #9ca3af; font-size: 12px; font-weight: normal; }
+  .field input, .field select {
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 15px;
+    background: #fff;
+    transition: border-color 0.15s;
+  }
+  .field input:focus, .field select:focus {
+    outline: none;
+    border-color: #0891b2;
+    box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
+  }
+  .field input:disabled {
+    background: #f3f4f6;
+    color: #9ca3af;
+    cursor: not-allowed;
+  }
+  .field.solve-for input {
+    background: #fef3c7;
+    border-color: #f59e0b;
+    font-weight: 600;
+    color: #92400e;
+  }
+  .field .helper {
+    font-size: 11.5px;
+    color: #059669;
+    margin-top: 4px;
+  }
+
+  /* 堰型示意图 */
+  .weir-viz {
+    display: flex;
+    justify-content: center;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 10px;
+    margin-bottom: 16px;
+  }
+  .weir-viz svg { max-width: 100%; height: auto; }
+
+  /* 淹没开关 */
+  .toggle-section {
+    background: #fefce8;
+    padding: 12px 14px;
+    border-radius: 8px;
+    margin-bottom: 14px;
+    border-left: 3px solid #eab308;
+  }
+  .toggle-section label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 13.5px;
+    color: #854d0e;
+    font-weight: 500;
+  }
+
+  /* 结果 */
+  .results {
+    margin-top: 24px;
+    padding: 20px;
+    background: linear-gradient(135deg, #ecfeff 0%, #f0f9ff 100%);
+    border-radius: 10px;
+    border-left: 4px solid #0891b2;
+  }
+  .results h2 { font-size: 16px; color: #0e7490; margin-bottom: 14px; }
+  .result-group { margin-bottom: 16px; }
+  .result-group-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #0e7490;
+    margin-bottom: 8px;
+    padding: 4px 10px;
+    background: #cffafe;
+    border-radius: 4px;
+    display: inline-block;
+  }
+  .result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 9px 0;
+    border-bottom: 1px dashed #bae6fd;
+    gap: 10px;
+  }
+  .result-row:last-child { border-bottom: none; }
+  .result-label { color: #4b5563; font-size: 13.5px; }
+  .result-value {
+    font-size: 19px;
+    font-weight: 600;
+    color: #0891b2;
+    font-variant-numeric: tabular-nums;
+  }
+  .result-value.big { font-size: 23px; color: #0e7490; }
+  .result-unit { color: #6b7280; font-size: 13px; margin-left: 4px; font-weight: normal; }
+  .highlight-row {
+    background: #ecfeff;
+    padding: 10px 12px !important;
+    border-radius: 6px;
+    border: 1px solid #67e8f9;
+    border-bottom: 1px solid #67e8f9 !important;
+  }
+
+  /* 校核提示 */
+  .check-box {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 13.5px;
+  }
+  .check-ok { background: #dcfce7; color: #166534; border-left: 3px solid #22c55e; }
+  .check-warn { background: #fef3c7; color: #92400e; border-left: 3px solid #f59e0b; }
+  .check-bad { background: #fee2e2; color: #991b1b; border-left: 3px solid #ef4444; }
+  .check-info { background: #dbeafe; color: #1e40af; border-left: 3px solid #3b82f6; }
+
+  /* 公式 */
+  .formula-box {
+    margin-top: 20px;
+    padding: 16px;
+    background: #fafafa;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #4b5563;
+  }
+  .formula-box h3 { font-size: 14px; color: #374151; margin: 14px 0 8px; }
+  .formula-box h3:first-child { margin-top: 0; }
+  .formula-box code {
+    display: block;
+    padding: 8px 12px;
+    background: #fff;
+    border-radius: 4px;
+    border: 1px solid #e5e7eb;
+    margin: 6px 0;
+    font-family: "SF Mono", Consolas, monospace;
+    font-size: 12.5px;
+    color: #0e7490;
+    overflow-x: auto;
+  }
+  .formula-box p { margin: 6px 0; font-size: 12.5px; }
+  .formula-box table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12px; }
+  .formula-box th, .formula-box td {
+    padding: 6px 10px; text-align: left; border-bottom: 1px solid #e5e7eb;
+  }
+  .formula-box th { background: #f1f5f9; color: #374151; }
+
+  .buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    flex: 1;
+    min-width: 120px;
+    padding: 11px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 500;
+  }
+  .btn-primary { background: #0891b2; color: #fff; }
+  .btn-primary:hover { background: #0e7490; }
+  .btn-secondary { background: #e5e7eb; color: #374151; }
+  .btn-secondary:hover { background: #d1d5db; }
+
+  .note {
+    margin-top: 16px;
+    padding: 12px;
+    background: #fef3c7;
+    border-radius: 8px;
+    font-size: 12.5px;
+    color: #92400e;
+    border-left: 3px solid #f59e0b;
+  }
+  footer {
+    text-align: center;
+    padding: 16px;
+    font-size: 12px;
+    color: #9ca3af;
+  }
+  @media (max-width: 480px) {
+    .main-wrap { padding: 8px; }
+    ..main-wrap { padding: 16px; }
+    header.tool-header { padding: 18px; }
+    header.tool-header h1 { font-size: 19px; }
+    .result-value { font-size: 17px; }
+    .result-value.big { font-size: 20px; }
+    .weir-tab, .mode-tab { font-size: 11.5px; }
+  }
+</style>
+</head>
+<body>
+
+
+<!-- 统一顶部导航 -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="brand">
+      <div class="brand-mark">W</div>
+      <div>
+        <div class="brand-name">水处理工具箱</div>
+        <div class="brand-sub">WaterKit · by 登登科技</div>
+      </div>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html" class="back">返回首页</a>
+      <a href="index.html#cat-hydraulics">水力计算</a>
+      <a href="https://dengdengtech.cn" target="_blank" rel="noopener">登登科技</a>
+    </nav>
+  </div>
+</header>
+
+<!-- 面包屑 -->
+<div class="breadcrumb">
+  <a href="index.html">首页</a>
+  <span class="sep">/</span>
+  <a href="index.html#cat-hydraulics">水力计算</a>
+  <span class="sep">/</span>
+  <span class="current">堰流计算</span>
+</div>
+
+<main class="main-wrap">
+
+<div class="container">
+  <header class="tool-header">
+    <h1>🌊 堰流计算器</h1>
+    <p>矩形 / 三角 / 梯形(Cipoletti) / 宽顶 四种堰型 · 自由与淹没出流 · 量水应用</p>
+  </header>
+
+  <div class="body">
+
+    <!-- 堰型选择 -->
+    <div class="section-title">① 堰型选择</div>
+    <div class="weir-tabs">
+      <button class="weir-tab active" data-type="rect" onclick="setWeir('rect')">矩形薄壁堰</button>
+      <button class="weir-tab" data-type="tri" onclick="setWeir('tri')">三角堰（V形）</button>
+      <button class="weir-tab" data-type="trap" onclick="setWeir('trap')">梯形堰（Cipoletti）</button>
+      <button class="weir-tab" data-type="broad" onclick="setWeir('broad')">宽顶堰</button>
+    </div>
+
+    <!-- 示意图 -->
+    <div class="weir-viz">
+      <svg id="vizSvg" width="340" height="180" viewBox="0 0 340 180" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+
+    <!-- 求解模式 -->
+    <div class="section-title">② 求解目标</div>
+    <div class="mode-tabs">
+      <button class="mode-tab active" data-mode="Q" onclick="setMode('Q')">已知 H 求 Q</button>
+      <button class="mode-tab" data-mode="H" onclick="setMode('H')">已知 Q 求 H</button>
+    </div>
+
+    <!-- 参数 -->
+    <div class="section-title">③ 堰参数</div>
+    <div class="grid">
+
+      <!-- 矩形堰参数 -->
+      <div class="field weir-rect weir-trap weir-broad">
+        <label>堰宽 b <span class="unit">m</span></label>
+        <input type="number" id="b" value="1.0" step="0.1">
+      </div>
+
+      <!-- 三角堰参数 -->
+      <div class="field weir-tri" style="display:none;">
+        <label>顶角 θ <span class="unit">°</span></label>
+        <select id="theta" onchange="calc()">
+          <option value="90" selected>90° (标准)</option>
+          <option value="60">60°</option>
+          <option value="45">45°</option>
+          <option value="30">30°</option>
+          <option value="120">120°</option>
+        </select>
+      </div>
+
+      <!-- 梯形堰说明（Cipoletti 固定1:4边坡） -->
+      <div class="field weir-trap" style="display:none;">
+        <label>边坡 <span class="unit">1:4 (Cipoletti)</span></label>
+        <input type="text" value="1:4 (固定)" disabled>
+      </div>
+
+      <!-- 宽顶堰宽度（堰顶长度 δ） -->
+      <div class="field weir-broad" style="display:none;">
+        <label>堰顶长度 δ <span class="unit">m</span></label>
+        <input type="number" id="delta" value="1.5" step="0.1">
+      </div>
+
+      <!-- 共用:水头H -->
+      <div class="field" id="f_H">
+        <label>堰上水头 H <span class="unit">m</span></label>
+        <input type="number" id="H" value="0.3" step="0.01">
+        <div class="helper">上游水面超过堰顶的高度</div>
+      </div>
+
+      <!-- 共用:流量Q -->
+      <div class="field" id="f_Q">
+        <label>流量 Q <span class="unit">m³/s</span></label>
+        <input type="number" id="Q" value="0.4" step="0.05">
+      </div>
+
+      <!-- 堰高P -->
+      <div class="field">
+        <label>堰高 P <span class="unit">m</span></label>
+        <input type="number" id="P" value="0.5" step="0.1">
+        <div class="helper">上游渠底到堰顶的高度</div>
+      </div>
+
+      <!-- 上游渠宽 -->
+      <div class="field weir-rect weir-trap weir-broad">
+        <label>上游渠宽 B <span class="unit">m</span></label>
+        <input type="number" id="B" value="2.0" step="0.1">
+        <div class="helper">B ≥ b,B = b 时为无侧收缩</div>
+      </div>
+    </div>
+
+    <!-- 淹没出流 -->
+    <div class="toggle-section">
+      <label>
+        <input type="checkbox" id="submerged" onchange="toggleSubmerged()">
+        <span>开启淹没出流修正（下游水位高于堰顶）</span>
+      </label>
+      <div class="grid" id="submerged_params" style="display:none; margin-top:10px;">
+        <div class="field">
+          <label>下游水深 h_s <span class="unit">m</span></label>
+          <input type="number" id="hs" value="0.1" step="0.05">
+          <div class="helper">下游水面到堰顶的高度</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 结果 -->
+    <div class="results">
+      <h2>计算结果</h2>
+
+      <div class="result-group">
+        <div class="result-group-title">核心结果</div>
+        <div class="result-row highlight-row">
+          <span class="result-label"><b>流量 Q</b></span>
+          <span><span class="result-value big" id="r_Q">—</span><span class="result-unit">m³/s</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">流量 Q（常用单位）</span>
+          <span><span class="result-value" id="r_Q_h">—</span><span class="result-unit">m³/h</span></span>
+        </div>
+        <div class="result-row highlight-row">
+          <span class="result-label"><b>堰上水头 H</b></span>
+          <span><span class="result-value big" id="r_H">—</span><span class="result-unit">m</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">堰顶水深（= H）</span>
+          <span><span class="result-value" id="r_H2">—</span><span class="result-unit">mm</span></span>
+        </div>
+      </div>
+
+      <div class="result-group">
+        <div class="result-group-title">水力参数</div>
+        <div class="result-row">
+          <span class="result-label">流量系数 m₀ / C_d</span>
+          <span><span class="result-value" id="r_m0">—</span><span class="result-unit">—</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">侧收缩系数 ε</span>
+          <span><span class="result-value" id="r_eps">—</span><span class="result-unit">—</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">淹没系数 σ</span>
+          <span><span class="result-value" id="r_sigma">—</span><span class="result-unit">—</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">堰口流速 v</span>
+          <span><span class="result-value" id="r_v">—</span><span class="result-unit">m/s</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">上游行近流速 v₀</span>
+          <span><span class="result-value" id="r_v0">—</span><span class="result-unit">m/s</span></span>
+        </div>
+      </div>
+
+      <div class="result-group">
+        <div class="result-group-title">适用性校核</div>
+        <div class="check-box" id="check_H">校核中...</div>
+        <div class="check-box" id="check_sub">校核中...</div>
+      </div>
+    </div>
+
+    <div class="buttons">
+      <button class="btn btn-primary" onclick="copyResults()">📋 复制结果</button>
+      <button class="btn btn-secondary" onclick="resetDefaults()">🔄 恢复默认</button>
+      <button class="btn btn-secondary" onclick="toggleFormula()">📖 查看公式</button>
+    </div>
+
+    <div class="formula-box" id="formulaBox" style="display:none;">
+      <h3>① 矩形薄壁堰（Rehbock 公式）</h3>
+      <p><strong>自由出流基本式</strong>：</p>
+      <code>Q = m₀ · ε · σ · b · √(2g) · H^(3/2)</code>
+      <p>其中 m₀ 为流量系数,ε 为侧收缩系数,σ 为淹没系数（自由出流时=1）。</p>
+      <p><strong>Rehbock 流量系数</strong>（无侧收缩,B=b）：</p>
+      <code>m₀ = 0.403 + 0.053 · H/P + 0.0007/H</code>
+      <p>适用条件：0.03 ≤ H ≤ 0.75 m;H/P ≤ 5;P ≥ 0.1 m。</p>
+      <p><strong>有侧收缩（B &gt; b）</strong>：采用 Francis 修正 或 ε 系数,工具中取：</p>
+      <code>ε = 1 − 0.1·n·H/b（n 为每边收缩数）</code>
+
+      <h3>② 三角堰（V形堰,Kindsvater-Shen）</h3>
+      <code>Q = (8/15) · C_d · tan(θ/2) · √(2g) · H^(5/2)</code>
+      <p>90° 三角堰是量水最常用的（小流量精度高）。C_d ≈ 0.585（标准 Thomson 公式）。</p>
+      <code>Q = 1.4 · H^(5/2)   (90° 简化式, Q m³/s, H m)</code>
+      <p>适用：0.05 ≤ H ≤ 0.38 m; P ≥ 2H; 上游渠宽 ≥ 3H。</p>
+
+      <h3>③ 梯形堰 Cipoletti（边坡 1:4）</h3>
+      <p>特点：侧边向外倾斜，补偿侧收缩损失，流量系数近似为常数。</p>
+      <code>Q = 1.86 · b · H^(3/2)   (Cipoletti 公式)</code>
+      <p>即 m₀ ≈ 0.42,ε ≈ 1.0（自动补偿）。适用：0.06 ≤ H ≤ 0.60 m;b ≥ 3H;P ≥ 2H。</p>
+
+      <h3>④ 宽顶堰</h3>
+      <code>Q = m · b · √(2g) · H₀^(3/2)</code>
+      <p>其中 H₀ = H + v₀²/(2g) 为包含行近流速头的全水头,m 为流量系数:</p>
+      <table>
+        <tr><th>δ/H</th><th>堰顶边缘形式</th><th>m 值</th></tr>
+        <tr><td>2.5-4</td><td>直角边</td><td>0.32-0.35</td></tr>
+        <tr><td>2.5-4</td><td>圆角修圆</td><td>0.36-0.385</td></tr>
+        <tr><td>2.5-10</td><td>一般宽顶堰</td><td>0.32-0.36</td></tr>
+      </table>
+      <p>本工具按 δ/H 判别,默认取 0.36（圆角修圆）。</p>
+
+      <h3>⑤ 淹没出流修正</h3>
+      <p>当下游水位 h_s &gt; 0（下游水面高于堰顶）时:</p>
+      <code>h_s / H_0 &gt; 0.15（宽顶堰） 或 h_s/H &gt; 临界值（薄壁堰）,进入淹没状态</code>
+      <p>淹没系数 σ 查表或用经验公式计算,本工具采用:</p>
+      <code>σ = (1 − (h_s/H)ⁿ)^0.5    (简化经验式)</code>
+
+      <h3>⑥ 常见应用场景</h3>
+      <table>
+        <tr><th>应用</th><th>推荐堰型</th><th>理由</th></tr>
+        <tr><td>水厂进水量测量</td><td>矩形堰 / 宽顶堰</td><td>流量大,H 变化范围适中</td></tr>
+        <tr><td>小流量实验室量水</td><td>90° 三角堰</td><td>Q ∝ H^2.5,小流量灵敏度极高</td></tr>
+        <tr><td>明渠量水</td><td>Cipoletti 梯形堰</td><td>流量公式简单,无需侧收缩修正</td></tr>
+        <tr><td>溢流坝 / 溢洪道</td><td>宽顶堰 / 实用堰</td><td>过流能力大,结构稳定</td></tr>
+        <tr><td>污水厂出水计量</td><td>矩形堰 + 超声波液位计</td><td>工程成熟,精度 ±3%</td></tr>
+      </table>
+    </div>
+
+    <div class="note">
+      ⚠️ 本工具用于工程估算与量水堰选型,实际测量精度需堰板加工、上游平直段长度、水面波动、液位计精度共同保证。现场安装须满足各堰型的适用条件（H 范围、P 值、B/b 比值等）。
+    </div>
+
+  </div>
+
+  <footer class="tool-inner-footer">水处理工具箱 · 仅供工程估算参考</footer>
+</div>
+</main>
+
+<!-- 统一页脚 -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-main">
+      <div class="footer-col footer-about-col">
+        <a href="index.html" class="brand">
+          <div class="brand-mark">W</div>
+          <div>
+            <div class="brand-name">水处理工具箱</div>
+            <div class="brand-sub">WaterKit · by 登登科技</div>
+          </div>
+        </a>
+        <p class="footer-about">水处理工具箱(WaterKit)是海南登登科技咨询有限公司推出的水处理在线计算工具集合,由一线水处理工艺工程师开发维护。免费、无广告、持续更新。</p>
+      </div>
+      <div class="footer-col">
+        <h4>水力计算</h4>
+        <ul>
+          <li><a href="pipe-hydraulic-calculator.html">管道水力</a></li>
+          <li><a href="open-channel-calculator.html">明渠水力</a></li>
+          <li><a href="weir-flow-calculator.html">堰流计算</a></li>
+          <li><a href="orifice-nozzle-calculator.html">孔口出流</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>工艺与设备</h4>
+        <ul>
+          <li><a href="aeration-calculator.html">曝气量</a></li>
+          <li><a href="sludge-production-calculator.html">污泥产量</a></li>
+          <li><a href="dosing-calculator.html">加药量</a></li>
+          <li><a href="pump-selection-calculator.html">水泵选型</a></li>
+          <li><a href="water-quality-unit-converter.html">水质换算</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="https://dengdengtech.cn" target="_blank" rel="noopener">登登科技官网 ↗</a></li>
+          <li>海南登登科技咨询</li>
+          <li>有限公司</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Open Source</h4>
+        <ul>
+          <li><a href="https://github.com/chengsunmail/waterkit" target="_blank" rel="noopener">GitHub 仓库 ↗</a></li>
+          <li><a href="https://github.com/chengsunmail/waterkit/blob/main/LICENSE" target="_blank" rel="noopener">AGPL-3.0 协议</a></li>
+          <li><a href="https://github.com/chengsunmail/waterkit/issues" target="_blank" rel="noopener">反馈 Issue</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 海南登登科技咨询有限公司 · <a href="https://dengdengtech.cn" target="_blank" rel="noopener">dengdengtech.cn</a></span>
+      <span>WaterKit · V 1.0 · <a href="https://github.com/chengsunmail/waterkit" target="_blank" rel="noopener">开源于 GitHub</a></span>
+    </div>
+  </div>
+</footer>
+
+
+
+<script>
+  const $ = id => document.getElementById(id);
+  const num = id => parseFloat($(id).value) || 0;
+  const g = 9.81;
+
+  let weir = 'rect';
+  let mode = 'Q';
+
+  function setWeir(w) {
+    weir = w;
+    document.querySelectorAll('.weir-tab').forEach(t => t.classList.remove('active'));
+    document.querySelector(`[data-type="${w}"]`).classList.add('active');
+
+    // 控制字段显示
+    document.querySelectorAll('.weir-rect').forEach(el => el.style.display = (w==='rect') ? '' : 'none');
+    document.querySelectorAll('.weir-tri').forEach(el => el.style.display = (w==='tri') ? '' : 'none');
+    document.querySelectorAll('.weir-trap').forEach(el => el.style.display = (w==='trap') ? '' : 'none');
+    document.querySelectorAll('.weir-broad').forEach(el => el.style.display = (w==='broad') ? '' : 'none');
+
+    drawWeir();
+    calc();
+  }
+
+  function setMode(m) {
+    mode = m;
+    document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+    document.querySelector(`[data-mode="${m}"]`).classList.add('active');
+    ['Q','H'].forEach(f => {
+      $(f).disabled = false;
+      $('f_'+f).classList.remove('solve-for');
+    });
+    $(mode).disabled = true;
+    $('f_'+mode).classList.add('solve-for');
+    calc();
+  }
+
+  function toggleSubmerged() {
+    const en = $('submerged').checked;
+    $('submerged_params').style.display = en ? 'grid' : 'none';
+    calc();
+  }
+
+  // ============ 流量计算（自由出流） ============
+  function Q_free(H) {
+    if (H <= 0) return {Q:0, m0:0, eps:1, v:0};
+
+    if (weir === 'rect') {
+      const b = num('b'), B = num('B'), P = num('P');
+      // Rehbock 流量系数
+      const m0 = 0.403 + 0.053 * H / Math.max(P, 0.001) + 0.0007 / Math.max(H, 0.001);
+      // 侧收缩
+      let eps = 1;
+      if (B > b) {
+        // Francis 经验:ε = 1 - 0.1·n·H/b, n=2(两侧收缩)
+        eps = Math.max(0.5, 1 - 0.1 * 2 * H / Math.max(b, 0.001));
+      }
+      const Q = m0 * eps * b * Math.sqrt(2*g) * Math.pow(H, 1.5);
+      const v = b > 0 ? Q / (b * H) : 0;
+      return {Q, m0, eps, v};
+    }
+
+    if (weir === 'tri') {
+      const theta = num('theta') * Math.PI / 180;
+      const Cd = 0.585;  // 标准三角堰
+      const Q = (8/15) * Cd * Math.tan(theta/2) * Math.sqrt(2*g) * Math.pow(H, 2.5);
+      // 流速按等效矩形估算
+      const area_eq = Math.tan(theta/2) * H * H;
+      const v = area_eq > 0 ? Q / area_eq : 0;
+      return {Q, m0: Cd, eps: 1, v};
+    }
+
+    if (weir === 'trap') {
+      // Cipoletti
+      const b = num('b');
+      const Q = 1.86 * b * Math.pow(H, 1.5);
+      const m0 = 0.42;
+      const eps = 1;
+      // 水面宽 = b + 2·(1/4)·H = b + H/2
+      const area = (b + H/4) * H;
+      const v = area > 0 ? Q / area : 0;
+      return {Q, m0, eps, v};
+    }
+
+    if (weir === 'broad') {
+      const b = num('b'), delta = num('delta'), B = num('B'), P = num('P');
+      // 流量系数按 δ/H 判断
+      let m0;
+      const ratio = delta / Math.max(H, 0.001);
+      if (ratio < 2) m0 = 0.36;
+      else if (ratio < 4) m0 = 0.36;
+      else if (ratio < 10) m0 = 0.34;
+      else m0 = 0.32;
+
+      // 考虑行近流速:迭代求解
+      let H0 = H, v0 = 0;
+      for (let k = 0; k < 10; k++) {
+        const Q_tmp = m0 * b * Math.sqrt(2*g) * Math.pow(H0, 1.5);
+        v0 = B > 0 && (P+H) > 0 ? Q_tmp / (B * (P + H)) : 0;
+        H0 = H + v0*v0/(2*g);
+      }
+      // 侧收缩
+      let eps = 1;
+      if (B > b) eps = Math.max(0.7, 1 - 0.1 * 2 * H / Math.max(b, 0.001));
+
+      const Q = m0 * eps * b * Math.sqrt(2*g) * Math.pow(H0, 1.5);
+      const v = b > 0 ? Q / (b * H) : 0;
+      return {Q, m0, eps, v, v0, H0};
+    }
+
+    return {Q:0, m0:0, eps:1, v:0};
+  }
+
+  // 淹没系数
+  function submergenceSigma(H) {
+    if (!$('submerged').checked) return 1;
+    const hs = num('hs');
+    if (hs <= 0) return 1;
+    if (hs >= H) return 0.1; // 严重淹没
+    // 简化经验式
+    const ratio = hs / H;
+    return Math.sqrt(Math.max(0.1, 1 - Math.pow(ratio, 3)));
+  }
+
+  // 已知 Q 求 H（二分法）
+  function H_from_Q(Q_target) {
+    let lo = 0.001, hi = 3.0;
+    for (let k = 0; k < 80; k++) {
+      const mid = (lo + hi) / 2;
+      const r = Q_free(mid);
+      const sigma = submergenceSigma(mid);
+      const q = r.Q * sigma;
+      if (q < Q_target) lo = mid; else hi = mid;
+      if (hi - lo < 1e-6) break;
+    }
+    return (lo + hi) / 2;
+  }
+
+  // ============ 绘制示意图 ============
+  function drawWeir() {
+    const svg = $('vizSvg');
+    const W = 340, H = 180;
+    const blue = '#0e7490', water = '#7dd3fc', dark = '#333';
+    let content = `
+      <defs>
+        <pattern id="wavesB" patternUnits="userSpaceOnUse" width="8" height="8">
+          <path d="M0,4 Q2,2 4,4 T8,4" fill="none" stroke="#0891b2" stroke-width="0.5" opacity="0.3"/>
+        </pattern>
+      </defs>
+    `;
+
+    // 通用尺寸
+    const cx = 170, cy = 150; // 堰顶位置参考点
+    const Ps = 50, Hs = 32;   // 堰高和水头的像素高度
+    const beforeX = 20, afterX = 320;
+
+    if (weir === 'rect' || weir === 'trap' || weir === 'broad') {
+      // 侧视图:上游水流→堰板→下游
+      const weirTop = cy - Ps;
+      const upWater = weirTop - Hs;
+
+      // 渠底
+      content += `<line x1="${beforeX}" y1="${cy}" x2="${afterX}" y2="${cy}" stroke="${dark}" stroke-width="1.5"/>`;
+
+      // 堰板
+      let weirWidth = 6;
+      if (weir === 'broad') weirWidth = 40;
+      content += `<rect x="${cx - weirWidth/2}" y="${weirTop}" width="${weirWidth}" height="${Ps}" fill="#d4d4d4" stroke="${dark}" stroke-width="1.5"/>`;
+
+      // 上游水面
+      content += `<path d="M ${beforeX} ${upWater} L ${cx - weirWidth/2} ${upWater} L ${cx - weirWidth/2} ${cy} L ${beforeX} ${cy} Z" fill="url(#wavesB)" stroke="${blue}" stroke-width="1"/>`;
+
+      // 水流从堰顶落下（曲线）
+      content += `<path d="M ${cx + weirWidth/2} ${weirTop} Q ${cx + weirWidth/2 + 25} ${weirTop + 10} ${cx + weirWidth/2 + 60} ${cy}" stroke="${blue}" stroke-width="1.5" fill="none"/>`;
+      content += `<path d="M ${cx + weirWidth/2} ${weirTop + 5} Q ${cx + weirWidth/2 + 20} ${weirTop + 15} ${cx + weirWidth/2 + 50} ${cy}" stroke="${blue}" stroke-width="1" fill="none" opacity="0.5"/>`;
+
+      // 淹没水位
+      if ($('submerged').checked) {
+        const hs_val = num('hs');
+        const H_val = num('H');
+        const hs_px = Math.min(Hs * hs_val / Math.max(H_val, 0.01), Hs - 3);
+        const downWater = weirTop + hs_px > weirTop ? weirTop - hs_px : cy;
+        content += `<line x1="${cx+weirWidth/2}" y1="${weirTop-hs_px}" x2="${afterX}" y2="${weirTop-hs_px}" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="3,3"/>`;
+        content += `<text x="${afterX-50}" y="${weirTop-hs_px - 5}" font-size="10" fill="#ef4444">h_s</text>`;
+      }
+
+      // 标注
+      content += `<text x="${cx - weirWidth/2 - 30}" y="${(upWater+weirTop)/2+4}" font-size="11" fill="${blue}">H</text>`;
+      content += `<line x1="${cx - weirWidth/2 - 8}" y1="${upWater}" x2="${cx - weirWidth/2 - 8}" y2="${weirTop}" stroke="${blue}" stroke-width="0.8"/>`;
+      content += `<text x="${cx - weirWidth/2 - 25}" y="${(weirTop+cy)/2+4}" font-size="11" fill="${dark}">P</text>`;
+      content += `<line x1="${cx - weirWidth/2 - 8}" y1="${weirTop}" x2="${cx - weirWidth/2 - 8}" y2="${cy}" stroke="${dark}" stroke-width="0.8"/>`;
+
+      // 堰型标注
+      if (weir === 'rect') content += `<text x="${cx - weirWidth/2 + 2}" y="${weirTop - 8}" font-size="10" fill="${dark}">矩形薄壁</text>`;
+      if (weir === 'trap') content += `<text x="${cx - weirWidth/2 - 5}" y="${weirTop - 8}" font-size="10" fill="${dark}">Cipoletti</text>`;
+      if (weir === 'broad') content += `<text x="${cx - 15}" y="${weirTop - 4}" font-size="10" fill="${dark}">δ</text>`;
+
+      // 来流箭头
+      content += `<path d="M ${beforeX + 10} ${(upWater+cy)/2} L ${beforeX + 30} ${(upWater+cy)/2}" stroke="${blue}" stroke-width="1.5" marker-end="url(#arrBlue)"/>`;
+
+      // 定义箭头
+      content += `<defs><marker id="arrBlue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="${blue}"/></marker></defs>`;
+    }
+
+    if (weir === 'tri') {
+      // 三角堰是正视图
+      const triTop = 50, triBottom = 130;
+      const triCenter = 170;
+      const theta = num('theta') * Math.PI / 180;
+      const halfW = (triBottom - triTop) * Math.tan(theta/2);
+
+      // 背景渠道
+      content += `<rect x="${triCenter - 110}" y="${triTop - 20}" width="220" height="${triBottom - triTop + 50}" fill="none" stroke="#999" stroke-width="1"/>`;
+
+      // 渠底
+      content += `<line x1="${triCenter - 110}" y1="${triBottom + 30}" x2="${triCenter + 110}" y2="${triBottom + 30}" stroke="${dark}" stroke-width="1.5"/>`;
+
+      // 堰板整体
+      content += `<rect x="${triCenter - 110}" y="${triTop - 20}" width="220" height="${triBottom - triTop + 50}" fill="#e5e5e5" stroke="${dark}" stroke-width="1.5"/>`;
+
+      // 水面
+      const waterY = triTop + 10;
+      content += `<line x1="${triCenter - 100}" y1="${waterY}" x2="${triCenter + 100}" y2="${waterY}" stroke="${blue}" stroke-width="1.5" stroke-dasharray="3,2"/>`;
+
+      // V形缺口
+      const notchPath = `M ${triCenter - halfW} ${triTop} L ${triCenter} ${triBottom} L ${triCenter + halfW} ${triTop} L ${triCenter + halfW + 10} ${triTop} L ${triCenter + halfW + 10} ${triTop - 30} L ${triCenter - halfW - 10} ${triTop - 30} L ${triCenter - halfW - 10} ${triTop} Z`;
+      content += `<path d="${notchPath}" fill="#e5e5e5" stroke="${dark}" stroke-width="1.5"/>`;
+
+      // 水面和V形之间的水
+      const fillH_px = triTop + 20;  // 示意水面在V形上方
+      content += `<path d="M ${triCenter - halfW*0.4} ${triTop + 30} L ${triCenter} ${triBottom} L ${triCenter + halfW*0.4} ${triTop + 30} Z" fill="url(#wavesB)"/>`;
+
+      // 标注
+      content += `<text x="${triCenter - 5}" y="${triBottom + 15}" font-size="12" fill="${blue}">V</text>`;
+      content += `<text x="${triCenter + halfW + 20}" y="${triTop + 5}" font-size="11" fill="${dark}">θ = ${num('theta')}°</text>`;
+
+      // H 标注
+      content += `<text x="${triCenter - halfW - 25}" y="${(waterY+triBottom)/2}" font-size="11" fill="${blue}">H</text>`;
+      content += `<line x1="${triCenter - halfW - 18}" y1="${waterY}" x2="${triCenter - halfW - 18}" y2="${triBottom - 5}" stroke="${blue}" stroke-width="0.6" stroke-dasharray="2,2"/>`;
+    }
+
+    svg.innerHTML = content;
+  }
+
+  function calc() {
+    let H_val, Q_val;
+
+    if (mode === 'Q') {
+      H_val = num('H');
+      const r = Q_free(H_val);
+      const sigma = submergenceSigma(H_val);
+      Q_val = r.Q * sigma;
+      $('Q').value = Q_val.toFixed(4);
+
+      // 显示详细
+      $('r_m0').textContent = r.m0.toFixed(3);
+      $('r_eps').textContent = r.eps.toFixed(3);
+      $('r_sigma').textContent = sigma.toFixed(3);
+      $('r_v').textContent = r.v.toFixed(3);
+      $('r_v0').textContent = (r.v0 || 0).toFixed(3);
+    } else {
+      Q_val = num('Q');
+      H_val = H_from_Q(Q_val);
+      $('H').value = H_val.toFixed(4);
+
+      const r = Q_free(H_val);
+      const sigma = submergenceSigma(H_val);
+      $('r_m0').textContent = r.m0.toFixed(3);
+      $('r_eps').textContent = r.eps.toFixed(3);
+      $('r_sigma').textContent = sigma.toFixed(3);
+      $('r_v').textContent = r.v.toFixed(3);
+      $('r_v0').textContent = (r.v0 || 0).toFixed(3);
+    }
+
+    // 行近流速
+    const B = num('B'), P = num('P');
+    if (weir === 'rect' || weir === 'trap' || weir === 'broad') {
+      const area0 = B * (P + H_val);
+      const v0 = area0 > 0 ? Q_val / area0 : 0;
+      $('r_v0').textContent = v0.toFixed(3);
+    }
+
+    $('r_Q').textContent = Q_val.toFixed(4);
+    $('r_Q_h').textContent = (Q_val * 3600).toFixed(1);
+    $('r_H').textContent = H_val.toFixed(4);
+    $('r_H2').textContent = (H_val * 1000).toFixed(0);
+
+    // ============ 校核 ============
+    const ck1 = $('check_H');
+    const conditions = {
+      rect:   {min: 0.03, max: 0.75, name: '矩形薄壁堰'},
+      tri:    {min: 0.05, max: 0.38, name: '三角堰'},
+      trap:   {min: 0.06, max: 0.60, name: '梯形堰（Cipoletti）'},
+      broad:  {min: 0.10, max: 2.00, name: '宽顶堰'}
+    };
+    const c = conditions[weir];
+    if (H_val >= c.min && H_val <= c.max) {
+      ck1.className = 'check-box check-ok';
+      ck1.innerHTML = `✓ <b>堰上水头适用</b> · H = ${H_val.toFixed(3)} m,在${c.name}推荐范围 ${c.min}-${c.max} m 内。`;
+    } else if (H_val < c.min) {
+      ck1.className = 'check-box check-warn';
+      ck1.innerHTML = `⚠ <b>水头偏低</b> · H = ${H_val.toFixed(3)} m &lt; ${c.min} m,公式精度下降,建议选更小堰或三角堰。`;
+    } else {
+      ck1.className = 'check-box check-warn';
+      ck1.innerHTML = `⚠ <b>水头偏高</b> · H = ${H_val.toFixed(3)} m &gt; ${c.max} m,超出该堰型推荐范围,建议选宽顶堰或加大堰宽。`;
+    }
+
+    // 淹没校核
+    const ck2 = $('check_sub');
+    if (!$('submerged').checked) {
+      ck2.className = 'check-box check-info';
+      ck2.innerHTML = `ℹ <b>自由出流状态</b> · 下游水位低于堰顶,流量不受下游影响。若下游水位上升应启用淹没修正。`;
+    } else {
+      const hs_val = num('hs');
+      const ratio = H_val > 0 ? hs_val / H_val : 0;
+      if (ratio < 0.15) {
+        ck2.className = 'check-box check-ok';
+        ck2.innerHTML = `✓ <b>轻微淹没</b> · h_s/H = ${ratio.toFixed(3)} &lt; 0.15,淹没影响很小。`;
+      } else if (ratio < 0.7) {
+        ck2.className = 'check-box check-warn';
+        ck2.innerHTML = `⚠ <b>显著淹没</b> · h_s/H = ${ratio.toFixed(3)},流量已受下游影响,淹没系数 σ = ${submergenceSigma(H_val).toFixed(3)}。`;
+      } else {
+        ck2.className = 'check-box check-bad';
+        ck2.innerHTML = `✗ <b>深度淹没</b> · h_s/H = ${ratio.toFixed(3)} &gt; 0.7,堰失去量水功能,工程上不推荐此运行工况。`;
+      }
+    }
+
+    drawWeir();
+  }
+
+  function copyResults() {
+    const names = {rect:'矩形薄壁堰', tri:`${num('theta')}°三角堰`, trap:'Cipoletti梯形堰', broad:'宽顶堰'};
+    let params = '';
+    if (weir === 'rect') params = `堰宽 b = ${num('b')} m,上游渠宽 B = ${num('B')} m`;
+    else if (weir === 'tri') params = `顶角 θ = ${num('theta')}°`;
+    else if (weir === 'trap') params = `堰宽 b = ${num('b')} m,边坡 1:4`;
+    else if (weir === 'broad') params = `堰宽 b = ${num('b')} m,堰顶 δ = ${num('delta')} m`;
+
+    const txt = `堰流计算结果 · ${names[weir]}
+————————————————
+${params}
+堰高 P = ${num('P')} m
+
+流量 Q = ${$('r_Q').textContent} m³/s (${$('r_Q_h').textContent} m³/h)
+堰上水头 H = ${$('r_H').textContent} m (${$('r_H2').textContent} mm)
+
+流量系数 = ${$('r_m0').textContent}
+侧收缩系数 ε = ${$('r_eps').textContent}
+淹没系数 σ = ${$('r_sigma').textContent}
+堰口流速 = ${$('r_v').textContent} m/s`;
+    navigator.clipboard.writeText(txt).then(() => {
+      alert('结果已复制');
+    }).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = txt;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      alert('结果已复制');
+    });
+  }
+
+  function resetDefaults() { location.reload(); }
+
+  function toggleFormula() {
+    const box = $('formulaBox');
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  }
+
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('input', calc);
+    el.addEventListener('change', calc);
+  });
+
+  // 初始化
+  setWeir('rect');
+  setMode('Q');
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>明渠水力计算器 | 水处理工具箱</title>
+<style>
+  :root {
+    --brand: #0891b2;
+    --brand-dark: #0e7490;
+    --brand-light: #ecfeff;
+    --brand-border: #67e8f9;
+    --ink: #0f172a;
+    --text: #334155;
+    --text-muted: #64748b;
+    --text-faint: #94a3b8;
+    --bg: #ffffff;
+    --bg-soft: #f8fafc;
+    --bg-section: #f1f5f9;
+    --border: #e2e8f0;
+    --border-soft: #f1f5f9;
+  }
+  body {
+    background: var(--bg) !important;
+    padding: 0 !important;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* 统一顶部导航 */
+  .topbar {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .topbar-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none; color: var(--ink);
+  }
+  .brand-mark {
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+    border-radius: 8px;
+    display: grid; place-items: center;
+    color: #fff; font-weight: 700; font-size: 16px;
+    letter-spacing: -1px;
+    box-shadow: 0 2px 6px rgba(8, 145, 178, 0.25);
+  }
+  .brand-name {
+    font-weight: 600; font-size: 16.5px;
+    color: var(--ink); letter-spacing: -0.2px;
+  }
+  .brand-sub {
+    font-size: 11px; color: var(--text-faint); margin-top: 1px;
+  }
+  .nav-links {
+    display: flex; gap: 24px; font-size: 14px; align-items: center;
+  }
+  .nav-links a {
+    color: var(--text); text-decoration: none;
+    transition: color 0.15s; font-weight: 500;
+  }
+  .nav-links a:hover { color: var(--brand); }
+  .nav-links a.back::before {
+    content: "←"; margin-right: 4px; color: var(--brand);
+  }
+  @media (max-width: 640px) {
+    .nav-links { gap: 16px; font-size: 13px; }
+    .nav-links a:not(.back) { display: none; }
+    .topbar-inner { padding: 12px 20px; }
+    .brand-name { font-size: 15px; }
+    .brand-sub { display: none; }
+  }
+
+  /* 面包屑 */
+  .breadcrumb {
+    max-width: 820px; margin: 0 auto;
+    padding: 20px 16px 0;
+    font-size: 12.5px; color: var(--text-muted);
+  }
+  .breadcrumb a {
+    color: var(--text-muted); text-decoration: none;
+    transition: color 0.15s;
+  }
+  .breadcrumb a:hover { color: var(--brand); }
+  .breadcrumb .sep { margin: 0 8px; color: var(--text-faint); }
+  .breadcrumb .current { color: var(--ink); font-weight: 500; }
+
+  /* 主体外壳 */
+  .main-wrap { flex: 1; padding: 16px; }
+
+  /* 统一页脚 */
+  .site-footer {
+    background: var(--bg-section);
+    border-top: 1px solid var(--border);
+    padding: 56px 32px 32px;
+    margin-top: 40px;
+  }
+  .footer-inner { max-width: 1280px; margin: 0 auto; }
+  .footer-main {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
+    gap: 40px;
+    padding-bottom: 32px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  @media (max-width: 720px) {
+    .footer-main { grid-template-columns: 1fr 1fr; gap: 28px; }
+  }
+  .footer-about-col .brand { margin-bottom: 14px; }
+  .footer-col h4 {
+    font-size: 11.5px; letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-muted); font-weight: 600;
+    margin-bottom: 14px;
+  }
+  .footer-col ul {
+    list-style: none; display: flex;
+    flex-direction: column; gap: 8px;
+  }
+  .footer-col li { font-size: 13px; color: var(--text); }
+  .footer-col a {
+    font-size: 13px; color: var(--text);
+    text-decoration: none; transition: color 0.15s;
+  }
+  .footer-col a:hover { color: var(--brand); }
+  .footer-about {
+    font-size: 13px; color: var(--text-muted);
+    line-height: 1.7; max-width: 340px;
+  }
+  .footer-bottom {
+    display: flex; justify-content: space-between;
+    align-items: center; font-size: 12px;
+    color: var(--text-muted);
+    flex-wrap: wrap; gap: 10px;
+  }
+  .footer-bottom a {
+    color: inherit; text-decoration: underline;
+    text-decoration-color: var(--border);
+    text-underline-offset: 2px;
+  }
+  .footer-bottom a:hover { color: var(--brand); }
+
+  /* 工具内部的小footer */
+  .tool-inner-footer {
+    text-align: center;
+    padding: 16px;
+    font-size: 12px;
+    color: #9ca3af;
+  }
+
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f5f7fa;
+    color: #1f2937;
+    line-height: 1.6;
+    padding: 16px;
+  }
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    overflow: hidden;
+  }
+  header.tool-header {
+    background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
+    color: #fff;
+    padding: 24px 24px 20px;
+  }
+  header.tool-header h1 { font-size: 22px; margin-bottom: 6px; }
+  header.tool-header p { font-size: 13px; opacity: 0.9; }
+  .body { padding: 24px; }
+
+  /* 断面选择 */
+  .section-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 20px;
+    padding: 4px;
+    background: #f1f5f9;
+    border-radius: 10px;
+  }
+  .section-tab {
+    flex: 1;
+    padding: 12px 8px;
+    text-align: center;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    font-size: 13.5px;
+    cursor: pointer;
+    color: #64748b;
+    transition: all 0.15s;
+    font-weight: 500;
+  }
+  .section-tab.active {
+    background: #fff;
+    color: #0891b2;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+
+  /* 求解模式 */
+  .mode-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 20px;
+    padding: 4px;
+    background: #eff6ff;
+    border: 1px solid #dbeafe;
+    border-radius: 10px;
+  }
+  .mode-tab {
+    flex: 1;
+    padding: 10px 6px;
+    text-align: center;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    font-size: 12.5px;
+    cursor: pointer;
+    color: #64748b;
+    transition: all 0.15s;
+    font-weight: 500;
+  }
+  .mode-tab.active {
+    background: #3b82f6;
+    color: #fff;
+  }
+
+  .section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #0e7490;
+    margin: 18px 0 10px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #e0f2fe;
+  }
+  .section-title:first-child { margin-top: 0; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+  }
+  .field { display: flex; flex-direction: column; }
+  .field label {
+    font-size: 13px;
+    color: #4b5563;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .field .unit { color: #9ca3af; font-size: 12px; font-weight: normal; }
+  .field input, .field select {
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 15px;
+    background: #fff;
+    transition: border-color 0.15s;
+  }
+  .field input:focus, .field select:focus {
+    outline: none;
+    border-color: #0891b2;
+    box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
+  }
+  .field input:disabled {
+    background: #f3f4f6;
+    color: #9ca3af;
+    cursor: not-allowed;
+  }
+  .field.solve-for input {
+    background: #fef3c7;
+    border-color: #f59e0b;
+    font-weight: 600;
+    color: #92400e;
+  }
+
+  /* 断面示意图 */
+  .section-viz {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    background: #f8fafc;
+    border-radius: 10px;
+    margin-bottom: 18px;
+  }
+  .section-viz svg {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* 结果 */
+  .results {
+    margin-top: 24px;
+    padding: 20px;
+    background: linear-gradient(135deg, #ecfeff 0%, #f0f9ff 100%);
+    border-radius: 10px;
+    border-left: 4px solid #0891b2;
+  }
+  .results h2 { font-size: 16px; color: #0e7490; margin-bottom: 14px; }
+  .result-group { margin-bottom: 16px; }
+  .result-group-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #0e7490;
+    margin-bottom: 8px;
+    padding: 4px 10px;
+    background: #cffafe;
+    border-radius: 4px;
+    display: inline-block;
+  }
+  .result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 9px 0;
+    border-bottom: 1px dashed #bae6fd;
+    gap: 10px;
+  }
+  .result-row:last-child { border-bottom: none; }
+  .result-label { color: #4b5563; font-size: 13.5px; }
+  .result-value {
+    font-size: 19px;
+    font-weight: 600;
+    color: #0891b2;
+    font-variant-numeric: tabular-nums;
+  }
+  .result-value.big { font-size: 23px; color: #0e7490; }
+  .result-unit { color: #6b7280; font-size: 13px; margin-left: 4px; font-weight: normal; }
+  .highlight-row {
+    background: #ecfeff;
+    padding: 10px 12px !important;
+    border-radius: 6px;
+    border: 1px solid #67e8f9;
+    border-bottom: 1px solid #67e8f9 !important;
+  }
+
+  /* 水流状态校核 */
+  .check-box {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 13.5px;
+  }
+  .check-ok { background: #dcfce7; color: #166534; border-left: 3px solid #22c55e; }
+  .check-warn { background: #fef3c7; color: #92400e; border-left: 3px solid #f59e0b; }
+  .check-bad { background: #fee2e2; color: #991b1b; border-left: 3px solid #ef4444; }
+  .check-info { background: #dbeafe; color: #1e40af; border-left: 3px solid #3b82f6; }
+
+  /* 公式 */
+  .formula-box {
+    margin-top: 20px;
+    padding: 16px;
+    background: #fafafa;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #4b5563;
+  }
+  .formula-box h3 { font-size: 14px; color: #374151; margin: 14px 0 8px; }
+  .formula-box h3:first-child { margin-top: 0; }
+  .formula-box code {
+    display: block;
+    padding: 8px 12px;
+    background: #fff;
+    border-radius: 4px;
+    border: 1px solid #e5e7eb;
+    margin: 6px 0;
+    font-family: "SF Mono", Consolas, monospace;
+    font-size: 12.5px;
+    color: #0e7490;
+    overflow-x: auto;
+  }
+  .formula-box p { margin: 6px 0; font-size: 12.5px; }
+  .formula-box table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12px; }
+  .formula-box th, .formula-box td {
+    padding: 6px 10px; text-align: left; border-bottom: 1px solid #e5e7eb;
+  }
+  .formula-box th { background: #f1f5f9; color: #374151; }
+
+  .buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    flex: 1;
+    min-width: 120px;
+    padding: 11px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 500;
+  }
+  .btn-primary { background: #0891b2; color: #fff; }
+  .btn-primary:hover { background: #0e7490; }
+  .btn-secondary { background: #e5e7eb; color: #374151; }
+  .btn-secondary:hover { background: #d1d5db; }
+
+  .note {
+    margin-top: 16px;
+    padding: 12px;
+    background: #fef3c7;
+    border-radius: 8px;
+    font-size: 12.5px;
+    color: #92400e;
+    border-left: 3px solid #f59e0b;
+  }
+  footer {
+    text-align: center;
+    padding: 16px;
+    font-size: 12px;
+    color: #9ca3af;
+  }
+  @media (max-width: 480px) {
+    .main-wrap { padding: 8px; }
+    ..main-wrap { padding: 16px; }
+    header.tool-header { padding: 18px; }
+    header.tool-header h1 { font-size: 19px; }
+    .result-value { font-size: 17px; }
+    .result-value.big { font-size: 20px; }
+    .section-tab, .mode-tab { font-size: 11.5px; }
+  }
+</style>
+</head>
+<body>
+
+
+<!-- 统一顶部导航 -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="brand">
+      <div class="brand-mark">W</div>
+      <div>
+        <div class="brand-name">水处理工具箱</div>
+        <div class="brand-sub">WaterKit · by 登登科技</div>
+      </div>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html" class="back">返回首页</a>
+      <a href="index.html#cat-hydraulics">水力计算</a>
+      <a href="https://dengdengtech.cn" target="_blank" rel="noopener">登登科技</a>
+    </nav>
+  </div>
+</header>
+
+<!-- 面包屑 -->
+<div class="breadcrumb">
+  <a href="index.html">首页</a>
+  <span class="sep">/</span>
+  <a href="index.html#cat-hydraulics">水力计算</a>
+  <span class="sep">/</span>
+  <span class="current">明渠水力</span>
+</div>
+
+<main class="main-wrap">
+
+<div class="container">
+  <header class="tool-header">
+    <h1>🌊 明渠水力计算器</h1>
+    <p>Manning 公式 · 三种断面 · 临界水深 · 水力最佳断面 · 弗劳德数判流</p>
+  </header>
+
+  <div class="body">
+
+    <!-- 断面类型 -->
+    <div class="section-title">① 断面形式</div>
+    <div class="section-tabs">
+      <button class="section-tab active" data-shape="trapezoidal" onclick="setShape('trapezoidal')">梯形断面</button>
+      <button class="section-tab" data-shape="rectangular" onclick="setShape('rectangular')">矩形断面</button>
+      <button class="section-tab" data-shape="circular" onclick="setShape('circular')">圆形断面</button>
+    </div>
+
+    <!-- 断面示意图 -->
+    <div class="section-viz">
+      <svg id="vizSvg" width="320" height="160" viewBox="0 0 320 160" xmlns="http://www.w3.org/2000/svg">
+        <!-- 会由JS动态绘制 -->
+      </svg>
+    </div>
+
+    <!-- 求解模式 -->
+    <div class="section-title">② 求解目标</div>
+    <div class="mode-tabs" id="modeTabs">
+      <button class="mode-tab active" data-mode="Q" onclick="setMode('Q')">已知 h 求 Q</button>
+      <button class="mode-tab" data-mode="h" onclick="setMode('h')">已知 Q 求 h</button>
+      <button class="mode-tab" data-mode="i" onclick="setMode('i')">已知 Q、h 求 i</button>
+    </div>
+
+    <!-- 断面参数 -->
+    <div class="section-title">③ 断面与水力参数</div>
+    <div class="grid" id="paramsGrid">
+      <!-- 梯形/矩形参数 -->
+      <div class="field shape-rect shape-trap">
+        <label>底宽 b <span class="unit">m</span></label>
+        <input type="number" id="b" value="2.0" step="0.1">
+      </div>
+      <div class="field shape-trap">
+        <label>边坡系数 m <span class="unit">横:竖</span></label>
+        <input type="number" id="m" value="1.5" step="0.1">
+      </div>
+
+      <!-- 圆形参数 -->
+      <div class="field shape-circ" style="display:none;">
+        <label>管径 D <span class="unit">m</span></label>
+        <input type="number" id="D" value="1.0" step="0.1">
+      </div>
+
+      <!-- 共用 -->
+      <div class="field" id="f_h">
+        <label>水深 h <span class="unit">m</span></label>
+        <input type="number" id="h" value="1.0" step="0.05">
+      </div>
+      <div class="field" id="f_Q">
+        <label>流量 Q <span class="unit">m³/s</span></label>
+        <input type="number" id="Q" value="2.5" step="0.1">
+      </div>
+      <div class="field" id="f_i">
+        <label>底坡 i <span class="unit">— (如 0.001)</span></label>
+        <input type="number" id="i" value="0.001" step="0.0001">
+      </div>
+
+      <div class="field">
+        <label>曼宁粗糙系数 n</label>
+        <select id="n_preset" onchange="updateN()">
+          <option value="0.011">光滑水泥抹面 (n=0.011)</option>
+          <option value="0.013" selected>混凝土 (n=0.013)</option>
+          <option value="0.014">粗糙混凝土/砖砌 (n=0.014)</option>
+          <option value="0.017">浆砌毛石 (n=0.017)</option>
+          <option value="0.020">干砌块石 (n=0.020)</option>
+          <option value="0.025">土渠(顺直) (n=0.025)</option>
+          <option value="0.030">土渠(杂草) (n=0.030)</option>
+          <option value="0.035">天然河道 (n=0.035)</option>
+          <option value="0.009">PVC/PE塑料管 (n=0.009)</option>
+          <option value="custom">自定义</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>n 值 <span class="unit">曼宁</span></label>
+        <input type="number" id="n" value="0.013" step="0.001">
+      </div>
+    </div>
+
+    <!-- 结果 -->
+    <div class="results">
+      <h2>计算结果</h2>
+
+      <div class="result-group">
+        <div class="result-group-title">正常流水力要素（均匀流）</div>
+        <div class="result-row highlight-row">
+          <span class="result-label"><b>流量 Q</b></span>
+          <span><span class="result-value big" id="r_Q">—</span><span class="result-unit">m³/s</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">流速 v</span>
+          <span><span class="result-value" id="r_v">—</span><span class="result-unit">m/s</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">水深 h（正常水深 h₀）</span>
+          <span><span class="result-value" id="r_h">—</span><span class="result-unit">m</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">过水断面面积 A</span>
+          <span><span class="result-value" id="r_A">—</span><span class="result-unit">m²</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">湿周 χ</span>
+          <span><span class="result-value" id="r_P">—</span><span class="result-unit">m</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">水力半径 R</span>
+          <span><span class="result-value" id="r_R">—</span><span class="result-unit">m</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">水面宽 B</span>
+          <span><span class="result-value" id="r_B">—</span><span class="result-unit">m</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">谢才系数 C</span>
+          <span><span class="result-value" id="r_C">—</span><span class="result-unit">m^0.5/s</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">底坡 i</span>
+          <span><span class="result-value" id="r_i">—</span><span class="result-unit">—</span></span>
+        </div>
+      </div>
+
+      <div class="result-group">
+        <div class="result-group-title">流态判定</div>
+        <div class="result-row">
+          <span class="result-label">临界水深 h_c</span>
+          <span><span class="result-value" id="r_hc">—</span><span class="result-unit">m</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">临界坡度 i_c</span>
+          <span><span class="result-value" id="r_ic">—</span><span class="result-unit">—</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">弗劳德数 Fr</span>
+          <span><span class="result-value" id="r_Fr">—</span><span class="result-unit" id="r_Fr_state">—</span></span>
+        </div>
+        <div class="check-box" id="flowCheck">判定中...</div>
+      </div>
+
+      <div class="result-group">
+        <div class="result-group-title">水力最佳断面（按当前流量校核）</div>
+        <div class="result-row">
+          <span class="result-label">最佳断面水深</span>
+          <span><span class="result-value" id="r_h_best">—</span><span class="result-unit">m</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">最佳断面底宽/直径</span>
+          <span><span class="result-value" id="r_b_best">—</span><span class="result-unit">m</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">宽深比 β</span>
+          <span><span class="result-value" id="r_beta">—</span><span class="result-unit">—</span></span>
+        </div>
+        <div class="check-box check-info" id="bestHint">最佳断面提示</div>
+      </div>
+    </div>
+
+    <div class="buttons">
+      <button class="btn btn-primary" onclick="copyResults()">📋 复制结果</button>
+      <button class="btn btn-secondary" onclick="resetDefaults()">🔄 恢复默认</button>
+      <button class="btn btn-secondary" onclick="toggleFormula()">📖 查看公式</button>
+    </div>
+
+    <div class="formula-box" id="formulaBox" style="display:none;">
+      <h3>① Manning 公式（谢才-曼宁,均匀流）</h3>
+      <code>Q = A · v = (1/n) · A · R^(2/3) · i^(1/2)</code>
+      <code>v = (1/n) · R^(2/3) · i^(1/2) = C · √(R · i)</code>
+      <p>C = R^(1/6)/n 为谢才系数,n 为曼宁粗糙系数。</p>
+
+      <h3>② 各断面水力要素</h3>
+
+      <p><strong>梯形断面</strong>（底宽 b,边坡 m = 水平:竖直,水深 h）：</p>
+      <code>A = (b + m·h) · h</code>
+      <code>χ = b + 2h·√(1+m²)</code>
+      <code>R = A / χ</code>
+      <code>B = b + 2m·h（水面宽）</code>
+
+      <p><strong>矩形断面</strong>（相当于 m=0 的梯形）：</p>
+      <code>A = b · h,  χ = b + 2h,  R = bh / (b+2h),  B = b</code>
+
+      <p><strong>圆形断面</strong>（管径 D,水深 h）：</p>
+      <code>θ = 2 · arccos(1 − 2h/D)  [弧度]</code>
+      <code>A = D²/8 · (θ − sin θ)</code>
+      <code>χ = D · θ / 2</code>
+      <code>R = A / χ</code>
+      <code>B = D · sin(θ/2)（水面宽）</code>
+
+      <h3>③ 临界水深与临界坡度</h3>
+      <code>α · Q² · B / (g · A³) = 1  →  求 h_c</code>
+      <p>α 动能修正系数取 1.0,g = 9.81 m/s²。本工具采用二分法迭代求解。</p>
+      <code>i_c = n² · Q² / (A² · R^(4/3))  代入 h = h_c</code>
+
+      <h3>④ 弗劳德数与流态</h3>
+      <code>Fr = v / √(g · A / B) = v / √(g · h_m)</code>
+      <p>h_m = A/B 为平均水深。Fr &lt; 1 缓流(h &gt; h_c),Fr = 1 临界流,Fr &gt; 1 急流(h &lt; h_c)。</p>
+
+      <h3>⑤ 水力最佳断面</h3>
+      <p><strong>矩形</strong>：h = b/2（宽深比 β = b/h = 2）</p>
+      <p><strong>梯形</strong>：β = b/h = 2·(√(1+m²) − m)</p>
+      <p>例如 m=1.5 时,最佳 β ≈ 0.606,即 b/h ≈ 0.606。</p>
+      <p><strong>圆形</strong>：充满度 h/D = 0.813 时流量最大（非满流效应）。</p>
+
+      <h3>⑥ 常用曼宁 n 值（GB 50014 / 水力学手册）</h3>
+      <table>
+        <tr><th>渠道/管道类型</th><th>n 值</th></tr>
+        <tr><td>光滑水泥抹面</td><td>0.010-0.012</td></tr>
+        <tr><td>混凝土 / 钢模浇筑</td><td>0.013-0.014</td></tr>
+        <tr><td>浆砌块石（条石）</td><td>0.015-0.017</td></tr>
+        <tr><td>浆砌毛石</td><td>0.017-0.025</td></tr>
+        <tr><td>干砌块石</td><td>0.020-0.030</td></tr>
+        <tr><td>土渠(顺直,整齐)</td><td>0.020-0.025</td></tr>
+        <tr><td>土渠(一般,有杂草)</td><td>0.025-0.030</td></tr>
+        <tr><td>土渠(杂草、弯曲)</td><td>0.030-0.040</td></tr>
+        <tr><td>天然河道(顺直、杂草少)</td><td>0.030-0.040</td></tr>
+        <tr><td>天然河道(弯曲、石滩)</td><td>0.040-0.060</td></tr>
+        <tr><td>PVC / PE 塑料管</td><td>0.009-0.011</td></tr>
+      </table>
+    </div>
+
+    <div class="note">
+      ⚠️ 本工具按均匀流(正常流)计算,即水深沿程不变,流量、流速、水深与底坡满足 Manning 公式。非均匀流(水面曲线)、变底坡、渐变流等须单独分析。圆形断面适用于无压排水管渠,满流时退化为压力流,应用管道水力工具。
+    </div>
+
+  </div>
+
+  <footer class="tool-inner-footer">水处理工具箱 · 仅供工程估算参考</footer>
+</div>
+</main>
+
+<!-- 统一页脚 -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-main">
+      <div class="footer-col footer-about-col">
+        <a href="index.html" class="brand">
+          <div class="brand-mark">W</div>
+          <div>
+            <div class="brand-name">水处理工具箱</div>
+            <div class="brand-sub">WaterKit · by 登登科技</div>
+          </div>
+        </a>
+        <p class="footer-about">水处理工具箱(WaterKit)是海南登登科技咨询有限公司推出的水处理在线计算工具集合,由一线水处理工艺工程师开发维护。免费、无广告、持续更新。</p>
+      </div>
+      <div class="footer-col">
+        <h4>水力计算</h4>
+        <ul>
+          <li><a href="pipe-hydraulic-calculator.html">管道水力</a></li>
+          <li><a href="open-channel-calculator.html">明渠水力</a></li>
+          <li><a href="weir-flow-calculator.html">堰流计算</a></li>
+          <li><a href="orifice-nozzle-calculator.html">孔口出流</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>工艺与设备</h4>
+        <ul>
+          <li><a href="aeration-calculator.html">曝气量</a></li>
+          <li><a href="sludge-production-calculator.html">污泥产量</a></li>
+          <li><a href="dosing-calculator.html">加药量</a></li>
+          <li><a href="pump-selection-calculator.html">水泵选型</a></li>
+          <li><a href="water-quality-unit-converter.html">水质换算</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="https://dengdengtech.cn" target="_blank" rel="noopener">登登科技官网 ↗</a></li>
+          <li>海南登登科技咨询</li>
+          <li>有限公司</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Open Source</h4>
+        <ul>
+          <li><a href="https://github.com/chengsunmail/waterkit" target="_blank" rel="noopener">GitHub 仓库 ↗</a></li>
+          <li><a href="https://github.com/chengsunmail/waterkit/blob/main/LICENSE" target="_blank" rel="noopener">AGPL-3.0 协议</a></li>
+          <li><a href="https://github.com/chengsunmail/waterkit/issues" target="_blank" rel="noopener">反馈 Issue</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 海南登登科技咨询有限公司 · <a href="https://dengdengtech.cn" target="_blank" rel="noopener">dengdengtech.cn</a></span>
+      <span>WaterKit · V 1.0 · <a href="https://github.com/chengsunmail/waterkit" target="_blank" rel="noopener">开源于 GitHub</a></span>
+    </div>
+  </div>
+</footer>
+
+
+
+<script>
+  const $ = id => document.getElementById(id);
+  const num = id => parseFloat($(id).value) || 0;
+  const g = 9.81;
+
+  let shape = 'trapezoidal';  // trapezoidal / rectangular / circular
+  let mode = 'Q';              // Q / h / i
+
+  function setShape(s) {
+    shape = s;
+    document.querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
+    document.querySelector(`[data-shape="${s}"]`).classList.add('active');
+
+    // 控制字段显示
+    document.querySelectorAll('.shape-trap').forEach(el => {
+      el.style.display = (s === 'trapezoidal') ? '' : 'none';
+    });
+    document.querySelectorAll('.shape-rect').forEach(el => {
+      el.style.display = (s === 'rectangular' || s === 'trapezoidal') ? '' : 'none';
+    });
+    document.querySelectorAll('.shape-circ').forEach(el => {
+      el.style.display = (s === 'circular') ? '' : 'none';
+    });
+
+    drawSection();
+    calc();
+  }
+
+  function setMode(m) {
+    mode = m;
+    document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+    document.querySelector(`[data-mode="${m}"]`).classList.add('active');
+
+    ['Q','h','i'].forEach(f => {
+      $(f).disabled = false;
+      $('f_'+f).classList.remove('solve-for');
+    });
+    $(mode).disabled = true;
+    $('f_'+mode).classList.add('solve-for');
+    calc();
+  }
+
+  function updateN() {
+    const v = $('n_preset').value;
+    if (v !== 'custom') $('n').value = v;
+    calc();
+  }
+
+  // ============ 断面几何 ============
+  function geom(h) {
+    const n_val = num('n');
+    if (shape === 'rectangular') {
+      const b = num('b');
+      const A = b * h;
+      const P = b + 2 * h;
+      const B = b;
+      return {A, P, R: A/P, B, h};
+    } else if (shape === 'trapezoidal') {
+      const b = num('b'), m = num('m');
+      const A = (b + m * h) * h;
+      const P = b + 2 * h * Math.sqrt(1 + m*m);
+      const B = b + 2 * m * h;
+      return {A, P, R: A/P, B, h};
+    } else { // circular
+      const D = num('D');
+      if (h <= 0 || h > D) return {A: 0, P: 0, R: 0, B: 0, h};
+      const theta = 2 * Math.acos(1 - 2*h/D);  // 弧度
+      const A = D*D/8 * (theta - Math.sin(theta));
+      const P = D * theta / 2;
+      const B = D * Math.sin(theta/2);
+      return {A, P, R: P>0?A/P:0, B, h};
+    }
+  }
+
+  // Manning 公式求 Q（给定 h、i）
+  function Q_from_hi(h, i) {
+    const n = num('n');
+    const g1 = geom(h);
+    if (g1.A <= 0 || g1.R <= 0 || i <= 0) return 0;
+    return (1/n) * g1.A * Math.pow(g1.R, 2/3) * Math.sqrt(i);
+  }
+
+  // 已知 Q、i,求 h（二分法）
+  function h_from_Qi(Q_target, i) {
+    let lo = 0.001, hi = (shape === 'circular') ? num('D') * 0.999 : 20.0;
+    for (let k = 0; k < 80; k++) {
+      const mid = (lo + hi) / 2;
+      const q = Q_from_hi(mid, i);
+      if (q < Q_target) lo = mid; else hi = mid;
+      if (hi - lo < 1e-6) break;
+    }
+    return (lo + hi) / 2;
+  }
+
+  // 已知 Q、h,求 i
+  function i_from_Qh(Q_target, h) {
+    const n = num('n');
+    const g1 = geom(h);
+    if (g1.A <= 0 || g1.R <= 0) return 0;
+    const denom = g1.A * Math.pow(g1.R, 2/3);
+    return Math.pow(Q_target * n / denom, 2);
+  }
+
+  // 临界水深:α Q² B / (g A³) = 1
+  function criticalDepth(Q_val) {
+    let lo = 0.001, hi = (shape === 'circular') ? num('D') * 0.999 : 20.0;
+    for (let k = 0; k < 80; k++) {
+      const mid = (lo + hi) / 2;
+      const gm = geom(mid);
+      if (gm.A <= 0 || gm.B <= 0) { lo = mid; continue; }
+      const val = Q_val * Q_val * gm.B / (g * Math.pow(gm.A, 3));
+      if (val > 1) lo = mid; else hi = mid;
+      if (hi - lo < 1e-6) break;
+    }
+    return (lo + hi) / 2;
+  }
+
+  // ============ 绘制断面示意图 ============
+  function drawSection() {
+    const svg = $('vizSvg');
+    const W = 320, H = 160;
+    const waterColor = '#7dd3fc';
+    const lineColor = '#0e7490';
+    const bgColor = '#e0f2fe';
+
+    let content = `
+      <defs>
+        <pattern id="waterWaves" patternUnits="userSpaceOnUse" width="8" height="8">
+          <path d="M0,4 Q2,2 4,4 T8,4" fill="none" stroke="#0891b2" stroke-width="0.5" opacity="0.3"/>
+        </pattern>
+      </defs>
+    `;
+
+    if (shape === 'trapezoidal') {
+      const cx = 160, cy = 130;
+      const bs = 70, hs = 55, ms = 35;
+      // 断面梯形轮廓
+      content += `
+        <polyline points="${cx-bs/2-ms-15},${cy-hs-10} ${cx-bs/2-ms},${cy-hs} ${cx-bs/2},${cy} ${cx+bs/2},${cy} ${cx+bs/2+ms},${cy-hs} ${cx+bs/2+ms+15},${cy-hs-10}" fill="none" stroke="${lineColor}" stroke-width="2"/>
+        <polygon points="${cx-bs/2-ms},${cy-hs} ${cx-bs/2},${cy} ${cx+bs/2},${cy} ${cx+bs/2+ms},${cy-hs}" fill="url(#waterWaves)" stroke="${lineColor}" stroke-width="0.5"/>
+        <line x1="${cx-bs/2-ms}" y1="${cy-hs}" x2="${cx+bs/2+ms}" y2="${cy-hs}" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <text x="${cx-bs/2-ms-30}" y="${cy-hs-5}" font-size="11" fill="#0e7490">水面</text>
+
+        <text x="${cx}" y="${cy+18}" font-size="11" fill="#333" text-anchor="middle">b</text>
+        <line x1="${cx-bs/2}" y1="${cy+7}" x2="${cx+bs/2}" y2="${cy+7}" stroke="#333" stroke-width="0.8" marker-start="url(#arrL)" marker-end="url(#arrR)"/>
+
+        <text x="${cx+bs/2+ms+25}" y="${cy-hs/2+3}" font-size="11" fill="#333">h</text>
+        <line x1="${cx+bs/2+ms+15}" y1="${cy-hs}" x2="${cx+bs/2+ms+15}" y2="${cy}" stroke="#333" stroke-width="0.8"/>
+
+        <text x="${cx+bs/2+ms/2+10}" y="${cy-hs-8}" font-size="10" fill="#666">m : 1</text>
+      `;
+    } else if (shape === 'rectangular') {
+      const cx = 160, cy = 130;
+      const bs = 100, hs = 60;
+      content += `
+        <polyline points="${cx-bs/2-20},${cy-hs} ${cx-bs/2},${cy-hs} ${cx-bs/2},${cy} ${cx+bs/2},${cy} ${cx+bs/2},${cy-hs} ${cx+bs/2+20},${cy-hs}" fill="none" stroke="${lineColor}" stroke-width="2"/>
+        <rect x="${cx-bs/2}" y="${cy-hs}" width="${bs}" height="${hs}" fill="url(#waterWaves)"/>
+        <line x1="${cx-bs/2}" y1="${cy-hs}" x2="${cx+bs/2}" y2="${cy-hs}" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3,2"/>
+
+        <text x="${cx}" y="${cy+18}" font-size="11" fill="#333" text-anchor="middle">b</text>
+        <text x="${cx+bs/2+15}" y="${cy-hs/2+4}" font-size="11" fill="#333">h</text>
+      `;
+    } else { // circular
+      const cx = 160, cy = 90, r = 55;
+      // 水深比
+      let fill_ratio = 0.7;
+      const D = num('D'), h = num('h');
+      if (D > 0 && h > 0 && h <= D) fill_ratio = h / D;
+
+      const theta = 2 * Math.acos(1 - 2*fill_ratio);
+      // 水面弦 y 坐标
+      const waterY = cy + r - 2*r*fill_ratio;
+      const halfW = r * Math.sin(theta/2);
+
+      content += `
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${lineColor}" stroke-width="2"/>
+        <path d="M ${cx-halfW},${waterY} A ${r},${r} 0 0 0 ${cx+halfW},${waterY} Z" fill="url(#waterWaves)" stroke="${lineColor}" stroke-width="0.5"/>
+        <line x1="${cx-halfW}" y1="${waterY}" x2="${cx+halfW}" y2="${waterY}" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3,2"/>
+
+        <line x1="${cx-r-5}" y1="${cy}" x2="${cx+r+5}" y2="${cy}" stroke="#666" stroke-width="0.5" stroke-dasharray="2,2"/>
+        <text x="${cx+r+10}" y="${cy+4}" font-size="11" fill="#333">D</text>
+        <text x="${cx+r+10}" y="${waterY+4}" font-size="11" fill="#0e7490">h</text>
+      `;
+    }
+
+    svg.innerHTML = content;
+  }
+
+  // ============ 主计算 ============
+  function calc() {
+    const n = num('n');
+    let h_val, Q_val, i_val;
+
+    if (mode === 'Q') {
+      h_val = num('h'); i_val = num('i');
+      Q_val = Q_from_hi(h_val, i_val);
+      $('Q').value = Q_val.toFixed(3);
+    } else if (mode === 'h') {
+      Q_val = num('Q'); i_val = num('i');
+      h_val = h_from_Qi(Q_val, i_val);
+      $('h').value = h_val.toFixed(3);
+    } else { // mode === 'i'
+      Q_val = num('Q'); h_val = num('h');
+      i_val = i_from_Qh(Q_val, h_val);
+      $('i').value = i_val.toFixed(6);
+    }
+
+    const gm = geom(h_val);
+    const v_val = gm.A > 0 ? Q_val / gm.A : 0;
+    const C_val = gm.R > 0 && n > 0 ? Math.pow(gm.R, 1/6) / n : 0;
+
+    $('r_Q').textContent = Q_val.toFixed(3);
+    $('r_v').textContent = v_val.toFixed(3);
+    $('r_h').textContent = h_val.toFixed(3);
+    $('r_A').textContent = gm.A.toFixed(3);
+    $('r_P').textContent = gm.P.toFixed(3);
+    $('r_R').textContent = gm.R.toFixed(3);
+    $('r_B').textContent = gm.B.toFixed(3);
+    $('r_C').textContent = C_val.toFixed(2);
+    $('r_i').textContent = i_val.toFixed(6);
+
+    // ============ 临界水深 ============
+    const hc = criticalDepth(Q_val);
+    $('r_hc').textContent = hc.toFixed(3);
+    const gc = geom(hc);
+    // 临界坡度
+    let ic = 0;
+    if (gc.A > 0 && gc.R > 0) {
+      ic = Math.pow(n, 2) * Math.pow(Q_val, 2) / (Math.pow(gc.A, 2) * Math.pow(gc.R, 4/3));
+    }
+    $('r_ic').textContent = ic.toFixed(6);
+
+    // 弗劳德数
+    const Fr = gm.B > 0 && gm.A > 0 ? v_val / Math.sqrt(g * gm.A / gm.B) : 0;
+    $('r_Fr').textContent = Fr.toFixed(3);
+
+    const st = $('r_Fr_state');
+    const cb = $('flowCheck');
+    if (Fr < 0.95) {
+      st.textContent = '缓流';
+      cb.className = 'check-box check-ok';
+      cb.innerHTML = `✓ <b>缓流 (Subcritical)</b> · Fr = ${Fr.toFixed(3)} &lt; 1, h (${h_val.toFixed(2)} m) &gt; h_c (${hc.toFixed(2)} m),扰动可向上游传播,常见于平原渠道、水处理主流渠。`;
+    } else if (Fr > 1.05) {
+      st.textContent = '急流';
+      cb.className = 'check-box check-warn';
+      cb.innerHTML = `⚠ <b>急流 (Supercritical)</b> · Fr = ${Fr.toFixed(3)} &gt; 1, h (${h_val.toFixed(2)} m) &lt; h_c (${hc.toFixed(2)} m),扰动不能向上游传播,注意陡坡、溢流下游、消能设计。`;
+    } else {
+      st.textContent = '临界流';
+      cb.className = 'check-box check-info';
+      cb.innerHTML = `ℹ <b>临界流 (Critical)</b> · Fr ≈ 1,流态不稳,工程上应避免此状态作为正常运行工况。`;
+    }
+
+    // ============ 水力最佳断面 ============
+    let h_best = 0, b_best = 0, beta = 0, hint = '';
+    if (shape === 'rectangular') {
+      // b = 2h, A = 2h²,v = (1/n)·(h/2)^(2/3)·√i
+      // Q = (1/n)·2h²·(h/2)^(2/3)·√i  →  h = [Q·n/(2·(1/2)^(2/3)·√i)]^(3/8)
+      if (i_val > 0) {
+        h_best = Math.pow(Q_val * n / (2 * Math.pow(0.5, 2/3) * Math.sqrt(i_val)), 3/8);
+        b_best = 2 * h_best;
+        beta = 2;
+        hint = `矩形最佳断面: b/h = 2,当 Q=${Q_val.toFixed(2)} m³/s, i=${i_val.toFixed(4)} 时,最佳尺寸约 b=${b_best.toFixed(2)} m, h=${h_best.toFixed(2)} m。当前 b=${num('b').toFixed(2)} m。`;
+      }
+    } else if (shape === 'trapezoidal') {
+      const m = num('m');
+      beta = 2 * (Math.sqrt(1 + m*m) - m);
+      // A = (β+m)h²,R = h/2,v = (1/n)(h/2)^(2/3)√i
+      // Q = (1/n)·(β+m)h²·(h/2)^(2/3)·√i
+      if (i_val > 0) {
+        const coeff = (1/n) * (beta + m) * Math.pow(0.5, 2/3) * Math.sqrt(i_val);
+        if (coeff > 0) {
+          h_best = Math.pow(Q_val / coeff, 3/8);
+          b_best = beta * h_best;
+          hint = `梯形最佳断面 (m=${m.toFixed(1)}): b/h = ${beta.toFixed(3)},最佳尺寸约 b=${b_best.toFixed(2)} m, h=${h_best.toFixed(2)} m。当前 b=${num('b').toFixed(2)} m, h=${h_val.toFixed(2)} m。`;
+        }
+      }
+    } else { // circular
+      const D = num('D');
+      h_best = 0.813 * D;   // 最大流量对应充满度
+      b_best = D;
+      beta = h_best / D;
+      hint = `圆形最大流量充满度 h/D = 0.813,即 h=${h_best.toFixed(2)} m (D=${D.toFixed(2)} m)。当前充满度 h/D = ${(h_val/D).toFixed(3)}。注意:最大流速对应 h/D≈0.81,最大流量对应 h/D≈0.938,满流后退化为压力流。`;
+    }
+    $('r_h_best').textContent = h_best > 0 ? h_best.toFixed(3) : '—';
+    $('r_b_best').textContent = b_best > 0 ? b_best.toFixed(3) : '—';
+    $('r_beta').textContent = beta > 0 ? beta.toFixed(3) : '—';
+    $('bestHint').innerHTML = hint;
+
+    // 重绘断面(圆形水深变化时)
+    if (shape === 'circular') drawSection();
+  }
+
+  function copyResults() {
+    const shapes = {trapezoidal:'梯形', rectangular:'矩形', circular:'圆形'};
+    const txt = `明渠水力计算结果（${shapes[shape]}断面）
+————————————————
+流量 Q = ${$('r_Q').textContent} m³/s
+流速 v = ${$('r_v').textContent} m/s
+水深 h = ${$('r_h').textContent} m
+底坡 i = ${$('r_i').textContent}
+曼宁 n = ${num('n')}
+
+【水力要素】
+过水面积 A = ${$('r_A').textContent} m²
+湿周 χ = ${$('r_P').textContent} m
+水力半径 R = ${$('r_R').textContent} m
+水面宽 B = ${$('r_B').textContent} m
+谢才系数 C = ${$('r_C').textContent}
+
+【流态】
+Fr = ${$('r_Fr').textContent} (${$('r_Fr_state').textContent})
+临界水深 h_c = ${$('r_hc').textContent} m
+临界坡度 i_c = ${$('r_ic').textContent}
+
+【最佳断面参考】
+推荐 h = ${$('r_h_best').textContent} m
+推荐 b = ${$('r_b_best').textContent} m`;
+    navigator.clipboard.writeText(txt).then(() => {
+      alert('结果已复制');
+    }).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = txt;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      alert('结果已复制');
+    });
+  }
+
+  function resetDefaults() { location.reload(); }
+
+  function toggleFormula() {
+    const box = $('formulaBox');
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  }
+
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('input', calc);
+    el.addEventListener('change', calc);
+  });
+
+  // 初始化
+  drawSection();
+  setMode('Q');
+</script>
+
+</body>
+</html>

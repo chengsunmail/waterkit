@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>水泵选型计算器 | 水处理工具箱</title>
+<style>
+  :root {
+    --brand: #0891b2;
+    --brand-dark: #0e7490;
+    --brand-light: #ecfeff;
+    --brand-border: #67e8f9;
+    --ink: #0f172a;
+    --text: #334155;
+    --text-muted: #64748b;
+    --text-faint: #94a3b8;
+    --bg: #ffffff;
+    --bg-soft: #f8fafc;
+    --bg-section: #f1f5f9;
+    --border: #e2e8f0;
+    --border-soft: #f1f5f9;
+  }
+  body {
+    background: var(--bg) !important;
+    padding: 0 !important;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* 统一顶部导航 */
+  .topbar {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .topbar-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none; color: var(--ink);
+  }
+  .brand-mark {
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+    border-radius: 8px;
+    display: grid; place-items: center;
+    color: #fff; font-weight: 700; font-size: 16px;
+    letter-spacing: -1px;
+    box-shadow: 0 2px 6px rgba(8, 145, 178, 0.25);
+  }
+  .brand-name {
+    font-weight: 600; font-size: 16.5px;
+    color: var(--ink); letter-spacing: -0.2px;
+  }
+  .brand-sub {
+    font-size: 11px; color: var(--text-faint); margin-top: 1px;
+  }
+  .nav-links {
+    display: flex; gap: 24px; font-size: 14px; align-items: center;
+  }
+  .nav-links a {
+    color: var(--text); text-decoration: none;
+    transition: color 0.15s; font-weight: 500;
+  }
+  .nav-links a:hover { color: var(--brand); }
+  .nav-links a.back::before {
+    content: "←"; margin-right: 4px; color: var(--brand);
+  }
+  @media (max-width: 640px) {
+    .nav-links { gap: 16px; font-size: 13px; }
+    .nav-links a:not(.back) { display: none; }
+    .topbar-inner { padding: 12px 20px; }
+    .brand-name { font-size: 15px; }
+    .brand-sub { display: none; }
+  }
+
+  /* 面包屑 */
+  .breadcrumb {
+    max-width: 820px; margin: 0 auto;
+    padding: 20px 16px 0;
+    font-size: 12.5px; color: var(--text-muted);
+  }
+  .breadcrumb a {
+    color: var(--text-muted); text-decoration: none;
+    transition: color 0.15s;
+  }
+  .breadcrumb a:hover { color: var(--brand); }
+  .breadcrumb .sep { margin: 0 8px; color: var(--text-faint); }
+  .breadcrumb .current { color: var(--ink); font-weight: 500; }
+
+  /* 主体外壳 */
+  .main-wrap { flex: 1; padding: 16px; }
+
+  /* 统一页脚 */
+  .site-footer {
+    background: var(--bg-section);
+    border-top: 1px solid var(--border);
+    padding: 56px 32px 32px;
+    margin-top: 40px;
+  }
+  .footer-inner { max-width: 1280px; margin: 0 auto; }
+  .footer-main {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
+    gap: 40px;
+    padding-bottom: 32px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  @media (max-width: 720px) {
+    .footer-main { grid-template-columns: 1fr 1fr; gap: 28px; }
+  }
+  .footer-about-col .brand { margin-bottom: 14px; }
+  .footer-col h4 {
+    font-size: 11.5px; letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-muted); font-weight: 600;
+    margin-bottom: 14px;
+  }
+  .footer-col ul {
+    list-style: none; display: flex;
+    flex-direction: column; gap: 8px;
+  }
+  .footer-col li { font-size: 13px; color: var(--text); }
+  .footer-col a {
+    font-size: 13px; color: var(--text);
+    text-decoration: none; transition: color 0.15s;
+  }
+  .footer-col a:hover { color: var(--brand); }
+  .footer-about {
+    font-size: 13px; color: var(--text-muted);
+    line-height: 1.7; max-width: 340px;
+  }
+  .footer-bottom {
+    display: flex; justify-content: space-between;
+    align-items: center; font-size: 12px;
+    color: var(--text-muted);
+    flex-wrap: wrap; gap: 10px;
+  }
+  .footer-bottom a {
+    color: inherit; text-decoration: underline;
+    text-decoration-color: var(--border);
+    text-underline-offset: 2px;
+  }
+  .footer-bottom a:hover { color: var(--brand); }
+
+  /* 工具内部的小footer */
+  .tool-inner-footer {
+    text-align: center;
+    padding: 16px;
+    font-size: 12px;
+    color: #9ca3af;
+  }
+
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f5f7fa;
+    color: #1f2937;
+    line-height: 1.6;
+    padding: 16px;
+  }
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    overflow: hidden;
+  }
+  header.tool-header {
+    background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
+    color: #fff;
+    padding: 24px 24px 20px;
+  }
+  header.tool-header h1 { font-size: 22px; margin-bottom: 6px; }
+  header.tool-header p { font-size: 13px; opacity: 0.9; }
+  .body { padding: 24px; }
+
+  .section-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #0e7490;
+    margin: 20px 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e0f2fe;
+  }
+  .section-title:first-child { margin-top: 0; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+  }
+  .field { display: flex; flex-direction: column; }
+  .field label {
+    font-size: 13px;
+    color: #4b5563;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .field .unit { color: #9ca3af; font-size: 12px; font-weight: normal; }
+  .field input, .field select {
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 15px;
+    background: #fff;
+    transition: border-color 0.15s;
+  }
+  .field input:focus, .field select:focus {
+    outline: none;
+    border-color: #0891b2;
+    box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
+  }
+  .field .helper {
+    font-size: 11.5px;
+    color: #059669;
+    margin-top: 4px;
+  }
+
+  /* 分组开关 */
+  .sub-section {
+    background: #f8fafc;
+    padding: 14px 16px;
+    border-radius: 8px;
+    margin-bottom: 14px;
+  }
+  .sub-section h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .auto-hint {
+    background: #e0f2fe;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #075985;
+    margin-top: 8px;
+  }
+
+  .results {
+    margin-top: 24px;
+    padding: 20px;
+    background: linear-gradient(135deg, #ecfeff 0%, #f0f9ff 100%);
+    border-radius: 10px;
+    border-left: 4px solid #0891b2;
+  }
+  .results h2 { font-size: 16px; color: #0e7490; margin-bottom: 14px; }
+  .result-group {
+    margin-bottom: 16px;
+  }
+  .result-group-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #0e7490;
+    margin-bottom: 8px;
+    padding: 4px 10px;
+    background: #cffafe;
+    border-radius: 4px;
+    display: inline-block;
+  }
+  .result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 9px 0;
+    border-bottom: 1px dashed #bae6fd;
+    gap: 10px;
+  }
+  .result-row:last-child { border-bottom: none; }
+  .result-label { color: #4b5563; font-size: 13.5px; }
+  .result-value {
+    font-size: 19px;
+    font-weight: 600;
+    color: #0891b2;
+    font-variant-numeric: tabular-nums;
+  }
+  .result-value.big { font-size: 23px; color: #0e7490; }
+  .result-unit { color: #6b7280; font-size: 13px; margin-left: 4px; font-weight: normal; }
+  .highlight-row {
+    background: #ecfeff;
+    padding: 10px 12px !important;
+    border-radius: 6px;
+    border: 1px solid #67e8f9;
+    border-bottom: 1px solid #67e8f9 !important;
+  }
+
+  /* NPSH校核 */
+  .check-box {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 13.5px;
+  }
+  .check-ok { background: #dcfce7; color: #166534; border-left: 3px solid #22c55e; }
+  .check-warn { background: #fef3c7; color: #92400e; border-left: 3px solid #f59e0b; }
+  .check-bad { background: #fee2e2; color: #991b1b; border-left: 3px solid #ef4444; }
+
+  /* 型号建议卡 */
+  .model-card {
+    margin-top: 16px;
+    padding: 16px;
+    background: #fff;
+    border-radius: 10px;
+    border: 2px solid #0891b2;
+  }
+  .model-card .title {
+    font-size: 13px;
+    color: #0e7490;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .model-card .model-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: #0e7490;
+    font-family: "SF Mono", Consolas, monospace;
+    letter-spacing: 1px;
+  }
+  .model-card .model-desc {
+    font-size: 12.5px;
+    color: #64748b;
+    margin-top: 6px;
+  }
+
+  /* 公式与参考 */
+  .formula-box {
+    margin-top: 20px;
+    padding: 16px;
+    background: #fafafa;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #4b5563;
+  }
+  .formula-box h3 { font-size: 14px; color: #374151; margin: 14px 0 8px; }
+  .formula-box h3:first-child { margin-top: 0; }
+  .formula-box code {
+    display: block;
+    padding: 8px 12px;
+    background: #fff;
+    border-radius: 4px;
+    border: 1px solid #e5e7eb;
+    margin: 6px 0;
+    font-family: "SF Mono", Consolas, monospace;
+    font-size: 12.5px;
+    color: #0e7490;
+    overflow-x: auto;
+  }
+  .formula-box p { margin: 6px 0; font-size: 12.5px; }
+  .formula-box table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12px; }
+  .formula-box th, .formula-box td {
+    padding: 6px 10px; text-align: left; border-bottom: 1px solid #e5e7eb;
+  }
+  .formula-box th { background: #f1f5f9; color: #374151; }
+
+  .buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    flex: 1;
+    min-width: 120px;
+    padding: 11px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 500;
+  }
+  .btn-primary { background: #0891b2; color: #fff; }
+  .btn-primary:hover { background: #0e7490; }
+  .btn-secondary { background: #e5e7eb; color: #374151; }
+  .btn-secondary:hover { background: #d1d5db; }
+
+  .note {
+    margin-top: 16px;
+    padding: 12px;
+    background: #fef3c7;
+    border-radius: 8px;
+    font-size: 12.5px;
+    color: #92400e;
+    border-left: 3px solid #f59e0b;
+  }
+  footer {
+    text-align: center;
+    padding: 16px;
+    font-size: 12px;
+    color: #9ca3af;
+  }
+  @media (max-width: 480px) {
+    .main-wrap { padding: 8px; }
+    ..main-wrap { padding: 16px; }
+    header.tool-header { padding: 18px; }
+    header.tool-header h1 { font-size: 19px; }
+    .result-value { font-size: 17px; }
+    .result-value.big { font-size: 20px; }
+  }
+</style>
+</head>
+<body>
+
+
+<!-- 统一顶部导航 -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="brand">
+      <div class="brand-mark">W</div>
+      <div>
+        <div class="brand-name">水处理工具箱</div>
+        <div class="brand-sub">WaterKit · by 登登科技</div>
+      </div>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html" class="back">返回首页</a>
+      <a href="index.html#cat-equipment">设备选型</a>
+      <a href="https://dengdengtech.cn" target="_blank" rel="noopener">登登科技</a>
+    </nav>
+  </div>
+</header>
+
+<!-- 面包屑 -->
+<div class="breadcrumb">
+  <a href="index.html">首页</a>
+  <span class="sep">/</span>
+  <a href="index.html#cat-equipment">设备选型</a>
+  <span class="sep">/</span>
+  <span class="current">水泵选型</span>
+</div>
+
+<main class="main-wrap">
+
+<div class="container">
+  <header class="tool-header">
+    <h1>⚙️ 水泵选型计算器</h1>
+    <p>系统扬程 · 轴功率/电机功率 · NPSH 汽蚀校核 · 并联/变频分析</p>
+  </header>
+
+  <div class="body">
+
+    <div class="section-title">① 基本工况参数</div>
+    <div class="grid">
+      <div class="field">
+        <label>设计流量 Q <span class="unit">m³/h</span></label>
+        <input type="number" id="Q" value="100" step="10">
+      </div>
+      <div class="field">
+        <label>介质类型</label>
+        <select id="fluid" onchange="updateFluid()">
+          <option value="clean_water" selected>清水</option>
+          <option value="sewage">污水（粗/中格栅后）</option>
+          <option value="sludge">污泥（含水率≥97%）</option>
+          <option value="seawater">海水</option>
+          <option value="chemical">化学药液</option>
+          <option value="custom">自定义</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>介质密度 ρ <span class="unit">kg/m³</span></label>
+        <input type="number" id="rho" value="1000" step="10">
+      </div>
+      <div class="field">
+        <label>介质温度 T <span class="unit">℃</span></label>
+        <input type="number" id="T" value="20" step="1">
+      </div>
+      <div class="field">
+        <label>泵类型</label>
+        <select id="pump_type" onchange="updatePumpType()">
+          <option value="centrifugal" selected>离心泵（ISG/IH/IS）</option>
+          <option value="submerged">潜水泵（WQ/QW）</option>
+          <option value="axial">轴流泵（ZLB）</option>
+          <option value="screw">螺杆泵</option>
+          <option value="dosing">计量泵</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="section-title">② 系统扬程（自动求和或直接输入）</div>
+
+    <div class="sub-section">
+      <h3>几何扬程（静扬程）</h3>
+      <div class="grid">
+        <div class="field">
+          <label>吸水池最低水位 <span class="unit">m</span></label>
+          <input type="number" id="z_suck" value="0" step="0.1">
+        </div>
+        <div class="field">
+          <label>出水池最高水位 <span class="unit">m</span></label>
+          <input type="number" id="z_disch" value="15" step="0.5">
+        </div>
+      </div>
+    </div>
+
+    <div class="sub-section">
+      <h3>压力扬程（非开口系统时填写）</h3>
+      <div class="grid">
+        <div class="field">
+          <label>吸水侧表压 P₁ <span class="unit">kPa</span></label>
+          <input type="number" id="P1" value="0" step="10">
+        </div>
+        <div class="field">
+          <label>出水侧表压 P₂ <span class="unit">kPa</span></label>
+          <input type="number" id="P2" value="0" step="10">
+        </div>
+      </div>
+    </div>
+
+    <div class="sub-section">
+      <h3>管路水头损失</h3>
+      <div class="grid">
+        <div class="field">
+          <label>吸水管沿程损失 <span class="unit">m</span></label>
+          <input type="number" id="hf_s" value="0.5" step="0.1">
+        </div>
+        <div class="field">
+          <label>压水管沿程损失 <span class="unit">m</span></label>
+          <input type="number" id="hf_d" value="3.0" step="0.1">
+        </div>
+        <div class="field">
+          <label>局部损失总和 <span class="unit">m</span></label>
+          <input type="number" id="hj" value="1.5" step="0.1">
+        </div>
+        <div class="field">
+          <label>富余扬程（安全系数） <span class="unit">%</span></label>
+          <input type="number" id="H_margin" value="10" step="1">
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">③ 效率与电机</div>
+    <div class="grid">
+      <div class="field">
+        <label>泵效率 η_pump <span class="unit">%</span></label>
+        <input type="number" id="eta_pump" value="75" step="1">
+      </div>
+      <div class="field">
+        <label>传动效率 η_trans <span class="unit">%</span></label>
+        <input type="number" id="eta_trans" value="98" step="1">
+      </div>
+      <div class="field">
+        <label>电机效率 η_motor <span class="unit">%</span></label>
+        <input type="number" id="eta_motor" value="92" step="1">
+      </div>
+      <div class="field">
+        <label>电机功率储备系数 K</label>
+        <input type="number" id="K" value="1.15" step="0.05">
+      </div>
+      <div class="field">
+        <label>日运行时间 <span class="unit">h/d</span></label>
+        <input type="number" id="hours" value="24" step="1">
+      </div>
+      <div class="field">
+        <label>电费单价 <span class="unit">元/kWh</span></label>
+        <input type="number" id="price" value="0.65" step="0.01">
+      </div>
+    </div>
+
+    <div class="section-title">④ NPSH 汽蚀校核</div>
+    <div class="grid">
+      <div class="field">
+        <label>海拔高度 <span class="unit">m</span></label>
+        <input type="number" id="altitude" value="0" step="50">
+      </div>
+      <div class="field">
+        <label>吸水几何高度 Hs <span class="unit">m</span></label>
+        <input type="number" id="Hs_geom" value="3" step="0.5">
+        <div class="helper">水面到泵中心线（吸上为正，倒灌为负）</div>
+      </div>
+      <div class="field">
+        <label>泵必需汽蚀余量 NPSHr <span class="unit">m</span></label>
+        <input type="number" id="NPSHr" value="3.5" step="0.1">
+        <div class="helper">查泵样本或厂家提供</div>
+      </div>
+      <div class="field">
+        <label>汽蚀安全余量 <span class="unit">m</span></label>
+        <input type="number" id="NPSH_safe" value="0.5" step="0.1">
+      </div>
+    </div>
+
+    <div class="section-title">⑤ 并联/变频分析（选填）</div>
+    <div class="grid">
+      <div class="field">
+        <label>并联台数 n <span class="unit">台</span></label>
+        <input type="number" id="n_parallel" value="2" step="1">
+      </div>
+      <div class="field">
+        <label>其中备用 <span class="unit">台</span></label>
+        <input type="number" id="n_backup" value="1" step="1">
+      </div>
+      <div class="field">
+        <label>变频调速比 <span class="unit">%（相对额定转速）</span></label>
+        <input type="number" id="speed_ratio" value="100" step="5">
+      </div>
+    </div>
+
+    <div class="results">
+      <h2>计算结果</h2>
+
+      <div class="result-group">
+        <div class="result-group-title">系统扬程分解</div>
+        <div class="result-row">
+          <span class="result-label">几何扬程 Hg</span>
+          <span><span class="result-value" id="r_Hg">—</span><span class="result-unit">m</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">压力扬程 Hp</span>
+          <span><span class="result-value" id="r_Hp">—</span><span class="result-unit">m</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">总水头损失 hw</span>
+          <span><span class="result-value" id="r_hw">—</span><span class="result-unit">m</span></span>
+        </div>
+        <div class="result-row highlight-row">
+          <span class="result-label"><b>系统所需扬程 H（含 ${''}富余）</b></span>
+          <span><span class="result-value big" id="r_H">—</span><span class="result-unit">m</span></span>
+        </div>
+      </div>
+
+      <div class="result-group">
+        <div class="result-group-title">功率计算（单泵）</div>
+        <div class="result-row">
+          <span class="result-label">有效功率 Pe（水功率）</span>
+          <span><span class="result-value" id="r_Pe">—</span><span class="result-unit">kW</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">泵轴功率 Psh</span>
+          <span><span class="result-value" id="r_Psh">—</span><span class="result-unit">kW</span></span>
+        </div>
+        <div class="result-row highlight-row">
+          <span class="result-label"><b>电机配套功率 Pm（含 K 系数）</b></span>
+          <span><span class="result-value big" id="r_Pm">—</span><span class="result-unit">kW</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">推荐电机功率（标准规格）</span>
+          <span><span class="result-value" id="r_Pm_std">—</span><span class="result-unit">kW</span></span>
+        </div>
+      </div>
+
+      <div class="result-group">
+        <div class="result-group-title">运行能耗与成本</div>
+        <div class="result-row">
+          <span class="result-label">吨水提升能耗</span>
+          <span><span class="result-value" id="r_ekwh">—</span><span class="result-unit">kWh/m³</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">日耗电量</span>
+          <span><span class="result-value" id="r_day_kwh">—</span><span class="result-unit">kWh/d</span></span>
+        </div>
+        <div class="result-row highlight-row">
+          <span class="result-label"><b>年运行电费（全部工作泵）</b></span>
+          <span><span class="result-value big" id="r_year_cost">—</span><span class="result-unit">万元/a</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">吨水电耗成本</span>
+          <span><span class="result-value" id="r_unit_cost">—</span><span class="result-unit">元/m³</span></span>
+        </div>
+      </div>
+
+      <div class="result-group">
+        <div class="result-group-title">NPSH 汽蚀校核</div>
+        <div class="result-row">
+          <span class="result-label">大气压 Pa</span>
+          <span><span class="result-value" id="r_Pa">—</span><span class="result-unit">kPa</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">饱和蒸汽压 Pv</span>
+          <span><span class="result-value" id="r_Pv">—</span><span class="result-unit">kPa</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">可用汽蚀余量 NPSHa</span>
+          <span><span class="result-value" id="r_NPSHa">—</span><span class="result-unit">m</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">最大允许吸水高度 Hs,max</span>
+          <span><span class="result-value" id="r_Hs_max">—</span><span class="result-unit">m</span></span>
+        </div>
+        <div class="check-box" id="checkNPSH">校核中...</div>
+      </div>
+
+      <div class="result-group" id="parallel_group" style="display:none;">
+        <div class="result-group-title">并联分析</div>
+        <div class="result-row">
+          <span class="result-label">工作泵数量</span>
+          <span><span class="result-value" id="r_n_work">—</span><span class="result-unit">台</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">单泵流量</span>
+          <span><span class="result-value" id="r_Q_each">—</span><span class="result-unit">m³/h</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">单泵电机功率</span>
+          <span><span class="result-value" id="r_Pm_each">—</span><span class="result-unit">kW</span></span>
+        </div>
+      </div>
+
+      <div class="result-group" id="vfd_group" style="display:none;">
+        <div class="result-group-title">变频运行（相似律预估）</div>
+        <div class="result-row">
+          <span class="result-label">变频后流量 Q'</span>
+          <span><span class="result-value" id="r_Q_vfd">—</span><span class="result-unit">m³/h</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">变频后扬程 H'</span>
+          <span><span class="result-value" id="r_H_vfd">—</span><span class="result-unit">m</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">变频后功率 P'</span>
+          <span><span class="result-value" id="r_P_vfd">—</span><span class="result-unit">kW</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">节能率估算</span>
+          <span><span class="result-value" id="r_save">—</span><span class="result-unit">%</span></span>
+        </div>
+      </div>
+
+      <div class="model-card">
+        <div class="title">🔖 选型建议</div>
+        <div class="model-name" id="r_suggest">Q = — m³/h, H = — m</div>
+        <div class="model-desc" id="r_suggest_desc">在泵厂样本中按此流量、扬程选择，优先工作点落在高效区（Q_opt 的 80-110%）。</div>
+      </div>
+    </div>
+
+    <div class="buttons">
+      <button class="btn btn-primary" onclick="copyResults()">📋 复制结果</button>
+      <button class="btn btn-secondary" onclick="resetDefaults()">🔄 恢复默认</button>
+      <button class="btn btn-secondary" onclick="toggleFormula()">📖 查看公式</button>
+    </div>
+
+    <div class="formula-box" id="formulaBox" style="display:none;">
+      <h3>① 系统扬程组成</h3>
+      <code>H = Hg + Hp + hw + H_margin</code>
+      <p>Hg = z₂ − z₁（出水液面高 − 吸水液面高，m）<br>
+         Hp = (P₂ − P₁)/(ρ·g) × 100（两侧表压差换算成液柱，m）<br>
+         hw = Σhf + Σhj（沿程损失+局部损失）<br>
+         H_margin：富余量，一般取总扬程的 5-15%。</p>
+
+      <h3>② 功率计算</h3>
+      <code>Pe = ρ·g·Q·H / 1000 / 3600  [kW]（水功率）</code>
+      <code>Psh = Pe / η_pump / η_trans  [kW]（轴功率）</code>
+      <code>Pm = K · Psh / η_motor  [kW]（配套电机）</code>
+      <p>简化公式（清水 ρ=1000, g=9.81）：</p>
+      <code>P_e = Q·H / 367  [kW]  （Q in m³/h, H in m）</code>
+
+      <h3>③ NPSH 汽蚀校核</h3>
+      <code>NPSHa = (Pa − Pv)/(ρ·g) × 100 − Hs − hf_s  [m]</code>
+      <p>Pa 大气压（按海拔），Pv 饱和蒸汽压（按水温），Hs 吸水几何高度（吸上为正），hf_s 吸水管水头损失。</p>
+      <code>NPSHa ≥ NPSHr + 安全余量（0.5~1.0 m）</code>
+      <p><strong>最大允许吸水高度</strong>：</p>
+      <code>Hs_max = (Pa − Pv)/(ρ·g)·100 − NPSHr − hf_s − 安全余量</code>
+
+      <h3>④ 泵相似律（变频调速预估）</h3>
+      <p>对同一台泵在不同转速 n 下：</p>
+      <code>Q' / Q = n' / n</code>
+      <code>H' / H = (n' / n)²</code>
+      <code>P' / P = (n' / n)³</code>
+      <p>⚠️ 降频后扬程快速降低，如系统有较大静扬程，过度降频会导致流量为零。</p>
+
+      <h3>⑤ 海拔-大气压-水汽压关系</h3>
+      <table>
+        <tr><th>海拔 (m)</th><th>大气压 (kPa)</th></tr>
+        <tr><td>0 (海平面)</td><td>101.3</td></tr>
+        <tr><td>500</td><td>95.5</td></tr>
+        <tr><td>1000</td><td>89.9</td></tr>
+        <tr><td>2000</td><td>79.5</td></tr>
+        <tr><td>3000</td><td>70.1</td></tr>
+      </table>
+      <table>
+        <tr><th>水温 (℃)</th><th>饱和蒸汽压 Pv (kPa)</th></tr>
+        <tr><td>10</td><td>1.23</td></tr>
+        <tr><td>20</td><td>2.34</td></tr>
+        <tr><td>30</td><td>4.24</td></tr>
+        <tr><td>40</td><td>7.38</td></tr>
+        <tr><td>60</td><td>19.92</td></tr>
+      </table>
+
+      <h3>⑥ 标准电机功率规格 (Y/Y2/YE3 系列)</h3>
+      <p>0.55、0.75、1.1、1.5、2.2、3.0、4.0、5.5、7.5、11、15、18.5、22、30、37、45、55、75、90、110、132、160、200、250、315、355、400、450、500 kW</p>
+
+      <h3>⑦ 常见场景推荐参数</h3>
+      <table>
+        <tr><th>应用场景</th><th>泵型</th><th>典型效率</th></tr>
+        <tr><td>给水提升（清水）</td><td>IS/ISG/SH 离心泵</td><td>75-85%</td></tr>
+        <tr><td>污水提升</td><td>WQ/QW 潜污泵</td><td>55-70%</td></tr>
+        <tr><td>低扬程大流量（雨水/排涝）</td><td>ZLB 轴流泵</td><td>70-85%</td></tr>
+        <tr><td>污泥输送</td><td>螺杆泵/凸轮转子泵</td><td>40-60%</td></tr>
+        <tr><td>药剂投加</td><td>柱塞/隔膜计量泵</td><td>85-95%</td></tr>
+      </table>
+    </div>
+
+    <div class="note">
+      ⚠️ 本工具用于方案与初步选型，最终型号须根据厂家样本特性曲线确认，使工作点位于 Q_opt 的 80-110% 高效区。对于含杂质介质（污水、污泥）应留有足够过流通道，并在铭牌功率基础上留 15-20% 裕量。
+    </div>
+
+  </div>
+
+  <footer class="tool-inner-footer">水处理工具箱 · 仅供工程估算参考</footer>
+</div>
+</main>
+
+<!-- 统一页脚 -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-main">
+      <div class="footer-col footer-about-col">
+        <a href="index.html" class="brand">
+          <div class="brand-mark">W</div>
+          <div>
+            <div class="brand-name">水处理工具箱</div>
+            <div class="brand-sub">WaterKit · by 登登科技</div>
+          </div>
+        </a>
+        <p class="footer-about">水处理工具箱(WaterKit)是海南登登科技咨询有限公司推出的水处理在线计算工具集合,由一线水处理工艺工程师开发维护。免费、无广告、持续更新。</p>
+      </div>
+      <div class="footer-col">
+        <h4>水力计算</h4>
+        <ul>
+          <li><a href="pipe-hydraulic-calculator.html">管道水力</a></li>
+          <li><a href="open-channel-calculator.html">明渠水力</a></li>
+          <li><a href="weir-flow-calculator.html">堰流计算</a></li>
+          <li><a href="orifice-nozzle-calculator.html">孔口出流</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>工艺与设备</h4>
+        <ul>
+          <li><a href="aeration-calculator.html">曝气量</a></li>
+          <li><a href="sludge-production-calculator.html">污泥产量</a></li>
+          <li><a href="dosing-calculator.html">加药量</a></li>
+          <li><a href="pump-selection-calculator.html">水泵选型</a></li>
+          <li><a href="water-quality-unit-converter.html">水质换算</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="https://dengdengtech.cn" target="_blank" rel="noopener">登登科技官网 ↗</a></li>
+          <li>海南登登科技咨询</li>
+          <li>有限公司</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Open Source</h4>
+        <ul>
+          <li><a href="https://github.com/chengsunmail/waterkit" target="_blank" rel="noopener">GitHub 仓库 ↗</a></li>
+          <li><a href="https://github.com/chengsunmail/waterkit/blob/main/LICENSE" target="_blank" rel="noopener">AGPL-3.0 协议</a></li>
+          <li><a href="https://github.com/chengsunmail/waterkit/issues" target="_blank" rel="noopener">反馈 Issue</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 海南登登科技咨询有限公司 · <a href="https://dengdengtech.cn" target="_blank" rel="noopener">dengdengtech.cn</a></span>
+      <span>WaterKit · V 1.0 · <a href="https://github.com/chengsunmail/waterkit" target="_blank" rel="noopener">开源于 GitHub</a></span>
+    </div>
+  </div>
+</footer>
+
+
+
+<script>
+  const $ = id => document.getElementById(id);
+  const num = id => parseFloat($(id).value) || 0;
+
+  // 标准电机功率规格
+  const STD_MOTORS = [0.55, 0.75, 1.1, 1.5, 2.2, 3.0, 4.0, 5.5, 7.5,
+    11, 15, 18.5, 22, 30, 37, 45, 55, 75, 90, 110, 132, 160, 200, 250,
+    315, 355, 400, 450, 500, 560, 630, 710, 800, 900, 1000];
+
+  // 介质类型默认参数
+  function updateFluid() {
+    const t = $('fluid').value;
+    const defaults = {
+      clean_water: {rho: 1000, eta_pump: 78},
+      sewage:      {rho: 1010, eta_pump: 65},
+      sludge:      {rho: 1020, eta_pump: 55},
+      seawater:    {rho: 1025, eta_pump: 72},
+      chemical:    {rho: 1100, eta_pump: 70},
+    };
+    if (defaults[t]) {
+      $('rho').value = defaults[t].rho;
+      $('eta_pump').value = defaults[t].eta_pump;
+    }
+    calc();
+  }
+
+  // 泵类型推荐效率
+  function updatePumpType() {
+    const t = $('pump_type').value;
+    const defaults = {
+      centrifugal: {eta_pump: 78, NPSHr: 3.5},
+      submerged:   {eta_pump: 65, NPSHr: 2.0},
+      axial:       {eta_pump: 78, NPSHr: 5.0},
+      screw:       {eta_pump: 55, NPSHr: 2.5},
+      dosing:      {eta_pump: 90, NPSHr: 1.5},
+    };
+    if (defaults[t]) {
+      $('eta_pump').value = defaults[t].eta_pump;
+      $('NPSHr').value = defaults[t].NPSHr;
+    }
+    calc();
+  }
+
+  // 大气压随海拔变化
+  function Pa_by_alt(alt) {
+    return 101.325 * Math.pow(1 - 0.0000225577 * alt, 5.25588);
+  }
+  // 饱和蒸汽压 Antoine 简化
+  function Pv_by_T(T) {
+    // Tetens: Pv(kPa) = 0.611 * exp(17.27*T/(T+237.3))
+    return 0.611 * Math.exp(17.27 * T / (T + 237.3));
+  }
+
+  // 选最近的标准电机规格（向上圆整）
+  function pickStdMotor(P) {
+    for (let m of STD_MOTORS) if (m >= P) return m;
+    return STD_MOTORS[STD_MOTORS.length - 1];
+  }
+
+  function calc() {
+    const Q = num('Q');  // m³/h
+    const rho = num('rho');
+    const T = num('T');
+    const g = 9.81;
+
+    // 扬程组成
+    const Hg = num('z_disch') - num('z_suck');
+    const P1 = num('P1'), P2 = num('P2');
+    const Hp = (P2 - P1) * 1000 / (rho * g);  // kPa换算成m液柱
+    const hw = num('hf_s') + num('hf_d') + num('hj');
+    const H_base = Hg + Hp + hw;
+    const margin = num('H_margin') / 100;
+    const H = H_base * (1 + margin);
+
+    // 效率
+    const eta_pump = num('eta_pump') / 100;
+    const eta_trans = num('eta_trans') / 100;
+    const eta_motor = num('eta_motor') / 100;
+    const K = num('K');
+
+    // 功率
+    const Pe = rho * g * (Q/3600) * H / 1000;  // kW
+    const Psh = eta_pump > 0 && eta_trans > 0 ? Pe / eta_pump / eta_trans : 0;
+    const Pm = eta_motor > 0 ? K * Psh / eta_motor : 0;
+    const Pm_std = pickStdMotor(Pm);
+
+    // 并联
+    const n_parallel = Math.max(1, parseInt($('n_parallel').value) || 1);
+    const n_backup = Math.max(0, parseInt($('n_backup').value) || 0);
+    const n_work = Math.max(1, n_parallel - n_backup);
+    const Q_each = Q / n_work;
+
+    // 为了给每台泵算功率，按单泵流量重算（扬程H在并联中基本不变）
+    const Pe_each = rho * g * (Q_each/3600) * H / 1000;
+    const Psh_each = eta_pump > 0 && eta_trans > 0 ? Pe_each / eta_pump / eta_trans : 0;
+    const Pm_each = eta_motor > 0 ? K * Psh_each / eta_motor : 0;
+    const Pm_each_std = pickStdMotor(Pm_each);
+
+    // 运行电费（总功率按n_work台工作泵）
+    const hours = num('hours');
+    const price = num('price');
+    const total_power = Pm_each_std * n_work;  // kW
+    const day_kwh = total_power * hours;
+    const year_cost = day_kwh * 365 * price / 10000;  // 万元
+    const unit_cost = Q > 0 ? (total_power * price) / Q : 0;  // 元/m³
+    const ekwh = Q > 0 ? total_power / Q : 0;  // kWh/m³
+
+    // NPSH 校核
+    const alt = num('altitude');
+    const Pa = Pa_by_alt(alt);
+    const Pv = Pv_by_T(T);
+    const Hs = num('Hs_geom');
+    const hf_s = num('hf_s');
+    const NPSHr = num('NPSHr');
+    const NPSH_safe = num('NPSH_safe');
+    const NPSHa = (Pa - Pv) * 1000 / (rho * g) - Hs - hf_s;
+    const Hs_max = (Pa - Pv) * 1000 / (rho * g) - NPSHr - hf_s - NPSH_safe;
+    const NPSH_margin = NPSHa - NPSHr;
+
+    // 变频分析
+    const speed_ratio = num('speed_ratio') / 100;
+    const Q_vfd = Q * speed_ratio;
+    const H_vfd = H * speed_ratio * speed_ratio;
+    const P_vfd = Pm_std * speed_ratio * speed_ratio * speed_ratio;
+    const save = Pm_std > 0 ? (1 - P_vfd/Pm_std) * 100 : 0;
+
+    // 渲染结果
+    $('r_Hg').textContent = Hg.toFixed(2);
+    $('r_Hp').textContent = Hp.toFixed(2);
+    $('r_hw').textContent = hw.toFixed(2);
+    $('r_H').textContent = H.toFixed(2);
+    $('r_Pe').textContent = Pe.toFixed(2);
+    $('r_Psh').textContent = Psh.toFixed(2);
+    $('r_Pm').textContent = Pm.toFixed(2);
+    $('r_Pm_std').textContent = Pm_std.toFixed(1);
+
+    $('r_ekwh').textContent = ekwh.toFixed(3);
+    $('r_day_kwh').textContent = day_kwh.toFixed(0);
+    $('r_year_cost').textContent = year_cost.toFixed(2);
+    $('r_unit_cost').textContent = unit_cost.toFixed(3);
+
+    $('r_Pa').textContent = Pa.toFixed(2);
+    $('r_Pv').textContent = Pv.toFixed(2);
+    $('r_NPSHa').textContent = NPSHa.toFixed(2);
+    $('r_Hs_max').textContent = Hs_max.toFixed(2);
+
+    // NPSH 校核结果
+    const cbox = $('checkNPSH');
+    if (NPSH_margin >= NPSH_safe) {
+      cbox.className = 'check-box check-ok';
+      cbox.innerHTML = `✓ 通过 NPSHa (${NPSHa.toFixed(2)} m) ≥ NPSHr (${NPSHr.toFixed(2)} m) + ${NPSH_safe.toFixed(1)} m 安全余量，余量 ${NPSH_margin.toFixed(2)} m`;
+    } else if (NPSH_margin >= 0) {
+      cbox.className = 'check-box check-warn';
+      cbox.innerHTML = `⚠ 安全余量不足 NPSHa − NPSHr = ${NPSH_margin.toFixed(2)} m，小于要求安全余量 ${NPSH_safe.toFixed(1)} m，建议降低 Hs 或换低 NPSHr 泵`;
+    } else {
+      cbox.className = 'check-box check-bad';
+      cbox.innerHTML = `✗ 汽蚀风险 NPSHa (${NPSHa.toFixed(2)} m) &lt; NPSHr (${NPSHr.toFixed(2)} m)，必然发生汽蚀！必须将泵位置降低 ≥ ${(NPSHr - NPSHa + NPSH_safe).toFixed(2)} m 或倒灌安装`;
+    }
+
+    // 并联显示
+    if (n_parallel > 1) {
+      $('parallel_group').style.display = 'block';
+      $('r_n_work').textContent = `${n_work} （总 ${n_parallel} 台，含 ${n_backup} 台备用）`;
+      $('r_Q_each').textContent = Q_each.toFixed(1);
+      $('r_Pm_each').textContent = `${Pm_each.toFixed(2)} → ${Pm_each_std.toFixed(1)} (标准)`;
+    } else {
+      $('parallel_group').style.display = 'none';
+    }
+
+    // 变频显示
+    if (Math.abs(speed_ratio - 1) > 0.001) {
+      $('vfd_group').style.display = 'block';
+      $('r_Q_vfd').textContent = Q_vfd.toFixed(1);
+      $('r_H_vfd').textContent = H_vfd.toFixed(2);
+      $('r_P_vfd').textContent = P_vfd.toFixed(2);
+      $('r_save').textContent = save.toFixed(1);
+    } else {
+      $('vfd_group').style.display = 'none';
+    }
+
+    // 选型建议
+    if (n_parallel > 1) {
+      $('r_suggest').textContent = `单泵：Q = ${Q_each.toFixed(0)} m³/h, H = ${H.toFixed(1)} m, N = ${Pm_each_std} kW × ${n_parallel} 台`;
+    } else {
+      $('r_suggest').textContent = `Q = ${Q.toFixed(0)} m³/h, H = ${H.toFixed(1)} m, N = ${Pm_std} kW`;
+    }
+    const type_names = {centrifugal:'ISG立式离心泵', submerged:'WQ潜污泵', axial:'ZLB轴流泵', screw:'螺杆泵', dosing:'计量泵'};
+    $('r_suggest_desc').textContent = `建议选型：${type_names[$('pump_type').value] || '离心泵'}。查厂家样本使工作点落在高效区（Q_opt 的 80-110%）。`;
+  }
+
+  function copyResults() {
+    const txt = `水泵选型计算结果
+————————————————
+设计流量 Q = ${num('Q')} m³/h
+系统扬程 H = ${$('r_H').textContent} m
+介质: ${$('fluid').options[$('fluid').selectedIndex].text}, ρ=${num('rho')} kg/m³, T=${num('T')}℃
+
+【扬程分解】
+几何扬程 Hg = ${$('r_Hg').textContent} m
+压力扬程 Hp = ${$('r_Hp').textContent} m
+水头损失 hw = ${$('r_hw').textContent} m
+
+【功率】
+有效功率 Pe = ${$('r_Pe').textContent} kW
+泵轴功率 Psh = ${$('r_Psh').textContent} kW
+电机配套 Pm = ${$('r_Pm').textContent} kW → 标准 ${$('r_Pm_std').textContent} kW
+
+【能耗】
+吨水能耗 = ${$('r_ekwh').textContent} kWh/m³
+日耗电 = ${$('r_day_kwh').textContent} kWh/d
+年电费 = ${$('r_year_cost').textContent} 万元
+吨水电耗成本 = ${$('r_unit_cost').textContent} 元/m³
+
+【NPSH 校核】
+Pa = ${$('r_Pa').textContent} kPa, Pv = ${$('r_Pv').textContent} kPa
+NPSHa = ${$('r_NPSHa').textContent} m, NPSHr = ${num('NPSHr')} m
+最大允许吸水高度 = ${$('r_Hs_max').textContent} m
+
+【选型建议】
+${$('r_suggest').textContent}`;
+    navigator.clipboard.writeText(txt).then(() => {
+      alert('结果已复制到剪贴板');
+    }).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = txt;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      alert('结果已复制');
+    });
+  }
+
+  function resetDefaults() {
+    location.reload();
+  }
+
+  function toggleFormula() {
+    const box = $('formulaBox');
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  }
+
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('input', calc);
+    el.addEventListener('change', calc);
+  });
+
+  calc();
+</script>
+
+</body>
+</html>
