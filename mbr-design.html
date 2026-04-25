@@ -1,0 +1,1732 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MBR 工程设计平台 | WaterKit</title>
+<meta name="description" content="MBR(膜生物反应器)工程设计平台，覆盖主设计计算、深度膜选型、清洗方案、能耗分析、案例库、发展史。依据 HJ 2010-2011 / Metcalf&Eddy。">
+<meta name="keywords" content="MBR,膜生物反应器,中空纤维膜,平板膜,膜通量,膜污染,ZeeWeed,Kubota,碧水源,三菱化学,水处理,WaterKit">
+<link rel="canonical" href="https://waterkit.cn/mbr-design.html">
+<style>
+  :root {
+    --brand: #0891b2; --brand-dark: #0e7490; --brand-light: #e0f2fe;
+    --text: #0f172a; --text-muted: #64748b; --text-faint: #94a3b8;
+    --border: #e2e8f0; --bg: #f8fafc; --white: #ffffff;
+    --ok: #16a34a; --warn: #d97706; --bad: #dc2626; --info: #2563eb;
+    --radius: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.5; }
+  a { color: var(--brand); text-decoration: none; }
+
+  /* ===== Hero ===== */
+  .hero { background: linear-gradient(135deg, #0c4a6e 0%, #0e7490 60%, #0891b2 100%); color: white; padding: 28px 24px 0; }
+  .hero-inner { max-width: 1280px; margin: 0 auto; }
+  .breadcrumb { font-size: 12px; opacity: 0.7; margin-bottom: 10px; }
+  .breadcrumb a { color: white; opacity: 0.8; }
+  .hero-badge { display: inline-block; background: rgba(255,255,255,0.15); padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 8px; }
+  .hero-title { font-size: clamp(22px,4vw,32px); font-weight: 700; margin-bottom: 8px; }
+  .hero-sub { font-size: 13px; opacity: 0.85; line-height: 1.6; max-width: 760px; margin-bottom: 16px; }
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 12px; padding-bottom: 4px; font-size: 12px; opacity: 0.8; }
+
+  /* ===== Tab Nav ===== */
+  .tab-nav-wrap { background: white; border-bottom: 2px solid var(--border); position: sticky; top: 0; z-index: 100; }
+  .tab-nav { max-width: 1280px; margin: 0 auto; display: flex; overflow-x: auto; padding: 0 12px; scrollbar-width: none; }
+  .tab-nav::-webkit-scrollbar { display: none; }
+  .tab-btn { flex-shrink: 0; padding: 14px 18px 12px; border: none; border-bottom: 3px solid transparent; background: none; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: 2px; transition: color 0.15s; }
+  .tab-btn:hover:not(.disabled) { color: var(--brand); }
+  .tab-btn.active { color: var(--brand); border-bottom-color: var(--brand); }
+  .tab-sub { font-size: 10px; font-weight: 500; opacity: 0.65; }
+
+  /* ===== Main Layout ===== */
+  main { max-width: 1280px; margin: 0 auto; padding: 20px 16px 60px; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ===== Common Components ===== */
+  .section-title { font-size: 14px; font-weight: 700; color: var(--text); margin: 24px 0 12px; display: flex; align-items: center; gap: 8px; }
+  .section-title .num { width: 22px; height: 22px; background: var(--brand); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .section-title .sub { font-weight: 400; font-size: 12px; color: var(--text-muted); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 10px; margin-bottom: 14px; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+  .field input, .field select { border: 1.5px solid var(--border); border-radius: 6px; padding: 7px 10px; font-size: 14px; background: white; color: var(--text); width: 100%; transition: border-color 0.15s; }
+  .field input:focus, .field select:focus { outline: none; border-color: var(--brand); }
+  .unit { font-size: 11px; font-weight: 400; color: var(--text-faint); }
+  .helper { font-size: 11px; color: var(--text-faint); margin-top: 2px; }
+  .results { background: linear-gradient(135deg, #f0f9ff 0%, #f0fdf4 100%); border: 1px solid #bae6fd; border-radius: 12px; padding: 20px; margin-top: 20px; }
+  .results h2 { font-size: 17px; color: var(--brand-dark); margin-bottom: 16px; }
+  .result-group { margin-bottom: 16px; }
+  .result-group-title { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .result-group-title .ic { font-style: normal; }
+  .auto-tag { background: #dcfce7; color: #166534; font-size: 10px; padding: 1px 6px; border-radius: 3px; font-weight: 700; margin-left: 4px; }
+  .result-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 13px; }
+  .result-row:last-child { border-bottom: none; }
+  .result-label { color: var(--text-muted); }
+  .result-value { font-weight: 600; color: var(--text); }
+  .result-value.big { font-size: 18px; color: var(--brand-dark); }
+  .result-unit { font-size: 11px; color: var(--text-faint); margin-left: 3px; }
+  .highlight-row { background: rgba(8,145,178,0.05); border-radius: 4px; padding: 7px 4px; }
+  .highlight-row .result-label { font-weight: 600; color: var(--text); }
+  .check-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+  .check-item { display: flex; gap: 8px; align-items: flex-start; padding: 8px 12px; border-radius: 6px; font-size: 12px; line-height: 1.5; }
+  .check-item .ic { font-size: 14px; flex-shrink: 0; }
+  .check-ok { background: #f0fdf4; }
+  .check-warn { background: #fefce8; }
+  .check-bad { background: #fef2f2; }
+  .check-info { background: #eff6ff; }
+  .note { background: #fffbeb; border-left: 3px solid #f59e0b; padding: 10px 14px; border-radius: 0 6px 6px 0; font-size: 12px; line-height: 1.7; margin-top: 14px; color: var(--text); }
+  .auto-calc-notice { background: #f0f9ff; border-left: 3px solid var(--brand); padding: 10px 14px; border-radius: 0 6px 6px 0; margin-bottom: 14px; font-size: 12px; line-height: 1.7; }
+  .notice-head { display: flex; gap: 8px; align-items: flex-start; }
+  .notice-ic { font-size: 16px; flex-shrink: 0; }
+  .score-ring { display: flex; gap: 20px; align-items: center; margin-top: 10px; }
+  .score-num { font-size: 36px; font-weight: 700; color: var(--brand-dark); }
+  .score-label { font-size: 12px; color: var(--text-muted); }
+  .score-title { font-size: 14px; font-weight: 700; color: var(--text); }
+  .water-preset { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+  .preset-tab { padding: 6px 16px; border: 1.5px solid var(--border); border-radius: 6px; background: white; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text-muted); transition: all 0.15s; }
+  .preset-tab.active { background: var(--brand); color: white; border-color: var(--brand); }
+  .subtype-tabs { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .subtype-tab { padding: 8px 14px; border: 1.5px solid var(--border); border-radius: 8px; background: white; cursor: pointer; font-size: 12px; text-align: left; transition: all 0.15s; min-width: 140px; }
+  .subtype-tab.active { border-color: var(--brand); background: var(--brand-light); }
+  .subtype-tab b { display: block; font-size: 13px; color: var(--text); }
+  .subtype-tab span { color: var(--text-muted); font-size: 11px; }
+  .advanced-toggle { cursor: pointer; font-size: 12px; color: var(--brand); display: flex; align-items: center; gap: 6px; padding: 6px 0; user-select: none; }
+  .advanced-params { display: none; }
+  .advanced-params.open { display: block; }
+  .flow-diagram { background: white; border-radius: 8px; padding: 12px; border: 1px solid var(--border); margin-bottom: 14px; overflow-x: auto; }
+  .buttons { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+  .btn { padding: 9px 20px; border-radius: 6px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.15s; }
+  .btn-primary { background: var(--brand); color: white; }
+  .btn-primary:hover { background: var(--brand-dark); }
+  .btn-secondary { background: white; color: var(--text-muted); border: 1.5px solid var(--border); }
+  .carrier-intro { background: linear-gradient(135deg,#ecfeff 0%,#f0fdf4 100%); border-radius: 12px; padding: 20px 24px; margin-bottom: 20px; border-left: 4px solid var(--brand); }
+  .carrier-intro h3 { font-size: 18px; color: var(--brand-dark); margin-bottom: 8px; }
+  .carrier-intro p { font-size: 13px; line-height: 1.7; color: var(--text); }
+  .mini-spec { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; font-size: 12px; color: var(--text-muted); }
+
+  /* ===== 膜选型专用 ===== */
+  .membrane-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap: 16px; margin: 14px 0 20px; }
+  .mem-card { background: white; border-radius: 10px; border: 2px solid var(--border); overflow: hidden; transition: border-color 0.2s, box-shadow 0.2s; cursor: pointer; }
+  .mem-card:hover { border-color: var(--brand); box-shadow: 0 4px 12px rgba(8,145,178,0.12); }
+  .mem-card.selected { border-color: var(--brand); background: var(--brand-light); }
+  .mem-card-head { padding: 12px 16px; display: flex; justify-content: space-between; align-items: flex-start; }
+  .mem-card-type { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 700; }
+  .mem-hf { background: #dbeafe; color: #1e40af; }
+  .mem-fs { background: #dcfce7; color: #166534; }
+  .mem-card-brand { font-size: 15px; font-weight: 700; color: var(--text); }
+  .mem-card-product { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .mem-card-origin { font-size: 11px; color: var(--text-faint); }
+  .mem-specs { padding: 0 16px 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .mem-spec-item { }
+  .mem-spec-label { font-size: 10px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.05em; }
+  .mem-spec-value { font-size: 13px; font-weight: 600; color: var(--text); }
+  .mem-card-footer { padding: 10px 16px; background: rgba(0,0,0,0.02); border-top: 1px solid var(--border); font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+  .mem-selector-notice { background: #eff6ff; border-left: 3px solid var(--info); padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 14px 0; font-size: 13px; line-height: 1.7; }
+
+  .compare-table { width: 100%; border-collapse: collapse; font-size: 12px; background: white; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); margin: 14px 0; }
+  .compare-table th { background: #f1f5f9; padding: 10px 12px; text-align: left; font-weight: 700; color: var(--text); border-bottom: 2px solid var(--border); }
+  .compare-table td { padding: 9px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table .td-hf { background: #eff6ff; }
+  .compare-table .td-fs { background: #f0fdf4; }
+  .compare-table .td-label { font-weight: 600; color: var(--text); background: #f8fafc; }
+  .tag-good { background: #dcfce7; color: #166534; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 700; }
+  .tag-warn { background: #fef9c3; color: #713f12; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 700; }
+
+  .decision-tree { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin: 14px 0; }
+  .dt-title { font-size: 14px; font-weight: 700; margin-bottom: 14px; color: var(--brand-dark); }
+  .dt-row { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #f1f5f9; }
+  .dt-row:last-child { border-bottom: none; margin-bottom: 0; }
+  .dt-condition { flex: 1; font-size: 12px; line-height: 1.6; }
+  .dt-arrow { font-size: 16px; flex-shrink: 0; padding-top: 1px; }
+  .dt-result { flex: 1; font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: 6px; }
+  .dt-hf { background: #eff6ff; color: #1e40af; }
+  .dt-fs { background: #f0fdf4; color: #166534; }
+  .dt-both { background: #fef9c3; color: #713f12; }
+
+  .calc-area { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin: 14px 0; }
+  .calc-title { font-size: 14px; font-weight: 700; margin-bottom: 12px; color: var(--text); }
+
+  /* ===== Tab 3 清洗方案 ===== */
+  .cleaning-stage-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin: 12px 0 20px; }
+  @media(max-width: 900px) { .cleaning-stage-grid { grid-template-columns: 1fr; } }
+  .clean-card { padding: 14px 16px; border-radius: 10px; border-left: 4px solid; }
+  .clean-online { background: #f0fdf4; border-left-color: #16a34a; }
+  .clean-ceb { background: #fefce8; border-left-color: #ca8a04; }
+  .clean-cip { background: #fef2f2; border-left-color: #dc2626; }
+  .clean-head { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .clean-trigger { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; font-style: italic; }
+  .clean-params { font-size: 12px; line-height: 1.8; }
+  .clean-params b { color: var(--text); }
+
+  .tmp-gauge { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin: 14px 0; }
+  .tmp-bar-wrap { position: relative; height: 28px; border-radius: 6px; overflow: hidden; margin: 12px 0; display: flex; }
+  .tmp-seg { height: 100%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; }
+  .tmp-normal { background: #16a34a; flex: 20; }
+  .tmp-op { background: #f59e0b; flex: 15; }
+  .tmp-alert { background: #dc2626; flex: 15; }
+  .tmp-marker { position: absolute; top: -4px; width: 3px; height: 36px; background: var(--text); border-radius: 2px; }
+  .tmp-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); }
+
+  /* ===== Tab 4 能耗分析 ===== */
+  .energy-bar-chart { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin: 14px 0; }
+  .energy-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .energy-label { width: 130px; font-size: 12px; color: var(--text-muted); flex-shrink: 0; text-align: right; }
+  .energy-bar-bg { flex: 1; height: 22px; background: #f1f5f9; border-radius: 4px; overflow: hidden; }
+  .energy-bar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 8px; font-size: 11px; font-weight: 700; color: white; min-width: 30px; transition: width 0.4s; }
+  .energy-value { width: 80px; font-size: 12px; font-weight: 600; color: var(--text); }
+
+  /* ===== Tab 5 案例库 ===== */
+  .case-cards-mbr { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap: 16px; margin: 14px 0; }
+  .case-card-mbr { background: white; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .ccm-head { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+  .ccm-tag { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 700; margin-bottom: 6px; }
+  .ccm-tag-muni { background: #dbeafe; color: #1e40af; }
+  .ccm-tag-ind { background: #fce7f3; color: #9d174d; }
+  .ccm-tag-leach { background: #d1fae5; color: #065f46; }
+  .ccm-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .ccm-scale { font-size: 12px; color: var(--text-muted); }
+  .ccm-specs { padding: 12px 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .ccm-spec { }
+  .ccm-spec-label { font-size: 10px; color: var(--text-faint); text-transform: uppercase; }
+  .ccm-spec-value { font-size: 13px; font-weight: 600; color: var(--text); }
+  .ccm-footer { padding: 10px 16px; background: #f8fafc; font-size: 11px; color: var(--text-muted); border-top: 1px solid var(--border); line-height: 1.6; }
+
+  /* ===== Tab 6 发展史 ===== */
+  .history-intro { padding: 20px 24px; background: linear-gradient(135deg,#ecfeff 0%,#f0fdf4 100%); border-radius: 12px; margin-bottom: 20px; border-left: 4px solid var(--brand); }
+  .history-intro h3 { font-size: 20px; color: var(--brand-dark); margin: 0 0 10px 0; }
+  .history-intro p { font-size: 13px; line-height: 1.7; color: var(--text); }
+  .inventor-card { padding: 18px 22px; background: linear-gradient(135deg,#eff6ff 0%,#f0fdf4 100%); border-radius: 12px; margin: 14px 0 20px; border: 1px solid #bfdbfe; }
+  .inventor-name { font-size: 18px; font-weight: 700; color: #1e40af; margin-bottom: 4px; }
+  .inventor-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+  .inventor-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 20px; font-size: 12px; line-height: 1.7; }
+  @media(max-width:700px) { .inventor-info-grid { grid-template-columns: 1fr; } }
+  .timeline-wrap { position: relative; padding: 10px 0; margin: 14px 0 20px; }
+  .timeline-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; background: linear-gradient(180deg,#3b82f6 0%,#0891b2 50%,#16a34a 100%); transform: translateX(-50%); }
+  .tl-node { position: relative; display: flex; margin-bottom: 22px; min-height: 70px; }
+  .tl-node.tl-left { justify-content: flex-start; }
+  .tl-node.tl-right { justify-content: flex-end; }
+  .tl-dot { position: absolute; left: 50%; top: 13px; width: 14px; height: 14px; border-radius: 50%; background: white; border: 3px solid var(--brand); transform: translateX(-50%); z-index: 2; }
+  .tl-dot.tl-key { background: #f59e0b; border-color: #d97706; width: 18px; height: 18px; top: 11px; box-shadow: 0 0 0 4px rgba(245,158,11,0.2); }
+  .tl-content { width: 44%; padding: 10px 14px; background: white; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+  .tl-content.tl-highlight { background: #fffbeb; border-color: #fcd34d; }
+  .tl-year { font-size: 13px; font-weight: 700; color: var(--brand); margin-bottom: 3px; }
+  .tl-title { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+  .tl-desc { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+  @media(max-width:700px) {
+    .timeline-line { left: 20px; }
+    .tl-dot { left: 20px; }
+    .tl-node,.tl-node.tl-right { justify-content: flex-start; }
+    .tl-content { width: calc(100% - 44px); margin-left: 36px; }
+  }
+  .china-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 12px 0 20px; }
+  @media(max-width:800px) { .china-grid { grid-template-columns: 1fr; } }
+  .china-phase { padding: 14px 16px; border-radius: 10px; background: white; border: 1px solid var(--border); border-top: 4px solid; }
+  .china-phase.cp-1 { border-top-color: #dc2626; background: #fef2f2; }
+  .china-phase.cp-2 { border-top-color: #f59e0b; background: #fffbeb; }
+  .china-phase.cp-3 { border-top-color: #16a34a; background: #f0fdf4; }
+  .china-phase.cp-4 { border-top-color: #0891b2; background: #ecfeff; }
+  .cp-year { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; }
+  .cp-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+  .cp-body { font-size: 12px; line-height: 1.7; color: var(--text); }
+  .cp-body ul { margin: 6px 0 0 18px; padding: 0; }
+  .cp-body li { margin-bottom: 3px; }
+
+  /* ===== 页脚 ===== */
+  .footer { background: white; border-top: 1px solid var(--border); padding: 20px 24px; text-align: center; }
+  .footer-inner { max-width: 1280px; margin: 0 auto; font-size: 12px; color: var(--text-muted); line-height: 1.8; }
+  .footer a { color: var(--text-muted); }
+  .footer a:hover { color: var(--brand); }
+
+  @media(max-width:600px) {
+    main { padding: 14px 10px 40px; }
+    .grid { grid-template-columns: 1fr 1fr; }
+    .membrane-cards { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== Hero ===== -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="breadcrumb">
+      <a href="index.html">WaterKit</a> / <a href="activated-sludge-process-calculator.html">工艺计算</a> / MBR 工程设计平台
+    </div>
+    <div class="hero-badge">🧫 MBR 工程设计</div>
+    <h1 class="hero-title">MBR 工程设计平台</h1>
+    <p class="hero-sub">
+      膜生物反应器(MBR)工程设计平台，覆盖主设计计算、深度膜选型、清洗方案设计、能耗分析、典型案例、工艺发展史全流程。
+      依据 HJ 2010-2011 / Metcalf&Eddy，覆盖市政污水再生利用、垃圾渗滤液、工业废水等场景。
+    </p>
+    <div class="hero-meta">
+      <span>📘 <b>依据 HJ 2010-2011</b></span>
+      <span>🌡️ <b>温度修正 3%/°C</b></span>
+      <span>🧫 <b>5 大品牌参数库</b></span>
+      <span>⚠️ 方案估算级，工程实施以设计院施工图为准</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Tab Nav ===== -->
+<div class="tab-nav-wrap">
+  <div class="tab-nav">
+    <button class="tab-btn active" data-tab="design" onclick="switchTab('design')">
+      主设计计算<span class="tab-sub">Design</span>
+    </button>
+    <button class="tab-btn" data-tab="membrane" onclick="switchTab('membrane')">
+      膜选型<span class="tab-sub">Membrane</span>
+    </button>
+    <button class="tab-btn" data-tab="cleaning" onclick="switchTab('cleaning')">
+      清洗方案<span class="tab-sub">Cleaning</span>
+    </button>
+    <button class="tab-btn" data-tab="energy" onclick="switchTab('energy')">
+      能耗分析<span class="tab-sub">Energy</span>
+    </button>
+    <button class="tab-btn" data-tab="cases" onclick="switchTab('cases')">
+      案例库<span class="tab-sub">Cases</span>
+    </button>
+    <button class="tab-btn" data-tab="history" onclick="switchTab('history')">
+      MBR 发展史<span class="tab-sub">History</span>
+    </button>
+  </div>
+</div>
+
+<main>
+
+<!-- ===== Tab 1: 主设计计算 ===== -->
+<div class="tab-panel active" id="panel-design">
+
+  <div class="section-title"><span class="num">1</span>水种 & 生物段配置</div>
+  <div class="water-preset">
+    <button class="preset-tab active" data-preset="municipal" onclick="setPreset('municipal')">城镇污水</button>
+    <button class="preset-tab" data-preset="industrial" onclick="setPreset('industrial')">工业废水</button>
+    <button class="preset-tab" data-preset="leachate" onclick="setPreset('leachate')">垃圾渗滤液</button>
+    <button class="preset-tab" data-preset="reuse" onclick="setPreset('reuse')">中水回用</button>
+  </div>
+  <div class="subtype-tabs">
+    <button class="subtype-tab active" data-bio="aao" onclick="setBioConfig('aao')">
+      <b>MBR + AAO</b><span>脱氮除磷 · 最常用</span>
+    </button>
+    <button class="subtype-tab" data-bio="ao_an" onclick="setBioConfig('ao_an')">
+      <b>MBR + AO 缺氧</b><span>脱氮 · 省厌氧段</span>
+    </button>
+    <button class="subtype-tab" data-bio="single_o" onclick="setBioConfig('single_o')">
+      <b>MBR + 单好氧</b><span>只除 COD · 最简</span>
+    </button>
+  </div>
+
+  <div class="section-title"><span class="num">2</span>进水条件</div>
+  <div class="grid">
+    <div class="field"><label>Q <span class="unit">万 m³/d</span></label>
+      <input type="number" id="d_Q" value="3" step="0.5" oninput="calc()"></div>
+    <div class="field"><label>T <span class="unit">°C</span></label>
+      <input type="number" id="d_T" value="20" step="1" oninput="calc()"></div>
+    <div class="field"><label>COD₀ <span class="unit">mg/L</span></label>
+      <input type="number" id="d_COD0" value="400" step="10" oninput="calc()"></div>
+    <div class="field"><label>BOD₅₀ <span class="unit">mg/L</span></label>
+      <input type="number" id="d_BOD0" value="180" step="5" oninput="calc()"></div>
+    <div class="field"><label>TN₀ <span class="unit">mg/L</span></label>
+      <input type="number" id="d_TN0" value="45" step="1" oninput="calc()"></div>
+    <div class="field"><label>NH₄-N₀ <span class="unit">mg/L</span></label>
+      <input type="number" id="d_NH40" value="35" step="1" oninput="calc()"></div>
+    <div class="field"><label>TP₀ <span class="unit">mg/L</span></label>
+      <input type="number" id="d_TP0" value="5" step="0.2" oninput="calc()"></div>
+    <div class="field"><label>SS₀ <span class="unit">mg/L</span></label>
+      <input type="number" id="d_SS0" value="200" step="10" oninput="calc()"></div>
+  </div>
+
+  <div class="section-title"><span class="num">3</span>出水目标</div>
+  <div class="grid">
+    <div class="field"><label>排放标准</label>
+      <select id="d_standard" onchange="applyStandard()">
+        <option value="1A">一级 A (GB18918)</option>
+        <option value="grade4">地表 IV 类</option>
+        <option value="grade3">地表 III 类</option>
+        <option value="reuse">城市杂用水</option>
+        <option value="custom">自定义</option>
+      </select></div>
+    <div class="field"><label>COD出</label><input type="number" id="d_CODe" value="30" step="1" oninput="calc()"></div>
+    <div class="field"><label>BOD出</label><input type="number" id="d_BODe" value="6" step="0.5" oninput="calc()"></div>
+    <div class="field"><label>NH₄-N出</label><input type="number" id="d_NH4e" value="1.5" step="0.5" oninput="calc()"></div>
+    <div class="field"><label>TN出</label><input type="number" id="d_TNe" value="10" step="0.5" oninput="calc()"></div>
+    <div class="field"><label>TP出</label><input type="number" id="d_TPe" value="0.3" step="0.1" oninput="calc()"></div>
+  </div>
+
+  <div class="section-title"><span class="num">4</span>生物段参数</div>
+  <div class="grid">
+    <div class="field"><label>MLSS <span class="unit">mg/L</span></label>
+      <input type="number" id="d_MLSS" value="10000" step="500" oninput="calc()">
+      <div class="helper">MBR 常 8000-12000</div></div>
+    <div class="field"><label>MLVSS/MLSS</label>
+      <input type="number" id="d_VSS_SS" value="0.72" step="0.01" oninput="calc()"></div>
+    <div class="field"><label>SRT <span class="unit">d</span></label>
+      <input type="number" id="d_SRT" value="25" step="1" oninput="calc()">
+      <div class="helper">MBR 常 20-30d</div></div>
+    <div class="field"><label>安全系数 SF</label>
+      <input type="number" id="d_SF" value="2.5" step="0.1" oninput="calc()"></div>
+    <div class="field"><label>厌氧段 HRT <span class="unit">h</span></label>
+      <input type="number" id="d_HRT_AN" value="1.0" step="0.1" oninput="calc()">
+      <div class="helper">仅 AAO 配置有效</div></div>
+  </div>
+
+  <div class="section-title"><span class="num">5</span>膜系统参数</div>
+  <div class="auto-calc-notice">
+    <div class="notice-head"><span class="notice-ic">🌡️</span>
+      <span>膜通量温度修正：J(T) = J₂₀ × 1.03^(T-20)。温度每降 1°C 通量减少约 3%，冬季低温时膜面积需求增加。</span>
+    </div>
+  </div>
+  <div class="grid">
+    <div class="field"><label>膜类型</label>
+      <select id="d_memType" onchange="applyMemType()">
+        <option value="hf">中空纤维膜 (HF)</option>
+        <option value="fs">平板式膜 (FS)</option>
+      </select></div>
+    <div class="field"><label>设计通量 J₂₀ <span class="unit">LMH @20°C</span></label>
+      <input type="number" id="d_J20" value="20" step="1" oninput="calc()">
+      <div class="helper" id="d_J_helper">中空纤维: 12-30，平板: 16-50</div></div>
+    <div class="field"><label>峰值系数</label>
+      <input type="number" id="d_peakFactor" value="1.3" step="0.1" oninput="calc()">
+      <div class="helper">应对峰值 1.3-1.8</div></div>
+    <div class="field"><label>运行时间比 <span class="unit">%</span></label>
+      <input type="number" id="d_runRatio" value="95" step="1" oninput="calc()">
+      <div class="helper">产水 95%, 5% 停机清洗</div></div>
+    <div class="field"><label>单组件膜面积 <span class="unit">m²</span></label>
+      <input type="number" id="d_moduleArea" value="25" step="1" oninput="calc()">
+      <div class="helper" id="d_mod_helper">三菱 25m², ZeeWeed 70m²</div></div>
+    <div class="field"><label>设计 TMP <span class="unit">kPa</span></label>
+      <input type="number" id="d_TMP" value="25" step="5" oninput="calc()">
+      <div class="helper">正常 10-35, 报警 >40</div></div>
+  </div>
+
+  <div class="advanced-toggle" onclick="toggleAdv()">
+    <span id="advChev">▸</span>
+    <span>高级参数 (动力学 / 曝气 / α β)</span>
+  </div>
+  <div class="advanced-params" id="advParams">
+    <div class="grid">
+      <div class="field"><label>Y</label><input type="number" id="d_Y" value="0.55" step="0.05" oninput="calc()"></div>
+      <div class="field"><label>Kd</label><input type="number" id="d_Kd" value="0.05" step="0.01" oninput="calc()"></div>
+      <div class="field"><label>μ_max <span class="unit">d⁻¹</span></label><input type="number" id="d_mumax" value="0.75" step="0.05" oninput="calc()"></div>
+      <div class="field"><label>SDNR₂₀ <span class="unit">g N/g VSS·d</span></label><input type="number" id="d_SDNR20" value="0.08" step="0.01" oninput="calc()"></div>
+      <div class="field"><label>α (膜池 FOC)</label><input type="number" id="d_alpha" value="0.55" step="0.05" oninput="calc()">
+        <div class="helper">MBR α 偏低 0.5-0.6</div></div>
+      <div class="field"><label>β</label><input type="number" id="d_beta" value="0.95" step="0.01" oninput="calc()"></div>
+      <div class="field"><label>膜曝气能耗 <span class="unit">kWh/m³水</span></label>
+        <input type="number" id="d_eMembrane" value="0.25" step="0.05" oninput="calc()">
+        <div class="helper">MBR 膜曝气特有, 约 0.2-0.3</div></div>
+      <div class="field"><label>化学清洗周期 <span class="unit">月</span></label>
+        <input type="number" id="d_cleanCycle" value="4" step="1" oninput="calc()">
+        <div class="helper">HF 约 3-4, FS 约 6</div></div>
+    </div>
+  </div>
+
+  <!-- 结果 -->
+  <div class="results">
+    <h2>🎯 <span id="d_titleSub">MBR + AAO</span> 设计结果</h2>
+
+    <div class="flow-diagram">
+      <svg id="mbrFlowSvg" width="100%" height="240" viewBox="0 0 960 240" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+
+    <div class="result-group">
+      <div class="result-group-title"><span class="ic">📐</span> 生物段池容</div>
+      <div class="result-row highlight-row"><span class="result-label"><b>生物池总容 V</b></span>
+        <span><span class="result-value big" id="d_r_V">—</span><span class="result-unit">m³</span></span></div>
+      <div class="result-row highlight-row"><span class="result-label"><b>总 HRT</b></span>
+        <span><span class="result-value big" id="d_r_HRT">—</span><span class="result-unit">h</span></span></div>
+      <div class="result-row" id="row_AN"><span class="result-label">厌氧段 V_AN</span>
+        <span><span class="result-value" id="d_r_VAN">—</span><span class="result-unit">m³</span></span></div>
+      <div class="result-row" id="row_AX"><span class="result-label">缺氧段 V_AX</span>
+        <span><span class="result-value" id="d_r_VAX">—</span><span class="result-unit">m³</span></span></div>
+      <div class="result-row"><span class="result-label">好氧/膜段 V_O</span>
+        <span><span class="result-value" id="d_r_VO">—</span><span class="result-unit">m³</span></span></div>
+      <div class="result-row"><span class="result-label">较传统活性污泥省地</span>
+        <span><span class="result-value" id="d_r_saveV">—</span><span class="result-unit">%</span></span></div>
+    </div>
+
+    <div class="result-group">
+      <div class="result-group-title"><span class="ic">🧫</span> 膜系统设计</div>
+      <div class="result-row highlight-row"><span class="result-label"><b>总膜面积 A_m</b></span>
+        <span><span class="result-value big" id="d_r_Am">—</span><span class="result-unit">m²</span></span></div>
+      <div class="result-row highlight-row"><span class="result-label"><b>实际通量 J(T°C)</b></span>
+        <span><span class="result-value big" id="d_r_JT">—</span><span class="result-unit">LMH</span></span></div>
+      <div class="result-row"><span class="result-label">膜组件数量</span>
+        <span><span class="result-value" id="d_r_modules">—</span><span class="result-unit">个</span></span></div>
+      <div class="result-row"><span class="result-label">峰值膜通量</span>
+        <span><span class="result-value" id="d_r_Jpeak">—</span><span class="result-unit">LMH</span></span></div>
+      <div class="result-row"><span class="result-label">温度修正系数 1.03^(T-20)</span>
+        <span><span class="result-value" id="d_r_Tfactor">—</span><span class="result-unit">×</span></span></div>
+    </div>
+
+    <div class="result-group">
+      <div class="result-group-title"><span class="ic">💨</span> 需氧量 & 污泥</div>
+      <div class="result-row highlight-row"><span class="result-label"><b>AOR</b></span>
+        <span><span class="result-value big" id="d_r_AOR">—</span><span class="result-unit">kg O₂/d</span></span></div>
+      <div class="result-row"><span class="result-label">SOR (标准氧)</span>
+        <span><span class="result-value" id="d_r_SOR">—</span><span class="result-unit">kg O₂/d</span></span></div>
+      <div class="result-row highlight-row"><span class="result-label"><b>剩余污泥 ΔX</b></span>
+        <span><span class="result-value big" id="d_r_dX">—</span><span class="result-unit">kg DS/d</span></span></div>
+      <div class="result-row"><span class="result-label">MLSS 浓缩比 (vs 进水 SS)</span>
+        <span><span class="result-value" id="d_r_MLSS_ratio">—</span><span class="result-unit">×</span></span></div>
+    </div>
+
+    <div class="result-group">
+      <div class="result-group-title"><span class="ic">⚡</span> 能耗概算 <span class="auto-tag">AUTO</span></div>
+      <div class="result-row"><span class="result-label">生物曝气能耗</span>
+        <span><span class="result-value" id="d_r_eBio">—</span><span class="result-unit">kWh/m³</span></span></div>
+      <div class="result-row"><span class="result-label">膜曝气能耗</span>
+        <span><span class="result-value" id="d_r_eMem">—</span><span class="result-unit">kWh/m³</span></span></div>
+      <div class="result-row"><span class="result-label">产水泵能耗</span>
+        <span><span class="result-value" id="d_r_ePump">—</span><span class="result-unit">kWh/m³</span></span></div>
+      <div class="result-row highlight-row"><span class="result-label"><b>总能耗</b></span>
+        <span><span class="result-value big" id="d_r_eTotal">—</span><span class="result-unit">kWh/m³</span></span></div>
+    </div>
+
+    <div class="result-group">
+      <div class="result-group-title"><span class="ic">🔎</span> 设计校核 & 警告</div>
+      <div class="check-list" id="d_checkList"></div>
+      <div class="score-ring">
+        <div><div class="score-num" id="d_scoreNum">—</div><div class="score-label">/ 100</div></div>
+        <div><div class="score-title" id="d_scoreTitle">设计合理性评分</div>
+          <div class="score-label" id="d_scoreDesc">综合评估</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="buttons">
+    <button class="btn btn-primary" onclick="copyDesignResult()">📋 复制结果</button>
+    <button class="btn btn-secondary" onclick="resetAll()">🔄 恢复默认</button>
+  </div>
+
+  <div class="note">
+    ℹ️ <b>MBR 与传统活性污泥的核心差异：</b>MBR 以膜分离替代二沉池，可维持 MLSS 8000-12000 mg/L（传统 3000-4000），
+    池容减少 30-50%；出水 SS &lt;1 mg/L、浊度 &lt;0.5 NTU；无需污泥回流泵和二沉池。
+    代价是膜需维护清洗，能耗比传统工艺高 0.3-0.6 kWh/m³。
+  </div>
+
+</div>
+<!-- ===== Tab 1 end ===== -->
+
+
+<!-- ===== Tab 2: 膜选型 ===== -->
+<div class="tab-panel" id="panel-membrane">
+
+  <div class="carrier-intro">
+    <h3>🧫 深度膜选型指南</h3>
+    <p>膜构型选择是 MBR 设计最关键的决定之一，直接影响运营成本、清洗频率和膜寿命。本指南覆盖
+    <b>5 大主流品牌参数库</b>、<b>中空纤维 vs 平板式深度对比</b>、<b>场景选型决策树</b>和<b>组件数计算</b>。</p>
+    <div class="mini-spec">
+      <span>🏭 5 个品牌参数库</span>
+      <span>📐 HJ 2010-2011 通量范围</span>
+      <span>🔄 清洗周期对比</span>
+    </div>
+  </div>
+
+  <!-- 1. 两类构型深度对比 -->
+  <div class="section-title"><span class="num">1</span>中空纤维 vs 平板式 · 深度对比</div>
+  <div style="overflow-x:auto;">
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th style="width:160px;">参数</th>
+        <th class="td-hf">中空纤维 (HF)</th>
+        <th class="td-fs">平板式 (FS)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="td-label">代表产品</td>
+        <td class="td-hf">GE/Veolia ZeeWeed · 三菱化学 STERAPORE™ · 碧水源 S-MBR</td>
+        <td class="td-fs">Kubota SMU · 碧水源 H-MBR</td>
+      </tr>
+      <tr>
+        <td class="td-label">设计通量 (市政)</td>
+        <td class="td-hf">12-30 LMH <span class="tag-good">通量高</span></td>
+        <td class="td-fs">16-50 LMH <span class="tag-good">适应性宽</span></td>
+      </tr>
+      <tr>
+        <td class="td-label">运行 MLSS</td>
+        <td class="td-hf">8-12 g/L</td>
+        <td class="td-fs">10-15 g/L <span class="tag-good">耐高浓度</span></td>
+      </tr>
+      <tr>
+        <td class="td-label">曝气清洗方式</td>
+        <td class="td-hf">间歇曝气 + 间歇反冲洗</td>
+        <td class="td-fs">持续曝气鼓泡 <span class="tag-good">不需反冲</span></td>
+      </tr>
+      <tr>
+        <td class="td-label">CIP 化学清洗周期</td>
+        <td class="td-hf">3-4 个月 <span class="tag-warn">较频繁</span></td>
+        <td class="td-fs">6 个月+ <span class="tag-good">较少</span></td>
+      </tr>
+      <tr>
+        <td class="td-label">膜预处理要求</td>
+        <td class="td-hf">严格，需细格栅 ≤3mm <span class="tag-warn">严格</span></td>
+        <td class="td-fs">较宽松，耐高 SS</td>
+      </tr>
+      <tr>
+        <td class="td-label">毛发/纤维缠绕问题</td>
+        <td class="td-hf">⚠️ 易缠绕膜丝，需除毛格栅</td>
+        <td class="td-fs">✅ 无缠绕风险，平板结构</td>
+      </tr>
+      <tr>
+        <td class="td-label">反冲洗可行性</td>
+        <td class="td-hf">✅ 可反冲，控制膜污染灵活</td>
+        <td class="td-fs">❌ 平板无法反冲</td>
+      </tr>
+      <tr>
+        <td class="td-label">能耗 (膜曝气)</td>
+        <td class="td-hf">0.2-0.35 kWh/m³</td>
+        <td class="td-fs">0.15-0.28 kWh/m³ <span class="tag-good">稍低</span></td>
+      </tr>
+      <tr>
+        <td class="td-label">膜组件装填密度</td>
+        <td class="td-hf">高 (帘式多层叠放)</td>
+        <td class="td-fs">中 (板式占更多空间)</td>
+      </tr>
+      <tr>
+        <td class="td-label">适合场景</td>
+        <td class="td-hf">大中型市政 · 中水回用 · 出水水质要求高</td>
+        <td class="td-fs">工业高浓废水 · 含高 SS / 毛发场景 · 小型工程</td>
+      </tr>
+      <tr>
+        <td class="td-label">HJ 2010-2011 范围</td>
+        <td class="td-hf">中空纤维: 12-30 LMH · MLSS 3-10 g/L</td>
+        <td class="td-fs">平板: 16-50 LMH</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <!-- 2. 五大品牌参数库 -->
+  <div class="section-title"><span class="num">2</span>主流品牌参数库 <span class="sub">点击卡片查看详情</span></div>
+  <div class="mem-selector-notice">
+    ℹ️ 以下参数为厂家典型规格和工程经验范围。实际项目请以厂家最新技术文件为准。价格区间为到岸含税参考，随采购规模和市场行情波动。
+  </div>
+  <div class="membrane-cards">
+
+    <!-- GE/Veolia ZeeWeed -->
+    <div class="mem-card" onclick="toggleMemCard('zw')">
+      <div class="mem-card-head">
+        <div>
+          <div class="mem-card-brand">GE/Veolia ZeeWeed 500D</div>
+          <div class="mem-card-product">LEAPmbr 系列 · PVDF 中空纤维</div>
+          <div class="mem-card-origin">🇺🇸 美/加 → 匈牙利生产 (Veolia 旗下)</div>
+        </div>
+        <span class="mem-card-type mem-hf">中空纤维 HF</span>
+      </div>
+      <div class="mem-specs">
+        <div class="mem-spec-item"><div class="mem-spec-label">膜材料</div><div class="mem-spec-value">PVDF + 编织增强</div></div>
+        <div class="mem-spec-item"><div class="mem-spec-label">孔径</div><div class="mem-spec-value">0.04 µm (UF)</div></div>
+        <div class="mem-spec-item"><div class="mem-spec-label">单组件面积</div><div class="mem-spec-value">70 m²</div></div>
+        <div class="mem-spec-item"><div class="mem-spec-label">设计通量</div><div class="mem-spec-value">15-25 LMH</div></div>
+        <div class="mem-spec-item"><div class="mem-spec-label">运行 MLSS</div><div class="mem-spec-value">8-12 g/L</div></div>
+        <div class="mem-spec-item"><div class="mem-spec-label">外径</div><div class="mem-spec-value">1.9 mm</div></div>
+      </div>
+      <div class="mem-card-footer" id="detail-zw" style="display:none;">
+        <b>优势：</b>全球应用最广，技术成熟，四十年验证记录，膜寿命 &gt;10 年（官方 15 年）<br>
+        <b>特点：</b>LEAPmbr 技术通过脉冲曝气节约 30-50% 曝气能耗；zeeDENSE™ 强化 MLSS 控制<br>
+        <b>适用：</b>大中型市政污水厂、再生水回用、工业废水中水回用<br>
+        <b>CIP 周期：</b>HF 标准 3-4 个月一次<br>
+        <b>价格参考：</b>进口价较高，国内工程到岸含税约 ¥800-1500/m²（随项目规模差异大）
+      </div>
+    </div>
+
+    <!-- 三菱化学 STERAPORE -->
+    <div class="mem-card" onclick="toggleMemCard('mmc')">
+      <div class="mem-card-head">
+        <div>
+          <div class="mem-card-brand">三菱化学 STERAPORE™</div>
+          <div class="mem-card-product">60E 系列 · PVDF 中空纤维帘式</div>
+          <div class="mem-card-origin">🇯🇵 日本 (三菱化学株式会社)</div>
+        </div>
+        <span class="mem-card-type mem-hf">中空纤维 HF</span>
+      </div>
+      <div class="mem-specs">
+        <div class="mem-spec-item"><div class="mem-spec-label">膜材料</div><div class="mem-spec-value">PVDF 双层复合</div></div>
+        <div class="mem-spec-item"><div class="mem-spec-label">孔径</div><div class="mem-spec-value">0.1-0.4 µm</div></div>
+        <div class="mem-spec-item"><div class="mem-spec-label">单组件面积</div><div class="mem-spec-value">6 / 15 / 25 / 40 m²</div></div>
+        <div class="mem-spec-item"><div class="mem-spec-label">设计通量</div><div class="mem-spec-value">20-33 LMH</div></div>
+        <div class="mem-spec-item"><div class="mem-spec-label">运行 MLSS</div><div class="mem-spec-value">8-12 g/L</div></div>
+        <div class="mem-spec-item"><div class="mem-spec-label">外径</div><div class="mem-spec-value">2.8 mm</div></div>
+      </div>
+      <div class="mem-card-footer" id="detail-mmc" style="display:none;">
+        <b>优势：</b>双层复合膜结构，外层损伤内层仍有效；单边产水设计，膜丝更均匀；型号多，可按膜池尺寸灵活选配<br>
+        <b>特点：</b>不需反冲洗（上下两端出水），无需外部循环泵，维护简单；抗拉力 &gt;200 N，断丝率低<br>
+        <b>适用：</b>市政污水/工业废水/渗滤液等多种场景，国内市场占有率高<br>
+        <b>CIP 周期：</b>3-4 个月<br>
+        <b>价格参考：</b>进口原装，25 m²/支，市场价约 ¥600-1000/m²
+      </div>
+    </div>
+
+    <!-- Kubota SMU -->
+    <div class="mem-card" onclick="toggleMemCard('kbt')">
+      <div class="mem-card-head">
+        <div>
+          <div class="mem-card-brand">Kubota SMU</div>
+          <div class="mem-card-product">Submerged Membrane Unit · 平板式</div>
+          <div class="mem-card-origin">🇯🇵 日本 (久保田株式会社)</div>
+        </div>
+        <span class="mem-card-type mem-fs">平板式 FS</span>
+      </div>
+      <div class="mem-specs">
+        <div class="mem-spec-item"><div class="mem-spec-label">膜材料</div><div class="mem-spec-value">c-PVC (氯化聚氯乙烯)</div></div>
+        <div class="mem-spec-item"><div class="mem-spec-label">孔径</div><div class="mem-spec-value">0.2 µm (MF)</div></div>
+        <div class="mem-spec-item"><div class="mem-spec-label">单组件面积</div><div class="mem-spec-value">5.4 m² (SP-A)</div></div>
+        <div class="mem-spec-item"><div class="mem-spec-label">设计通量</div><div class="mem-spec-value">8-20 LMH</div></div>
+        <div class="mem-spec-item"><div class="mem-spec-label">运行 MLSS</div><div class="mem-spec-value">10-15 g/L</div></div>
+        <div class="mem-spec-item"><div class="mem-spec-label">重力出水</div><div class="mem-spec-value">✅ 可重力出水</div></div>
+      </div>
+      <div class="mem-card-footer" id="detail-kbt" style="display:none;">
+        <b>优势：</b>最高 MLSS 15 g/L，池容最省；重力出水不需抽吸泵，能耗低；平板结构无毛发缠绕；改造扩容提升 400% 无需建新池<br>
+        <b>特点：</b>不能反冲洗（平板特性），靠持续曝气鼓泡控制污染；Kubota "Combined MBR" 生物曝气与膜曝气合一节能<br>
+        <b>适用：</b>工业废水（高 SS）、小型工程、改造扩容、含毛发/纤维废水<br>
+        <b>CIP 周期：</b>6 个月+（平板优势）<br>
+        <b>价格参考：</b>进口，含框架和曝气系统，综合成本约 ¥1200-2000/m²
+      </div>
+    </div>
+
+    <!-- 碧水源 S-MBR -->
+    <div class="mem-card" onclick="toggleMemCard('bws')">
+      <div class="mem-card-head">
+        <div>
+          <div class="mem-card-brand">碧水源 S-MBR</div>
+          <div class="mem-card-product">纤维增强型 PVDF 中空纤维</div>
+          <div class="mem-card-origin">🇨🇳 北京 (北京碧水源科技股份有限公司)</div>
+        </div>
+        <span class="mem-card-type mem-hf">中空纤维 HF</span>
+      </div>
+      <div class="mem-specs">
+        <div class="mem-spec-item"><div class="mem-spec-label">膜材料</div><div class="mem-spec-value">PVDF + 亲水改性</div></div>
+        <div class="mem-spec-item"><div class="mem-spec-label">孔径</div><div class="mem-spec-value">0.1 µm</div></div>
+        <div class="mem-spec-item"><div class="mem-spec-label">单组件面积</div><div class="mem-spec-value">5 / 10 / 35 m²</div></div>
+        <div class="mem-spec-item"><div class="mem-spec-label">设计通量</div><div class="mem-spec-value">20-30 LMH</div></div>
+        <div class="mem-spec-item"><div class="mem-spec-label">运行 MLSS</div><div class="mem-spec-value">8-12 g/L</div></div>
+        <div class="mem-spec-item"><div class="mem-spec-label">寿命</div><div class="mem-spec-value">&gt;5 年 (实际 8-10 年)</div></div>
+      </div>
+      <div class="mem-card-footer" id="detail-bws" style="display:none;">
+        <b>优势：</b>2010 年打破进口垄断，现国内市场主导品牌；性能已达国际第一梯队；膜通量最新版可达 30 LMH，吨水能耗 &lt;0.3 kWh/m³<br>
+        <b>代表项目：</b>北京密云再生水工程(4.5万t/d)·清河再生水厂(15万t/d)·湖北神定河(11万t/d)<br>
+        <b>国家荣誉：</b>两次国家科技进步二等奖<br>
+        <b>CIP 周期：</b>3-6 个月<br>
+        <b>价格参考：</b>国产，性价比突出，约 ¥200-400/m²（含组器约 ¥400-600/m²）
+      </div>
+    </div>
+
+    <!-- 碧水源 H-MBR -->
+    <div class="mem-card" onclick="toggleMemCard('bwh')">
+      <div class="mem-card-head">
+        <div>
+          <div class="mem-card-brand">碧水源 H-MBR</div>
+          <div class="mem-card-product">弦纹阵列平板膜</div>
+          <div class="mem-card-origin">🇨🇳 北京 (北京碧水源科技股份有限公司)</div>
+        </div>
+        <span class="mem-card-type mem-fs">平板式 FS</span>
+      </div>
+      <div class="mem-specs">
+        <div class="mem-spec-item"><div class="mem-spec-label">膜材料</div><div class="mem-spec-value">PVDF</div></div>
+        <div class="mem-spec-item"><div class="mem-spec-label">孔径</div><div class="mem-spec-value">0.1 µm</div></div>
+        <div class="mem-spec-item"><div class="mem-spec-label">单组件面积</div><div class="mem-spec-value">2.3 / 5 m²</div></div>
+        <div class="mem-spec-item"><div class="mem-spec-label">设计通量</div><div class="mem-spec-value">16-30 LMH</div></div>
+        <div class="mem-spec-item"><div class="mem-spec-label">运行 MLSS</div><div class="mem-spec-value">8-15 g/L</div></div>
+        <div class="mem-spec-item"><div class="mem-spec-label">毛发问题</div><div class="mem-spec-value">✅ 无缠绕</div></div>
+      </div>
+      <div class="mem-card-footer" id="detail-bwh" style="display:none;">
+        <b>优势：</b>弦纹结构（非传统刚性平板）装填密度比传统平板高 200%+；能耗低于传统平板 50%；无毛发缠绕<br>
+        <b>特点：</b>独特"上下气通道"设计顺畅，不积泥；大型工程选小间距高层叠放节能，小型工程选大间距降维护<br>
+        <b>适用：</b>含毛发/纤维废水、食品/养殖废水、工业高 SS 场景<br>
+        <b>CIP 周期：</b>约 6 个月（平板优势）<br>
+        <b>价格参考：</b>国产，约 ¥300-500/m²（含组器约 ¥500-800/m²）
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 场景选型决策树 -->
+  <div class="section-title"><span class="num">3</span>场景选型决策树</div>
+  <div class="decision-tree">
+    <div class="dt-title">根据你的工程场景，推荐膜构型：</div>
+    <div class="dt-row">
+      <div class="dt-condition">🏙️ <b>大中型市政污水</b>（&gt;1 万 m³/d）· 出水中水回用</div>
+      <div class="dt-arrow">→</div>
+      <div class="dt-result dt-hf">中空纤维 HF<br><small>推荐 ZeeWeed 或 碧水源 S-MBR</small></div>
+    </div>
+    <div class="dt-row">
+      <div class="dt-condition">🐄 <b>含毛发/纤维</b> 废水（屠宰/养殖/纺织）</div>
+      <div class="dt-arrow">→</div>
+      <div class="dt-result dt-fs">平板式 FS<br><small>推荐 碧水源 H-MBR 或 Kubota</small></div>
+    </div>
+    <div class="dt-row">
+      <div class="dt-condition">🏭 <b>高浓度工业废水</b>（MLSS 需 &gt;12 g/L）</div>
+      <div class="dt-arrow">→</div>
+      <div class="dt-result dt-fs">平板式 FS<br><small>Kubota SMU（耐高 MLSS 15 g/L）</small></div>
+    </div>
+    <div class="dt-row">
+      <div class="dt-condition">🗑️ <b>垃圾渗滤液</b>（高 COD、高 SS、难降解）</div>
+      <div class="dt-arrow">→</div>
+      <div class="dt-result dt-hf">中空纤维 HF · 需严格预处理<br><small>三菱 STERAPORE™ 应用广泛</small></div>
+    </div>
+    <div class="dt-row">
+      <div class="dt-condition">🔧 <b>老厂改造扩容</b>（利用原有池体，不新建）</div>
+      <div class="dt-arrow">→</div>
+      <div class="dt-result dt-both">HF 或 FS 均可<br><small>Kubota 改造提升 400% 容量；碧水源 S-MBR 成本低</small></div>
+    </div>
+    <div class="dt-row">
+      <div class="dt-condition">💰 <b>预算敏感型项目</b>（国产优先、性价比）</div>
+      <div class="dt-arrow">→</div>
+      <div class="dt-result dt-hf">中空纤维 HF (国产)<br><small>碧水源 S-MBR · 价格约 1/3-1/5 进口</small></div>
+    </div>
+    <div class="dt-row">
+      <div class="dt-condition">⚡ <b>极低能耗</b>优先（运营成本敏感）</div>
+      <div class="dt-arrow">→</div>
+      <div class="dt-result dt-fs">平板式 FS<br><small>Kubota 重力出水 · 碧水源 H-MBR 低气水比</small></div>
+    </div>
+  </div>
+
+  <!-- 4. 组件数计算 -->
+  <div class="section-title"><span class="num">4</span>膜面积与组件数计算</div>
+  <div class="calc-area">
+    <div class="calc-title">📐 基于当前主设计结果自动计算</div>
+    <div class="grid" style="max-width:600px;">
+      <div class="field"><label>设计总膜面积 A_m <span class="unit">m²</span></label>
+        <input type="number" id="m_Am" value="" step="10" oninput="calcModules()" placeholder="来自 Tab 1 结果">
+        <div class="helper">可手动输入或从 Tab 1 自动同步</div></div>
+      <div class="field"><label>单组件面积 <span class="unit">m²/个</span></label>
+        <input type="number" id="m_singleArea" value="25" step="1" oninput="calcModules()">
+        <div class="helper">三菱 6/15/25/40 · ZeeWeed 70 · Kubota 5.4</div></div>
+      <div class="field"><label>备用系数</label>
+        <input type="number" id="m_redundancy" value="1.15" step="0.05" oninput="calcModules()">
+        <div class="helper">通常取 1.1-1.2（备用 10-20%）</div></div>
+    </div>
+    <div style="background:#f0fdf4;border-radius:8px;padding:14px;margin-top:10px;display:flex;gap:30px;flex-wrap:wrap;">
+      <div><div style="font-size:11px;color:var(--text-muted);">最少组件数</div>
+        <div style="font-size:28px;font-weight:700;color:var(--brand-dark);" id="m_r_modules_min">—</div></div>
+      <div><div style="font-size:11px;color:var(--text-muted);">含备用后组件数</div>
+        <div style="font-size:28px;font-weight:700;color:var(--brand-dark);" id="m_r_modules_total">—</div></div>
+      <div><div style="font-size:11px;color:var(--text-muted);">实际覆盖膜面积</div>
+        <div style="font-size:22px;font-weight:700;color:var(--text);" id="m_r_Am_actual">—</div></div>
+    </div>
+  </div>
+
+  <div class="note">
+    ℹ️ <b>膜选型最重要的注意事项：</b>
+    <br>(1) <b>预处理决定膜寿命</b>：中空纤维膜对毛发/纤维极敏感，必须配置 1-3mm 细格栅；平板式耐受力强但仍需粗格栅
+    <br>(2) <b>通量不是越高越好</b>：超临界通量运行会加速不可逆污染，建议设计通量不超过临界通量的 80%
+    <br>(3) <b>温度修正必须做</b>：冬季 T=10°C 时通量下降约 26%，若不做温度修正则冬季产水量严重不足
+  </div>
+
+</div>
+<!-- ===== Tab 2 end ===== -->
+
+<!-- ===== Tab 3: 清洗方案 ===== -->
+<div class="tab-panel" id="panel-cleaning">
+  <div class="carrier-intro">
+    <h3>🧪 MBR 清洗方案设计</h3>
+    <p>膜清洗是 MBR 运营的核心工作，分三个层次：在线物理清洗（日常维护）、
+    化学加强反冲 CEB（周期性控制污染）、恢复性化学清洗 CIP（定期大清洗）。
+    清洗方案设计直接影响膜寿命和运营成本。</p>
+  </div>
+
+  <div class="section-title"><span class="num">1</span>三层清洗体系</div>
+  <div class="cleaning-stage-grid">
+    <div class="clean-card clean-online">
+      <div class="clean-head">🔄 在线物理清洗</div>
+      <div class="clean-trigger">触发：每个产水周期自动执行</div>
+      <div class="clean-params">
+        <b>松弛（Relaxation）</b><br>
+        · 停止抽吸 2-5 min，仅曝气<br>
+        · 污泥沉积自然脱落<br><br>
+        <b>反冲洗（Backpulse）</b><br>
+        · 仅中空纤维适用<br>
+        · 频率：30-120 min/次<br>
+        · 时间：20-30 秒/次<br>
+        · 压力：约 TMP × 1.5<br><br>
+        <b>曝气增强（Air Scour）</b><br>
+        · 持续或间歇曝气<br>
+        · HF：间歇曝气（节能 30-50%）<br>
+        · FS：持续曝气鼓泡
+      </div>
+    </div>
+    <div class="clean-card clean-ceb">
+      <div class="clean-head">⚗️ 化学加强反冲 (CEB)</div>
+      <div class="clean-trigger">触发：TMP 升高 5-10 kPa / 每日 1-2 次</div>
+      <div class="clean-params">
+        <b>碱洗（去有机污染）</b><br>
+        · 药剂：NaOCl + NaOH（1:1）<br>
+        · 浓度：1000-2000 ppm<br>
+        · 接触时间：20-30 min<br><br>
+        <b>酸洗（去无机结垢）</b><br>
+        · 药剂：柠檬酸<br>
+        · 浓度：2000-3000 ppm<br>
+        · 接触时间：20-30 min<br><br>
+        <b>碱-酸交替频率</b><br>
+        · 通常每天一次碱洗<br>
+        · 每周 1-2 次酸洗（视水质）
+      </div>
+    </div>
+    <div class="clean-card clean-cip">
+      <div class="clean-head">🔬 恢复性化学清洗 (CIP)</div>
+      <div class="clean-trigger">触发：TMP &gt;35 kPa 或定期（离线大清洗）</div>
+      <div class="clean-params">
+        <b>标准流程：碱洗 → 水洗 → 酸洗</b><br><br>
+        <b>碱洗（去生物污染）</b><br>
+        · 药剂：NaOCl + NaOH（1:1）<br>
+        · 浓度：1000-2000 ppm<br>
+        · 时间：1-4 h，可加温<br><br>
+        <b>酸洗（去无机结垢）</b><br>
+        · 药剂：柠檬酸（3000-5000 ppm）<br>
+        &nbsp;&nbsp;&nbsp;或 盐酸（2000-3000 ppm）<br>
+        · 时间：1-4 h<br><br>
+        <b>周期（HJ 2010-2011）</b><br>
+        · 中空纤维：约 3-4 个月<br>
+        · 平板式：约 6 个月+
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title"><span class="num">2</span>TMP 运行区间监控</div>
+  <div class="tmp-gauge">
+    <div style="font-size:13px;font-weight:600;margin-bottom:8px;">跨膜压差 TMP 典型区间（浸没式 MBR）</div>
+    <div class="tmp-bar-wrap">
+      <div class="tmp-seg tmp-normal">正常运行<br>0-25 kPa</div>
+      <div class="tmp-seg tmp-op">警戒区间<br>25-40 kPa</div>
+      <div class="tmp-seg tmp-alert">需 CIP<br>&gt;40 kPa</div>
+    </div>
+    <div class="tmp-labels">
+      <span>0 kPa</span><span>10</span><span>20</span><span>30</span><span>40</span><span>50+ kPa</span>
+    </div>
+    <div style="margin-top:12px;font-size:12px;line-height:1.8;color:var(--text);">
+      <b>📌 操作要点：</b><br>
+      · <b>设计 TMP</b>：10-35 kPa（新膜投运初期约 5-10 kPa）<br>
+      · <b>CEB 触发</b>：TMP 升高 5-10 kPa 时启动化学加强反冲<br>
+      · <b>CIP 触发</b>：TMP &gt; 35-40 kPa 或 CEB 后无法恢复<br>
+      · <b>停机检查</b>：TMP &gt; 50 kPa 或产水量持续下降 &gt; 30%<br>
+      · <b>温度影响</b>：冬季 TMP 天然偏高（黏度增加），应设季节性阈值
+    </div>
+  </div>
+
+  <div class="section-title"><span class="num">3</span>药剂用量估算</div>
+  <div class="grid" style="max-width:500px;">
+    <div class="field"><label>设计规模 Q <span class="unit">万 m³/d</span></label>
+      <input type="number" id="c_Q" value="3" step="0.5" oninput="calcChem()"></div>
+    <div class="field"><label>膜类型</label>
+      <select id="c_memType" onchange="calcChem()">
+        <option value="hf">中空纤维 HF</option>
+        <option value="fs">平板式 FS</option>
+      </select></div>
+    <div class="field"><label>CIP 周期 <span class="unit">月</span></label>
+      <input type="number" id="c_cipCycle" value="4" step="1" oninput="calcChem()">
+      <div class="helper">HF 建议 3-4，FS 建议 6</div></div>
+    <div class="field"><label>水厂运行天数/年</label>
+      <input type="number" id="c_days" value="365" step="1" oninput="calcChem()"></div>
+  </div>
+  <div class="results" style="margin-top:14px;">
+    <h2>🧪 年药剂消耗估算</h2>
+    <div class="result-group">
+      <div class="result-group-title"><span class="ic">⚗️</span> CEB 日常化学清洗</div>
+      <div class="result-row"><span class="result-label">NaOCl 年用量（CEB 碱洗）</span>
+        <span><span class="result-value" id="c_r_naocl_ceb">—</span><span class="result-unit">kg/年</span></span></div>
+      <div class="result-row"><span class="result-label">柠檬酸年用量（CEB 酸洗）</span>
+        <span><span class="result-value" id="c_r_citric_ceb">—</span><span class="result-unit">kg/年</span></span></div>
+    </div>
+    <div class="result-group">
+      <div class="result-group-title"><span class="ic">🔬</span> CIP 恢复性大清洗</div>
+      <div class="result-row"><span class="result-label">CIP 次数/年</span>
+        <span><span class="result-value" id="c_r_cip_times">—</span><span class="result-unit">次</span></span></div>
+      <div class="result-row"><span class="result-label">NaOCl 年用量（CIP）</span>
+        <span><span class="result-value" id="c_r_naocl_cip">—</span><span class="result-unit">kg/年</span></span></div>
+      <div class="result-row"><span class="result-label">柠檬酸年用量（CIP）</span>
+        <span><span class="result-value" id="c_r_citric_cip">—</span><span class="result-unit">kg/年</span></span></div>
+      <div class="result-row highlight-row"><span class="result-label"><b>药剂总年费（含 CEB+CIP）</b></span>
+        <span><span class="result-value big" id="c_r_cost">—</span><span class="result-unit">万元/年</span></span></div>
+    </div>
+  </div>
+
+  <div class="note">
+    ℹ️ <b>清洗注意事项：</b>
+    <br>(1) NaOCl 碱洗后<b>必须充分水洗</b>再进行酸洗，防止氯气产生
+    <br>(2) 渗滤液等高难废水中<b>无机结垢（钙镁碳酸盐）</b>更严重，应增加酸洗频率
+    <br>(3) 碧水源等国产膜建议使用厂家推荐配方，过高浓度 NaOCl 会加速 PVDF 降解
+    <br>(4) 停机超过 1 周，须<b>保湿存放</b>（清水浸泡），冬季防冻
+  </div>
+</div>
+<!-- Tab 3 end -->
+
+<!-- ===== Tab 4: 能耗分析 ===== -->
+<div class="tab-panel" id="panel-energy">
+  <div class="carrier-intro">
+    <h3>⚡ MBR 能耗分析</h3>
+    <p>MBR 吨水能耗通常为 0.6-1.2 kWh/m³，高于传统活性污泥（0.3-0.5 kWh/m³）约 0.3-0.6 kWh/m³。
+    主要增量来自膜曝气（控制膜污染）和产水泵（TMP 驱动产水）。合理设计可将总能耗控制在 0.8 kWh/m³ 以内。</p>
+    <div class="mini-spec">
+      <span>📐 依据：Metcalf&Eddy MBR 能耗章节</span>
+      <span>🏭 典型范围：0.6-1.2 kWh/m³</span>
+    </div>
+  </div>
+
+  <div class="section-title"><span class="num">1</span>能耗分项计算器</div>
+  <div class="grid">
+    <div class="field"><label>Q <span class="unit">万 m³/d</span></label>
+      <input type="number" id="e_Q" value="3" step="0.5" oninput="calcEnergy()"></div>
+    <div class="field"><label>膜类型</label>
+      <select id="e_memType" onchange="calcEnergy()">
+        <option value="hf">中空纤维 HF</option>
+        <option value="fs">平板式 FS</option>
+      </select></div>
+    <div class="field"><label>膜面积 A_m <span class="unit">m²</span></label>
+      <input type="number" id="e_Am" value="5000" step="100" oninput="calcEnergy()">
+      <div class="helper">来自 Tab 1 主设计</div></div>
+    <div class="field"><label>SADm <span class="unit">m³空气/m²膜·h</span></label>
+      <input type="number" id="e_SADm" value="0.20" step="0.02" oninput="calcEnergy()">
+      <div class="helper">HF: 0.15-0.30, FS: 0.10-0.20</div></div>
+    <div class="field"><label>设计 TMP <span class="unit">kPa</span></label>
+      <input type="number" id="e_TMP" value="25" step="5" oninput="calcEnergy()"></div>
+    <div class="field"><label>产水泵效率 <span class="unit">%</span></label>
+      <input type="number" id="e_pumpEff" value="65" step="5" oninput="calcEnergy()"></div>
+    <div class="field"><label>生物曝气量 <span class="unit">Nm³/h</span></label>
+      <input type="number" id="e_bioAir" value="2000" step="100" oninput="calcEnergy()">
+      <div class="helper">来自 Tab 1 主设计 SOR 折算</div></div>
+    <div class="field"><label>鼓风机效率 <span class="unit">%</span></label>
+      <input type="number" id="e_blowerEff" value="70" step="5" oninput="calcEnergy()"></div>
+    <div class="field"><label>回流泵比例 <span class="unit">% of Q</span></label>
+      <input type="number" id="e_recirc" value="300" step="50" oninput="calcEnergy()">
+      <div class="helper">MBR 内回流较大 200-400%</div></div>
+    <div class="field"><label>电价 <span class="unit">元/kWh</span></label>
+      <input type="number" id="e_price" value="0.7" step="0.05" oninput="calcEnergy()"></div>
+  </div>
+
+  <div class="results">
+    <h2>⚡ 能耗分析结果</h2>
+    <div class="result-group">
+      <div class="result-group-title"><span class="ic">📊</span> 分项能耗</div>
+      <div class="result-row"><span class="result-label">① 生物曝气</span>
+        <span><span class="result-value" id="e_r_bio">—</span><span class="result-unit">kWh/m³</span></span></div>
+      <div class="result-row"><span class="result-label">② 膜曝气（控膜污染专用）</span>
+        <span><span class="result-value" id="e_r_mem">—</span><span class="result-unit">kWh/m³</span></span></div>
+      <div class="result-row"><span class="result-label">③ 产水泵（TMP 驱动）</span>
+        <span><span class="result-value" id="e_r_pump">—</span><span class="result-unit">kWh/m³</span></span></div>
+      <div class="result-row"><span class="result-label">④ 回流泵</span>
+        <span><span class="result-value" id="e_r_recirc">—</span><span class="result-unit">kWh/m³</span></span></div>
+      <div class="result-row"><span class="result-label">⑤ 其他（仪控/照明等）</div>
+        <span><span class="result-value">约 0.05</span><span class="result-unit">kWh/m³</span></span></div>
+      <div class="result-row highlight-row"><span class="result-label"><b>总能耗</b></span>
+        <span><span class="result-value big" id="e_r_total">—</span><span class="result-unit">kWh/m³</span></span></div>
+    </div>
+    <div class="result-group">
+      <div class="result-group-title"><span class="ic">💰</span> 年运营成本</div>
+      <div class="result-row"><span class="result-label">年耗电量</span>
+        <span><span class="result-value" id="e_r_kwhYear">—</span><span class="result-unit">万 kWh/年</span></span></div>
+      <div class="result-row highlight-row"><span class="result-label"><b>年电费</b></span>
+        <span><span class="result-value big" id="e_r_costYear">—</span><span class="result-unit">万元/年</span></span></div>
+      <div class="result-row"><span class="result-label">吨水电费</span>
+        <span><span class="result-value" id="e_r_costTon">—</span><span class="result-unit">元/m³</span></span></div>
+    </div>
+    <div class="energy-bar-chart">
+      <div style="font-size:13px;font-weight:600;margin-bottom:12px;">能耗分布</div>
+      <div class="energy-row">
+        <div class="energy-label">生物曝气</div>
+        <div class="energy-bar-bg"><div class="energy-bar-fill" id="e_bar_bio" style="width:0%;background:#3b82f6;"></div></div>
+        <div class="energy-value" id="e_val_bio">—</div>
+      </div>
+      <div class="energy-row">
+        <div class="energy-label">膜曝气</div>
+        <div class="energy-bar-bg"><div class="energy-bar-fill" id="e_bar_mem" style="width:0%;background:#0891b2;"></div></div>
+        <div class="energy-value" id="e_val_mem">—</div>
+      </div>
+      <div class="energy-row">
+        <div class="energy-label">产水泵</div>
+        <div class="energy-bar-bg"><div class="energy-bar-fill" id="e_bar_pump" style="width:0%;background:#16a34a;"></div></div>
+        <div class="energy-value" id="e_val_pump">—</div>
+      </div>
+      <div class="energy-row">
+        <div class="energy-label">回流泵</div>
+        <div class="energy-bar-bg"><div class="energy-bar-fill" id="e_bar_recirc" style="width:0%;background:#d97706;"></div></div>
+        <div class="energy-value" id="e_val_recirc">—</div>
+      </div>
+    </div>
+    <div class="result-group">
+      <div class="result-group-title"><span class="ic">📈</span> 与传统工艺对比</div>
+      <div class="result-row"><span class="result-label">传统活性污泥（AAO）</span>
+        <span><span class="result-value">0.3-0.5</span><span class="result-unit">kWh/m³</span></span></div>
+      <div class="result-row"><span class="result-label">MBR 额外能耗（膜系统）</span>
+        <span><span class="result-value" id="e_r_extra">—</span><span class="result-unit">kWh/m³</span></span></div>
+      <div class="result-row"><span class="result-label">MBR 年额外电费</span>
+        <span><span class="result-value" id="e_r_extraCost">—</span><span class="result-unit">万元/年</span></span></div>
+    </div>
+  </div>
+
+  <div class="note">
+    ℹ️ <b>能耗优化方向：</b>
+    <br>(1) <b>间歇曝气（HF）</b>：ZeeWeed LEAPmbr 等通过脉冲曝气可节省 30-50% 膜曝气能耗
+    <br>(2) <b>膜通量优化</b>：适当提高通量可减少膜面积，进而减少膜曝气量
+    <br>(3) <b>Kubota 重力出水</b>：取消产水泵，节省泵送能耗
+    <br>(4) <b>碧水源最新版本</b>吨水能耗已降至 0.3 kWh/m³ 以下（不含生物曝气）
+  </div>
+</div>
+<!-- Tab 4 end -->
+
+<!-- ===== Tab 5: 案例库 ===== -->
+<div class="tab-panel" id="panel-cases">
+  <div class="carrier-intro">
+    <h3>📂 MBR 典型工程案例库</h3>
+    <p>收录市政污水再生利用、工业高浓废水、垃圾渗滤液等典型 MBR 工程参数，仅供工程方案参考，非具体实际项目引用。</p>
+  </div>
+
+  <div class="case-cards-mbr" id="casesContainer"></div>
+
+  <div class="note">
+    ℹ️ <b>本案例库为典型参考模板，非特指实际项目。</b>参数来源于工程经验范围和公开资料，具体项目应以设计院施工图为准。
+  </div>
+</div>
+<!-- Tab 5 end -->
+
+<!-- ===== Tab 6: MBR 发展史 ===== -->
+<div class="tab-panel" id="panel-history">
+  <div class="history-intro">
+    <h3>📜 MBR 的发明与发展</h3>
+    <p>膜生物反应器（MBR）从 1969 年外置式雏形到 1989 年浸没式革命，再到中国大规模应用，走过了 50 余年。
+    MBR 的核心创新是用膜分离替代二沉池——这一思路彻底改变了污水处理工艺的设计逻辑。</p>
+  </div>
+
+  <div class="section-title"><span class="num">1</span>MBR 解决了什么问题？</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:12px 0 20px;">
+    <div style="padding:14px 16px;background:#fef2f2;border-radius:8px;border-left:3px solid #dc2626;">
+      <div style="font-weight:700;margin-bottom:8px;">⚠️ 传统活性污泥的痛点</div>
+      <ul style="font-size:12px;line-height:1.8;padding-left:18px;">
+        <li>二沉池占地大，依赖重力沉降</li>
+        <li>出水含大量悬浮固体</li>
+        <li>污泥膨胀时沉淀失败、出水恶化</li>
+        <li>泥水分离效率有天花板</li>
+        <li>用于回用水需再增三级过滤</li>
+      </ul>
+    </div>
+    <div style="padding:14px 16px;background:#ecfeff;border-radius:8px;border-left:3px solid #0891b2;">
+      <div style="font-weight:700;margin-bottom:8px;">💡 MBR 的创新思路</div>
+      <ul style="font-size:12px;line-height:1.8;padding-left:18px;">
+        <li>用膜（0.04-0.4 µm）替代二沉池</li>
+        <li>出水 SS &lt;1 mg/L，直接达回用水标准</li>
+        <li>不受污泥膨胀影响</li>
+        <li>MLSS 提高到 8000-12000 mg/L</li>
+        <li>池容减少 30-50%</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-title"><span class="num">2</span>关键人物与发明节点</div>
+  <div class="inventor-card">
+    <div class="inventor-name">👨‍🔬 MBR 的发展脉络</div>
+    <div class="inventor-sub">从美国外置式 (1969) 到日本浸没式 (1989) —— 两次关键跃升</div>
+    <div class="inventor-info-grid">
+      <div><span>🇺🇸 1969</span> Dorr-Oliver 公司（美国）开发首个外置式 MBR，用于纺织废水</div>
+      <div><span>⚡ 问题</span> 外置式循环泵能耗极高（3-5 kWh/m³），限制了推广</div>
+      <div><span>🇯🇵 1989</span> Yamamoto 等（日本京都大学）发明浸没式 MBR，能耗降低 80-90%</div>
+      <div><span>🏭 1991</span> Kubota 商业化浸没式平板膜 MBR，首个全规模工程</div>
+      <div><span>🇨🇦 1992</span> Zenon（加拿大）推出 ZeeWeed 中空纤维浸没式膜，成为市场主流</div>
+      <div><span>🇨🇳 2003+</span> 中国大规模引进 MBR，碧水源成为推广先行者</div>
+    </div>
+  </div>
+
+  <div class="section-title"><span class="num">3</span>全球发展时间线</div>
+  <div class="timeline-wrap">
+    <div class="timeline-line"></div>
+    <div class="tl-node tl-left">
+      <div class="tl-dot"></div>
+      <div class="tl-content"><div class="tl-year">1969</div><div class="tl-title">外置式 MBR 诞生</div><div class="tl-desc">Dorr-Oliver（美）将超滤膜与活性污泥结合，用于工业废水，能耗极高</div></div>
+    </div>
+    <div class="tl-node tl-right">
+      <div class="tl-dot"></div>
+      <div class="tl-content"><div class="tl-year">1980s</div><div class="tl-title">学术研究活跃期</div><div class="tl-desc">日本、欧美大量实验室研究，探索降低能耗的路径</div></div>
+    </div>
+    <div class="tl-node tl-left">
+      <div class="tl-dot tl-key"></div>
+      <div class="tl-content tl-highlight"><div class="tl-year">⭐ 1989</div><div class="tl-title">浸没式 MBR 发明</div><div class="tl-desc">日本京都大学 Yamamoto 等将膜直接浸入生物池，能耗从 3-5 降至 0.3-0.5 kWh/m³，革命性突破</div></div>
+    </div>
+    <div class="tl-node tl-right">
+      <div class="tl-dot"></div>
+      <div class="tl-content"><div class="tl-year">1991</div><div class="tl-title">Kubota 首个商业化 FS-MBR</div><div class="tl-desc">日本 Kubota 推出平板膜浸没式 MBR，日本市场快速铺开</div></div>
+    </div>
+    <div class="tl-node tl-left">
+      <div class="tl-dot tl-key"></div>
+      <div class="tl-content tl-highlight"><div class="tl-year">⭐ 1992</div><div class="tl-title">ZeeWeed 中空纤维问世</div><div class="tl-desc">加拿大 Zenon 推出 ZeeWeed，PVDF 中空纤维，成为全球最成功 MBR 商业产品</div></div>
+    </div>
+    <div class="tl-node tl-right">
+      <div class="tl-dot"></div>
+      <div class="tl-content"><div class="tl-year">1990s</div><div class="tl-title">欧洲大规模推广</div><div class="tl-desc">德国、英国、法国相继建成大型 MBR 污水厂，成为再生水主流工艺</div></div>
+    </div>
+    <div class="tl-node tl-left">
+      <div class="tl-dot"></div>
+      <div class="tl-content"><div class="tl-year">2001</div><div class="tl-title">国内首批工程</div><div class="tl-desc">中国首批引进 MBR，主要用于工业废水和水资源短缺地区再生水回用</div></div>
+    </div>
+    <div class="tl-node tl-right">
+      <div class="tl-dot tl-key"></div>
+      <div class="tl-content tl-highlight"><div class="tl-year">⭐ 2006</div><div class="tl-title">GE 收购 Zenon</div><div class="tl-desc">GE 以 4.6 亿美元收购 Zenon，ZeeWeed 进入全球快速扩张阶段</div></div>
+    </div>
+    <div class="tl-node tl-left">
+      <div class="tl-dot tl-key"></div>
+      <div class="tl-content tl-highlight"><div class="tl-year">⭐ 2010</div><div class="tl-title">碧水源打破进口垄断</div><div class="tl-desc">碧水源开发国产增强型 PVDF 中空纤维膜，结束国内 MBR 依赖进口历史，成本降低 3-5 倍</div></div>
+    </div>
+    <div class="tl-node tl-right">
+      <div class="tl-dot"></div>
+      <div class="tl-content"><div class="tl-year">2017</div><div class="tl-title">Veolia 收购 GE 水务</div><div class="tl-desc">Veolia 收购 GE Water &amp; Process Technologies，ZeeWeed 转入 Veolia 旗下（Suez 过渡后最终归 Veolia）</div></div>
+    </div>
+    <div class="tl-node tl-left">
+      <div class="tl-dot tl-key"></div>
+      <div class="tl-content tl-highlight"><div class="tl-year">🌍 今日</div><div class="tl-title">全球数千座 MBR 污水厂</div><div class="tl-desc">中国已成全球最大 MBR 市场；国产膜性能达国际第一梯队；总处理规模超数亿吨/天</div></div>
+    </div>
+  </div>
+
+  <div class="section-title"><span class="num">4</span>MBR 在中国 · 发展历程</div>
+  <div class="china-grid">
+    <div class="china-phase cp-1">
+      <div class="cp-year">1990s-2005</div>
+      <div class="cp-title">🚪 引进探索期</div>
+      <div class="cp-body">
+        <ul>
+          <li>国内学术界开始关注 MBR 工艺</li>
+          <li>2001 年前后首批进口膜进入中国市场</li>
+          <li>早期应用集中于工业废水和水资源短缺城市</li>
+          <li>Kubota 和 GE ZeeWeed 是主要进口品牌</li>
+          <li>综合成本 ¥5-8 元/m³，仅用于高附加值场景</li>
+        </ul>
+      </div>
+    </div>
+    <div class="china-phase cp-2">
+      <div class="cp-year">2006-2010</div>
+      <div class="cp-title">📈 市政应用爆发期</div>
+      <div class="cp-body">
+        <ul>
+          <li>碧水源密云再生水工程(4.5万t/d)、清河(15万t/d)落地</li>
+          <li>2006-2008 年国内 MBR 规模年增长 67%/100%/78%</li>
+          <li>出水一级 A 标准需求推动大规模应用</li>
+          <li>神定河污水厂(11万t/d)成为当时国内最大 MBR 工程</li>
+          <li>国内设计院开始系统掌握 MBR 设计方法</li>
+        </ul>
+      </div>
+    </div>
+    <div class="china-phase cp-3">
+      <div class="cp-year">2010-2020</div>
+      <div class="cp-title">🏭 国产崛起与成熟</div>
+      <div class="cp-body">
+        <ul>
+          <li>2010 年碧水源国产增强型 PVDF 膜问世</li>
+          <li>国产膜价格约为进口 1/3-1/5，大幅降低成本</li>
+          <li>一级 A 提标改造需求大量涌现，MBR 成为主流方案</li>
+          <li>国产膜品质逐步提升至国际第一梯队</li>
+          <li>应用拓展：渗滤液、制药、食品、养殖废水</li>
+        </ul>
+      </div>
+    </div>
+    <div class="china-phase cp-4">
+      <div class="cp-year">2020-今</div>
+      <div class="cp-title">🌐 提质降耗时代</div>
+      <div class="cp-body">
+        <ul>
+          <li>中国成为全球最大 MBR 市场</li>
+          <li>碧水源最新膜通量 30 LMH，吨水能耗 &lt;0.3 kWh/m³</li>
+          <li>技术方向：低能耗、高通量、膜电极集成</li>
+          <li>双碳背景下，MBR 能耗优化成为研究热点</li>
+          <li>地表 IV 类及以上标准推动更严格出水需求</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="note" style="background:#f0fdf4;border-left-color:#16a34a;margin-top:16px;">
+    ✅ <b>MBR vs MBBR：两个常被混淆的技术</b>
+    <br>MBR（膜生物反应器）= 活性污泥 + 膜分离，替代二沉池，<b>出水水质极高（SS &lt;1 mg/L）</b>，适合中水回用
+    <br>MBBR（移动床生物膜反应器）= 活性污泥 + 填料生物膜，<b>增强硝化/脱氮能力</b>，适合提标改造
+    <br>两者技术路线完全不同，WaterKit 对两者均有专用设计工具。
+  </div>
+</div>
+<!-- Tab 6 end -->
+
+</main>
+
+<!-- ===== 页脚 ===== -->
+<footer class="footer">
+  <div style="max-width:1280px;margin:0 auto 14px;padding:12px 16px;background:#fef9c3;border-left:3px solid #ca8a04;border-radius:4px;font-size:12px;color:#713f12;line-height:1.6;">
+    ⚠️ <b>免责声明：</b>本工具提供的膜通量、价格区间、工艺参数等数据仅供方案估算参考，实际以厂家最新官方数据和项目具体情况为准。品牌名和产品名仅作技术识别用途，不代表本工具与相关厂家有任何授权或背书关系。工程实施请以正规设计院出具的施工图为准。依据 HJ 2010-2011。
+  </div>
+  <div class="footer-inner">
+    <span>© 2025 <a href="https://dengdengtech.cn" target="_blank" rel="noopener">海南登登科技咨询</a> · WaterKit</span>
+    &nbsp;·&nbsp;
+    <a href="index.html">工具首页</a>
+    &nbsp;·&nbsp;
+    <a href="pure-mbbr-design.html">MBBR 工程设计</a>
+    &nbsp;·&nbsp;
+    <a href="activated-sludge-process-calculator.html">活性污泥工艺</a>
+  </div>
+</footer>
+
+<script>
+const $ = id => document.getElementById(id);
+
+// ============ 常量 ============
+const STANDARDS = {
+  '1A':    { CODe:50, BODe:10, NH4e:5,  TNe:15, TPe:0.5 },
+  'grade4':{ CODe:30, BODe:6,  NH4e:1.5,TNe:10, TPe:0.3 },
+  'grade3':{ CODe:20, BODe:4,  NH4e:1.0,TNe:5,  TPe:0.05 },
+  'reuse': { CODe:30, BODe:6,  NH4e:5,  TNe:15, TPe:1.0 },
+};
+
+const PRESETS = {
+  municipal: { d_Q:3, d_T:20, d_COD0:400, d_BOD0:180, d_TN0:45, d_NH40:35, d_TP0:5, d_SS0:200, d_MLSS:10000, d_SRT:25 },
+  industrial: { d_Q:2, d_T:25, d_COD0:800, d_BOD0:350, d_TN0:60, d_NH40:45, d_TP0:8, d_SS0:400, d_MLSS:10000, d_SRT:25 },
+  leachate: { d_Q:0.1, d_T:20, d_COD0:8000, d_BOD0:3000, d_TN0:2000, d_NH40:1800, d_TP0:20, d_SS0:1000, d_MLSS:12000, d_SRT:40 },
+  reuse: { d_Q:5, d_T:20, d_COD0:300, d_BOD0:120, d_TN0:35, d_NH40:25, d_TP0:3.5, d_SS0:150, d_MLSS:10000, d_SRT:25 },
+};
+
+// ============ 案例库数据 ============
+const MBR_CASES = [
+  {
+    type:'muni', tag:'市政污水', title:'北方城镇污水再生利用',
+    scale:'3 万 m³/d', bio:'AAO+MBR', membrane:'中空纤维 HF',
+    data:{ Q:3, T:15, COD0:400, BOD0:180, NH40:35, TN0:45, TP0:5 },
+    outlet:'一级 A / 中水回用', J_design:'20 LMH', MLSS:'10000 mg/L',
+    Am:'5500 m²', energy:'0.95 kWh/m³', note:'冬季 T=10°C 需按 0.74 倍通量校核膜面积，建议备用系数 1.2'
+  },
+  {
+    type:'muni', tag:'市政污水', title:'南方城镇污水提标改造',
+    scale:'5 万 m³/d', bio:'AAO+MBR', membrane:'中空纤维 HF',
+    data:{ Q:5, T:22, COD0:350, BOD0:160, NH40:30, TN0:40, TP0:4 },
+    outlet:'地表 IV 类', J_design:'25 LMH', MLSS:'10000 mg/L',
+    Am:'7500 m²', energy:'0.85 kWh/m³', note:'南方水温高，通量可取上限；出水直排河道，TP 须 ≤0.3 mg/L 需配合 PAC'
+  },
+  {
+    type:'ind', tag:'工业废水', title:'食品加工废水 MBR 处理',
+    scale:'0.5 万 m³/d', bio:'AO缺氧+MBR', membrane:'平板式 FS',
+    data:{ Q:0.5, T:25, COD0:2000, BOD0:800, NH40:80, TN0:100, TP0:15 },
+    outlet:'园区排放标准', J_design:'16 LMH', MLSS:'12000 mg/L',
+    Am:'1300 m²', energy:'1.1 kWh/m³', note:'食品废水含大量油脂/蛋白，选平板式避免毛发缠绕；需强化除磷（PAC）'
+  },
+  {
+    type:'ind', tag:'工业废水', title:'制药废水深度处理',
+    scale:'0.2 万 m³/d', bio:'AAO+MBR', membrane:'中空纤维 HF',
+    data:{ Q:0.2, T:30, COD0:3000, BOD0:1200, NH40:120, TN0:150, TP0:10 },
+    outlet:'制药行业排放标准', J_design:'18 LMH', MLSS:'10000 mg/L',
+    Am:'460 m²', energy:'1.2 kWh/m³', note:'制药废水含抑制性物质，SRT 需延长至 30-40d；关注 TMP 上升速率，可能需要更频繁 CIP'
+  },
+  {
+    type:'leach', tag:'垃圾渗滤液', title:'垃圾填埋场渗滤液处理',
+    scale:'200 m³/d', bio:'AAO+MBR+NF/RO', membrane:'中空纤维 HF',
+    data:{ Q:0.02, T:20, COD0:8000, BOD0:3000, NH40:1800, TN0:2000, TP0:20 },
+    outlet:'垃圾填埋场污染控制标准', J_design:'12 LMH', MLSS:'12000 mg/L',
+    Am:'700 m²', energy:'1.5 kWh/m³(MBR段)', note:'高氨氮需预吹脱；MBR 后接 NF/RO 才能达标排放；SRT 40-60d；膜污染速率快，CIP 周期缩短至 2-3 个月'
+  },
+  {
+    type:'muni', tag:'中水回用', title:'中水回用 · RO 预处理',
+    scale:'2 万 m³/d', bio:'单好氧+MBR', membrane:'中空纤维 HF',
+    data:{ Q:2, T:20, COD0:300, BOD0:120, NH40:25, TN0:35, TP0:3.5 },
+    outlet:'RO 进水 / 工业用水', J_design:'22 LMH', MLSS:'9000 mg/L',
+    Am:'3400 m²', energy:'0.8 kWh/m³', note:'MBR 出水直接进 RO，无需砂滤等三级处理；SDI &lt;3，满足 RO 进水要求；运营成本低于"二级+三级过滤+RO"路线'
+  },
+];
+
+// ============ 生物段配置 ============
+let bioConfig = 'aao';
+
+function setBioConfig(cfg) {
+  bioConfig = cfg;
+  document.querySelectorAll('[data-bio]').forEach(t => t.classList.remove('active'));
+  document.querySelector(`[data-bio="${cfg}"]`).classList.add('active');
+  // 厌氧/缺氧段显示
+  $('row_AN').style.display = (cfg === 'aao') ? '' : 'none';
+  $('row_AX').style.display = (cfg !== 'single_o') ? '' : 'none';
+  const sub = { aao:'MBR + AAO', ao_an:'MBR + AO 缺氧', single_o:'MBR + 单好氧' };
+  $('d_titleSub').textContent = sub[cfg];
+  calc();
+}
+
+function setPreset(key) {
+  document.querySelectorAll('[data-preset]').forEach(t => t.classList.remove('active'));
+  document.querySelector(`[data-preset="${key}"]`).classList.add('active');
+  const p = PRESETS[key];
+  Object.keys(p).forEach(id => { if ($(id)) $(id).value = p[id]; });
+  calc();
+}
+
+function applyStandard() {
+  const std = $('d_standard').value;
+  if (std === 'custom') return;
+  const s = STANDARDS[std]; if (!s) return;
+  $('d_CODe').value = s.CODe; $('d_BODe').value = s.BODe;
+  $('d_NH4e').value = s.NH4e; $('d_TNe').value = s.TNe;
+  $('d_TPe').value = s.TPe;
+  calc();
+}
+
+function applyMemType() {
+  const t = $('d_memType').value;
+  if (t === 'hf') {
+    $('d_J20').value = 20;
+    $('d_moduleArea').value = 25;
+    $('d_J_helper').textContent = '中空纤维 (HJ 2010): 12-30 LMH';
+    $('d_mod_helper').textContent = '三菱 25m², ZeeWeed 70m², 碧水源 5/10/35m²';
+    $('d_cleanCycle').value = 4;
+    $('d_eMembrane').value = 0.25;
+  } else {
+    $('d_J20').value = 18;
+    $('d_moduleArea').value = 5.4;
+    $('d_J_helper').textContent = '平板式 (HJ 2010): 16-50 LMH';
+    $('d_mod_helper').textContent = 'Kubota 5.4m², 碧水源 H-MBR 2.3/5m²';
+    $('d_cleanCycle').value = 6;
+    $('d_eMembrane').value = 0.20;
+  }
+  calc();
+}
+
+function toggleAdv() {
+  const p = $('advParams'), c = $('advChev').parentElement;
+  p.classList.toggle('open');
+  $('advChev').textContent = p.classList.contains('open') ? '▾' : '▸';
+}
+
+// ============ 主设计计算 ============
+function calc() {
+  const g = id => parseFloat($(id)?.value) || 0;
+  const Q_wan = g('d_Q'), Q = Q_wan * 1e4;
+  const T = g('d_T');
+  const COD0 = g('d_COD0'), BOD0 = g('d_BOD0');
+  const TN0 = g('d_TN0'), NH40 = g('d_NH40'), TNe = g('d_TNe'), NH4e = g('d_NH4e');
+  const TP0 = g('d_TP0'), TPe = g('d_TPe');
+  const MLSS = g('d_MLSS'), VSS_SS = g('d_VSS_SS'), SRT = g('d_SRT'), SF = g('d_SF');
+  const HRT_AN = g('d_HRT_AN');
+  const J20 = g('d_J20'), peakFactor = g('d_peakFactor'), runRatio = g('d_runRatio') / 100;
+  const moduleArea = g('d_moduleArea'), TMP = g('d_TMP');
+  const Y = g('d_Y'), Kd = g('d_Kd'), alpha = g('d_alpha'), beta = g('d_beta');
+  const mumax = g('d_mumax'), SDNR20 = g('d_SDNR20');
+  const eMembrane = g('d_eMembrane');
+
+  // === 生物段计算 ===
+  const MLVSS = MLSS * VSS_SS;
+  const BOD_rem = (BOD0 - g('d_BODe')) * Q / 1e3; // kg/d
+  const Yobs = Y / (1 + Kd * SRT);
+  // 生物池容: V = Q * SRT * Yobs * BOD_rem / (MLVSS * Q) * SF
+  // 简化: HRT = SRT * Yobs * BOD0_rem / MLVSS
+  const HRT_bio_h = SRT * Yobs * (BOD0 - g('d_BODe')) / MLVSS * 24 * SF;
+  const V_total = HRT_bio_h / 24 * Q;
+  const V_O = V_total * (bioConfig === 'single_o' ? 1.0 : bioConfig === 'ao_an' ? 0.60 : 0.55);
+  const V_AX = bioConfig === 'single_o' ? 0 : V_total * (bioConfig === 'ao_an' ? 0.40 : 0.30);
+  const V_AN = bioConfig === 'aao' ? HRT_AN / 24 * Q : 0;
+  const HRT_total = (V_total + V_AN) / Q * 24;
+
+  // 与传统活性污泥对比省地 (传统 MLSS~3500)
+  const V_trad = V_total * (MLSS / 3500) * 1.15; // 传统还需 1.15 倍含二沉池
+  const saveV = Math.max(0, (V_trad - V_total) / V_trad * 100);
+
+  // === 膜系统计算 ===
+  const T_factor = Math.pow(1.03, T - 20);
+  const J_T = J20 * T_factor; // 实际通量
+  const J_peak = J_T * peakFactor;
+  // 总膜面积: A_m = Q / (J_T * runRatio) * 1e6 / 24 (LMH → m/d)
+  const A_m = Q / (J_T / 1000 * runRatio * 24); // m²
+  const modules = Math.ceil(A_m / moduleArea);
+
+  // === 需氧量 ===
+  const COD_rem = (COD0 - g('d_CODe')) * Q / 1e3;
+  const NH4_rem = (NH40 - NH4e) * Q / 1e3;
+  const dN = Math.max(0, (TN0 - TNe)) * Q / 1e3;
+  const AOR_carb = COD_rem * 1.0 - BOD_rem * 1.42 * Yobs; // 简化
+  const AOR_nitrif = NH4_rem * 4.57;
+  const AOR_dentrif = -dN * 2.86;
+  const AOR = Math.max(AOR_carb + AOR_nitrif + AOR_dentrif, BOD_rem * 1.5);
+  // SOR
+  const SOR = AOR / (alpha * beta * 9.09 / 9.09 * Math.pow(1.024, T - 20));
+
+  // === 剩余污泥 ===
+  const dX = Yobs * BOD_rem - Kd * MLVSS * V_total / 1e3;
+
+  // === 能耗 ===
+  const eBio = SOR / Q * 0.3; // 鼓风机 kWh/m³
+  const eMem_val = eMembrane; // 用户输入
+  const ePump = TMP * 1000 / (0.65 * 3.6e6); // kPa→Pa / η / (J→kWh): kWh/m³
+  const eRecirc = g('d_SRT') > 0 ? 0.05 : 0; // 近似
+  const eTotal = eBio + eMem_val + ePump + 0.05;
+
+  // === 渲染结果 ===
+  $('d_r_V').textContent = V_total.toFixed(0);
+  $('d_r_HRT').textContent = HRT_total.toFixed(1);
+  $('d_r_VAN').textContent = V_AN.toFixed(0);
+  $('d_r_VAX').textContent = V_AX.toFixed(0);
+  $('d_r_VO').textContent = V_O.toFixed(0);
+  $('d_r_saveV').textContent = saveV.toFixed(0);
+  $('d_r_Am').textContent = A_m.toFixed(0);
+  $('d_r_JT').textContent = J_T.toFixed(1);
+  $('d_r_modules').textContent = modules;
+  $('d_r_Jpeak').textContent = J_peak.toFixed(1);
+  $('d_r_Tfactor').textContent = T_factor.toFixed(3);
+  $('d_r_AOR').textContent = AOR.toFixed(0);
+  $('d_r_SOR').textContent = SOR.toFixed(0);
+  $('d_r_dX').textContent = Math.max(0, dX).toFixed(0);
+  $('d_r_MLSS_ratio').textContent = (MLSS / Math.max(g('d_SS0'), 10)).toFixed(1);
+  $('d_r_eBio').textContent = eBio.toFixed(2);
+  $('d_r_eMem').textContent = eMem_val.toFixed(2);
+  $('d_r_ePump').textContent = ePump.toFixed(2);
+  $('d_r_eTotal').textContent = eTotal.toFixed(2);
+
+  // 同步到 Tab2 膜面积计算
+  if (!$('m_Am').value) $('m_Am').value = A_m.toFixed(0);
+  calcModules();
+
+  // 同步 Tab3/Tab4
+  $('c_Q').value = Q_wan;
+  $('e_Q').value = Q_wan;
+  $('e_Am').value = A_m.toFixed(0);
+  calcChem();
+  calcEnergy();
+
+  // SVG 流程图
+  drawFlow(bioConfig, { Q_wan, V_total, A_m, modules });
+
+  // 校核
+  const checks = checkDesign({ J_T, J20, T, A_m, V_total, HRT_total, MLSS, SRT, AOR, dX, eBio, eMem_val, ePump, eTotal, T_factor });
+  $('d_checkList').innerHTML = checks.items.map(c => `<div class="check-item check-${c.type}"><span class="ic">${c.ic}</span><span>${c.text}</span></div>`).join('');
+  const scoreNum = checks.score;
+  $('d_scoreNum').textContent = scoreNum;
+  const [st, sd] = scoreNum >= 80 ? ['✅ 设计合理','参数在工程常规范围内'] : scoreNum >= 60 ? ['⚠️ 设计有风险','请关注上方警告项'] : ['✗ 设计有重大问题','需重新核查主要参数'];
+  $('d_scoreTitle').textContent = st;
+  $('d_scoreDesc').textContent = sd;
+}
+
+function checkDesign({ J_T, J20, T, A_m, V_total, HRT_total, MLSS, SRT, AOR, dX, eBio, eMem_val, ePump, eTotal, T_factor }) {
+  const items = []; let score = 100;
+  if (J_T < 12) { items.push({type:'warn',ic:'⚠',text:`<b>通量偏低</b>: 当前 T=${T}°C 下通量 ${J_T.toFixed(1)} LMH < 12，膜面积偏大，可适当提高 J₂₀ 设计值`}); score -= 10; }
+  if (J_T > 30) { items.push({type:'bad',ic:'✗',text:`<b>通量超限</b>: ${J_T.toFixed(1)} LMH 超过 HJ 2010 中空纤维膜上限 30 LMH，有超临界通量风险`}); score -= 20; }
+  if (T_factor < 0.75) { items.push({type:'warn',ic:'⚠',text:`<b>低温影响显著</b>: T=${T}°C 下通量修正系数 ${T_factor.toFixed(2)}，冬季膜面积需增加 ${((1/T_factor-1)*100).toFixed(0)}%`}); score -= 10; }
+  if (MLSS < 8000) { items.push({type:'warn',ic:'⚠',text:`<b>MLSS 偏低</b>: ${MLSS} mg/L < 8000，未充分发挥 MBR 浓缩优势`}); score -= 8; }
+  if (MLSS > 12000) { items.push({type:'warn',ic:'⚠',text:`<b>MLSS 偏高</b>: ${MLSS} mg/L > 12000，膜污染速率加快，需强化清洗`}); score -= 8; }
+  if (SRT < 20) { items.push({type:'warn',ic:'⚠',text:`<b>SRT 偏短</b>: ${SRT}d < 20d，MBR 通常 SRT 20-30d 以保证硝化和低污泥量`}); score -= 8; }
+  if (HRT_total < 4) { items.push({type:'warn',ic:'⚠',text:`<b>HRT 偏短</b>: ${HRT_total.toFixed(1)}h < 4h，生物反应不充分`}); score -= 12; }
+  if (eTotal > 1.2) { items.push({type:'warn',ic:'⚠',text:`<b>总能耗偏高</b>: ${eTotal.toFixed(2)} kWh/m³ > 1.2，建议优化膜曝气方式（如脉冲曝气）`}); score -= 8; }
+  if (eTotal < 0.6) { items.push({type:'ok',ic:'✓',text:`<b>能耗优秀</b>: ${eTotal.toFixed(2)} kWh/m³，低于 0.6 kWh/m³ 基准`}); }
+  if (items.length === 0 || items.every(i => i.type === 'ok')) { items.push({type:'ok',ic:'✓',text:'<b>设计参数合理</b>: 通量、MLSS、SRT、HRT 均在 HJ 2010 推荐范围内'}); }
+  return { items, score: Math.max(10, score) };
+}
+
+// ============ SVG 流程图 ============
+function drawFlow(cfg, r) {
+  const ink = '#0f172a', muted = '#64748b', brand = '#0891b2';
+  const svgW = 960, H = 80, y = 100;
+  let h = `<defs><marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="${brand}"/></marker></defs>`;
+  h += `<text x="480" y="22" font-size="13" font-weight="600" fill="${ink}" text-anchor="middle">MBR 工艺流程 (${r.Q_wan} 万 m³/d)</text>`;
+
+  const arrow = (x1, x2, y0) => `<path d="M ${x1} ${y0} L ${x2} ${y0}" stroke="${brand}" stroke-width="2" marker-end="url(#arr)"/>`;
+  const box = (x, w, label, sub, color) => `<rect x="${x}" y="${y}" width="${w}" height="${H}" fill="${color}" fill-opacity="0.15" stroke="${color}" stroke-width="2" rx="6"/>
+    <text x="${x+w/2}" y="${y+H/2}" font-size="13" font-weight="700" fill="${color}" text-anchor="middle">${label}</text>
+    <text x="${x+w/2}" y="${y+H/2+18}" font-size="10" fill="${muted}" text-anchor="middle">${sub}</text>`;
+
+  let x = 50;
+  h += `<path d="M 20 ${y+H/2} L ${x} ${y+H/2}" stroke="${brand}" stroke-width="2" marker-end="url(#arr)"/>`;
+  h += `<text x="10" y="${y+H/2-6}" font-size="11" fill="${ink}">进水</text>`;
+
+  if (cfg === 'aao') {
+    const panels = [
+      { w:100, label:'厌氧段', sub:`V≈${Math.round(r.Q_wan*1e4*1/24*1/1e3)*1e3||'-'} m³`, color:'#9333ea' },
+      { w:130, label:'缺氧段', sub:'脱氮', color:'#ea580c' },
+      { w:180, label:'好氧+膜池', sub:`A_m≈${Math.round(r.A_m/100)*100} m²`, color:'#0891b2' },
+    ];
+    panels.forEach(p => {
+      h += arrow(x, x+8, y+H/2);
+      h += box(x, p.w, p.label, p.sub, p.color);
+      x += p.w + 8;
+    });
+  } else if (cfg === 'ao_an') {
+    [{ w:140, label:'缺氧段', sub:'脱氮', color:'#ea580c' },
+     { w:190, label:'好氧+膜池', sub:`A_m≈${Math.round(r.A_m/100)*100} m²`, color:'#0891b2' }].forEach(p => {
+      h += arrow(x, x+8, y+H/2);
+      h += box(x, p.w, p.label, p.sub, p.color);
+      x += p.w + 8;
+    });
+  } else {
+    h += arrow(x, x+8, y+H/2);
+    h += box(x, 200, '好氧+膜池', `A_m≈${Math.round(r.A_m/100)*100} m²`, '#0891b2');
+    x += 208;
+  }
+  // 膜产水
+  h += arrow(x, x+40, y+H/2);
+  h += `<text x="${x+42}" y="${y+H/2-6}" font-size="11" fill="${ink}" font-weight="600">出水</text>`;
+  h += `<text x="${x+42}" y="${y+H/2+10}" font-size="10" fill="${muted}">SS&lt;1 mg/L</text>`;
+  // 污泥回流
+  h += `<path d="M ${x-10} ${y+H+10} L ${x-10} ${y+H+30} L 180 ${y+H+30} L 180 ${y+H+10}" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"/>`;
+  h += `<text x="${(x-10+180)/2}" y="${y+H+26}" font-size="10" fill="${muted}" text-anchor="middle">污泥回流 RAS</text>`;
+
+  const svg = $('mbrFlowSvg');
+  svg.innerHTML = h;
+}
+
+// ============ Tab 2: 膜选型 ============
+function toggleMemCard(id) {
+  const el = $('detail-' + id);
+  if (!el) return;
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+function calcModules() {
+  const Am = parseFloat($('m_Am')?.value) || 0;
+  const sa = parseFloat($('m_singleArea')?.value) || 25;
+  const red = parseFloat($('m_redundancy')?.value) || 1.15;
+  const min = Math.ceil(Am / sa);
+  const total = Math.ceil(Am * red / sa);
+  const actual = total * sa;
+  if ($('m_r_modules_min')) $('m_r_modules_min').textContent = min;
+  if ($('m_r_modules_total')) $('m_r_modules_total').textContent = total;
+  if ($('m_r_Am_actual')) $('m_r_Am_actual').textContent = actual + ' m²';
+}
+
+// ============ Tab 3: 清洗药剂 ============
+function calcChem() {
+  const Q_wan = parseFloat($('c_Q')?.value) || 3;
+  const Q = Q_wan * 1e4; // m³/d
+  const cipCycle = parseFloat($('c_cipCycle')?.value) || 4; // 月
+  const days = parseFloat($('c_days')?.value) || 365;
+  const memType = $('c_memType')?.value;
+
+  // CEB 每日一次碱洗 + 每周2次酸洗
+  // NaOCl 1500ppm, 接触体积约 10L/m²·次·天, 膜面积按 Q 估算
+  const Am_est = Q / (20 / 1000 * 0.95 * 24); // 粗估
+  const ceb_naocl_daily = Am_est * 0.01 * 1.5 / 1000; // kg/次
+  const ceb_naocl_year = ceb_naocl_daily * days;
+  const ceb_citric_year = ceb_naocl_year * 0.5;
+
+  // CIP 次数/年
+  const cip_times = Math.round(12 / cipCycle);
+  // CIP 用药: 约 10kg NaOCl / 1000 m² / 次
+  const cip_naocl_once = Am_est / 1000 * 10;
+  const cip_citric_once = Am_est / 1000 * 8;
+  const cip_naocl_year = cip_naocl_once * cip_times;
+  const cip_citric_year = cip_citric_once * cip_times;
+
+  // 成本估算 (NaOCl 0.8元/kg, 柠檬酸 5元/kg)
+  const cost_year = (ceb_naocl_year + cip_naocl_year) * 0.8 + (ceb_citric_year + cip_citric_year) * 5;
+
+  if ($('c_r_naocl_ceb')) $('c_r_naocl_ceb').textContent = ceb_naocl_year.toFixed(0);
+  if ($('c_r_citric_ceb')) $('c_r_citric_ceb').textContent = ceb_citric_year.toFixed(0);
+  if ($('c_r_cip_times')) $('c_r_cip_times').textContent = cip_times;
+  if ($('c_r_naocl_cip')) $('c_r_naocl_cip').textContent = cip_naocl_year.toFixed(0);
+  if ($('c_r_citric_cip')) $('c_r_citric_cip').textContent = cip_citric_year.toFixed(0);
+  if ($('c_r_cost')) $('c_r_cost').textContent = (cost_year / 1e4).toFixed(2);
+}
+
+// ============ Tab 4: 能耗分析 ============
+function calcEnergy() {
+  const Q_wan = parseFloat($('e_Q')?.value) || 3;
+  const Q = Q_wan * 1e4;
+  const Am = parseFloat($('e_Am')?.value) || 5000;
+  const SADm = parseFloat($('e_SADm')?.value) || 0.20;
+  const TMP = parseFloat($('e_TMP')?.value) || 25;
+  const pumpEff = (parseFloat($('e_pumpEff')?.value) || 65) / 100;
+  const bioAir = parseFloat($('e_bioAir')?.value) || 2000; // Nm³/h
+  const blowerEff = (parseFloat($('e_blowerEff')?.value) || 70) / 100;
+  const recirc = (parseFloat($('e_recirc')?.value) || 300) / 100;
+  const price = parseFloat($('e_price')?.value) || 0.7;
+
+  // 生物曝气: 鼓风机功率 kW
+  const P_bio_kW = bioAir * 101.325 * ((Math.pow(101.325 + 5 / 101.325, 0.283) - 1)) / (0.283 * blowerEff * 1000);
+  const eBio = P_bio_kW * 24 / Q;
+
+  // 膜曝气: SADm × Am × 24h → Nm³/d → kW
+  const memAir_m3h = SADm * Am;
+  const P_mem_kW = memAir_m3h * 101.325 * 0.283 / (blowerEff * 1000);
+  const eMem = P_mem_kW * 24 / Q;
+
+  // 产水泵: P = Q × TMP / (η × 3.6×10⁶) kW
+  const P_pump_kW = Q / 24 / 3600 * TMP * 1000 / (pumpEff * 1000);
+  const ePump = P_pump_kW * 24 / Q;
+
+  // 回流泵: 简化
+  const P_recirc_kW = Q * recirc / 24 / 3600 * 9.81 * 2 / (0.65 * 1000);
+  const eRecirc = P_recirc_kW * 24 / Q;
+
+  const eTotal = eBio + eMem + ePump + eRecirc + 0.05;
+  const eExtra = Math.max(0, eTotal - 0.4); // 高于传统 0.4 的部分
+  const kwhYear = eTotal * Q * 365 / 1e4;
+  const costYear = kwhYear * price;
+  const costTon = eTotal * price;
+
+  if ($('e_r_bio')) $('e_r_bio').textContent = eBio.toFixed(2);
+  if ($('e_r_mem')) $('e_r_mem').textContent = eMem.toFixed(2);
+  if ($('e_r_pump')) $('e_r_pump').textContent = ePump.toFixed(2);
+  if ($('e_r_recirc')) $('e_r_recirc').textContent = eRecirc.toFixed(2);
+  if ($('e_r_total')) $('e_r_total').textContent = eTotal.toFixed(2);
+  if ($('e_r_kwhYear')) $('e_r_kwhYear').textContent = kwhYear.toFixed(0);
+  if ($('e_r_costYear')) $('e_r_costYear').textContent = costYear.toFixed(0);
+  if ($('e_r_costTon')) $('e_r_costTon').textContent = costTon.toFixed(2);
+  if ($('e_r_extra')) $('e_r_extra').textContent = eExtra.toFixed(2);
+  if ($('e_r_extraCost')) $('e_r_extraCost').textContent = (eExtra * Q * 365 * price / 1e4).toFixed(0);
+
+  // 更新柱状图
+  const maxE = Math.max(eBio, eMem, ePump, eRecirc, 0.1);
+  const bars = [{id:'bio',v:eBio},{id:'mem',v:eMem},{id:'pump',v:ePump},{id:'recirc',v:eRecirc}];
+  bars.forEach(b => {
+    if ($('e_bar_'+b.id)) $('e_bar_'+b.id).style.width = Math.max(5, b.v/maxE*90)+'%';
+    if ($('e_val_'+b.id)) $('e_val_'+b.id).textContent = b.v.toFixed(2)+' kWh/m³';
+  });
+}
+
+// ============ Tab 5: 案例库渲染 ============
+function renderCases() {
+  const tagClass = { muni:'ccm-tag-muni', ind:'ccm-tag-ind', leach:'ccm-tag-leach' };
+  const html = MBR_CASES.map(c => `
+    <div class="case-card-mbr">
+      <div class="ccm-head">
+        <div class="ccm-tag ${tagClass[c.type]}">${c.tag}</div>
+        <div class="ccm-title">${c.title}</div>
+        <div class="ccm-scale">${c.scale} · ${c.bio}</div>
+      </div>
+      <div class="ccm-specs">
+        <div class="ccm-spec"><div class="ccm-spec-label">膜类型</div><div class="ccm-spec-value">${c.membrane}</div></div>
+        <div class="ccm-spec"><div class="ccm-spec-label">设计通量</div><div class="ccm-spec-value">${c.J_design}</div></div>
+        <div class="ccm-spec"><div class="ccm-spec-label">MLSS</div><div class="ccm-spec-value">${c.MLSS}</div></div>
+        <div class="ccm-spec"><div class="ccm-spec-label">膜面积</div><div class="ccm-spec-value">${c.Am}</div></div>
+        <div class="ccm-spec"><div class="ccm-spec-label">出水标准</div><div class="ccm-spec-value">${c.outlet}</div></div>
+        <div class="ccm-spec"><div class="ccm-spec-label">总能耗</div><div class="ccm-spec-value">${c.energy}</div></div>
+      </div>
+      <div class="ccm-footer">💡 ${c.note}</div>
+    </div>
+  `).join('');
+  $('casesContainer').innerHTML = html;
+}
+
+// ============ 工具函数 ============
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+  $('panel-' + tab).classList.add('active');
+  if (tab === 'cases') renderCases();
+  if (tab === 'energy') calcEnergy();
+  if (tab === 'cleaning') calcChem();
+}
+
+function copyDesignResult() {
+  const r = id => $(id)?.textContent || '—';
+  const txt = `MBR 工程设计结果
+生物池容: ${r('d_r_V')} m³  HRT: ${r('d_r_HRT')} h
+总膜面积: ${r('d_r_Am')} m²  通量 J(T): ${r('d_r_JT')} LMH
+膜组件数: ${r('d_r_modules')} 个
+AOR: ${r('d_r_AOR')} kg O₂/d  污泥: ${r('d_r_dX')} kg DS/d
+总能耗: ${r('d_r_eTotal')} kWh/m³
+—— 由 WaterKit MBR 工程设计平台生成`;
+  navigator.clipboard.writeText(txt).then(() => alert('已复制'));
+}
+
+function resetAll() {
+  if (confirm('重置所有参数为城镇污水默认值？')) {
+    setPreset('municipal');
+    setBioConfig('aao');
+    applyStandard();
+    applyMemType();
+  }
+}
+
+// ============ 初始化 ============
+calc();
+setBioConfig('aao');
+renderCases();
+calcModules();
+calcChem();
+calcEnergy();
+</script>
+</body>
+</html>
