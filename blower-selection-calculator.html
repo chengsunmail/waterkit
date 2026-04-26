@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>鼓风机选型计算器 | 水处理工具箱</title>
+<meta name="description" content="污水处理鼓风机选型计算：风量、风压、轴功率、电机功率，覆盖罗茨鼓风机、离心鼓风机、磁悬浮鼓风机选型建议。依据 GB 50014、HJ 576。">
+<style>
+  :root {
+    --brand: #0891b2;
+    --brand-dark: #0e7490;
+    --brand-light: #ecfeff;
+    --brand-border: #67e8f9;
+    --ink: #0f172a;
+    --text: #334155;
+    --text-muted: #64748b;
+    --text-faint: #94a3b8;
+    --bg: #ffffff;
+    --bg-soft: #f8fafc;
+    --bg-section: #f1f5f9;
+    --border: #e2e8f0;
+    --border-soft: #f1f5f9;
+  }
+  body {
+    background: var(--bg);
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    color: var(--text);
+    margin: 0;
+  }
+
+  /* 顶部导航 */
+  .topbar {
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .topbar-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .brand-mark {
+    width: 30px; height: 30px;
+    background: var(--ink);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .brand-mark svg { width: 16px; height: 16px; }
+  .brand-text { font-size: 15px; font-weight: 700; color: var(--ink); }
+  .brand-sub { font-size: 11px; color: var(--text-muted); font-weight: 400; }
+  nav { display: flex; gap: 24px; align-items: center; }
+  nav a { font-size: 13.5px; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+  nav a:hover { color: var(--ink); }
+
+  /* 面包屑 */
+  .breadcrumb {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 12px 32px;
+    font-size: 12.5px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .breadcrumb a { color: var(--text-muted); text-decoration: none; }
+  .breadcrumb a:hover { color: var(--brand); }
+  .breadcrumb .sep { color: var(--border); }
+  .breadcrumb .current { color: var(--text); }
+
+  /* 主体 */
+  .main-wrap { flex: 1; padding: 0 0 60px; }
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+  .tool-header {
+    padding: 32px 0 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 28px;
+  }
+  .tool-header h1 {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--ink);
+    margin: 0 0 8px;
+    letter-spacing: -0.5px;
+  }
+  .tool-header p {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  /* 分区标题 */
+  .section-title {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin: 28px 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* 网格布局 */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 4px;
+  }
+  .grid-2 { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 680px) {
+    .grid, .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  /* 输入字段 */
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  label { font-size: 12.5px; color: var(--text-muted); font-weight: 500; }
+  label .unit {
+    font-size: 11px;
+    color: var(--text-faint);
+    font-weight: 400;
+    margin-left: 3px;
+  }
+  input[type="number"], select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    font-size: 14px;
+    color: var(--ink);
+    background: var(--bg);
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.2s;
+    font-family: inherit;
+  }
+  input[type="number"]:focus, select:focus { border-color: var(--brand); }
+  .helper {
+    font-size: 11px;
+    color: var(--text-faint);
+    line-height: 1.5;
+  }
+
+  /* 信息提示框 */
+  .info-box {
+    background: var(--brand-light);
+    border: 1px solid var(--brand-border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--brand-dark);
+    margin: 16px 0;
+    line-height: 1.6;
+  }
+  .info-box b { color: var(--brand-dark); }
+
+  /* 结果区 */
+  .results {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-top: 32px;
+  }
+  .results h2 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 0 0 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .result-group { margin-bottom: 24px; }
+  .result-group:last-child { margin-bottom: 0; }
+  .result-group-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border-soft);
+    gap: 12px;
+  }
+  .result-row:last-child { border-bottom: none; }
+  .result-label { font-size: 13px; color: var(--text-muted); flex: 1; }
+  .result-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .result-value.big { font-size: 22px; color: var(--brand-dark); }
+  .result-unit { font-size: 12px; color: var(--text-muted); margin-left: 3px; }
+  .highlight-row { background: var(--brand-light); margin: 0 -4px; padding: 9px 4px; border-radius: 4px; }
+  .highlight-row .result-label { color: var(--brand-dark); font-weight: 500; }
+
+  /* 风机推荐区 */
+  .blower-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 16px;
+  }
+  @media (max-width: 680px) { .blower-cards { grid-template-columns: 1fr; } }
+  .blower-card {
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+  }
+  .blower-card.recommended {
+    border-color: var(--brand);
+    background: var(--brand-light);
+  }
+  .blower-card.recommended::before {
+    content: '推荐';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--brand);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 99px;
+  }
+  .blower-type {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .blower-range {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+  .blower-pros {
+    font-size: 11.5px;
+    color: var(--brand-dark);
+    margin-top: 8px;
+    line-height: 1.6;
+  }
+  .blower-cons {
+    font-size: 11.5px;
+    color: #92400e;
+    margin-top: 4px;
+    line-height: 1.6;
+  }
+  .match-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-top: 8px;
+  }
+  .match-good { background: #dcfce7; color: #166534; }
+  .match-ok   { background: #fef9c3; color: #854d0e; }
+  .match-poor { background: #fee2e2; color: #991b1b; }
+
+  /* 校核警告 */
+  .check-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+    padding: 8px 12px;
+    border-radius: 7px;
+  }
+  .check-ok   { background: #f0fdf4; color: #166534; }
+  .check-warn { background: #fffbeb; color: #92400e; }
+  .check-bad  { background: #fef2f2; color: #991b1b; }
+  .check-item .ic { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+  /* 按钮 */
+  .btn-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    padding: 10px 20px;
+    font-size: 13.5px;
+    font-weight: 500;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .btn-primary { background: var(--ink); color: white; }
+  .btn-primary:hover { background: #1e293b; }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { border-color: var(--ink); color: var(--ink); }
+
+  /* 公式框 */
+  .formula-box {
+    display: none;
+    background: var(--bg-section);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-top: 20px;
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  .formula-box code {
+    display: block;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 12.5px;
+    color: var(--ink);
+    margin: 8px 0;
+  }
+  .formula-box h4 { margin: 16px 0 4px; font-size: 13px; color: var(--ink); }
+  .formula-box h4:first-child { margin-top: 0; }
+
+  /* 注释 */
+  .note {
+    font-size: 12px;
+    color: var(--text-faint);
+    line-height: 1.7;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* 页脚 */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 24px 32px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-faint);
+  }
+  footer a { color: var(--text-muted); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="index.html">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-text">WaterKit</div>
+        <div class="brand-sub">水处理工具箱</div>
+      </div>
+    </a>
+    <nav>
+      <a href="index.html">首页</a>
+      <a href="index.html#cat-process">工艺计算</a>
+      <a href="index.html#cat-equipment">设备选型</a>
+      <a href="https://dengdengtech.cn" target="_blank" rel="noopener">登登科技</a>
+    </nav>
+  </div>
+</div>
+
+<div class="breadcrumb">
+  <a href="index.html">首页</a>
+  <span class="sep">/</span>
+  <a href="index.html#cat-equipment">设备选型</a>
+  <span class="sep">/</span>
+  <span class="current">鼓风机选型</span>
+</div>
+
+<main class="main-wrap">
+<div class="container">
+
+  <header class="tool-header">
+    <h1>💨 鼓风机选型计算器</h1>
+    <p>依据 GB 50014-2021、HJ 576，计算鼓风机风量、风压、轴功率及电机功率，并给出机型选型建议</p>
+  </header>
+
+  <div class="info-box">
+    💡 可直接输入供气量，或从曝气量计算器的结果（标准供气量 Gs）导入。风压由曝气池水深、管道阻力和曝气器背压共同决定。
+  </div>
+
+  <!-- 第一部分：风量 -->
+  <div class="section-title">① 供气量输入</div>
+  <div class="grid">
+    <div class="field">
+      <label>平均供气量 Q<sub>avg</sub> <span class="unit">Nm³/min</span></label>
+      <input type="number" id="Q_avg" value="15" step="0.5" oninput="calc()">
+      <div class="helper">来自曝气量计算器的标准供气量 Gs</div>
+    </div>
+    <div class="field">
+      <label>最大时系数 K<sub>h</sub></label>
+      <input type="number" id="Kh" value="1.5" step="0.1" oninput="calc()">
+      <div class="helper">典型 1.3-2.0，GB 50014 建议 ≥1.5</div>
+    </div>
+    <div class="field">
+      <label>鼓风机台数（运行）<span class="unit">台</span></label>
+      <input type="number" id="n_run" value="2" step="1" oninput="calc()">
+      <div class="helper">不含备用台，通常 2-4 台并联</div>
+    </div>
+  </div>
+
+  <!-- 第二部分：风压计算 -->
+  <div class="section-title">② 风压计算</div>
+  <div class="grid">
+    <div class="field">
+      <label>曝气池有效水深 H <span class="unit">m</span></label>
+      <input type="number" id="H_pool" value="5.0" step="0.5" oninput="calc()">
+      <div class="helper">曝气器安装位置到水面距离</div>
+    </div>
+    <div class="field">
+      <label>曝气器背压 ΔP<sub>diff</sub> <span class="unit">kPa</span></label>
+      <input type="number" id="dP_diff" value="4.0" step="0.5" oninput="calc()">
+      <div class="helper">微孔曝气器 3-6 kPa，穿孔管 1-2 kPa</div>
+    </div>
+    <div class="field">
+      <label>管道沿程+局部阻力 ΔP<sub>pipe</sub> <span class="unit">kPa</span></label>
+      <input type="number" id="dP_pipe" value="5.0" step="0.5" oninput="calc()">
+      <div class="helper">含出口至曝气器管道，通常 3-8 kPa</div>
+    </div>
+    <div class="field">
+      <label>安全余量系数 f<sub>s</sub></label>
+      <input type="number" id="fs" value="1.1" step="0.05" oninput="calc()">
+      <div class="helper">风压安全系数，通常 1.05-1.15</div>
+    </div>
+    <div class="field">
+      <label>海拔高度 <span class="unit">m</span></label>
+      <input type="number" id="alt" value="0" step="100" oninput="calc()">
+      <div class="helper">影响空气密度和绝对压力</div>
+    </div>
+    <div class="field">
+      <label>进气温度 <span class="unit">°C</span></label>
+      <input type="number" id="T_inlet" value="20" step="1" oninput="calc()">
+      <div class="helper">夏季最高气温，影响风机出力</div>
+    </div>
+  </div>
+
+  <!-- 第三部分：机械效率 -->
+  <div class="section-title">③ 效率参数</div>
+  <div class="grid">
+    <div class="field">
+      <label>风机绝热效率 η<sub>bl</sub> <span class="unit">%</span></label>
+      <input type="number" id="eta_bl" value="75" step="1" oninput="calc()">
+      <div class="helper">罗茨 60-75%，离心 75-85%，磁悬浮 80-88%</div>
+    </div>
+    <div class="field">
+      <label>传动效率 η<sub>t</sub> <span class="unit">%</span></label>
+      <input type="number" id="eta_t" value="95" step="1" oninput="calc()">
+      <div class="helper">直联 95-98%，皮带 90-95%</div>
+    </div>
+    <div class="field">
+      <label>电机效率 η<sub>m</sub> <span class="unit">%</span></label>
+      <input type="number" id="eta_m" value="93" step="1" oninput="calc()">
+      <div class="helper">IE3 电机 91-95%，IE4 93-96%</div>
+    </div>
+  </div>
+
+  <!-- 结果区 -->
+  <div class="results">
+    <h2>🔧 鼓风机选型计算结果</h2>
+
+    <!-- 风量 -->
+    <div class="result-group">
+      <div class="result-group-title">💨 风量</div>
+      <div class="result-row">
+        <span class="result-label">平均供气量（设计值）</span>
+        <span><span class="result-value" id="r_Q_avg">—</span><span class="result-unit">Nm³/min</span></span>
+      </div>
+      <div class="result-row highlight-row">
+        <span class="result-label"><b>最大时供气量（选型基准）</b></span>
+        <span><span class="result-value big" id="r_Q_max">—</span><span class="result-unit">Nm³/min</span></span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">单台风机风量</span>
+        <span><span class="result-value" id="r_Q_unit">—</span><span class="result-unit">Nm³/min</span></span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">单台折算实际进气量（T°C修正）</span>
+        <span><span class="result-value" id="r_Q_actual">—</span><span class="result-unit">m³/min</span></span>
+      </div>
+    </div>
+
+    <!-- 风压 -->
+    <div class="result-group">
+      <div class="result-group-title">📊 风压</div>
+      <div class="result-row">
+        <span class="result-label">水柱静压（ρ_水 × g × H）</span>
+        <span><span class="result-value" id="r_dP_water">—</span><span class="result-unit">kPa</span></span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">曝气器背压</span>
+        <span><span class="result-value" id="r_dP_diff">—</span><span class="result-unit">kPa</span></span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">管道阻力</span>
+        <span><span class="result-value" id="r_dP_pipe">—</span><span class="result-unit">kPa</span></span>
+      </div>
+      <div class="result-row highlight-row">
+        <span class="result-label"><b>设计总风压（含安全余量）</b></span>
+        <span><span class="result-value big" id="r_dP_total">—</span><span class="result-unit">kPa</span></span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">进气绝对压力 P₁</span>
+        <span><span class="result-value" id="r_P1">—</span><span class="result-unit">kPa(abs)</span></span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">出口绝对压力 P₂</span>
+        <span><span class="result-value" id="r_P2">—</span><span class="result-unit">kPa(abs)</span></span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">压力比 P₂/P₁</span>
+        <span><span class="result-value" id="r_pr">—</span></span>
+      </div>
+    </div>
+
+    <!-- 功率 -->
+    <div class="result-group">
+      <div class="result-group-title">⚡ 功率</div>
+      <div class="result-row">
+        <span class="result-label">单台绝热压缩功率 N<sub>ad</sub></span>
+        <span><span class="result-value" id="r_N_ad">—</span><span class="result-unit">kW</span></span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">单台轴功率 N<sub>shaft</sub></span>
+        <span><span class="result-value" id="r_N_shaft">—</span><span class="result-unit">kW</span></span>
+      </div>
+      <div class="result-row highlight-row">
+        <span class="result-label"><b>配套电机功率（选型参考）</b></span>
+        <span><span class="result-value big" id="r_N_motor">—</span><span class="result-unit">kW</span></span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">标准电机规格（就大不就小）</span>
+        <span><span class="result-value" id="r_N_std" style="font-size:15px;">—</span><span class="result-unit">kW</span></span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">全站总装机功率（运行台×电机）</span>
+        <span><span class="result-value" id="r_N_total">—</span><span class="result-unit">kW</span></span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">年运行电费（24h×365d×0.8元/kWh）</span>
+        <span><span class="result-value" id="r_annual_cost">—</span><span class="result-unit">万元/年</span></span>
+      </div>
+    </div>
+
+    <!-- 机型推荐 -->
+    <div class="result-group">
+      <div class="result-group-title">🔩 机型选型建议</div>
+      <div class="blower-cards" id="blowerCards">
+        <!-- JS 动态生成 -->
+      </div>
+    </div>
+
+    <!-- 校核 -->
+    <div class="result-group">
+      <div class="result-group-title">🔎 设计校核</div>
+      <div class="check-list" id="checkList"></div>
+    </div>
+  </div>
+
+  <!-- 公式说明 -->
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="toggleFormula()">📐 公式说明</button>
+    <button class="btn btn-ghost" onclick="copyResult()">📋 复制结果</button>
+    <button class="btn btn-ghost" onclick="resetDefaults()">↺ 恢复默认</button>
+  </div>
+
+  <div class="formula-box" id="formulaBox">
+    <h4>① 最大时风量</h4>
+    <code>Q_max = Q_avg × K_h  [Nm³/min]</code>
+    <p>单台风量 = Q_max / 运行台数</p>
+
+    <h4>② 实际进气量（温度修正）</h4>
+    <code>Q_actual = Q_unit × (273.15 + T) / 293.15  [m³/min]</code>
+    <p>标准状态定义为 20°C、101.325 kPa；实际进气温度影响密度，需修正流量。</p>
+
+    <h4>③ 风压计算</h4>
+    <code>ΔP_water = ρ_水 × g × H = 9.8 × H  [kPa]</code>
+    <code>ΔP_total = (ΔP_water + ΔP_diff + ΔP_pipe) × f_s  [kPa]</code>
+    <p>海拔修正：P₁ = 101.325 × exp(-alt/8435) kPa(abs)</p>
+    <code>P₂ = P₁ + ΔP_total  [kPa(abs)]</code>
+
+    <h4>④ 绝热压缩功率（等熵压缩）</h4>
+    <code>N_ad = (κ/(κ-1)) × P₁ × Q_actual × [(P₂/P₁)^((κ-1)/κ) - 1]  [kW]</code>
+    <p>κ = 1.4（空气绝热指数）；P 单位 kPa，Q 单位 m³/s。<br>
+    此公式为等熵压缩理论功率，是计算风机功率的标准方法（GB 50014 附录）。</p>
+
+    <h4>⑤ 轴功率与电机功率</h4>
+    <code>N_shaft = N_ad / η_bl  [kW]</code>
+    <code>N_motor = N_shaft / (η_t × η_m)  [kW]（选型时取上一档标准功率）</code>
+  </div>
+
+  <div class="note">
+    ℹ️ <b>选型要点：</b>①风量按最大时工况（K_h）选型；②风压应有 5-15% 余量；③离心风机应避免在喘振区运行，核查风机特性曲线；④磁悬浮风机调速性能好，适合变负荷场景；⑤建议至少备用一台，总台数宜为 3-5 台。<br>
+    📐 <b>依据：</b>GB 50014-2021《室外排水设计标准》、HJ 576《厌氧-缺氧-好氧活性污泥法》
+  </div>
+
+</div>
+</main>
+
+<footer>
+  <a href="index.html">WaterKit 水处理工具箱</a> · 海南登登科技咨询有限公司 ·
+  <a href="index.html">返回首页</a>
+</footer>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const g = id => parseFloat($(id).value) || 0;
+
+  // 标准电机功率档次（kW）
+  const STD_MOTORS = [0.75,1.1,1.5,2.2,3,4,5.5,7.5,11,15,18.5,22,30,37,45,55,
+                      75,90,110,132,160,185,200,220,250,280,315,355,400,450,500];
+
+  function nextStdMotor(kw) {
+    return STD_MOTORS.find(m => m >= kw) || Math.ceil(kw / 50) * 50;
+  }
+
+  function calc() {
+    const Q_avg   = g('Q_avg');
+    const Kh      = g('Kh')      || 1.5;
+    const n_run   = Math.max(1, Math.round(g('n_run') || 2));
+    const H_pool  = g('H_pool');
+    const dP_diff = g('dP_diff');
+    const dP_pipe = g('dP_pipe');
+    const fs      = g('fs')      || 1.1;
+    const alt     = g('alt');
+    const T_inlet = g('T_inlet');
+    const eta_bl  = (g('eta_bl') || 75) / 100;
+    const eta_t   = (g('eta_t')  || 95) / 100;
+    const eta_m   = (g('eta_m')  || 93) / 100;
+
+    // ── 风量 ────────────────────────────────────────────────────
+    const Q_max    = Q_avg * Kh;                          // Nm³/min
+    const Q_unit   = Q_max / n_run;                       // 单台 Nm³/min
+    // 温度修正：标准20°C→实际T°C
+    const Q_actual = Q_unit * (273.15 + T_inlet) / 293.15; // m³/min
+
+    // ── 风压 ────────────────────────────────────────────────────
+    const dP_water = 9.8 * H_pool;                       // kPa 水柱静压
+    const dP_raw   = dP_water + dP_diff + dP_pipe;       // kPa 裸压
+    const dP_total = dP_raw * fs;                         // kPa 含余量
+
+    // 海拔修正大气压
+    const P1 = 101.325 * Math.exp(-alt / 8435);          // kPa(abs)
+    const P2 = P1 + dP_total;                             // kPa(abs)
+    const pr = P2 / P1;                                   // 压力比
+
+    // ── 功率 ────────────────────────────────────────────────────
+    const kappa = 1.4;
+    const exp   = (kappa - 1) / kappa;                   // 0.2857
+    // 绝热功率（kW）：Q 换算 m³/s，P 单位 kPa → ×1000 → Pa → ÷1000 = kW
+    const Q_m3s  = Q_actual / 60;                         // m³/s
+    const N_ad   = (kappa / (kappa - 1)) * P1 * 1000 * Q_m3s * (Math.pow(pr, exp) - 1) / 1000;
+    const N_shaft  = eta_bl > 0 ? N_ad / eta_bl : 0;
+    const N_motor_calc = (eta_t * eta_m) > 0 ? N_shaft / (eta_t * eta_m) : 0;
+    const N_motor_std  = nextStdMotor(N_motor_calc * 1.1);  // 留10%余量后取标准档
+    const N_total      = N_motor_std * n_run;
+    const annual_cost  = N_total * 24 * 365 * 0.8 / 10000; // 万元/年
+
+    // ── 渲染结果 ─────────────────────────────────────────────────
+    const set = (id, v, dec = 1) => { const el = $(id); if (el) el.textContent = typeof v === 'number' ? v.toFixed(dec) : v; };
+    set('r_Q_avg',    Q_avg,    1);
+    set('r_Q_max',    Q_max,    1);
+    set('r_Q_unit',   Q_unit,   2);
+    set('r_Q_actual', Q_actual, 2);
+    set('r_dP_water', dP_water, 1);
+    set('r_dP_diff',  dP_diff,  1);
+    set('r_dP_pipe',  dP_pipe,  1);
+    set('r_dP_total', dP_total, 1);
+    set('r_P1',       P1,       2);
+    set('r_P2',       P2,       2);
+    set('r_pr',       pr,       4);
+    set('r_N_ad',     N_ad,     1);
+    set('r_N_shaft',  N_shaft,  1);
+    set('r_N_motor',  N_motor_calc, 1);
+    set('r_N_std',    N_motor_std,  0);
+    set('r_N_total',  N_total,  0);
+    set('r_annual_cost', annual_cost, 1);
+
+    // ── 机型推荐 ─────────────────────────────────────────────────
+    const Q_u_nm3h = Q_unit * 60;   // Nm³/h，便于判断
+    const dP_kpa   = dP_total;
+
+    // 判断各机型匹配度
+    // 罗茨鼓风机：风量 1-200 Nm³/min，风压 20-100 kPa，噪音大
+    const roots_q_ok = Q_unit >= 1 && Q_unit <= 200;
+    const roots_p_ok = dP_kpa >= 15 && dP_kpa <= 100;
+    const roots_score = (roots_q_ok ? 1 : 0) + (roots_p_ok ? 1 : 0);
+
+    // 单级高速离心：风量 20-500 Nm³/min，风压 40-120 kPa
+    const cent_q_ok = Q_unit >= 15 && Q_unit <= 500;
+    const cent_p_ok = dP_kpa >= 40 && dP_kpa <= 120;
+    const cent_score = (cent_q_ok ? 1 : 0) + (cent_p_ok ? 1 : 0);
+
+    // 磁悬浮/空气悬浮：风量 5-200 Nm³/min，风压 40-100 kPa，高效调速
+    const mag_q_ok = Q_unit >= 5 && Q_unit <= 200;
+    const mag_p_ok = dP_kpa >= 35 && dP_kpa <= 100;
+    const mag_score = (mag_q_ok ? 1 : 0) + (mag_p_ok ? 1 : 0);
+
+    const scores = [roots_score, cent_score, mag_score];
+    const maxScore = Math.max(...scores);
+
+    const cards = [
+      {
+        type: '罗茨鼓风机',
+        range: `风量：1-200 Nm³/min<br>风压：15-100 kPa<br>单台：${Q_unit.toFixed(1)} Nm³/min / ${dP_kpa.toFixed(0)} kPa`,
+        pros: '✓ 结构简单，维护方便<br>✓ 价格低，国产化程度高<br>✓ 适合中小型污水处理厂',
+        cons: '✗ 噪音大（85-95 dB），需隔音<br>✗ 效率偏低（60-75%）<br>✗ 风量调节范围有限',
+        score: roots_score,
+        max: maxScore,
+      },
+      {
+        type: '单级高速离心鼓风机',
+        range: `风量：15-500 Nm³/min<br>风压：40-120 kPa<br>单台：${Q_unit.toFixed(1)} Nm³/min / ${dP_kpa.toFixed(0)} kPa`,
+        pros: '✓ 效率高（75-85%），可变频<br>✓ 噪音相对较低<br>✓ 适合大中型污水处理厂',
+        cons: '✗ 注意喘振区，需配防喘振阀<br>✗ 造价高于罗茨<br>✗ 调速范围受限（一般 70-100%）',
+        score: cent_score,
+        max: maxScore,
+      },
+      {
+        type: '磁悬浮/空气悬浮鼓风机',
+        range: `风量：5-200 Nm³/min<br>风压：35-100 kPa<br>单台：${Q_unit.toFixed(1)} Nm³/min / ${dP_kpa.toFixed(0)} kPa`,
+        pros: '✓ 效率最高（80-88%）<br>✓ 调速范围广（30-100%）<br>✓ 免润滑，维护成本极低<br>✓ 噪音低（<80 dB）',
+        cons: '✗ 造价高（约为罗茨的 3-5 倍）<br>✗ 单台功率上限约 300 kW<br>✗ 对电网质量要求较高',
+        score: mag_score,
+        max: maxScore,
+      },
+    ];
+
+    $('blowerCards').innerHTML = cards.map(c => {
+      const isRec = c.score === c.max && c.score > 0;
+      const matchClass = c.score === 2 ? 'match-good' : c.score === 1 ? 'match-ok' : 'match-poor';
+      const matchText  = c.score === 2 ? '✓ 参数匹配' : c.score === 1 ? '⚠ 部分匹配' : '✗ 超出范围';
+      return `<div class="blower-card${isRec ? ' recommended' : ''}">
+        <div class="blower-type">${c.type}</div>
+        <div class="blower-range">${c.range}</div>
+        <div class="blower-pros">${c.pros}</div>
+        <div class="blower-cons">${c.cons}</div>
+        <span class="match-badge ${matchClass}">${matchText}</span>
+      </div>`;
+    }).join('');
+
+    // ── 校核 ─────────────────────────────────────────────────────
+    const checks = [];
+
+    // 压力比校核（罗茨一般 < 1.5，离心 < 1.8）
+    if (pr > 1.8) {
+      checks.push({type:'bad', ic:'✗', text:`压力比 ${pr.toFixed(3)} > 1.8，已超离心鼓风机常用范围，单级离心鼓风机可能无法满足，建议考虑两级压缩或提高充氧效率以降低水深`});
+    } else if (pr > 1.5) {
+      checks.push({type:'warn', ic:'⚠', text:`压力比 ${pr.toFixed(3)} 在 1.5-1.8，罗茨鼓风机已接近上限，建议优先选离心或磁悬浮鼓风机`});
+    } else {
+      checks.push({type:'ok', ic:'✓', text:`压力比 ${pr.toFixed(3)}，三种机型均可满足`});
+    }
+
+    // 台数校核
+    if (n_run < 2) {
+      checks.push({type:'warn', ic:'⚠', text:'运行台数为 1 台，无法通过台数调节风量，建议至少 2 台并联运行，另备 1 台'});
+    } else if (n_run > 6) {
+      checks.push({type:'warn', ic:'⚠', text:`运行台数 ${n_run} 台偏多，管理维护复杂，通常 2-4 台为宜`});
+    } else {
+      checks.push({type:'ok', ic:'✓', text:`运行 ${n_run} 台并联，具备台数调节能力，建议另设 1 台备用`});
+    }
+
+    // 单台风量校核
+    if (Q_unit < 1) {
+      checks.push({type:'warn', ic:'⚠', text:`单台风量 ${Q_unit.toFixed(2)} Nm³/min 过小，建议减少台数或合并`});
+    } else if (Q_unit > 500) {
+      checks.push({type:'warn', ic:'⚠', text:`单台风量 ${Q_unit.toFixed(0)} Nm³/min 超大，国内离心风机单台上限约 500 Nm³/min，请核查`});
+    } else {
+      checks.push({type:'ok', ic:'✓', text:`单台风量 ${Q_unit.toFixed(1)} Nm³/min，在常用范围内`});
+    }
+
+    // 风压校核
+    if (dP_total < 30) {
+      checks.push({type:'warn', ic:'⚠', text:`设计风压 ${dP_total.toFixed(1)} kPa 偏低，请核查曝气池水深和曝气器背压`});
+    } else if (dP_total > 120) {
+      checks.push({type:'warn', ic:'⚠', text:`设计风压 ${dP_total.toFixed(1)} kPa > 120 kPa，超出单级鼓风机常用范围，考虑减小水深或采用两级压缩`});
+    } else {
+      checks.push({type:'ok', ic:'✓', text:`设计风压 ${dP_total.toFixed(1)} kPa（含 ${((fs-1)*100).toFixed(0)}% 余量），符合设计规范`});
+    }
+
+    // 效率校核
+    const eta_overall = eta_bl * eta_t * eta_m;
+    if (eta_overall < 0.5) {
+      checks.push({type:'warn', ic:'⚠', text:`综合效率 ${(eta_overall*100).toFixed(0)}% 偏低，建议提高风机和传动效率`});
+    } else {
+      checks.push({type:'ok', ic:'✓', text:`综合效率 ${(eta_overall*100).toFixed(0)}%（风机 × 传动 × 电机）`});
+    }
+
+    $('checkList').innerHTML = checks.map(c =>
+      `<div class="check-item check-${c.type}"><span class="ic">${c.ic}</span><span>${c.text}</span></div>`
+    ).join('');
+  }
+
+  function toggleFormula() {
+    const box = $('formulaBox');
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  }
+
+  function copyResult() {
+    const txt = `鼓风机选型计算结果（WaterKit）
+最大时供气量 = ${$('r_Q_max').textContent} Nm³/min
+单台风量 = ${$('r_Q_unit').textContent} Nm³/min
+设计总风压 = ${$('r_dP_total').textContent} kPa
+压力比 P₂/P₁ = ${$('r_pr').textContent}
+单台绝热功率 = ${$('r_N_ad').textContent} kW
+单台轴功率 = ${$('r_N_shaft').textContent} kW
+配套电机功率（计算值）= ${$('r_N_motor').textContent} kW
+标准电机规格 = ${$('r_N_std').textContent} kW
+运行台装机总功率 = ${$('r_N_total').textContent} kW
+年运行电费估算 = ${$('r_annual_cost').textContent} 万元/年`;
+    navigator.clipboard.writeText(txt).then(() => alert('结果已复制')).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = txt; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      alert('结果已复制');
+    });
+  }
+
+  function resetDefaults() {
+    const d = { Q_avg:15, Kh:1.5, n_run:2, H_pool:5.0, dP_diff:4.0,
+                dP_pipe:5.0, fs:1.1, alt:0, T_inlet:20,
+                eta_bl:75, eta_t:95, eta_m:93 };
+    Object.keys(d).forEach(k => { const el = $(k); if(el) el.value = d[k]; });
+    calc();
+  }
+
+  document.querySelectorAll('input').forEach(el => el.addEventListener('input', calc));
+  calc();
+</script>
+
+</body>
+</html>
