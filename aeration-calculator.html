@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>曝气量计算器 | 水处理工具箱</title>
+<title>曝气量计算器 | 水处理工具箱 · WaterKit</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230891b2'/%3E%3Ctext x='16' y='22.5' font-size='18' font-weight='700' text-anchor='middle' fill='white' font-family='Arial,sans-serif'%3EW%3C/text%3E%3C/svg%3E">
+<meta name="description" content="在线计算活性污泥法曝气需氧量与供气量：按污泥龄法求 BOD 去除、硝化与反硝化需氧量，经 α、β、温度、海拔、水深修正得到 SOR 与标准供气量 Gs。">
+<link rel="canonical" href="https://waterkit.cn/aeration-calculator.html">
 <style>
   :root {
     --brand: #0891b2;
@@ -20,14 +23,6 @@
     --border: #e2e8f0;
     --border-soft: #f1f5f9;
   }
-  body {
-    background: var(--bg) !important;
-    padding: 0 !important;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-
   /* 统一顶部导航 */
   .topbar {
     background: rgba(255, 255, 255, 0.92);
@@ -167,10 +162,13 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: #f5f7fa;
+    background: var(--bg);
     color: #1f2937;
     line-height: 1.6;
-    padding: 16px;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
   }
   .container {
     max-width: 780px;
@@ -316,19 +314,15 @@
     color: #92400e;
     border-left: 3px solid #f59e0b;
   }
-  footer {
-    text-align: center;
-    padding: 16px;
-    font-size: 12px;
-    color: #9ca3af;
-  }
   @media (max-width: 480px) {
     .main-wrap { padding: 8px; }
-    ..main-wrap { padding: 16px; }
     header.tool-header { padding: 18px; }
     header.tool-header h1 { font-size: 19px; }
     .result-value { font-size: 17px; }
   }
+  .invalid{border-color:#ef4444!important;background:#fef2f2!important}
+  .warn-box{margin-top:12px;padding:10px 12px;background:#fef2f2;border-left:3px solid #ef4444;border-radius:6px;font-size:12.5px;color:#991b1b;line-height:1.7}
+  .warn-box.soft{background:#fffbeb;border-left-color:#f59e0b;color:#92400e}
 </style>
 </head>
 <body>
@@ -374,43 +368,47 @@
     <div class="section-title">基本水质水量参数</div>
     <div class="grid">
       <div class="field">
-        <label>处理水量 Q <span class="unit">m³/d</span></label>
+        <label for="Q">处理水量 Q <span class="unit">m³/d</span></label>
         <input type="number" id="Q" value="10000" step="100">
       </div>
       <div class="field">
-        <label>进水 BOD₅ <span class="unit">mg/L</span></label>
+        <label for="So">进水 BOD₅ <span class="unit">mg/L</span></label>
         <input type="number" id="So" value="200" step="10">
       </div>
       <div class="field">
-        <label>出水 BOD₅ <span class="unit">mg/L</span></label>
+        <label for="Se">出水 BOD₅ <span class="unit">mg/L</span></label>
         <input type="number" id="Se" value="10" step="1">
       </div>
       <div class="field">
-        <label>进水 TKN <span class="unit">mg/L</span></label>
+        <label for="TKNo">进水 TKN <span class="unit">mg/L</span></label>
         <input type="number" id="TKNo" value="40" step="1">
       </div>
       <div class="field">
-        <label>出水 NH₃-N <span class="unit">mg/L</span></label>
+        <label for="Ne">出水 NH₃-N <span class="unit">mg/L</span></label>
         <input type="number" id="Ne" value="1.5" step="0.1">
+      </div>
+      <div class="field">
+        <label for="dNO3">反硝化脱氮量 ΔNO₃-N <span class="unit">mg/L</span></label>
+        <input type="number" id="dNO3" value="0" step="1">
       </div>
     </div>
 
     <div class="section-title">生物反应参数</div>
     <div class="grid">
       <div class="field">
-        <label>污泥产率系数 Y <span class="unit">kgVSS/kgBOD</span></label>
+        <label for="Y">污泥产率系数 Y <span class="unit">kgVSS/kgBOD</span></label>
         <input type="number" id="Y" value="0.6" step="0.05">
       </div>
       <div class="field">
-        <label>污泥自身氧化率 Kd <span class="unit">d⁻¹</span></label>
+        <label for="Kd">污泥自身氧化率 Kd <span class="unit">d⁻¹</span></label>
         <input type="number" id="Kd" value="0.05" step="0.01">
       </div>
       <div class="field">
-        <label>污泥龄 SRT <span class="unit">d</span></label>
+        <label for="SRT">污泥龄 SRT <span class="unit">d</span></label>
         <input type="number" id="SRT" value="15" step="1">
       </div>
       <div class="field">
-        <label>安全系数（需氧） <span class="unit">—</span></label>
+        <label for="sf">安全系数（需氧） <span class="unit">—</span></label>
         <input type="number" id="sf" value="1.1" step="0.05">
       </div>
     </div>
@@ -418,41 +416,49 @@
     <div class="section-title">环境与充氧修正条件</div>
     <div class="grid">
       <div class="field">
-        <label>水温 T <span class="unit">℃</span></label>
+        <label for="T">水温 T <span class="unit">℃</span></label>
         <input type="number" id="T" value="20" step="1">
       </div>
       <div class="field">
-        <label>海拔高度 <span class="unit">m</span></label>
+        <label for="alt">海拔高度 <span class="unit">m</span></label>
         <input type="number" id="alt" value="0" step="50">
       </div>
       <div class="field">
-        <label>曝气池水深 H <span class="unit">m</span></label>
+        <label for="H">曝气池水深 H <span class="unit">m</span></label>
         <input type="number" id="H" value="5.0" step="0.1">
       </div>
       <div class="field">
-        <label>扩散器安装深度 <span class="unit">m</span></label>
+        <label for="Hd">扩散器安装深度 <span class="unit">m</span></label>
         <input type="number" id="Hd" value="4.8" step="0.1">
       </div>
       <div class="field">
-        <label>α（传质修正） <span class="unit">—</span></label>
+        <label for="alpha">α（传质修正） <span class="unit">—</span></label>
         <input type="number" id="alpha" value="0.82" step="0.01">
       </div>
       <div class="field">
-        <label>β（饱和度修正） <span class="unit">—</span></label>
+        <label for="beta">β（饱和度修正） <span class="unit">—</span></label>
         <input type="number" id="beta" value="0.95" step="0.01">
       </div>
       <div class="field">
-        <label>运行池混合液 DO <span class="unit">mg/L</span></label>
+        <label for="Cw">运行池混合液 DO <span class="unit">mg/L</span></label>
         <input type="number" id="Cw" value="2.0" step="0.1">
       </div>
       <div class="field">
-        <label>扩散器氧转移效率 EA <span class="unit">%</span></label>
+        <label for="EA">扩散器氧转移效率 EA <span class="unit">%</span></label>
         <input type="number" id="EA" value="25" step="1">
+      </div>
+      <div class="field">
+        <label for="kh">供气峰值系数 Kz <span class="unit">—</span></label>
+        <input type="number" id="kh" value="1.5" step="0.1">
       </div>
     </div>
 
     <div class="results">
       <h2>计算结果</h2>
+      <div class="result-row">
+        <span class="result-label">剩余污泥产量 ΔXv</span>
+        <span><span class="result-value" id="r_Px">—</span><span class="result-unit">kgVSS/d</span></span>
+      </div>
       <div class="result-row">
         <span class="result-label">去除 BOD 所需氧量 O₁</span>
         <span><span class="result-value" id="r_O1">—</span><span class="result-unit">kgO₂/d</span></span>
@@ -460,6 +466,10 @@
       <div class="result-row">
         <span class="result-label">硝化所需氧量 O₂</span>
         <span><span class="result-value" id="r_O2">—</span><span class="result-unit">kgO₂/d</span></span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">反硝化回收氧量 O₃</span>
+        <span><span class="result-value" id="r_O3">—</span><span class="result-unit">kgO₂/d</span></span>
       </div>
       <div class="result-row">
         <span class="result-label">实际需氧量 AOR</span>
@@ -471,16 +481,18 @@
       </div>
       <div class="result-row">
         <span class="result-label">标准供气量 Gs</span>
-        <span><span class="result-value" id="r_Gs">—</span><span class="result-unit">Nm³/min</span></span>
+        <span><span class="result-value" id="r_Gs">—</span><span class="result-unit">m³/min（标准状态 20 ℃、101.325 kPa）</span></span>
       </div>
       <div class="result-row">
         <span class="result-label">平均气水比</span>
         <span><span class="result-value" id="r_ratio">—</span><span class="result-unit">m³气/m³水</span></span>
       </div>
       <div class="result-row">
-        <span class="result-label">最大时供气量（峰值系数1.5）</span>
-        <span><span class="result-value" id="r_Gmax">—</span><span class="result-unit">Nm³/min</span></span>
+        <span class="result-label">最大时供气量（峰值系数 <span id="r_kh">1.5</span>）</span>
+        <span><span class="result-value" id="r_Gmax">—</span><span class="result-unit">m³/min（标准状态）</span></span>
       </div>
+      <div class="warn-box" id="warnBox" style="display:none;"></div>
+      <div class="warn-box soft" id="hintBox" style="display:none;"></div>
     </div>
 
     <div class="buttons">
@@ -492,23 +504,26 @@
     <div class="formula-box" id="formulaBox" style="display:none;">
       <h3>计算原理与公式</h3>
       <p><strong>① 去除 BOD 所需氧量</strong></p>
-      <code>O₁ = a' · Q · (So − Se)/1000 − b' · Xv · V</code>
-      <p>简化式（按污泥龄法）：O₁ = Q·(So−Se)·(1 − 1.42·Y/(1+Kd·SRT))/1000 × 1.42（系数1.42为VSS含氧当量的近似处理），本工具采用：</p>
-      <code>O₁ = Q · (So − Se) × [1 − 1.42 · Y / (1 + Kd · SRT)] / 1000</code>
+      <p>按污泥龄法，先求净剩余污泥产量 Px（kgVSS/d），再按 BOD₅ 的最终需氧量（1.47 kgO₂/kgBOD₅，即 BOD_u/BOD₅ ≈ 1/0.68）扣除排泥带走的氧当量（1.42 kgO₂/kgVSS）：</p>
+      <code>ΔXv = Px = Y · Q · (So − Se) / (1 + Kd · SRT) / 1000</code>
+      <code>O₁ = 1.47 · Q · (So − Se) / 1000 − 1.42 · Px</code>
 
-      <p><strong>② 硝化所需氧量</strong>（每氧化1 kg NH₃-N约需 4.57 kg O₂）</p>
-      <code>O₂ = 4.57 · Q · (TKNo − Ne) / 1000</code>
+      <p><strong>② 硝化所需氧量</strong>（每氧化1 kg NH₃-N约需 4.57 kg O₂，并扣除污泥同化氮 0.12 kgN/kgVSS）</p>
+      <code>O₂ = 4.57 · [Q · (TKNo − Ne) / 1000 − 0.12 · Px]</code>
 
-      <p><strong>③ 实际需氧量</strong></p>
-      <code>AOR = (O₁ + O₂) × 安全系数</code>
+      <p><strong>③ 实际需氧量</strong>（反硝化每还原 1 kg NO₃-N 回收 2.86 kg O₂，仅对设有缺氧段的工艺填入 ΔNO₃-N）</p>
+      <code>O₃ = 2.86 · Q · ΔNO₃-N / 1000</code>
+      <code>AOR = (O₁ + O₂ − O₃) × 安全系数</code>
 
       <p><strong>④ 标准需氧量（SOR）—— 修正到 20℃、清水、DO=0 条件</strong></p>
-      <code>SOR = AOR · Cs20 / [α · (β · ρ · Csm(T) − Cw) · 1.024^(T−20)]</code>
-      <p>其中 Cs20 = 9.08 mg/L；ρ 为大气压修正因子（按海拔）；Csm(T) 为池中平均饱和溶解氧，考虑扩散器深度导致的静水压增加。</p>
+      <code>SOR = AOR · Cs20 / [α · (β · Csm(T) − Cw) · 1.024^(T−20)]</code>
+      <code>Csm(T) = Cs(T) · [ρ + Hd · 9.81 / 101.325 + Ot / 21] / 2</code>
+      <p>其中 Cs20 = Cs(20) ≈ 9.02 mg/L（与 Cs(T) 同一拟合式）；ρ 为海拔大气压比 P/P₀；Hd·9.81/101.325 为扩散器深度处的静水压（atm）；Ot = 21·(1 − EA) / [79 + 21·(1 − EA)] × 100 为出气含氧 %（Metcalf &amp; Eddy 式 5-67）。海拔与水深按压力叠加，不再重复相乘。Cs(T) 为三次多项式拟合，适用约 0–40 ℃，超出范围误差增大。若 Cw ≥ β·Csm，则无传质推动力，SOR 无解。</p>
 
       <p><strong>⑤ 标准供气量</strong></p>
-      <code>Gs = SOR / (0.28 · EA)  [Nm³/min，其中 0.28 为标况空气含氧量 kgO₂/Nm³ ÷ 60]</code>
-      <p>注：常用关系式 1 Nm³ 空气约含 0.28 kg O₂（21%体积 × 1.331 kg/m³）。除以 60 是将 kg/h 换算成 Nm³/min 的时间系数。</p>
+      <code>Gs = SOR / (0.28 · EA · 1440)  [m³/min，标准状态 20 ℃、101.325 kPa]</code>
+      <code>Gmax = Kz · Gs</code>
+      <p>注：0.28 kgO₂/m³ = 标准状态（20 ℃、101.325 kPa）空气密度 1.2 kg/m³ × 氧质量分数 23.2%；若按 0 ℃ 的 Nm³ 计，系数应为 0.30，二者相差约 7%。除以 1440 是将 kg/d 换算成每分钟。Kz 为供气峰值系数，可参照 GB 50014 污水量总变化系数（约 1.2–2.3，随规模减小而增大）取值。</p>
     </div>
 
     <div class="note">
@@ -533,7 +548,7 @@
             <div class="brand-sub">WaterKit · by 登登科技</div>
           </div>
         </a>
-        <p class="footer-about">水处理工具箱(WaterKit)是海南登登科技咨询有限公司推出的水处理在线计算工具集合,由一线水处理工艺工程师开发维护。免费、无广告、持续更新。</p>
+        <p class="footer-about">水处理工具箱(WaterKit)是海南登登科技咨询有限公司推出的水处理在线计算工具集合,由一线水处理工艺工程师开发维护。免费、持续更新。</p>
       </div>
       <div class="footer-col">
         <h4>水力计算</h4>
@@ -550,7 +565,11 @@
           <li><a href="aeration-calculator.html">曝气量</a></li>
           <li><a href="sludge-production-calculator.html">污泥产量</a></li>
           <li><a href="dosing-calculator.html">加药量</a></li>
+          <li><a href="activated-sludge-process-calculator.html">活性污泥工艺</a></li>
+          <li><a href="mbbr-design.html">MBBR 工程设计</a></li>
+          <li><a href="mbr-design.html">MBR 工程设计</a></li>
           <li><a href="pump-selection-calculator.html">水泵选型</a></li>
+          <li><a href="blower-selection-calculator.html">鼓风机选型</a></li>
           <li><a href="water-quality-unit-converter.html">水质换算</a></li>
         </ul>
       </div>
@@ -586,7 +605,7 @@
 
   // 不同温度下清水饱和溶解氧 (mg/L)，标准大气压
   function Cs_T(T) {
-    // 拟合公式（5-30℃范围精度足够）
+    // 三次多项式拟合（约 0–40℃ 适用，>40℃ 失真，calc() 中给出提示）
     return 14.652 - 0.41022*T + 0.0079910*T*T - 0.000077774*T*T*T;
   }
 
@@ -596,45 +615,96 @@
     return Math.pow(1 - 0.0000225577 * alt, 5.25588);
   }
 
+  const VALIDATE = [
+    ['Q', '处理水量 Q', 'pos'], ['So', '进水 BOD₅', 'nn'], ['Se', '出水 BOD₅', 'nn'],
+    ['TKNo', '进水 TKN', 'nn'], ['Ne', '出水 NH₃-N', 'nn'], ['dNO3', '反硝化脱氮量', 'nn'],
+    ['Y', '污泥产率系数 Y', 'nn'], ['Kd', '污泥自身氧化率 Kd', 'nn'], ['SRT', '污泥龄 SRT', 'pos'],
+    ['sf', '安全系数', 'pos'], ['H', '曝气池水深 H', 'pos'], ['Hd', '扩散器安装深度', 'nn'],
+    ['alpha', 'α', 'pos'], ['beta', 'β', 'pos'], ['Cw', '运行 DO', 'nn'],
+    ['EA', '氧转移效率 EA', 'pos'], ['kh', '供气峰值系数', 'pos']
+  ];
+  const OUT_IDS = ['r_Px','r_O1','r_O2','r_O3','r_AOR','r_SOR','r_Gs','r_ratio','r_Gmax'];
+
+  function showMsg(id, html) {
+    const el = $(id);
+    el.innerHTML = html || '';
+    el.style.display = html ? 'block' : 'none';
+  }
+
   function calc() {
+    // 输入校验：作除数或物理上不可能为负的输入
+    const errs = [];
+    VALIDATE.forEach(([id, name, rule]) => {
+      const v = parseFloat($(id).value);
+      const bad = isNaN(v) || (rule === 'pos' ? v <= 0 : v < 0);
+      $(id).classList.toggle('invalid', bad);
+      if (bad) errs.push(rule === 'pos' ? `请输入大于 0 的${name}` : `${name}不能为负值`);
+    });
+    if (num('EA') > 100) { $('EA').classList.add('invalid'); errs.push('氧转移效率 EA 不应超过 100%'); }
+    if (errs.length) {
+      OUT_IDS.forEach(id => $(id).textContent = '—');
+      showMsg('warnBox', '⚠️ ' + errs.join('；'));
+      showMsg('hintBox', '');
+      return;
+    }
+
     const Q = num('Q'), So = num('So'), Se = num('Se');
-    const TKNo = num('TKNo'), Ne = num('Ne');
+    const TKNo = num('TKNo'), Ne = num('Ne'), dNO3 = num('dNO3');
     const Y = num('Y'), Kd = num('Kd'), SRT = num('SRT'), sf = num('sf');
     const T = num('T'), alt = num('alt');
     const H = num('H'), Hd = num('Hd');
     const alpha = num('alpha'), beta = num('beta'), Cw = num('Cw'), EA = num('EA')/100;
+    const kh = num('kh');
 
-    // ① 去除BOD需氧量
-    const O1 = Q * (So - Se) * (1 - 1.42 * Y / (1 + Kd * SRT)) / 1000;
+    const hints = [];
+    if (Hd > H) hints.push(`扩散器安装深度 Hd（${Hd} m）大于曝气池水深 H（${H} m），请核对`);
+    if (T > 40) hints.push('水温超过 40 ℃，饱和溶解氧拟合多项式已超出适用范围，结果可能失真');
+    else if (T < 0) hints.push('水温低于 0 ℃，饱和溶解氧拟合多项式已超出适用范围');
 
-    // ② 硝化需氧量
-    const O2 = 4.57 * Q * Math.max(TKNo - Ne, 0) / 1000;
+    // ① 去除BOD需氧量（污泥龄法）：净剩余污泥 Px，1.47 = BOD_u/BOD5，1.42 = VSS 氧当量
+    const Px = Y * Q * (So - Se) / (1 + Kd * SRT) / 1000;  // kgVSS/d
+    const O1 = Math.max(1.47 * Q * (So - Se) / 1000 - 1.42 * Px, 0);
 
-    // ③ AOR
-    const AOR = (O1 + O2) * sf;
+    // ② 硝化需氧量（扣除污泥同化氮 0.12 kgN/kgVSS）
+    const O2 = 4.57 * Math.max(Q * (TKNo - Ne) / 1000 - 0.12 * Px, 0);
+
+    // ③ 反硝化回收氧量（2.86 kgO2/kgNO3-N），AOR
+    const O3 = 2.86 * Q * dNO3 / 1000;
+    const AOR = Math.max(O1 + O2 - O3, 0) * sf;
 
     // ④ SOR：修正因子
-    const Cs20 = 9.08;  // mg/L, 20℃清水饱和DO
+    const Cs20 = Cs_T(20);  // mg/L, 20℃清水饱和DO，与 Cs_T 同一口径
     const CsT = Cs_T(T);
     const rho = rho_alt(alt);
-    // 池中平均饱和DO：考虑扩散器深度静水压使底部DO饱和度提升
-    // 采用简化：Csm = CsT · (Pb/Pa + Ot/21)/2，工程常用近似
-    const Pb_Pa = 1 + (Hd * 9.81 / 101.325);  // 底部压力比
-    const Ot_out = 21 * (1 - EA);  // 出气中氧浓度%
-    const Csm = CsT * ((Pb_Pa + Ot_out/21) / 2);
+    // 出气氧浓度%（Metcalf & Eddy 5-67）：Ot = 21(1−EA)/[79+21(1−EA)]×100
+    const Ot_out = 21 * (1 - EA) / (79 + 21 * (1 - EA)) * 100;
+    // 池中平均饱和DO：海拔大气压与扩散器深度静水压按压力叠加
+    const Csm = CsT * ((rho + Hd * 9.81 / 101.325 + Ot_out/21) / 2);
 
-    const denom = alpha * (beta * rho * Csm - Cw) * Math.pow(1.024, T - 20);
-    const SOR = denom > 0 ? AOR * Cs20 / denom : 0;
-
-    // ⑤ 标准供气量：1 Nm³ 空气含氧约0.28 kg，换算成每分钟
-    // SOR [kg/d] / 0.28 [kgO2/Nm³] / EA / 1440 [min/d] = Nm³/min
-    const Gs = EA > 0 ? SOR / 0.28 / EA / 1440 : 0;
-    const Gmax = Gs * 1.5;
-    const ratio = Q > 0 ? (Gs * 1440) / Q : 0;
-
+    const denom = alpha * (beta * Csm - Cw) * Math.pow(1.024, T - 20);
+    $('r_Px').textContent = Px.toFixed(1);
     $('r_O1').textContent = O1.toFixed(1);
     $('r_O2').textContent = O2.toFixed(1);
+    $('r_O3').textContent = O3.toFixed(1);
     $('r_AOR').textContent = AOR.toFixed(1);
+    $('r_kh').textContent = kh;
+    showMsg('hintBox', hints.length ? '💡 ' + hints.join('；') : '');
+
+    if (!(denom > 0)) {
+      ['r_SOR','r_Gs','r_ratio','r_Gmax'].forEach(id => $(id).textContent = '—');
+      $('Cw').classList.add('invalid');
+      showMsg('warnBox', `⚠️ 运行 DO 过高，无法传质：混合液 DO（${Cw} mg/L）≥ β·Csm（${(beta*Csm).toFixed(2)} mg/L），请降低运行 DO 或核对 β、水温、海拔参数。`);
+      return;
+    }
+    showMsg('warnBox', '');
+    const SOR = AOR * Cs20 / denom;
+
+    // ⑤ 标准供气量：标准状态（20℃、101.325 kPa）1 m³ 空气含氧约 0.28 kg
+    // SOR [kg/d] / 0.28 [kgO2/m³] / EA / 1440 [min/d] = m³/min
+    const Gs = SOR / 0.28 / EA / 1440;
+    const Gmax = Gs * kh;
+    const ratio = (Gs * 1440) / Q;
+
     $('r_SOR').textContent = SOR.toFixed(1);
     $('r_Gs').textContent = Gs.toFixed(2);
     $('r_Gmax').textContent = Gmax.toFixed(2);
@@ -647,15 +717,20 @@
 处理水量: ${num('Q')} m³/d
 进/出水BOD: ${num('So')}/${num('Se')} mg/L
 进水TKN/出水NH3-N: ${num('TKNo')}/${num('Ne')} mg/L
+反硝化脱氮量 ΔNO3-N: ${num('dNO3')} mg/L
 水温: ${num('T')} ℃  海拔: ${num('alt')} m
+池深 H / 扩散器深度 Hd: ${num('H')} / ${num('Hd')} m
+α / β / DO / EA: ${num('alpha')} / ${num('beta')} / ${num('Cw')} mg/L / ${num('EA')}%
 
+剩余污泥产量 ΔXv = ${$('r_Px').textContent} kgVSS/d
 去除BOD需氧 O1 = ${$('r_O1').textContent} kgO₂/d
 硝化需氧  O2 = ${$('r_O2').textContent} kgO₂/d
+反硝化回收 O3 = ${$('r_O3').textContent} kgO₂/d
 实际需氧量 AOR = ${$('r_AOR').textContent} kgO₂/d
 标准需氧量 SOR = ${$('r_SOR').textContent} kgO₂/d
-标准供气量 Gs = ${$('r_Gs').textContent} Nm³/min
-最大时供气量  = ${$('r_Gmax').textContent} Nm³/min
-平均气水比   = ${$('r_ratio').textContent} m³气/m³水`;
+标准供气量 Gs = ${$('r_Gs').textContent} m³/min（标准状态 20 ℃、101.325 kPa）
+最大时供气量（峰值系数 ${num('kh')}） = ${$('r_Gmax').textContent} m³/min（标准状态）
+平均气水比   = ${$('r_ratio').textContent} m³气/m³水${$('warnBox').style.display !== 'none' ? '\n\n' + $('warnBox').textContent : ''}`;
     navigator.clipboard.writeText(txt).then(() => {
       alert('结果已复制到剪贴板');
     }).catch(() => {
@@ -671,10 +746,10 @@
   }
 
   function resetDefaults() {
-    const defaults = {Q:10000, So:200, Se:10, TKNo:40, Ne:1.5,
+    const defaults = {Q:10000, So:200, Se:10, TKNo:40, Ne:1.5, dNO3:0,
       Y:0.6, Kd:0.05, SRT:15, sf:1.1,
       T:20, alt:0, H:5.0, Hd:4.8,
-      alpha:0.82, beta:0.95, Cw:2.0, EA:25};
+      alpha:0.82, beta:0.95, Cw:2.0, EA:25, kh:1.5};
     Object.keys(defaults).forEach(k => $(k).value = defaults[k]);
     calc();
   }

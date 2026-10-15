@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>水处理工具箱 · WaterKit · 工艺工程师在线计算平台</title>
-<meta name="description" content="专为水处理设计师、水厂运行工程师打造的在线计算工具:曝气量、管道水力、明渠、堰流、污泥产量、加药量、水质换算、水泵选型。依据GB 50014、HJ 576等现行规范。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230891b2'/%3E%3Ctext x='16' y='22.5' font-size='18' font-weight='700' text-anchor='middle' fill='white' font-family='Arial,sans-serif'%3EW%3C/text%3E%3C/svg%3E">
+<meta name="description" content="专为水处理设计师、水厂运行工程师打造的 13 个在线计算工具:管道水力、明渠、堰流、孔口出流、曝气量、污泥产量、加药量、活性污泥工艺、MBBR、MBR、水泵选型、鼓风机选型、水质换算。依据GB 50014、HJ 576等现行规范。">
+<link rel="canonical" href="https://waterkit.cn/">
 <meta name="keywords" content="曝气量计算,管道水力,明渠水力,堰流,污泥产量,加药量,水质换算,水泵选型,水处理计算,污水处理设计">
 <style>
   :root {
@@ -143,6 +145,9 @@
   }
   @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
   .hero-meta .sep { color: var(--border); }
+  @media (max-width: 640px) {
+    .hero-meta .sep { display: none; } /* 换行时不留孤立分隔符 */
+  }
 
   .hero-title {
     font-size: clamp(40px, 6vw, 72px);
@@ -382,7 +387,7 @@
     color: var(--brand);
   }
   .tool-head {
-    padding: 18px 22px 14px;
+    padding: 18px 52px 14px 22px; /* 右侧留出 ↗ 箭头位置，避免与标签重叠 */
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -539,14 +544,15 @@
   .tool-card:nth-child(2) { animation-delay: 0.12s; }
   .tool-card:nth-child(3) { animation-delay: 0.19s; }
   .tool-card:nth-child(4) { animation-delay: 0.26s; }
-  .tool-card:nth-child(5) { animation-delay: 0.33s; }
 </style>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5592784012274809"
+     crossorigin="anonymous"></script>
 </head>
 <body>
 
 <header class="topbar">
   <div class="topbar-inner">
-    <a href="#" class="brand">
+    <a href="index.html" class="brand">
       <div class="brand-mark">W</div>
       <div>
         <div class="brand-name">水处理工具箱</div>
@@ -567,6 +573,8 @@
     <span>依据 GB 50014 / HJ 576 / GB 50013</span>
     <span class="sep">·</span>
     <span>共 13 个工具</span>
+    <span class="sep">·</span>
+    <span>最后更新：2026-10-15</span>
   </div>
 
   <div class="hero-grid">
@@ -578,7 +586,7 @@
       <p class="hero-text">
         <strong>水处理工具箱</strong>是为设计院工程师、水厂运行人员、环保公司技术员准备的在线计算平台。告别 Excel 到处找、手册翻半天——高频工艺与水力计算整合在此,依据国标与行业规范,结果可直接用于方案与概算。
         <br><br>
-        覆盖<strong>水力、工艺、设备、换算</strong>四大类,9 个核心工具处理从方案设计到运行管理的主要计算场景,参数可调、结果实时、全站免费。
+        覆盖<strong>水力、工艺、设备、换算</strong>四大类,13 个工具处理从方案设计到运行管理的主要计算场景,参数可调、结果实时、全站免费。
       </p>
       <div class="hero-cta">
         <a href="#tools" class="btn-primary">进入工具箱 →</a>
@@ -600,15 +608,26 @@
 <section class="tools-section" id="tools">
   <div class="section-head">
     <h2>工具目录</h2>
-    <span class="meta">14 Items · 4 Categories</span>
+    <span class="meta">13 Items · 4 Categories</span>
   </div>
 
   <nav class="cat-nav">
-    <a href="#cat-hydraulics"><span class="cat-num">01</span><span class="cat-info"><span class="cat-name">水力计算</span><span class="cat-count">5 Tools</span></span></a>
-    <a href="#cat-process"><span class="cat-num">02</span><span class="cat-info"><span class="cat-name">工艺计算</span><span class="cat-count">7 Tools</span></span></a>
+    <a href="#cat-hydraulics"><span class="cat-num">01</span><span class="cat-info"><span class="cat-name">水力计算</span><span class="cat-count">4 Tools</span></span></a>
+    <a href="#cat-process"><span class="cat-num">02</span><span class="cat-info"><span class="cat-name">工艺计算</span><span class="cat-count">6 Tools</span></span></a>
     <a href="#cat-equipment"><span class="cat-num">03</span><span class="cat-info"><span class="cat-name">设备选型</span><span class="cat-count">2 Tools</span></span></a>
     <a href="#cat-utilities"><span class="cat-num">04</span><span class="cat-info"><span class="cat-name">基础换算</span><span class="cat-count">1 Tool</span></span></a>
   </nav>
+
+  <!-- Google AdSense 广告 -->
+  <div style="margin: 24px 0; text-align:center; min-height:90px;">
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-5592784012274809"
+         data-ad-slot="7662803564"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
 
   <div class="tool-group" id="cat-hydraulics">
     <div class="tool-group-head">
@@ -622,7 +641,7 @@
         <div class="tool-head"><span class="tool-num">H-01</span><span class="tool-tag">压力流</span></div>
         <div class="tool-body">
           <div class="tool-title">管道水力计算器</div>
-          <div class="tool-desc">Q / v / D 三者互算,Colebrook-White 迭代求 λ,内置 9 种管材粗糙度库,流速自动校核。</div>
+          <div class="tool-desc">Q / v / D 三者互算,Colebrook-White 迭代求 λ,内置 8 种管材粗糙度库（另可自定义）,流速自动校核。</div>
           <div class="tool-specs"><span><span class="mark"></span>雷诺数</span><span><span class="mark"></span>沿程损失</span><span><span class="mark"></span>DN 推荐</span></div>
         </div>
       </a>
@@ -651,15 +670,6 @@
           <div class="tool-title">孔口管嘴出流计算器</div>
           <div class="tool-desc">薄壁小孔 / 管嘴 / 大孔口 多种出流形式,淹没与自由出流,恒定水头与变水头泄流时间。</div>
           <div class="tool-specs"><span><span class="mark"></span>恒定出流</span><span><span class="mark"></span>变水头泄流</span><span><span class="mark"></span>流量系数</span></div>
-        </div>
-      </a>
-      <a class="tool-card" href="pipe-hydraulic-pro.html">
-        <div class="tool-arrow">↗</div>
-        <div class="tool-head"><span class="tool-num">H-05</span><span class="tool-tag">压力流 · 重力流</span></div>
-        <div class="tool-body">
-          <div class="tool-title">管道水力计算器（加强版）</div>
-          <div class="tool-desc">9 种管材 × 32 个壁厚与压力等级的真实内径体系,23 项管件阻力库(Crane / Idelchik 三体系溯源),Manning 重力流反解定径与坡度求解,PN 承压校核。</div>
-          <div class="tool-specs"><span><span class="mark"></span>规格选型</span><span><span class="mark"></span>局部损失</span><span><span class="mark"></span>重力流定径</span></div>
         </div>
       </a>
     </div>
@@ -704,7 +714,7 @@
         <div class="tool-head"><span class="tool-num">P-04</span><span class="tool-tag-beta">🚧 Beta · 开发中</span></div>
         <div class="tool-body">
           <div class="tool-title">活性污泥法工艺计算器</div>
-          <div class="tool-desc">AAO / A/O / SBR / 氧化沟 五种主流活性污泥工艺一站式设计，同步脱氮除磷。MBR 和 MBBR 已迁移至专用平台（↓下方）。</div>
+          <div class="tool-desc">AAO / A/O（缺氧-好氧、厌氧-好氧）/ SBR / 氧化沟 五种主流活性污泥工艺一站式设计，同步脱氮除磷。MBR 和 MBBR 已迁移至专用平台（↓下方）。</div>
           <div class="tool-specs"><span><span class="mark"></span>5 种工艺</span><span><span class="mark"></span>池容/回流/需氧</span><span><span class="mark"></span>工程评分</span></div>
         </div>
       </a>
@@ -713,8 +723,8 @@
         <div class="tool-head"><span class="tool-num">P-05</span><span class="tool-tag-beta">🚧 Beta · 开发中</span></div>
         <div class="tool-body">
           <div class="tool-title">MBBR / IFAS / RAS 工程设计平台</div>
-          <div class="tool-desc">移动床生物膜反应器全流程工程设计平台。覆盖纯 MBBR 工艺设计（11 种段组合）、IFAS 混合工艺（含 MLR 回流）、循环水养殖 RAS 硝化/反硝化、填料选型（11 种）、挂膜启动、MBBR 发展史。</div>
-          <div class="tool-specs"><span><span class="mark"></span>8 Tab</span><span><span class="mark"></span>11 种填料</span><span><span class="mark"></span>MBBR + IFAS + RAS</span></div>
+          <div class="tool-desc">移动床生物膜反应器全流程工程设计平台。覆盖纯 MBBR 工艺设计（7 种段组合）、IFAS 混合工艺（含 MLR 回流）、循环水养殖 RAS 硝化/反硝化、填料选型（11 种）、挂膜启动、MBBR 发展史。</div>
+          <div class="tool-specs"><span><span class="mark"></span>7 Tab</span><span><span class="mark"></span>11 种填料</span><span><span class="mark"></span>MBBR + IFAS + RAS</span></div>
         </div>
       </a>
       <a class="tool-card" href="mbr-design.html">
@@ -722,8 +732,8 @@
         <div class="tool-head"><span class="tool-num">P-06</span><span class="tool-tag-beta">🚧 Beta · 开发中</span></div>
         <div class="tool-body">
           <div class="tool-title">MBR 工程设计平台</div>
-          <div class="tool-desc">膜生物反应器全流程工程设计平台。覆盖主设计计算（池容+膜面积+能耗）、深度膜选型（5 大品牌参数库：ZeeWeed / 三菱 / Kubota / 碧水源）、清洗方案、能耗分析、案例库。</div>
-          <div class="tool-specs"><span><span class="mark"></span>6 Tab</span><span><span class="mark"></span>5 品牌膜库</span><span><span class="mark"></span>HJ 2010-2011</span></div>
+          <div class="tool-desc">膜生物反应器全流程工程设计平台。覆盖主设计计算（池容+膜面积+能耗）、深度膜选型（5 款主流膜产品参数库：ZeeWeed / 三菱 / Kubota / 碧水源 S-MBR、H-MBR）、清洗方案、能耗分析、案例库。</div>
+          <div class="tool-specs"><span><span class="mark"></span>6 Tab</span><span><span class="mark"></span>5 款膜产品库</span><span><span class="mark"></span>HJ 2010-2011</span></div>
         </div>
       </a>
     </div>
@@ -781,7 +791,7 @@
   <div class="footer-inner">
     <div class="footer-main">
       <div class="footer-col footer-about-col">
-        <a href="#" class="brand">
+        <a href="index.html" class="brand">
           <div class="brand-mark">W</div>
           <div>
             <div class="brand-name">水处理工具箱</div>
@@ -809,7 +819,7 @@
           <li><a href="mbbr-design.html">MBBR 工程设计</a></li>
           <li><a href="mbr-design.html">MBR 工程设计</a></li>
           <li><a href="pump-selection-calculator.html">水泵选型</a></li>
-                  <li><a href="blower-selection-calculator.html">鼓风机选型</a></li>
+          <li><a href="blower-selection-calculator.html">鼓风机选型</a></li>
           <li><a href="water-quality-unit-converter.html">水质换算</a></li>
         </ul>
       </div>

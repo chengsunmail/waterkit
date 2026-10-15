@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>管道水力计算器 | 水处理工具箱 · WaterKit</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230891b2'/%3E%3Ctext x='16' y='22.5' font-size='18' font-weight='700' text-anchor='middle' fill='white' font-family='Arial,sans-serif'%3EW%3C/text%3E%3C/svg%3E">
+<meta name="description" content="管道水力计算器：已知流量、流速、管径任意两项求第三项，按 Darcy-Weisbach（Colebrook-White）、Hazen-Williams 或 Manning 公式计算沿程与局部水头损失，并推荐公称直径、校核流速。">
+<link rel="canonical" href="https://waterkit.cn/pipe-hydraulic-calculator.html">
 <style>
   :root {
     --brand: #0891b2;
@@ -222,6 +225,7 @@
     font-weight: 600;
     color: #92400e;
   }
+  .invalid { border-color: #ef4444 !important; background: #fef2f2 !important; }
   .field .hint {
     font-size: 11.5px;
     color: #059669;
@@ -428,7 +432,7 @@
     </a>
     <nav class="nav-links">
       <a href="index.html" class="back">返回首页</a>
-      <a href="index.html#cat-hydraulics">水力工具</a>
+      <a href="index.html#cat-hydraulics">水力计算</a>
       <a href="https://dengdengtech.cn" target="_blank" rel="noopener">登登科技</a>
     </nav>
   </div>
@@ -456,15 +460,15 @@
     <div class="mode-tabs">
       <button class="mode-tab active" data-mode="D" onclick="setMode('D')">已知 Q、v，求 D</button>
       <button class="mode-tab" data-mode="v" onclick="setMode('v')">已知 Q、D，求 v</button>
-      <button class="mode-tab" data-mode="Q" onclick="setMode('Q')">已知 v、D,求 Q</button>
+      <button class="mode-tab" data-mode="Q" onclick="setMode('Q')">已知 v、D，求 Q</button>
     </div>
 
     <div class="section-title">基本参数</div>
     <div class="grid">
       <div class="field" id="f_Q">
-        <label>流量 Q <span class="unit" id="u_Q">m³/h</span></label>
+        <label for="Q">流量 Q <span class="unit" id="u_Q">m³/h</span></label>
         <input type="number" id="Q" value="100" step="10">
-        <select id="unit_Q" onchange="calc()">
+        <select id="unit_Q">
           <option value="m3/h" selected>m³/h</option>
           <option value="m3/d">m³/d</option>
           <option value="L/s">L/s</option>
@@ -472,11 +476,11 @@
         </select>
       </div>
       <div class="field" id="f_v">
-        <label>流速 v <span class="unit">m/s</span></label>
+        <label for="v">流速 v <span class="unit">m/s</span></label>
         <input type="number" id="v" value="1.2" step="0.1">
       </div>
       <div class="field" id="f_D">
-        <label>管内径 D <span class="unit">mm</span></label>
+        <label for="D">管内径 D <span class="unit">mm</span></label>
         <input type="number" id="D" value="150" step="10">
         <div class="hint" id="D_hint"></div>
       </div>
@@ -485,11 +489,19 @@
     <div class="section-title">水头损失参数</div>
     <div class="grid">
       <div class="field">
-        <label>管长 L <span class="unit">m</span></label>
+        <label for="hfMethod">沿程损失公式</label>
+        <select id="hfMethod">
+          <option value="dw" selected>Darcy-Weisbach（Colebrook-White，用 ε）</option>
+          <option value="hw">Hazen-Williams（用 C）</option>
+          <option value="manning">Manning（用 n）</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="L">管长 L <span class="unit">m</span></label>
         <input type="number" id="L" value="100" step="10">
       </div>
       <div class="field">
-        <label>管材 <span class="unit">粗糙度 n/C/ε</span></label>
+        <label for="material">管材 <span class="unit">粗糙度 n/C/ε</span></label>
         <select id="material" onchange="updateMaterial()">
           <option value="steel">钢管（新）</option>
           <option value="steel_old">钢管（旧/结垢）</option>
@@ -503,23 +515,23 @@
         </select>
       </div>
       <div class="field">
-        <label>曼宁系数 n <span class="unit">—</span></label>
+        <label for="n">曼宁系数 n <span class="unit">—</span></label>
         <input type="number" id="n" value="0.009" step="0.001">
       </div>
       <div class="field">
-        <label>Hazen-Williams C <span class="unit">—</span></label>
+        <label for="C">Hazen-Williams C <span class="unit">—</span></label>
         <input type="number" id="C" value="150" step="5">
       </div>
       <div class="field">
-        <label>绝对粗糙度 ε <span class="unit">mm</span></label>
+        <label for="eps">绝对粗糙度 ε <span class="unit">mm</span></label>
         <input type="number" id="eps" value="0.0015" step="0.001">
       </div>
       <div class="field">
-        <label>水温 T <span class="unit">℃</span></label>
+        <label for="T">水温 T <span class="unit">℃</span></label>
         <input type="number" id="T" value="20" step="1">
       </div>
       <div class="field">
-        <label>局部阻力系数 Σζ <span class="unit">—</span></label>
+        <label for="zeta">局部阻力系数 Σζ <span class="unit">—</span></label>
         <input type="number" id="zeta" value="2.0" step="0.5">
       </div>
     </div>
@@ -547,8 +559,12 @@
         <span><span class="result-value" id="r_Re">—</span><span class="result-unit" id="r_Re_t">—</span></span>
       </div>
       <div class="result-row">
-        <span class="result-label">沿程阻力系数 λ</span>
+        <span class="result-label" id="r_lambda_l">沿程阻力系数 λ</span>
         <span><span class="result-value" id="r_lambda">—</span><span class="result-unit">—</span></span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">沿程损失公式</span>
+        <span><span class="result-value" id="r_method" style="font-size:14px">—</span></span>
       </div>
       <div class="result-row">
         <span class="result-label">沿程水头损失 hf</span>
@@ -584,14 +600,25 @@
 
       <p><strong>② 雷诺数 Re</strong></p>
       <code>Re = v · D / ν</code>
-      <p>ν 为水的运动黏度 [m²/s]，随温度变化：20℃时 ν ≈ 1.003×10⁻⁶ m²/s。Re &lt; 2300 层流；Re &gt; 4000 紊流（给排水管道几乎都是紊流）。</p>
+      <p>ν 为水的运动黏度 [m²/s]，按手册"水的物性表"表值线性插值（0–100 ℃，超出范围提示并按端点钳位）：</p>
+      <table>
+        <tr><th>T (℃)</th><td>0</td><td>5</td><td>10</td><td>15</td><td>20</td><td>25</td><td>30</td><td>35</td></tr>
+        <tr><th>ν (×10⁻⁶ m²/s)</th><td>1.792</td><td>1.519</td><td>1.307</td><td>1.139</td><td>1.004</td><td>0.893</td><td>0.801</td><td>0.724</td></tr>
+        <tr><th>T (℃)</th><td>40</td><td>50</td><td>60</td><td>70</td><td>80</td><td>90</td><td>100</td><td></td></tr>
+        <tr><th>ν (×10⁻⁶ m²/s)</th><td>0.658</td><td>0.553</td><td>0.474</td><td>0.413</td><td>0.364</td><td>0.326</td><td>0.294</td><td></td></tr>
+      </table>
+      <p>来源：水的物性表（给水排水 / 流体力学手册）。Re &lt; 2300 层流；Re &gt; 4000 紊流（给排水管道几乎都是紊流）。</p>
 
       <p><strong>③ 沿程阻力系数 λ —— Colebrook-White 公式（隐式，迭代求解）</strong></p>
       <code>1/√λ = −2·log₁₀(ε/(3.7D) + 2.51/(Re·√λ))</code>
-      <p>层流时 λ = 64/Re。本工具采用 Swamee-Jain 显式近似作为初值，再用 Colebrook-White 迭代 20 次收敛。</p>
+      <p>层流时 λ = 64/Re。本工具采用 Swamee-Jain 显式近似作为初值，再用 Colebrook-White 迭代至收敛（|Δλ| &lt; 10⁻⁸，最多 30 次）。2300 ≤ Re &lt; 4000 的过渡区仍按 Colebrook-White 计算，λ 不确定性较大。</p>
 
       <p><strong>④ 沿程水头损失 hf —— Darcy-Weisbach 公式</strong></p>
       <code>hf = λ · (L/D) · v² / (2g)</code>
+      <p>默认公式。也可在"沿程损失公式"中切换为下列经验公式（Q [m³/s]、D [m]、L [m]）：</p>
+      <code>Hazen-Williams：hf = 10.67 · L · Q^1.852 / (C^1.852 · D^4.87)</code>
+      <code>Manning：hf = 10.29 · n² · L · Q² / D^5.333</code>
+      <p>选用经验公式时，结果中的 λ 为由 hf 反算的等效值 λ = hf · D · 2g / (L · v²)。</p>
 
       <p><strong>⑤ 局部水头损失 hj</strong></p>
       <code>hj = Σζ · v² / (2g)</code>
@@ -637,17 +664,17 @@
   <div class="footer-inner">
     <div class="footer-main">
       <div class="footer-col footer-about-col">
-        <a href="index.html" class="brand footer-brand">
+        <a href="index.html" class="brand">
           <div class="brand-mark">W</div>
           <div>
             <div class="brand-name">水处理工具箱</div>
             <div class="brand-sub">WaterKit · by 登登科技</div>
           </div>
         </a>
-        <p class="footer-about">水处理工具箱(WaterKit)是海南登登科技咨询有限公司推出的水处理在线计算工具集合,由一线水处理工艺工程师开发维护。免费、无广告、持续更新。</p>
+        <p class="footer-about">水处理工具箱(WaterKit)是海南登登科技咨询有限公司推出的水处理在线计算工具集合,由一线水处理工艺工程师开发维护。免费、持续更新。</p>
       </div>
       <div class="footer-col">
-        <h4>/ 水力计算</h4>
+        <h4>水力计算</h4>
         <ul>
           <li><a href="pipe-hydraulic-calculator.html">管道水力</a></li>
           <li><a href="open-channel-calculator.html">明渠水力</a></li>
@@ -656,17 +683,21 @@
         </ul>
       </div>
       <div class="footer-col">
-        <h4>/ 工艺与设备</h4>
+        <h4>工艺与设备</h4>
         <ul>
           <li><a href="aeration-calculator.html">曝气量</a></li>
           <li><a href="sludge-production-calculator.html">污泥产量</a></li>
           <li><a href="dosing-calculator.html">加药量</a></li>
+          <li><a href="activated-sludge-process-calculator.html">活性污泥工艺</a></li>
+          <li><a href="mbbr-design.html">MBBR 工程设计</a></li>
+          <li><a href="mbr-design.html">MBR 工程设计</a></li>
           <li><a href="pump-selection-calculator.html">水泵选型</a></li>
+          <li><a href="blower-selection-calculator.html">鼓风机选型</a></li>
           <li><a href="water-quality-unit-converter.html">水质换算</a></li>
         </ul>
       </div>
       <div class="footer-col">
-        <h4>/ Company</h4>
+        <h4>Company</h4>
         <ul>
           <li><a href="https://dengdengtech.cn" target="_blank" rel="noopener">登登科技官网 ↗</a></li>
           <li>海南登登科技咨询</li>
@@ -674,7 +705,7 @@
         </ul>
       </div>
       <div class="footer-col">
-        <h4>/ Open Source</h4>
+        <h4>Open Source</h4>
         <ul>
           <li><a href="https://github.com/chengsunmail/waterkit" target="_blank" rel="noopener">GitHub 仓库 ↗</a></li>
           <li><a href="https://github.com/chengsunmail/waterkit/blob/main/LICENSE" target="_blank" rel="noopener">AGPL-3.0 协议</a></li>
@@ -737,10 +768,16 @@
     calc();
   }
 
-  // 水的运动黏度（温度修正）
+  // 水的运动黏度：手册"水的物性表"表值线性插值（℃ → ν×10⁻⁶ m²/s），超出 0–100 ℃ 钳位
+  const NU_TABLE = [[0,1.792],[5,1.519],[10,1.307],[15,1.139],[20,1.004],[25,0.893],[30,0.801],[35,0.724],
+                    [40,0.658],[50,0.553],[60,0.474],[70,0.413],[80,0.364],[90,0.326],[100,0.294]];
   function nu_T(T) {
-    // ν = 1.792e-6 / (1 + 0.0337*T + 0.000221*T²)
-    return 1.792e-6 / (1 + 0.0337*T + 0.000221*T*T);
+    const Tc = Math.min(100, Math.max(0, T));
+    for (let i = 0; i < NU_TABLE.length - 1; i++) {
+      const [t1, n1] = NU_TABLE[i], [t2, n2] = NU_TABLE[i+1];
+      if (Tc >= t1 && Tc <= t2) return (n1 + (n2 - n1) * (Tc - t1) / (t2 - t1)) * 1e-6;
+    }
+    return NU_TABLE[NU_TABLE.length - 1][1] * 1e-6;
   }
 
   // 流量单位换算到 m³/s
@@ -791,12 +828,33 @@
     if (v < 0.3) return {cls: 'check-warn', msg: `⚠ 流速 ${v.toFixed(2)} m/s 偏低（&lt;0.3），易沉积，建议放大流速或减小管径`};
     if (v < 0.6) return {cls: 'check-warn', msg: `⚠ 流速 ${v.toFixed(2)} m/s 偏低，污水管道需 ≥ 0.6 m/s 防沉积`};
     if (v <= 1.5) return {cls: 'check-ok', msg: `✓ 流速 ${v.toFixed(2)} m/s 处于常规给水管道推荐范围（0.6-1.5 m/s）`};
-    if (v <= 2.5) return {cls: 'check-ok', msg: `✓ 流速 ${v.toFixed(2)} m/s 处于压力管/加药管推荐范围（1.5-2.5 m/s）`};
+    if (v <= 2.5) return {cls: 'check-warn', msg: `⚠ 流速 ${v.toFixed(2)} m/s 偏高，注意经济流速（给水干管一般 ≤ 1.5–2.0 m/s；压力管/加药管可取至 2.5 m/s）`};
     if (v <= 5.0) return {cls: 'check-warn', msg: `⚠ 流速 ${v.toFixed(2)} m/s 偏高，注意水锤和管道冲刷`};
     return {cls: 'check-bad', msg: `✗ 流速 ${v.toFixed(2)} m/s 超过 5 m/s，水锤风险极高，建议放大管径`};
   }
 
+  // 流量按单位取小数位
+  function fmtQ(val, unit) {
+    const dp = unit === 'm3/s' ? 5 : (unit === 'm3/d' ? 1 : 2);
+    return val.toFixed(dp);
+  }
+
+  const RESULT_IDS = ['r_Q','r_v','r_D','r_DN','r_Re','r_Re_t','r_lambda','r_method','r_hf','r_hj','r_H','r_i'];
+  const METHOD_NAME = {dw: 'Darcy-Weisbach', hw: 'Hazen-Williams', manning: 'Manning'};
+
+  // 输入无效：结果置"—"并提示
+  function showInvalid(ids, msg) {
+    ids.forEach(id => $(id).classList.add('invalid'));
+    RESULT_IDS.forEach(id => $(id).textContent = '—');
+    $('D_hint').textContent = '';
+    const cbox = $('checkBox');
+    cbox.className = 'check-box check-bad';
+    cbox.textContent = '✗ ' + msg;
+  }
+
   function calc() {
+    const unitMap = {'m3/h':'m³/h','m3/d':'m³/d','L/s':'L/s','m3/s':'m³/s'};
+    const method = $('hfMethod').value;
     const Q_in = num('Q'), unit = $('unit_Q').value;
     const v_in = num('v');
     const D_in = num('D'); // mm
@@ -806,6 +864,24 @@
     const zeta = num('zeta');
     const g = 9.81;
     const nu = nu_T(T);
+    const C_hw = num('C'), n_m = num('n');
+    $('u_Q').textContent = unitMap[unit];
+
+    // 输入校验
+    document.querySelectorAll('.invalid').forEach(el => el.classList.remove('invalid'));
+    const need = {D: [['Q','流量 Q'],['v','流速 v']], v: [['Q','流量 Q'],['D','管内径 D']], Q: [['v','流速 v'],['D','管内径 D']]}[mode];
+    const bad = need.filter(([id]) => !(num(id) > 0));
+    if (bad.length) {
+      showInvalid(bad.map(b => b[0]), `请输入大于 0 的${bad.map(b => b[1]).join('、')}`);
+      return;
+    }
+    const neg = [['L','管长 L'],['eps','粗糙度 ε'],['zeta','局部阻力系数 Σζ']].filter(([id]) => num(id) < 0);
+    if (neg.length) {
+      showInvalid(neg.map(b => b[0]), `${neg.map(b => b[1]).join('、')}不能为负`);
+      return;
+    }
+    if (method === 'hw' && !(C_hw > 0)) { showInvalid(['C'], '请输入大于 0 的 Hazen-Williams 系数 C'); return; }
+    if (method === 'manning' && !(n_m > 0)) { showInvalid(['n'], '请输入大于 0 的曼宁系数 n'); return; }
 
     let Q_m3s, v, D_m;
 
@@ -823,7 +899,7 @@
       v = v_in;
       D_m = D_in / 1000;
       Q_m3s = v * Math.PI * D_m * D_m / 4;
-      $('Q').value = Q_from_m3s(Q_m3s, unit).toFixed(2);
+      $('Q').value = fmtQ(Q_from_m3s(Q_m3s, unit), unit);
     }
 
     // 雷诺数
@@ -831,10 +907,19 @@
 
     // 沿程阻力系数
     const eps_m = eps / 1000;
-    const lambda = solveLambda(Re, eps_m / D_m);
+    let lambda = solveLambda(Re, eps_m / D_m);
 
-    // 水头损失
-    const hf = lambda * (L / D_m) * v * v / (2 * g);
+    // 沿程水头损失（按所选公式）
+    let hf;
+    if (method === 'hw') {
+      hf = 10.67 * L * Math.pow(Q_m3s, 1.852) / (Math.pow(C_hw, 1.852) * Math.pow(D_m, 4.87));
+    } else if (method === 'manning') {
+      hf = 10.29 * n_m * n_m * L * Q_m3s * Q_m3s / Math.pow(D_m, 16/3);
+    } else {
+      hf = lambda * (L / D_m) * v * v / (2 * g);
+    }
+    // 经验公式时 λ 显示由 hf 反算的等效值
+    if (method !== 'dw' && L > 0) lambda = hf * D_m * 2 * g / (L * v * v);
     const hj = zeta * v * v / (2 * g);
     const H_total = hf + hj;
     const i_per_km = L > 0 ? (hf / L) * 1000 : 0;
@@ -843,15 +928,16 @@
     const DN = recommendDN(D_m * 1000);
 
     // 更新结果显示
-    const unitMap = {'m3/h':'m³/h','m3/d':'m³/d','L/s':'L/s','m3/s':'m³/s'};
-    $('r_Q').textContent = Q_from_m3s(Q_m3s, unit).toFixed(2);
+    $('r_Q').textContent = fmtQ(Q_from_m3s(Q_m3s, unit), unit);
     $('r_Q_u').textContent = unitMap[unit];
     $('r_v').textContent = v.toFixed(3);
     $('r_D').textContent = (D_m * 1000).toFixed(1);
     $('r_DN').textContent = 'DN ' + DN;
     $('r_Re').textContent = Re.toExponential(2);
     $('r_Re_t').textContent = Re < 2300 ? '层流' : (Re < 4000 ? '过渡' : '紊流');
-    $('r_lambda').textContent = lambda.toFixed(4);
+    $('r_lambda').textContent = (method !== 'dw' && !(L > 0)) ? '—' : lambda.toFixed(4);
+    $('r_lambda_l').textContent = method === 'dw' ? '沿程阻力系数 λ' : '等效沿程阻力系数 λ';
+    $('r_method').textContent = METHOD_NAME[method];
     $('r_hf').textContent = hf.toFixed(3);
     $('r_hj').textContent = hj.toFixed(3);
     $('r_H').textContent = H_total.toFixed(3);
@@ -868,7 +954,8 @@
     const check = velocityCheck(v);
     const cbox = $('checkBox');
     cbox.className = 'check-box ' + check.cls;
-    cbox.innerHTML = check.msg;
+    cbox.innerHTML = check.msg + (Re >= 2300 && Re < 4000 ? '<br>⚠ Re 处于 2300–4000 过渡区，λ 不确定性较大' : '')
+      + (T < 0 || T > 100 ? `<br>⚠ 水温 ${T} ℃ 超出黏度表范围 0–100 ℃，ν 已按 ${T < 0 ? 0 : 100} ℃ 取值` : '');
   }
 
   function copyResults() {
@@ -881,7 +968,8 @@
 推荐 ${$('r_DN').textContent}
 
 雷诺数 Re = ${$('r_Re').textContent} (${$('r_Re_t').textContent})
-沿程阻力系数 λ = ${$('r_lambda').textContent}
+${$('r_lambda_l').textContent} = ${$('r_lambda').textContent}
+沿程损失公式 = ${$('r_method').textContent}
 沿程水头损失 hf = ${$('r_hf').textContent} m
 局部水头损失 hj = ${$('r_hj').textContent} m
 总水头损失 H = ${$('r_H').textContent} m
@@ -889,7 +977,11 @@
 
 管长 L = ${num('L')} m
 管材 = ${$('material').options[$('material').selectedIndex].text}
-水温 T = ${num('T')} ℃`;
+ε = ${num('eps')} mm，n = ${num('n')}，C = ${num('C')}
+水温 T = ${num('T')} ℃
+局部阻力系数 Σζ = ${num('zeta')}
+
+流速校核：${$('checkBox').textContent}`;
     navigator.clipboard.writeText(txt).then(() => {
       alert('结果已复制到剪贴板');
     }).catch(() => {
@@ -904,10 +996,12 @@
   }
 
   function resetDefaults() {
+    mode = 'D'; // 先切回默认模式，避免 updateMaterial() 内的 calc() 按旧模式覆盖 Q/v/D
     $('Q').value = 100; $('unit_Q').value = 'm3/h';
     $('v').value = 1.2;
     $('D').value = 150;
     $('L').value = 100;
+    $('hfMethod').value = 'dw';
     $('material').value = 'pvc';
     updateMaterial();
     $('T').value = 20;

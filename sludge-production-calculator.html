@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>污泥产量计算器 | 水处理工具箱</title>
+<title>污泥产量计算器 | 水处理工具箱 · WaterKit</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230891b2'/%3E%3Ctext x='16' y='22.5' font-size='18' font-weight='700' text-anchor='middle' fill='white' font-family='Arial,sans-serif'%3EW%3C/text%3E%3C/svg%3E">
+<meta name="description" content="在线估算污水处理厂初沉污泥、剩余活性污泥与化学除磷污泥干泥量，换算浓缩、脱水后湿泥量与体积，并估算年处置费用与吨水成本。">
+<link rel="canonical" href="https://waterkit.cn/sludge-production-calculator.html">
 <style>
   :root {
     --brand: #0891b2;
@@ -20,14 +23,6 @@
     --border: #e2e8f0;
     --border-soft: #f1f5f9;
   }
-  body {
-    background: var(--bg) !important;
-    padding: 0 !important;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-
   /* 统一顶部导航 */
   .topbar {
     background: rgba(255, 255, 255, 0.92);
@@ -167,10 +162,13 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: #f5f7fa;
+    background: var(--bg);
     color: #1f2937;
     line-height: 1.6;
-    padding: 16px;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
   }
   .container {
     max-width: 820px;
@@ -364,20 +362,16 @@
     color: #92400e;
     border-left: 3px solid #f59e0b;
   }
-  footer {
-    text-align: center;
-    padding: 16px;
-    font-size: 12px;
-    color: #9ca3af;
-  }
   @media (max-width: 480px) {
     .main-wrap { padding: 8px; }
-    ..main-wrap { padding: 16px; }
     header.tool-header { padding: 18px; }
     header.tool-header h1 { font-size: 19px; }
     .result-value { font-size: 16px; }
     .result-value.big { font-size: 19px; }
   }
+  .invalid{border-color:#ef4444!important;background:#fef2f2!important}
+  .warn-box{margin-top:12px;padding:10px 12px;background:#fef2f2;border-left:3px solid #ef4444;border-radius:6px;font-size:12.5px;color:#991b1b;line-height:1.7}
+  .warn-box.soft{background:#fffbeb;border-left-color:#f59e0b;color:#92400e}
 </style>
 </head>
 <body>
@@ -423,20 +417,24 @@
     <div class="section-title">① 基本水质水量</div>
     <div class="grid">
       <div class="field">
-        <label>处理水量 Q <span class="unit">m³/d</span></label>
+        <label for="Q">处理水量 Q <span class="unit">m³/d</span></label>
         <input type="number" id="Q" value="10000" step="100">
       </div>
       <div class="field">
-        <label>进水 SS <span class="unit">mg/L</span></label>
+        <label for="SSo">进水 SS <span class="unit">mg/L</span></label>
         <input type="number" id="SSo" value="200" step="10">
       </div>
       <div class="field">
-        <label>进水 BOD₅ <span class="unit">mg/L</span></label>
+        <label for="BODo">进水 BOD₅ <span class="unit">mg/L</span></label>
         <input type="number" id="BODo" value="200" step="10">
       </div>
       <div class="field">
-        <label>出水 BOD₅ <span class="unit">mg/L</span></label>
+        <label for="BODe">出水 BOD₅ <span class="unit">mg/L</span></label>
         <input type="number" id="BODe" value="10" step="1">
+      </div>
+      <div class="field">
+        <label for="SSe">出水 SS <span class="unit">mg/L</span></label>
+        <input type="number" id="SSe" value="10" step="1">
       </div>
     </div>
 
@@ -444,32 +442,36 @@
       ② 生物处理段（活性污泥法）
     </div>
     <div class="process-type">
-      <label><input type="radio" name="method" value="Y" checked onchange="calc()"> 按产率系数法（Y & Kd）</label>
-      <label><input type="radio" name="method" value="load" onchange="calc()"> 按污泥负荷法（Fr 系数）</label>
+      <label><input type="radio" name="method" value="Y" checked> 按产率系数法（Y & Kd）</label>
+      <label><input type="radio" name="method" value="load"> 按污泥负荷法（Fr 系数）</label>
     </div>
 
     <div class="grid" id="bio_Y_block">
       <div class="field">
-        <label>污泥产率 Y <span class="unit">kgVSS/kgBOD</span></label>
+        <label for="Y">污泥产率 Y <span class="unit">kgVSS/kgBOD</span></label>
         <input type="number" id="Y" value="0.6" step="0.05">
       </div>
       <div class="field">
-        <label>内源呼吸率 Kd <span class="unit">d⁻¹</span></label>
+        <label for="Kd">内源呼吸率 Kd <span class="unit">d⁻¹</span></label>
         <input type="number" id="Kd" value="0.05" step="0.01">
       </div>
       <div class="field">
-        <label>污泥龄 SRT <span class="unit">d</span></label>
+        <label for="SRT">污泥龄 SRT <span class="unit">d</span></label>
         <input type="number" id="SRT" value="15" step="1">
       </div>
       <div class="field">
-        <label>VSS/SS 比 <span class="unit">—</span></label>
+        <label for="f_vss">VSS/SS 比 <span class="unit">—</span></label>
         <input type="number" id="f_vss" value="0.75" step="0.05">
+      </div>
+      <div class="field">
+        <label for="f_inert">进水 SS 不可降解系数 f <span class="unit">—</span></label>
+        <input type="number" id="f_inert" value="0.5" step="0.05">
       </div>
     </div>
 
     <div class="grid" id="bio_load_block" style="display:none;">
       <div class="field">
-        <label>污泥产率系数 Fr <span class="unit">kgSS/kgBOD</span></label>
+        <label for="Fr">污泥产率系数 Fr <span class="unit">kgSS/kgBOD</span></label>
         <input type="number" id="Fr" value="0.8" step="0.05">
       </div>
     </div>
@@ -480,15 +482,15 @@
     </div>
     <div class="grid" id="ps_block">
       <div class="field">
-        <label>初沉 SS 去除率 <span class="unit">%</span></label>
+        <label for="eta_SS">初沉 SS 去除率 <span class="unit">%</span></label>
         <input type="number" id="eta_SS" value="55" step="5">
       </div>
       <div class="field">
-        <label>初沉 BOD 去除率 <span class="unit">%</span></label>
+        <label for="eta_BOD">初沉 BOD 去除率 <span class="unit">%</span></label>
         <input type="number" id="eta_BOD" value="30" step="5">
       </div>
       <div class="field">
-        <label>初沉污泥含水率 <span class="unit">%</span></label>
+        <label for="w_ps">初沉污泥含水率 <span class="unit">%</span></label>
         <input type="number" id="w_ps" value="97" step="0.5">
       </div>
     </div>
@@ -499,15 +501,15 @@
     </div>
     <div class="grid disabled-section" id="chem_block">
       <div class="field">
-        <label>进水 TP <span class="unit">mg/L</span></label>
+        <label for="TPo">进水 TP <span class="unit">mg/L</span></label>
         <input type="number" id="TPo" value="4" step="0.5">
       </div>
       <div class="field">
-        <label>出水 TP <span class="unit">mg/L</span></label>
+        <label for="TPe">出水 TP <span class="unit">mg/L</span></label>
         <input type="number" id="TPe" value="0.3" step="0.1">
       </div>
       <div class="field">
-        <label>药剂类型</label>
+        <label for="chem_type">药剂类型</label>
         <select id="chem_type">
           <option value="PAC">PAC（聚合氯化铝）</option>
           <option value="FeCl3">FeCl₃（三氯化铁）</option>
@@ -516,7 +518,7 @@
         </select>
       </div>
       <div class="field">
-        <label>投药比（摩尔比 Me/P） <span class="unit">—</span></label>
+        <label for="mole_ratio">投药比（摩尔比 Me/P） <span class="unit">—</span></label>
         <input type="number" id="mole_ratio" value="1.5" step="0.1">
       </div>
     </div>
@@ -524,25 +526,31 @@
     <div class="section-title">⑤ 脱水与处置</div>
     <div class="grid">
       <div class="field">
-        <label>浓缩后含水率 <span class="unit">%</span></label>
+        <label for="w_thick">浓缩后含水率 <span class="unit">%</span></label>
         <input type="number" id="w_thick" value="97" step="0.5">
       </div>
       <div class="field">
-        <label>脱水后含水率 <span class="unit">%</span></label>
+        <label for="w_dewater">脱水后含水率 <span class="unit">%</span></label>
         <input type="number" id="w_dewater" value="80" step="1">
       </div>
       <div class="field">
-        <label>污泥密度 <span class="unit">t/m³</span></label>
+        <label for="rho">浓缩污泥密度 <span class="unit">t/m³</span></label>
         <input type="number" id="rho" value="1.02" step="0.01">
       </div>
       <div class="field">
-        <label>处置单价 <span class="unit">元/吨湿泥</span></label>
+        <label for="rho_cake">泥饼密度 <span class="unit">t/m³</span></label>
+        <input type="number" id="rho_cake" value="1.05" step="0.01">
+      </div>
+      <div class="field">
+        <label for="price">处置单价 <span class="unit">元/吨湿泥</span></label>
         <input type="number" id="price" value="300" step="10">
       </div>
     </div>
 
     <div class="results">
       <h2>计算结果</h2>
+      <div class="warn-box" id="warnBox" style="display:none;margin:0 0 12px;"></div>
+      <div class="warn-box soft" id="hintBox" style="display:none;margin:0 0 12px;"></div>
 
       <div class="result-group">
         <div class="result-group-title">分项干泥产量（kgDS/d）</div>
@@ -551,7 +559,7 @@
           <span><span class="result-value" id="r_ps">—</span><span class="result-unit">kgDS/d</span></span>
         </div>
         <div class="result-row">
-          <span class="result-label">剩余活性污泥（生物）</span>
+          <span class="result-label">剩余活性污泥（生物<span id="r_bio_note">，含进水惰性固体</span>）</span>
           <span><span class="result-value" id="r_bio">—</span><span class="result-unit">kgDS/d</span></span>
         </div>
         <div class="result-row">
@@ -567,7 +575,7 @@
       <div class="result-group">
         <div class="result-group-title">湿污泥产量与体积</div>
         <div class="result-row">
-          <span class="result-label">浓缩后污泥量（含水率设定值）</span>
+          <span class="result-label">浓缩后污泥量（初沉泥按初沉含水率，剩余+化学泥按浓缩后含水率）</span>
           <span><span class="result-value" id="r_thick_m">—</span><span class="result-unit">t/d</span></span>
         </div>
         <div class="result-row">
@@ -579,7 +587,7 @@
           <span><span class="result-value big" id="r_cake_m">—</span><span class="result-unit">t/d</span></span>
         </div>
         <div class="result-row">
-          <span class="result-label">脱水后泥饼体积（ρ≈1.05）</span>
+          <span class="result-label">脱水后泥饼体积（按泥饼密度）</span>
           <span><span class="result-value" id="r_cake_v">—</span><span class="result-unit">m³/d</span></span>
         </div>
       </div>
@@ -620,26 +628,32 @@
       <h3>② 生物污泥（剩余活性污泥）</h3>
       <p><strong>方法一：产率系数法（Lawrence-McCarty 模型）</strong></p>
       <code>ΔX_bio_VSS = Y · Q · ΔBOD / (1 + Kd · SRT) / 1000</code>
-      <code>ΔX_bio_SS = ΔX_bio_VSS / f_vss</code>
+      <code>ΔX_bio_SS = ΔX_bio_VSS / f_vss + f · Q · (SS₀ − SSₑ) / 1000</code>
+      <p>后一项为进水中不可降解（惰性）固体在系统内的积累（GB 50014 剩余污泥量公式中的 f·Q·(SS₀−SSₑ) 项）：f 为进水 SS 中不可生物降解及惰性部分的比例，一般取 0.5-0.7，默认 0.5；SS₀ 为进入生物段的 SS（启用初沉时取初沉出水 SS = SS_o·(1−η_SS)，否则取进水 SS），SSₑ 为出水 SS。</p>
       <p>其中 ΔBOD 为进入生物段后的 BOD 去除量（若有初沉，需扣除初沉去除部分）。Y 典型值 0.4-0.8 kgVSS/kgBOD；Kd 典型值 0.04-0.08 d⁻¹；f_vss（VSS/SS）典型值 0.7-0.8。</p>
 
       <p><strong>方法二：污泥负荷法（经验系数）</strong></p>
       <code>ΔX_bio = Fr · Q · ΔBOD / 1000</code>
-      <p>Fr 为总污泥产率（包含衰减），典型值 0.6-1.0 kgSS/kgBOD。此法简单，适合工程估算。</p>
+      <p>Fr 为总污泥产率（包含衰减），典型值 0.6-1.0 kgSS/kgBOD。此法简单，适合工程估算。Fr 为按 SS 计的总产率经验值，已隐含进水惰性固体，不再另加 f·Q·(SS₀−SSₑ) 项。</p>
 
       <h3>③ 化学除磷污泥</h3>
       <code>ΔP = Q · (TP_o − TP_e) / 1000  [kgP/d]</code>
       <p>根据药剂类型，化学污泥包括两部分：反应生成的金属磷酸盐 + 过量投药生成的金属氢氧化物。</p>
-      <p><strong>PAC/铝系</strong>（以 Al 计）：</p>
-      <code>ΔX_chem ≈ 5.3 · ΔP · (Al/P) / 1.5 + 2.89 · 其余Al</code>
-      <p><strong>FeCl₃/铁系</strong>：</p>
-      <code>ΔX_chem ≈ 5.4 · ΔP · (Fe/P) / 1.5 + 3.07 · 其余Fe</code>
-      <p>Me/P 摩尔比一般取 1.2-2.0。本工具采用简化工程经验公式：化学污泥 ≈ 3.3 × ΔP（PAC 1.5倍摩尔比时）或 4.8 × ΔP（FeCl₃ 1.5倍摩尔比时）。</p>
+      <p>按化学计量：每 1 mol P 生成 1 mol 金属磷酸盐，过量的 (Me/P − 1) mol 金属生成氢氧化物。摩尔质量：P=31，AlPO₄=122，Al(OH)₃=78，FePO₄=150.8，Fe(OH)₃=106.9。</p>
+      <p><strong>PAC/铝系</strong>：</p>
+      <code>ΔX_chem = ΔP · [122/31 + (Al/P − 1) · 78/31]</code>
+      <p><strong>FeCl₃/PFS 铁系</strong>：</p>
+      <code>ΔX_chem = ΔP · [150.8/31 + (Fe/P − 1) · 106.9/31]</code>
+      <p><strong>石灰</strong>（经验值，不随摩尔比线性；石灰除磷主要受 pH 控制）：</p>
+      <code>ΔX_chem ≈ ΔP · (5.0 + 2.0 · Ca/P)</code>
+      <p>Me/P 摩尔比一般取 1.2-2.0。摩尔比 1.5 时：PAC ≈ 5.19 kgDS/kgP，铁盐 ≈ 6.59 kgDS/kgP。石灰除磷同时生成 CaCO₃ 等副产物，与水的碱度强相关，此处仅为经验估算。</p>
 
       <h3>④ 污泥浓缩脱水换算</h3>
       <code>M_wet = M_dry / (1 − w)  [kg/d]</code>
       <code>V_sludge = M_wet / (ρ × 1000)  [m³/d]</code>
-      <p>其中 w 为含水率（小数）。含水率关系示例：</p>
+      <p>其中 w 为含水率（小数）。浓缩后污泥量分别计算再汇总：初沉污泥按“初沉污泥含水率”，剩余活性污泥与化学污泥按“浓缩后含水率”：</p>
+      <code>M_浓缩 = ΔX_ps / (1 − w_ps) + (ΔX_bio + ΔX_chem) / (1 − w_thick)</code>
+      <p>浓缩污泥体积按“浓缩污泥密度”，泥饼体积按“泥饼密度”（默认 1.05 t/m³）换算。含水率关系示例：</p>
       <table>
         <tr><th>含水率</th><th>含固率</th><th>体积比（相对99%）</th></tr>
         <tr><td>99%</td><td>1%</td><td>100</td></tr>
@@ -651,11 +665,11 @@
 
       <h3>⑤ 处置成本估算</h3>
       <code>年成本 = M_cake_年 × 单价</code>
-      <p>目前国内常见污泥处置单价：卫生填埋 150-300 元/t（60%含水率）；焚烧 300-600 元/t；堆肥 200-400 元/t；水泥窑协同处置 200-400 元/t。</p>
+      <p>目前国内常见污泥处置单价：卫生填埋 150-300 元/t；焚烧 300-600 元/t；堆肥 200-400 元/t；水泥窑协同处置 200-400 元/t。本工具按“脱水后含水率”下的泥饼湿重计价（默认 80%）；部分处置途径（如填埋）要求含水率 ≤60%，此时需深度脱水，泥饼量与单价均应按对应含水率取值。</p>
     </div>
 
     <div class="note">
-      ⚠️ 本工具用于方案阶段估算与概算，详细设计须根据原水水质特性、工艺流程、药剂种类、脱水设备类型等进行复核。化学污泥部分为简化工程经验，严格计算建议采用 Metcalf & Eddy 或 GB 50014 附录公式。
+      ⚠️ 本工具用于方案阶段估算与概算，详细设计须根据原水水质特性、工艺流程、药剂种类、脱水设备类型等进行复核。化学污泥铝/铁系按化学计量下限估算、石灰为经验值，严格计算建议采用 Metcalf & Eddy 或 GB 50014 附录公式。
     </div>
 
   </div>
@@ -676,7 +690,7 @@
             <div class="brand-sub">WaterKit · by 登登科技</div>
           </div>
         </a>
-        <p class="footer-about">水处理工具箱(WaterKit)是海南登登科技咨询有限公司推出的水处理在线计算工具集合,由一线水处理工艺工程师开发维护。免费、无广告、持续更新。</p>
+        <p class="footer-about">水处理工具箱(WaterKit)是海南登登科技咨询有限公司推出的水处理在线计算工具集合,由一线水处理工艺工程师开发维护。免费、持续更新。</p>
       </div>
       <div class="footer-col">
         <h4>水力计算</h4>
@@ -693,7 +707,11 @@
           <li><a href="aeration-calculator.html">曝气量</a></li>
           <li><a href="sludge-production-calculator.html">污泥产量</a></li>
           <li><a href="dosing-calculator.html">加药量</a></li>
+          <li><a href="activated-sludge-process-calculator.html">活性污泥工艺</a></li>
+          <li><a href="mbbr-design.html">MBBR 工程设计</a></li>
+          <li><a href="mbr-design.html">MBR 工程设计</a></li>
           <li><a href="pump-selection-calculator.html">水泵选型</a></li>
+          <li><a href="blower-selection-calculator.html">鼓风机选型</a></li>
           <li><a href="water-quality-unit-converter.html">水质换算</a></li>
         </ul>
       </div>
@@ -743,34 +761,83 @@
       const m = document.querySelector('input[name="method"]:checked').value;
       $('bio_Y_block').style.display = m === 'Y' ? 'grid' : 'none';
       $('bio_load_block').style.display = m === 'load' ? 'grid' : 'none';
-      calc();
+      // calc() 由下方通用 change 监听触发，此处不再重复调用
     });
   });
 
+  const OUT_IDS = ['r_ps','r_bio','r_chem','r_total_dry','r_thick_m','r_thick_v','r_cake_m','r_cake_v',
+    'r_year_dry','r_year_cake','r_year_cost','r_unit_cost'];
+  function showMsg(id, html) {
+    const el = $(id);
+    el.innerHTML = html || '';
+    el.style.display = html ? 'block' : 'none';
+  }
+
   function calc() {
-    const Q = num('Q');
-    const SSo = num('SSo'), BODo = num('BODo'), BODe = num('BODe');
     const usePS = $('usePS').checked;
     const useChem = $('useChem').checked;
+    const methodSel = document.querySelector('input[name="method"]:checked').value;
+
+    // 输入校验（pos：须 > 0；nn：不能为负；w：含水率 0 ≤ w < 100）
+    const rules = [
+      ['Q', '处理水量 Q', 'pos'], ['SSo', '进水 SS', 'nn'], ['SSe', '出水 SS', 'nn'], ['BODo', '进水 BOD₅', 'nn'], ['BODe', '出水 BOD₅', 'nn'],
+      ['w_thick', '浓缩后含水率', 'w'], ['w_dewater', '脱水后含水率', 'w'],
+      ['rho', '浓缩污泥密度', 'pos'], ['rho_cake', '泥饼密度', 'pos'], ['price', '处置单价', 'nn']
+    ];
+    if (methodSel === 'Y') rules.push(['Y', '污泥产率 Y', 'nn'], ['Kd', '内源呼吸率 Kd', 'nn'], ['SRT', '污泥龄 SRT', 'pos'], ['f_vss', 'VSS/SS 比', 'pos'], ['f_inert', '不可降解系数 f', 'nn']);
+    else rules.push(['Fr', '污泥产率系数 Fr', 'nn']);
+    if (usePS) rules.push(['eta_SS', '初沉 SS 去除率', 'nn'], ['eta_BOD', '初沉 BOD 去除率', 'nn'], ['w_ps', '初沉污泥含水率', 'w']);
+    if (useChem) rules.push(['TPo', '进水 TP', 'nn'], ['TPe', '出水 TP', 'nn'], ['mole_ratio', '投药比', 'nn']);
+    document.querySelectorAll('.invalid').forEach(el => el.classList.remove('invalid'));
+    const errs = [];
+    rules.forEach(([id, name, rule]) => {
+      const v = parseFloat($(id).value);
+      let msg = '';
+      if (isNaN(v)) msg = `请输入${name}`;
+      else if (rule === 'pos' && v <= 0) msg = `请输入大于 0 的${name}`;
+      else if (rule === 'nn' && v < 0) msg = `${name}不能为负值`;
+      else if (rule === 'w' && (v < 0 || v >= 100)) msg = `${name}应在 0 ~ 100% 之间（不含 100%）`;
+      if (msg) { $(id).classList.add('invalid'); errs.push(msg); }
+    });
+    if (errs.length) {
+      OUT_IDS.forEach(id => $(id).textContent = '—');
+      showMsg('warnBox', '⚠️ ' + errs.join('；'));
+      showMsg('hintBox', '');
+      return;
+    }
+    showMsg('warnBox', '');
+    const hints = [];
+    if (num('w_dewater') > num('w_thick')) {
+      $('w_dewater').classList.add('invalid');
+      hints.push('脱水后含水率高于浓缩后含水率（脱水后反而更稀），请核对');
+    }
+    showMsg('hintBox', hints.length ? '💡 ' + hints.join('；') : '');
+
+    const Q = num('Q');
+    const SSo = num('SSo'), BODo = num('BODo'), BODe = num('BODe');
 
     // ① 初沉污泥
     let X_ps = 0;
     let BOD_bio_in = BODo;  // 进入生物段的BOD
+    let SS_bio_in = SSo;    // 进入生物段的SS（SS₀）
     if (usePS) {
       const eta_SS = num('eta_SS') / 100;
       const eta_BOD = num('eta_BOD') / 100;
       X_ps = Q * SSo * eta_SS / 1000;
       BOD_bio_in = BODo * (1 - eta_BOD);
+      SS_bio_in = SSo * (1 - eta_SS);
     }
     const dBOD_bio = Math.max(BOD_bio_in - BODe, 0);
 
     // ② 生物污泥
     const method = document.querySelector('input[name="method"]:checked').value;
-    let X_bio = 0;
+    let X_bio = 0, X_inert = 0;
     if (method === 'Y') {
       const Y = num('Y'), Kd = num('Kd'), SRT = num('SRT'), fvss = num('f_vss');
       const X_VSS = Y * Q * dBOD_bio / (1 + Kd * SRT) / 1000;
-      X_bio = fvss > 0 ? X_VSS / fvss : X_VSS;
+      // 惰性固体：GB 50014 f·Q·(SS₀−SSₑ)/1000，SS₀ 为进入生物段的 SS
+      X_inert = num('f_inert') * Q * Math.max(SS_bio_in - num('SSe'), 0) / 1000;
+      X_bio = (fvss > 0 ? X_VSS / fvss : X_VSS) + X_inert;
     } else {
       const Fr = num('Fr');
       X_bio = Fr * Q * dBOD_bio / 1000;
@@ -783,16 +850,17 @@
       const dP = Q * Math.max(TPo - TPe, 0) / 1000;  // kgP/d
       const mole = num('mole_ratio');
       const chemType = $('chem_type').value;
-      // 工程简化系数：每kg磷产生的化学污泥量（含过量药剂生成的氢氧化物）
+      // 化学计量系数：每kg磷产生的化学污泥量 = 金属磷酸盐 + 过量金属生成的氢氧化物
+      // M_P=31；AlPO4=122，Al(OH)3=78；FePO4=150.8，Fe(OH)3=106.85
       let factor;
       if (chemType === 'PAC') {
-        // Al基：化学计量2.27kg Al(OH)3/kg Al + AlPO4 5.3kg/kg P
-        // 简化：按摩尔比1.5时 ≈ 3.3 kg污泥/kg P
-        factor = 2.2 + 0.75 * mole;  // 大约在mole=1时2.95, mole=1.5时3.3, mole=2.0时3.7
+        // Al基：1 mol P → 1 mol AlPO4 + (mole−1) mol Al(OH)3
+        factor = 122/31 + (mole - 1) * 78/31;      // mole=1.5 时 ≈ 5.19 kg/kgP
       } else if (chemType === 'FeCl3' || chemType === 'PFS') {
-        factor = 3.3 + 1.0 * mole;   // 铁系较重
+        // Fe基：1 mol P → 1 mol FePO4 + (mole−1) mol Fe(OH)3
+        factor = 150.8/31 + (mole - 1) * 106.85/31; // mole=1.5 时 ≈ 6.59 kg/kgP
       } else {
-        factor = 5.0 + 2.0 * mole;   // 石灰系最多
+        factor = 5.0 + 2.0 * mole;   // 石灰系：经验值（含 CaCO3 等副产物，与碱度相关）
       }
       X_chem = dP * factor;
     }
@@ -802,12 +870,14 @@
     // ④ 浓缩/脱水
     const w_thick = num('w_thick') / 100;
     const w_dewater = num('w_dewater') / 100;
-    const rho = num('rho');
+    const w_ps = num('w_ps') / 100;
+    const rho = num('rho'), rho_cake = num('rho_cake');
 
-    const M_thick = w_thick < 1 ? X_total / (1 - w_thick) / 1000 : 0;  // t/d
-    const V_thick = rho > 0 ? M_thick / rho : 0;  // m³/d
-    const M_cake = w_dewater < 1 ? X_total / (1 - w_dewater) / 1000 : 0;  // t/d
-    const V_cake = M_cake / 1.05;  // 泥饼密度约1.05
+    // 浓缩后：初沉污泥按初沉含水率 w_ps，剩余+化学污泥按浓缩后含水率 w_thick，分别计算后汇总
+    const M_thick = (X_ps / (1 - w_ps) + (X_bio + X_chem) / (1 - w_thick)) / 1000;  // t/d
+    const V_thick = M_thick / rho;  // m³/d
+    const M_cake = X_total / (1 - w_dewater) / 1000;  // t/d
+    const V_cake = M_cake / rho_cake;  // m³/d
 
     // ⑤ 年产量与成本
     const year_dry = X_total * 365 / 1000;  // tDS/a
@@ -819,6 +889,7 @@
     // 输出
     $('r_ps').textContent = X_ps.toFixed(1);
     $('r_bio').textContent = X_bio.toFixed(1);
+    $('r_bio_note').textContent = method === 'Y' ? '，含进水惰性固体' : '';
     $('r_chem').textContent = X_chem.toFixed(1);
     $('r_total_dry').textContent = X_total.toFixed(1);
     $('r_thick_m').textContent = M_thick.toFixed(2);
@@ -836,16 +907,16 @@
 ————————————————
 处理水量: ${num('Q')} m³/d
 进/出水 BOD: ${num('BODo')}/${num('BODe')} mg/L
-进水 SS: ${num('SSo')} mg/L
+进/出水 SS: ${num('SSo')}/${num('SSe')} mg/L
 
 【干污泥产量】
 初沉污泥 = ${$('r_ps').textContent} kgDS/d
-剩余生物污泥 = ${$('r_bio').textContent} kgDS/d
+剩余生物污泥 = ${$('r_bio').textContent} kgDS/d${document.querySelector('input[name="method"]:checked').value === 'Y' ? '（含惰性固体 f=' + num('f_inert') + '）' : ''}
 化学除磷污泥 = ${$('r_chem').textContent} kgDS/d
 干污泥总量 ΔX = ${$('r_total_dry').textContent} kgDS/d
 
 【湿污泥】
-浓缩后(${num('w_thick')}%): ${$('r_thick_m').textContent} t/d (${$('r_thick_v').textContent} m³/d)
+浓缩后(${$('usePS').checked ? '初沉 ' + num('w_ps') + '%，剩余+化学 ' : ''}${num('w_thick')}%): ${$('r_thick_m').textContent} t/d (${$('r_thick_v').textContent} m³/d)
 脱水后泥饼(${num('w_dewater')}%): ${$('r_cake_m').textContent} t/d (${$('r_cake_v').textContent} m³/d)
 
 【年处置】
@@ -867,14 +938,15 @@
   }
 
   function resetDefaults() {
-    const d = {Q:10000, SSo:200, BODo:200, BODe:10,
-      Y:0.6, Kd:0.05, SRT:15, f_vss:0.75, Fr:0.8,
+    const d = {Q:10000, SSo:200, SSe:10, BODo:200, BODe:10,
+      Y:0.6, Kd:0.05, SRT:15, f_vss:0.75, f_inert:0.5, Fr:0.8,
       eta_SS:55, eta_BOD:30, w_ps:97,
       TPo:4, TPe:0.3, mole_ratio:1.5,
-      w_thick:97, w_dewater:80, rho:1.02, price:300};
+      w_thick:97, w_dewater:80, rho:1.02, rho_cake:1.05, price:300};
     Object.keys(d).forEach(k => $(k).value = d[k]);
     $('usePS').checked = true;
     $('useChem').checked = false;
+    $('chem_type').value = 'PAC';
     document.querySelector('input[name="method"][value="Y"]').checked = true;
     $('bio_Y_block').style.display = 'grid';
     $('bio_load_block').style.display = 'none';
@@ -886,9 +958,11 @@
     box.style.display = box.style.display === 'none' ? 'block' : 'none';
   }
 
+  // 每个控件只绑定一次 calc：数字框用 input，下拉/单选用 change；复选框已由 togglePS/toggleChem 调用 calc
   document.querySelectorAll('input, select').forEach(el => {
-    el.addEventListener('input', calc);
-    el.addEventListener('change', calc);
+    if (el.type === 'checkbox') return;
+    const ev = (el.tagName === 'SELECT' || el.type === 'radio') ? 'change' : 'input';
+    el.addEventListener(ev, calc);
   });
 
   calc();

@@ -1,0 +1,10 @@
+name = "waterkit"
+compatibility_date = "2026-04-01"
+
+# 让 Workers 托管静态资源(仓库根目录下所有 HTML/CSS/JS 文件)
+# 访客访问 waterkit.cn 时直接返回这些静态文件,无需写服务端代码
+# 不想公开的文件(README、配置等)列在 .assetsignore 中
+[assets]
+directory = "./"
+# 多页静态站:不存在的地址返回 404.html(HTTP 404),不再回退到首页
+not_found_handling = "404-page"

@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>水泵选型计算器 | 水处理工具箱</title>
+<title>水泵选型计算器 | 水处理工具箱 · WaterKit</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230891b2'/%3E%3Ctext x='16' y='22.5' font-size='18' font-weight='700' text-anchor='middle' fill='white' font-family='Arial,sans-serif'%3EW%3C/text%3E%3C/svg%3E">
+<meta name="description" content="水泵选型在线计算：系统扬程组成、水功率/轴功率/配套电机功率、运行电耗与电费、NPSH 汽蚀校核及并联与变频调速分析，适用于给排水与污水提升泵初步选型。">
+<link rel="canonical" href="https://waterkit.cn/pump-selection-calculator.html">
 <style>
   :root {
     --brand: #0891b2;
@@ -20,13 +23,18 @@
     --border: #e2e8f0;
     --border-soft: #f1f5f9;
   }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    background: var(--bg) !important;
-    padding: 0 !important;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: #1f2937;
+    line-height: 1.6;
+    padding: 0;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
   }
+  .invalid { border-color: #ef4444 !important; background: #fef2f2 !important; }
 
   /* 统一顶部导航 */
   .topbar {
@@ -164,14 +172,6 @@
   }
 
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: #f5f7fa;
-    color: #1f2937;
-    line-height: 1.6;
-    padding: 16px;
-  }
   .container {
     max-width: 860px;
     margin: 0 auto;
@@ -404,15 +404,8 @@
     color: #92400e;
     border-left: 3px solid #f59e0b;
   }
-  footer {
-    text-align: center;
-    padding: 16px;
-    font-size: 12px;
-    color: #9ca3af;
-  }
   @media (max-width: 480px) {
     .main-wrap { padding: 8px; }
-    ..main-wrap { padding: 16px; }
     header.tool-header { padding: 18px; }
     header.tool-header h1 { font-size: 19px; }
     .result-value { font-size: 17px; }
@@ -463,11 +456,11 @@
     <div class="section-title">① 基本工况参数</div>
     <div class="grid">
       <div class="field">
-        <label>设计流量 Q <span class="unit">m³/h</span></label>
+        <label for="Q">设计流量 Q <span class="unit">m³/h</span></label>
         <input type="number" id="Q" value="100" step="10">
       </div>
       <div class="field">
-        <label>介质类型</label>
+        <label for="fluid">介质类型</label>
         <select id="fluid" onchange="updateFluid()">
           <option value="clean_water" selected>清水</option>
           <option value="sewage">污水（粗/中格栅后）</option>
@@ -478,15 +471,15 @@
         </select>
       </div>
       <div class="field">
-        <label>介质密度 ρ <span class="unit">kg/m³</span></label>
+        <label for="rho">介质密度 ρ <span class="unit">kg/m³</span></label>
         <input type="number" id="rho" value="1000" step="10">
       </div>
       <div class="field">
-        <label>介质温度 T <span class="unit">℃</span></label>
+        <label for="T">介质温度 T <span class="unit">℃</span></label>
         <input type="number" id="T" value="20" step="1">
       </div>
       <div class="field">
-        <label>泵类型</label>
+        <label for="pump_type">泵类型</label>
         <select id="pump_type" onchange="updatePumpType()">
           <option value="centrifugal" selected>离心泵（ISG/IH/IS）</option>
           <option value="submerged">潜水泵（WQ/QW）</option>
@@ -503,11 +496,11 @@
       <h3>几何扬程（静扬程）</h3>
       <div class="grid">
         <div class="field">
-          <label>吸水池最低水位 <span class="unit">m</span></label>
+          <label for="z_suck">吸水池最低水位 <span class="unit">m</span></label>
           <input type="number" id="z_suck" value="0" step="0.1">
         </div>
         <div class="field">
-          <label>出水池最高水位 <span class="unit">m</span></label>
+          <label for="z_disch">出水池最高水位 <span class="unit">m</span></label>
           <input type="number" id="z_disch" value="15" step="0.5">
         </div>
       </div>
@@ -517,11 +510,12 @@
       <h3>压力扬程（非开口系统时填写）</h3>
       <div class="grid">
         <div class="field">
-          <label>吸水侧表压 P₁ <span class="unit">kPa</span></label>
+          <label for="P1">吸水侧表压 P₁ <span class="unit">kPa</span></label>
           <input type="number" id="P1" value="0" step="10">
+          <div class="helper">吸水池/容器液面表压，开口水池取 0；同时计入 NPSHa</div>
         </div>
         <div class="field">
-          <label>出水侧表压 P₂ <span class="unit">kPa</span></label>
+          <label for="P2">出水侧表压 P₂ <span class="unit">kPa</span></label>
           <input type="number" id="P2" value="0" step="10">
         </div>
       </div>
@@ -531,19 +525,19 @@
       <h3>管路水头损失</h3>
       <div class="grid">
         <div class="field">
-          <label>吸水管沿程损失 <span class="unit">m</span></label>
+          <label for="hf_s">吸水管沿程损失 <span class="unit">m</span></label>
           <input type="number" id="hf_s" value="0.5" step="0.1">
         </div>
         <div class="field">
-          <label>压水管沿程损失 <span class="unit">m</span></label>
+          <label for="hf_d">压水管沿程损失 <span class="unit">m</span></label>
           <input type="number" id="hf_d" value="3.0" step="0.1">
         </div>
         <div class="field">
-          <label>局部损失总和 <span class="unit">m</span></label>
+          <label for="hj">局部损失总和 <span class="unit">m</span></label>
           <input type="number" id="hj" value="1.5" step="0.1">
         </div>
         <div class="field">
-          <label>富余扬程（安全系数） <span class="unit">%</span></label>
+          <label for="H_margin">富余扬程（安全系数） <span class="unit">%</span></label>
           <input type="number" id="H_margin" value="10" step="1">
         </div>
       </div>
@@ -552,27 +546,28 @@
     <div class="section-title">③ 效率与电机</div>
     <div class="grid">
       <div class="field">
-        <label>泵效率 η_pump <span class="unit">%</span></label>
+        <label for="eta_pump">泵效率 η_pump <span class="unit">%</span></label>
         <input type="number" id="eta_pump" value="75" step="1">
+        <div class="helper" id="eta_hint" style="display:none;"></div>
       </div>
       <div class="field">
-        <label>传动效率 η_trans <span class="unit">%</span></label>
+        <label for="eta_trans">传动效率 η_trans <span class="unit">%</span></label>
         <input type="number" id="eta_trans" value="98" step="1">
       </div>
       <div class="field">
-        <label>电机效率 η_motor <span class="unit">%</span></label>
+        <label for="eta_motor">电机效率 η_motor <span class="unit">%</span></label>
         <input type="number" id="eta_motor" value="92" step="1">
       </div>
       <div class="field">
-        <label>电机功率储备系数 K</label>
+        <label for="K">电机功率储备系数 K</label>
         <input type="number" id="K" value="1.15" step="0.05">
       </div>
       <div class="field">
-        <label>日运行时间 <span class="unit">h/d</span></label>
+        <label for="hours">日运行时间 <span class="unit">h/d</span></label>
         <input type="number" id="hours" value="24" step="1">
       </div>
       <div class="field">
-        <label>电费单价 <span class="unit">元/kWh</span></label>
+        <label for="price">电费单价 <span class="unit">元/kWh</span></label>
         <input type="number" id="price" value="0.65" step="0.01">
       </div>
     </div>
@@ -580,21 +575,21 @@
     <div class="section-title">④ NPSH 汽蚀校核</div>
     <div class="grid">
       <div class="field">
-        <label>海拔高度 <span class="unit">m</span></label>
+        <label for="altitude">海拔高度 <span class="unit">m</span></label>
         <input type="number" id="altitude" value="0" step="50">
       </div>
       <div class="field">
-        <label>吸水几何高度 Hs <span class="unit">m</span></label>
+        <label for="Hs_geom">吸水几何高度 Hs <span class="unit">m</span></label>
         <input type="number" id="Hs_geom" value="3" step="0.5">
         <div class="helper">水面到泵中心线（吸上为正，倒灌为负）</div>
       </div>
       <div class="field">
-        <label>泵必需汽蚀余量 NPSHr <span class="unit">m</span></label>
+        <label for="NPSHr">泵必需汽蚀余量 NPSHr <span class="unit">m</span></label>
         <input type="number" id="NPSHr" value="3.5" step="0.1">
         <div class="helper">查泵样本或厂家提供</div>
       </div>
       <div class="field">
-        <label>汽蚀安全余量 <span class="unit">m</span></label>
+        <label for="NPSH_safe">汽蚀安全余量 <span class="unit">m</span></label>
         <input type="number" id="NPSH_safe" value="0.5" step="0.1">
       </div>
     </div>
@@ -602,15 +597,15 @@
     <div class="section-title">⑤ 并联/变频分析（选填）</div>
     <div class="grid">
       <div class="field">
-        <label>并联台数 n <span class="unit">台</span></label>
+        <label for="n_parallel">并联台数 n <span class="unit">台</span></label>
         <input type="number" id="n_parallel" value="2" step="1">
       </div>
       <div class="field">
-        <label>其中备用 <span class="unit">台</span></label>
+        <label for="n_backup">其中备用 <span class="unit">台</span></label>
         <input type="number" id="n_backup" value="1" step="1">
       </div>
       <div class="field">
-        <label>变频调速比 <span class="unit">%（相对额定转速）</span></label>
+        <label for="speed_ratio">变频调速比 <span class="unit">%（相对额定转速）</span></label>
         <input type="number" id="speed_ratio" value="100" step="5">
       </div>
     </div>
@@ -633,7 +628,7 @@
           <span><span class="result-value" id="r_hw">—</span><span class="result-unit">m</span></span>
         </div>
         <div class="result-row highlight-row">
-          <span class="result-label"><b>系统所需扬程 H（含 ${''}富余）</b></span>
+          <span class="result-label"><b>系统所需扬程 H（含富余）</b></span>
           <span><span class="result-value big" id="r_H">—</span><span class="result-unit">m</span></span>
         </div>
       </div>
@@ -713,6 +708,7 @@
           <span class="result-label">单泵电机功率</span>
           <span><span class="result-value" id="r_Pm_each">—</span><span class="result-unit">kW</span></span>
         </div>
+        <div class="check-box" id="checkParallel" style="display:none;"></div>
       </div>
 
       <div class="result-group" id="vfd_group" style="display:none;">
@@ -733,6 +729,7 @@
           <span class="result-label">节能率估算</span>
           <span><span class="result-value" id="r_save">—</span><span class="result-unit">%</span></span>
         </div>
+        <div class="check-box" id="checkVFD" style="display:none;"></div>
       </div>
 
       <div class="model-card">
@@ -752,23 +749,24 @@
       <h3>① 系统扬程组成</h3>
       <code>H = Hg + Hp + hw + H_margin</code>
       <p>Hg = z₂ − z₁（出水液面高 − 吸水液面高，m）<br>
-         Hp = (P₂ − P₁)/(ρ·g) × 100（两侧表压差换算成液柱，m）<br>
+         Hp = (P₂ − P₁)/(ρ·g) × 1000（两侧表压差 kPa 换算成液柱，m）<br>
          hw = Σhf + Σhj（沿程损失+局部损失）<br>
          H_margin：富余量，一般取总扬程的 5-15%。</p>
 
       <h3>② 功率计算</h3>
       <code>Pe = ρ·g·Q·H / 1000 / 3600  [kW]（水功率）</code>
       <code>Psh = Pe / η_pump / η_trans  [kW]（轴功率）</code>
-      <code>Pm = K · Psh / η_motor  [kW]（配套电机）</code>
+      <code>Pm = K · Psh  [kW]（配套电机，K 为储备系数）</code>
+      <code>P_in = Psh / η_motor  [kW]（电机输入电功率，用于电耗计算）</code>
       <p>简化公式（清水 ρ=1000, g=9.81）：</p>
       <code>P_e = Q·H / 367  [kW]  （Q in m³/h, H in m）</code>
 
       <h3>③ NPSH 汽蚀校核</h3>
-      <code>NPSHa = (Pa − Pv)/(ρ·g) × 100 − Hs − hf_s  [m]</code>
-      <p>Pa 大气压（按海拔），Pv 饱和蒸汽压（按水温），Hs 吸水几何高度（吸上为正），hf_s 吸水管水头损失。</p>
+      <code>NPSHa = (Pa + P₁ − Pv)/(ρ·g) × 1000 − Hs − hf_s  [m]</code>
+      <p>Pa 大气压（按海拔），P₁ 吸水池液面表压（开口水池为 0），Pv 饱和蒸汽压（按水温），Hs 吸水几何高度（吸上为正），hf_s 吸水管水头损失。</p>
       <code>NPSHa ≥ NPSHr + 安全余量（0.5~1.0 m）</code>
       <p><strong>最大允许吸水高度</strong>：</p>
-      <code>Hs_max = (Pa − Pv)/(ρ·g)·100 − NPSHr − hf_s − 安全余量</code>
+      <code>Hs_max = (Pa + P₁ − Pv)/(ρ·g)·1000 − NPSHr − hf_s − 安全余量</code>
 
       <h3>④ 泵相似律（变频调速预估）</h3>
       <p>对同一台泵在不同转速 n 下：</p>
@@ -795,8 +793,9 @@
         <tr><td>60</td><td>19.92</td></tr>
       </table>
 
-      <h3>⑥ 标准电机功率规格 (Y/Y2/YE3 系列)</h3>
-      <p>0.55、0.75、1.1、1.5、2.2、3.0、4.0、5.5、7.5、11、15、18.5、22、30、37、45、55、75、90、110、132、160、200、250、315、355、400、450、500 kW</p>
+      <h3>⑥ 标准电机功率规格 (Y/Y2/YE3 系列，GB/T 功率等级)</h3>
+      <p>0.37、0.55、0.75、1.1、1.5、2.2、3、4、5.5、7.5、11、15、18.5、22、30、37、45、55、75、90、110、132、160、185、200、220、250、280、315、355、400、450、500、560、630、710、800、900、1000 kW</p>
+      <p>按 Pm 向上取最近一档；超过 1000 kW 时按 100 kW 向上取整，须向厂家确认。鼓风机选型计算器使用同一档位表。</p>
 
       <h3>⑦ 常见场景推荐参数</h3>
       <table>
@@ -831,7 +830,7 @@
             <div class="brand-sub">WaterKit · by 登登科技</div>
           </div>
         </a>
-        <p class="footer-about">水处理工具箱(WaterKit)是海南登登科技咨询有限公司推出的水处理在线计算工具集合,由一线水处理工艺工程师开发维护。免费、无广告、持续更新。</p>
+        <p class="footer-about">水处理工具箱(WaterKit)是海南登登科技咨询有限公司推出的水处理在线计算工具集合,由一线水处理工艺工程师开发维护。免费、持续更新。</p>
       </div>
       <div class="footer-col">
         <h4>水力计算</h4>
@@ -848,7 +847,11 @@
           <li><a href="aeration-calculator.html">曝气量</a></li>
           <li><a href="sludge-production-calculator.html">污泥产量</a></li>
           <li><a href="dosing-calculator.html">加药量</a></li>
+          <li><a href="activated-sludge-process-calculator.html">活性污泥工艺</a></li>
+          <li><a href="mbbr-design.html">MBBR 工程设计</a></li>
+          <li><a href="mbr-design.html">MBR 工程设计</a></li>
           <li><a href="pump-selection-calculator.html">水泵选型</a></li>
+          <li><a href="blower-selection-calculator.html">鼓风机选型</a></li>
           <li><a href="water-quality-unit-converter.html">水质换算</a></li>
         </ul>
       </div>
@@ -883,9 +886,19 @@
   const num = id => parseFloat($(id).value) || 0;
 
   // 标准电机功率规格
-  const STD_MOTORS = [0.55, 0.75, 1.1, 1.5, 2.2, 3.0, 4.0, 5.5, 7.5,
-    11, 15, 18.5, 22, 30, 37, 45, 55, 75, 90, 110, 132, 160, 200, 250,
-    315, 355, 400, 450, 500, 560, 630, 710, 800, 900, 1000];
+  // 标准电机功率档位（GB/T 系列，与鼓风机选型计算器共用同一列表）
+  const STD_MOTORS = [0.37,0.55,0.75,1.1,1.5,2.2,3,4,5.5,7.5,11,15,18.5,22,30,37,45,55,75,90,110,132,160,185,200,220,250,280,315,355,400,450,500,560,630,710,800,900,1000];
+  // 读取原始数值（空/非数字返回 NaN，用于校验）
+  const raw = id => parseFloat($(id).value);
+
+  const FLUID_NAMES = {clean_water:'清水', sewage:'污水', sludge:'污泥', seawater:'海水', chemical:'化学药液'};
+  const PUMP_NAMES = {centrifugal:'离心泵', submerged:'潜水泵', axial:'轴流泵', screw:'螺杆泵', dosing:'计量泵'};
+  function setEtaHint(txt) {
+    const h = $('eta_hint');
+    if (!h) return;
+    h.textContent = txt || '';
+    h.style.display = txt ? 'block' : 'none';
+  }
 
   // 介质类型默认参数
   function updateFluid() {
@@ -900,6 +913,7 @@
     if (defaults[t]) {
       $('rho').value = defaults[t].rho;
       $('eta_pump').value = defaults[t].eta_pump;
+      setEtaHint(`已按介质「${FLUID_NAMES[t]}」取默认效率 ${defaults[t].eta_pump}%（会覆盖泵类型给出的默认值，可手动修改）`);
     }
     calc();
   }
@@ -917,6 +931,7 @@
     if (defaults[t]) {
       $('eta_pump').value = defaults[t].eta_pump;
       $('NPSHr').value = defaults[t].NPSHr;
+      setEtaHint(`已按泵类型「${PUMP_NAMES[t]}」取默认效率 ${defaults[t].eta_pump}%、NPSHr ${defaults[t].NPSHr} m（会覆盖介质类型给出的默认效率，可手动修改）`);
     }
     calc();
   }
@@ -934,10 +949,61 @@
   // 选最近的标准电机规格（向上圆整）
   function pickStdMotor(P) {
     for (let m of STD_MOTORS) if (m >= P) return m;
-    return STD_MOTORS[STD_MOTORS.length - 1];
+    return Math.ceil(P / 100) * 100;  // 超出档位表，按 100 kW 向上取整，须厂家确认
+  }
+
+  // 电机档位显示：< 1 kW 保留原值（0.37/0.55/0.75），其余保留 1 位小数
+  const fmtMotor = m => m < 1 ? String(m) : m.toFixed(1);
+
+  // 输入校验：不合格时结果区显示“—”并在 NPSH 校核框提示
+  function validateInputs() {
+    const rules = [
+      ['Q',         v => v > 0,              '请输入大于 0 的设计流量 Q'],
+      ['rho',       v => v > 0,              '请输入大于 0 的介质密度 ρ'],
+      ['H_margin',  v => v >= 0,             '富余扬程不能为负值'],
+      ['eta_pump',  v => v > 0 && v <= 100,  '泵效率 η_pump 应在 0–100% 之间（大于 0）'],
+      ['eta_trans', v => v > 0 && v <= 100,  '传动效率 η_trans 应在 0–100% 之间（大于 0）'],
+      ['eta_motor', v => v > 0 && v <= 100,  '电机效率 η_motor 应在 0–100% 之间（大于 0）'],
+      ['K',         v => v > 0,              '请输入大于 0 的电机功率储备系数 K'],
+      ['hours',     v => v >= 0 && v <= 24,  '日运行时间应在 0–24 h 之间'],
+      ['price',     v => v >= 0,             '电费单价不能为负值'],
+      ['NPSHr',     v => v >= 0,             '必需汽蚀余量 NPSHr 不能为负值'],
+      ['NPSH_safe', v => v >= 0,             '汽蚀安全余量不能为负值'],
+      ['n_parallel',v => v >= 1,             '并联台数应不少于 1 台'],
+      ['n_backup',  v => v >= 0,             '备用台数不能为负值'],
+      ['speed_ratio', v => v > 0,            '请输入大于 0 的变频调速比'],
+    ];
+    const errs = [];
+    rules.forEach(([id, ok, msg]) => {
+      const el = $(id);
+      const v = raw(id);
+      const bad = isNaN(v) || !ok(v);
+      el.classList.toggle('invalid', bad);
+      if (bad) errs.push(msg);
+    });
+    // 温度限定在 Tetens 蒸汽压公式的合理适用范围内
+    const T = raw('T');
+    const badT = isNaN(T) || T <= -50 || T >= 200;
+    $('T').classList.toggle('invalid', badT);
+    if (badT) errs.push('介质温度 T 应在 -50 ~ 200 ℃ 之间');
+    return errs;
+  }
+
+  function showInvalid(errs) {
+    document.querySelectorAll('.results [id^="r_"]').forEach(el => { el.textContent = '—'; });
+    $('r_suggest').textContent = 'Q = — m³/h, H = — m';
+    $('r_suggest_desc').textContent = '输入有误，请先修正标红的参数。';
+    $('parallel_group').style.display = 'none';
+    $('vfd_group').style.display = 'none';
+    const cbox = $('checkNPSH');
+    cbox.className = 'check-box check-bad';
+    cbox.textContent = '✗ ' + errs.join('；');
   }
 
   function calc() {
+    const errs = validateInputs();
+    if (errs.length) { showInvalid(errs); return; }
+
     const Q = num('Q');  // m³/h
     const rho = num('rho');
     const T = num('T');
@@ -961,7 +1027,8 @@
     // 功率
     const Pe = rho * g * (Q/3600) * H / 1000;  // kW
     const Psh = eta_pump > 0 && eta_trans > 0 ? Pe / eta_pump / eta_trans : 0;
-    const Pm = eta_motor > 0 ? K * Psh / eta_motor : 0;
+    const Pm = K * Psh;  // 配套电机功率（K 为储备系数，不再除以电机效率）
+    const P_in = eta_motor > 0 ? Psh / eta_motor : 0;  // 电机输入电功率 kW
     const Pm_std = pickStdMotor(Pm);
 
     // 并联
@@ -973,13 +1040,14 @@
     // 为了给每台泵算功率，按单泵流量重算（扬程H在并联中基本不变）
     const Pe_each = rho * g * (Q_each/3600) * H / 1000;
     const Psh_each = eta_pump > 0 && eta_trans > 0 ? Pe_each / eta_pump / eta_trans : 0;
-    const Pm_each = eta_motor > 0 ? K * Psh_each / eta_motor : 0;
+    const Pm_each = K * Psh_each;
+    const P_in_each = eta_motor > 0 ? Psh_each / eta_motor : 0;  // 单泵实际输入电功率 kW
     const Pm_each_std = pickStdMotor(Pm_each);
 
-    // 运行电费（总功率按n_work台工作泵）
+    // 运行电费（按 n_work 台工作泵的实际输入电功率，而非铭牌功率）
     const hours = num('hours');
     const price = num('price');
-    const total_power = Pm_each_std * n_work;  // kW
+    const total_power = P_in_each * n_work;  // kW
     const day_kwh = total_power * hours;
     const year_cost = day_kwh * 365 * price / 10000;  // 万元
     const unit_cost = Q > 0 ? (total_power * price) / Q : 0;  // 元/m³
@@ -993,16 +1061,18 @@
     const hf_s = num('hf_s');
     const NPSHr = num('NPSHr');
     const NPSH_safe = num('NPSH_safe');
-    const NPSHa = (Pa - Pv) * 1000 / (rho * g) - Hs - hf_s;
-    const Hs_max = (Pa - Pv) * 1000 / (rho * g) - NPSHr - hf_s - NPSH_safe;
+    // 计入吸水池液面表压 P1（开口水池 P1 = 0）
+    const NPSHa = (Pa + P1 - Pv) * 1000 / (rho * g) - Hs - hf_s;
+    const Hs_max = (Pa + P1 - Pv) * 1000 / (rho * g) - NPSHr - hf_s - NPSH_safe;
     const NPSH_margin = NPSHa - NPSHr;
 
     // 变频分析
     const speed_ratio = num('speed_ratio') / 100;
     const Q_vfd = Q * speed_ratio;
     const H_vfd = H * speed_ratio * speed_ratio;
-    const P_vfd = Pm_std * speed_ratio * speed_ratio * speed_ratio;
-    const save = Pm_std > 0 ? (1 - P_vfd/Pm_std) * 100 : 0;
+    const vfd_below_static = H_vfd < Hg;  // 变频后扬程低于静扬程，无出流
+    const P_vfd = Psh * speed_ratio * speed_ratio * speed_ratio;  // 基数为轴功率
+    const save = Psh > 0 ? (1 - P_vfd/Psh) * 100 : 0;
 
     // 渲染结果
     $('r_Hg').textContent = Hg.toFixed(2);
@@ -1012,7 +1082,7 @@
     $('r_Pe').textContent = Pe.toFixed(2);
     $('r_Psh').textContent = Psh.toFixed(2);
     $('r_Pm').textContent = Pm.toFixed(2);
-    $('r_Pm_std').textContent = Pm_std.toFixed(1);
+    $('r_Pm_std').textContent = fmtMotor(Pm_std);
 
     $('r_ekwh').textContent = ekwh.toFixed(3);
     $('r_day_kwh').textContent = day_kwh.toFixed(0);
@@ -1038,11 +1108,20 @@
     }
 
     // 并联显示
-    if (n_parallel > 1) {
+    const backup_overflow = n_backup > 0 && n_backup >= n_parallel;
+    if (n_parallel > 1 || backup_overflow) {
       $('parallel_group').style.display = 'block';
       $('r_n_work').textContent = `${n_work} （总 ${n_parallel} 台，含 ${n_backup} 台备用）`;
       $('r_Q_each').textContent = Q_each.toFixed(1);
-      $('r_Pm_each').textContent = `${Pm_each.toFixed(2)} → ${Pm_each_std.toFixed(1)} (标准)`;
+      $('r_Pm_each').textContent = `${Pm_each.toFixed(2)} → ${fmtMotor(Pm_each_std)} (标准)`;
+      const pbox = $('checkParallel');
+      if (backup_overflow) {
+        pbox.style.display = 'block';
+        pbox.className = 'check-box check-warn';
+        pbox.textContent = `⚠ 备用台数（${n_backup}）不少于并联台数（${n_parallel}），已按 1 台工作计算，请核对台数`;
+      } else {
+        pbox.style.display = 'none';
+      }
     } else {
       $('parallel_group').style.display = 'none';
     }
@@ -1050,10 +1129,22 @@
     // 变频显示
     if (Math.abs(speed_ratio - 1) > 0.001) {
       $('vfd_group').style.display = 'block';
-      $('r_Q_vfd').textContent = Q_vfd.toFixed(1);
-      $('r_H_vfd').textContent = H_vfd.toFixed(2);
-      $('r_P_vfd').textContent = P_vfd.toFixed(2);
-      $('r_save').textContent = save.toFixed(1);
+      const vbox = $('checkVFD');
+      if (vfd_below_static) {
+        $('r_Q_vfd').textContent = '— 已低于静扬程，无出流';
+        $('r_H_vfd').textContent = `${H_vfd.toFixed(2)} < Hg ${Hg.toFixed(2)}`;
+        $('r_P_vfd').textContent = '—';
+        $('r_save').textContent = '—';
+        vbox.style.display = 'block';
+        vbox.className = 'check-box check-bad';
+        vbox.innerHTML = `✗ 变频后扬程 H' (${H_vfd.toFixed(2)} m) 已低于静扬程 Hg (${Hg.toFixed(2)} m)，泵无法出流，相似律预估无效，请提高调速比`;
+      } else {
+        $('r_Q_vfd').textContent = Q_vfd.toFixed(1);
+        $('r_H_vfd').textContent = H_vfd.toFixed(2);
+        $('r_P_vfd').textContent = P_vfd.toFixed(2);
+        $('r_save').textContent = save.toFixed(1);
+        vbox.style.display = 'none';
+      }
     } else {
       $('vfd_group').style.display = 'none';
     }
@@ -1095,7 +1186,19 @@
 Pa = ${$('r_Pa').textContent} kPa, Pv = ${$('r_Pv').textContent} kPa
 NPSHa = ${$('r_NPSHa').textContent} m, NPSHr = ${num('NPSHr')} m
 最大允许吸水高度 = ${$('r_Hs_max').textContent} m
-
+${$('checkNPSH').textContent}
+${$('parallel_group').style.display !== 'none' ? `
+【并联分析】
+工作泵数量 = ${$('r_n_work').textContent} 台
+单泵流量 = ${$('r_Q_each').textContent} m³/h
+单泵电机功率 = ${$('r_Pm_each').textContent} kW${$('checkParallel').style.display !== 'none' ? '\n' + $('checkParallel').textContent : ''}
+` : ''}${$('vfd_group').style.display !== 'none' ? `
+【变频运行（调速比 ${num('speed_ratio')}%）】
+Q' = ${$('r_Q_vfd').textContent} m³/h
+H' = ${$('r_H_vfd').textContent} m
+P' = ${$('r_P_vfd').textContent} kW
+节能率 = ${$('r_save').textContent} %${$('checkVFD').style.display !== 'none' ? '\n' + $('checkVFD').textContent : ''}
+` : ''}
 【选型建议】
 ${$('r_suggest').textContent}`;
     navigator.clipboard.writeText(txt).then(() => {
@@ -1124,6 +1227,7 @@ ${$('r_suggest').textContent}`;
     el.addEventListener('input', calc);
     el.addEventListener('change', calc);
   });
+  $('eta_pump').addEventListener('input', () => setEtaHint('手动输入的泵效率；切换介质或泵类型会重新覆盖此值'));
 
   calc();
 </script>

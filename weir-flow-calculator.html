@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>堰流计算器 | 水处理工具箱</title>
+<title>堰流计算器 | 水处理工具箱 · WaterKit</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230891b2'/%3E%3Ctext x='16' y='22.5' font-size='18' font-weight='700' text-anchor='middle' fill='white' font-family='Arial,sans-serif'%3EW%3C/text%3E%3C/svg%3E">
+<meta name="description" content="在线堰流计算：矩形薄壁堰、三角堰、Cipoletti 梯形堰、宽顶堰，已知水头求流量或已知流量求水头，含侧收缩、行近流速与淹没出流修正。">
+<link rel="canonical" href="https://waterkit.cn/weir-flow-calculator.html">
 <style>
   :root {
     --brand: #0891b2;
@@ -21,8 +24,11 @@
     --border-soft: #f1f5f9;
   }
   body {
-    background: var(--bg) !important;
-    padding: 0 !important;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: #1f2937;
+    line-height: 1.6;
+    padding: 0;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -156,6 +162,8 @@
   .footer-bottom a:hover { color: var(--brand); }
 
   /* 工具内部的小footer */
+  .invalid { border-color: #ef4444 !important; background: #fef2f2 !important; }
+
   .tool-inner-footer {
     text-align: center;
     padding: 16px;
@@ -165,13 +173,6 @@
 
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: #f5f7fa;
-    color: #1f2937;
-    line-height: 1.6;
-    padding: 16px;
-  }
   .container {
     max-width: 860px;
     margin: 0 auto;
@@ -453,15 +454,8 @@
     color: #92400e;
     border-left: 3px solid #f59e0b;
   }
-  footer {
-    text-align: center;
-    padding: 16px;
-    font-size: 12px;
-    color: #9ca3af;
-  }
   @media (max-width: 480px) {
     .main-wrap { padding: 8px; }
-    ..main-wrap { padding: 16px; }
     header.tool-header { padding: 18px; }
     header.tool-header h1 { font-size: 19px; }
     .result-value { font-size: 17px; }
@@ -537,13 +531,13 @@
 
       <!-- 矩形堰参数 -->
       <div class="field weir-rect weir-trap weir-broad">
-        <label>堰宽 b <span class="unit">m</span></label>
+        <label for="b">堰宽 b <span class="unit">m</span></label>
         <input type="number" id="b" value="1.0" step="0.1">
       </div>
 
       <!-- 三角堰参数 -->
       <div class="field weir-tri" style="display:none;">
-        <label>顶角 θ <span class="unit">°</span></label>
+        <label for="theta">顶角 θ <span class="unit">°</span></label>
         <select id="theta" onchange="calc()">
           <option value="90" selected>90° (标准)</option>
           <option value="60">60°</option>
@@ -555,39 +549,49 @@
 
       <!-- 梯形堰说明（Cipoletti 固定1:4边坡） -->
       <div class="field weir-trap" style="display:none;">
-        <label>边坡 <span class="unit">1:4 (Cipoletti)</span></label>
-        <input type="text" value="1:4 (固定)" disabled>
+        <label for="trap_slope">边坡 <span class="unit">1:4 (Cipoletti)</span></label>
+        <input type="text" id="trap_slope" value="1:4 (固定)" disabled>
       </div>
 
       <!-- 宽顶堰宽度（堰顶长度 δ） -->
       <div class="field weir-broad" style="display:none;">
-        <label>堰顶长度 δ <span class="unit">m</span></label>
+        <label for="delta">堰顶长度 δ <span class="unit">m</span></label>
         <input type="number" id="delta" value="1.5" step="0.1">
+      </div>
+
+      <!-- 宽顶堰进口形式 -->
+      <div class="field weir-broad" style="display:none;">
+        <label for="broad_inlet">堰顶进口形式</label>
+        <select id="broad_inlet">
+          <option value="square" selected>直角进口</option>
+          <option value="round">圆角进口</option>
+        </select>
+        <div class="helper">直角按 δ/H 分档取 m；圆角简化取 m = 0.36</div>
       </div>
 
       <!-- 共用:水头H -->
       <div class="field" id="f_H">
-        <label>堰上水头 H <span class="unit">m</span></label>
+        <label for="H">堰上水头 H <span class="unit">m</span></label>
         <input type="number" id="H" value="0.3" step="0.01">
         <div class="helper">上游水面超过堰顶的高度</div>
       </div>
 
       <!-- 共用:流量Q -->
       <div class="field" id="f_Q">
-        <label>流量 Q <span class="unit">m³/s</span></label>
+        <label for="Q">流量 Q <span class="unit">m³/s</span></label>
         <input type="number" id="Q" value="0.4" step="0.05">
       </div>
 
       <!-- 堰高P -->
       <div class="field">
-        <label>堰高 P <span class="unit">m</span></label>
+        <label for="P">堰高 P <span class="unit">m</span></label>
         <input type="number" id="P" value="0.5" step="0.1">
         <div class="helper">上游渠底到堰顶的高度</div>
       </div>
 
       <!-- 上游渠宽 -->
       <div class="field weir-rect weir-trap weir-broad">
-        <label>上游渠宽 B <span class="unit">m</span></label>
+        <label for="B">上游渠宽 B <span class="unit">m</span></label>
         <input type="number" id="B" value="2.0" step="0.1">
         <div class="helper">B ≥ b,B = b 时为无侧收缩</div>
       </div>
@@ -601,7 +605,7 @@
       </label>
       <div class="grid" id="submerged_params" style="display:none; margin-top:10px;">
         <div class="field">
-          <label>下游水深 h_s <span class="unit">m</span></label>
+          <label for="hs">下游水深 h_s <span class="unit">m</span></label>
           <input type="number" id="hs" value="0.1" step="0.05">
           <div class="helper">下游水面到堰顶的高度</div>
         </div>
@@ -627,7 +631,7 @@
           <span><span class="result-value big" id="r_H">—</span><span class="result-unit">m</span></span>
         </div>
         <div class="result-row">
-          <span class="result-label">堰顶水深（= H）</span>
+          <span class="result-label">堰上水头 H</span>
           <span><span class="result-value" id="r_H2">—</span><span class="result-unit">mm</span></span>
         </div>
       </div>
@@ -647,7 +651,7 @@
           <span><span class="result-value" id="r_sigma">—</span><span class="result-unit">—</span></span>
         </div>
         <div class="result-row">
-          <span class="result-label">堰口流速 v</span>
+          <span class="result-label">名义流速 Q/(bH)</span>
           <span><span class="result-value" id="r_v">—</span><span class="result-unit">m/s</span></span>
         </div>
         <div class="result-row">
@@ -660,6 +664,7 @@
         <div class="result-group-title">适用性校核</div>
         <div class="check-box" id="check_H">校核中...</div>
         <div class="check-box" id="check_sub">校核中...</div>
+        <div class="check-box" id="check_delta" style="display:none;"></div>
       </div>
     </div>
 
@@ -676,14 +681,18 @@
       <p>其中 m₀ 为流量系数,ε 为侧收缩系数,σ 为淹没系数（自由出流时=1）。</p>
       <p><strong>Rehbock 流量系数</strong>（无侧收缩,B=b）：</p>
       <code>m₀ = 0.403 + 0.053 · H/P + 0.0007/H</code>
-      <p>适用条件：0.03 ≤ H ≤ 0.75 m;H/P ≤ 5;P ≥ 0.1 m。</p>
+      <p>适用条件：0.03 ≤ H ≤ 0.75 m;H/P ≤ 1（ISO 1438）;P ≥ 0.1 m。H/P &gt; 1 时工具提示"超出 Rehbock 适用范围"。</p>
       <p><strong>有侧收缩（B &gt; b）</strong>：采用 Francis 修正 或 ε 系数,工具中取：</p>
-      <code>ε = 1 − 0.1·n·H/b（n 为每边收缩数）</code>
+      <code>ε = 1 − 0.1·n·H/b（n 为收缩边数,两侧收缩取 n = 2;工具中 ε 下限取 0.5）</code>
+      <p>注:ε 下限 0.5 为经验取值,以规范 / 手册原文为准。</p>
+      <p>上游渠宽 B 不得小于堰宽 b;B = b 时 ε = 1。</p>
 
-      <h3>② 三角堰（V形堰,Kindsvater-Shen）</h3>
-      <code>Q = (8/15) · C_d · tan(θ/2) · √(2g) · H^(5/2)</code>
-      <p>90° 三角堰是量水最常用的（小流量精度高）。C_d ≈ 0.585（标准 Thomson 公式）。</p>
-      <code>Q = 1.4 · H^(5/2)   (90° 简化式, Q m³/s, H m)</code>
+      <h3>② 三角堰（V形堰,Kindsvater-Shen 公式）</h3>
+      <code>Q = (8/15) · C_e · tan(θ/2) · √(2g) · (H + k_h)^(5/2)   （SI 单位）</code>
+      <p>C_e 为有效流量系数,k_h 为水头修正值,均随顶角 θ（°）变化（USBR《Water Measurement Manual》/ ISO 1438 曲线的多项式拟合,完全收缩 V 形堰）：</p>
+      <code>C_e = 0.607165052 − 0.000874466963·θ + 6.10393334×10⁻⁶·θ²</code>
+      <code>k_h [ft] = 0.0144902648 − 0.00033955535·θ + 3.29819003×10⁻⁶·θ² − 1.06215442×10⁻⁸·θ³;k_h [m] = k_h [ft] × 0.3048</code>
+      <p>90° 时 C_e ≈ 0.578、k_h ≈ 0.89 mm,Q ≈ 1.365 · (H + 0.00089)^(5/2)。拟合式适用 20° ≤ θ ≤ 100°,超出时工具给出提示（120° 为外推,仅供参考）。</p>
       <p>适用：0.05 ≤ H ≤ 0.38 m; P ≥ 2H; 上游渠宽 ≥ 3H。</p>
 
       <h3>③ 梯形堰 Cipoletti（边坡 1:4）</h3>
@@ -692,21 +701,29 @@
       <p>即 m₀ ≈ 0.42,ε ≈ 1.0（自动补偿）。适用：0.06 ≤ H ≤ 0.60 m;b ≥ 3H;P ≥ 2H。</p>
 
       <h3>④ 宽顶堰</h3>
-      <code>Q = m · b · √(2g) · H₀^(3/2)</code>
-      <p>其中 H₀ = H + v₀²/(2g) 为包含行近流速头的全水头,m 为流量系数:</p>
+      <code>Q = m · ε · b · √(2g) · H₀^(3/2)</code>
+      <p>其中 H₀ = H + v₀²/(2g) 为包含行近流速头的全水头（v₀ = Q/[B·(P+H)],迭代中 Q 同样计入 m·ε,迭代 10 次求解,使 H₀ 与最终 Q 自洽）,ε 为侧收缩系数（ε = 1 − 0.2·H/b,下限 0.7,仅 B &gt; b 时计入;经验值,以规范 / 手册原文为准）,m 为流量系数,按"堰顶进口形式"取值:</p>
       <table>
-        <tr><th>δ/H</th><th>堰顶边缘形式</th><th>m 值</th></tr>
-        <tr><td>2.5-4</td><td>直角边</td><td>0.32-0.35</td></tr>
-        <tr><td>2.5-4</td><td>圆角修圆</td><td>0.36-0.385</td></tr>
-        <tr><td>2.5-10</td><td>一般宽顶堰</td><td>0.32-0.36</td></tr>
+        <tr><th>进口形式</th><th>δ/H</th><th>工具取 m</th><th>手册常用范围</th></tr>
+        <tr><td>直角进口</td><td>&lt; 4</td><td>0.36</td><td rowspan="3">0.32-0.35</td></tr>
+        <tr><td>直角进口</td><td>4-10</td><td>0.34</td></tr>
+        <tr><td>直角进口</td><td>≥ 10</td><td>0.32</td></tr>
+        <tr><td>圆角进口</td><td>2.5-10</td><td>0.36（简化为常数）</td><td>0.36-0.385（随 r/H 增大）</td></tr>
       </table>
-      <p>本工具按 δ/H 判别,默认取 0.36（圆角修圆）。</p>
+      <p>默认按直角进口计算。圆角进口的 m 实际随圆角半径 r/H 变化,工具简化取 0.36,偏于保守。表中工具取值为参考值,以规范 / 手册原文为准。</p>
+      <p>宽顶堰适用范围 2.5 ≤ δ/H ≤ 10:δ/H &lt; 2.5 不属宽顶堰,宜按实用堰/薄壁堰计算;δ/H &gt; 10 属长堰,需计入堰顶沿程水头损失,本式会高估流量。</p>
 
       <h3>⑤ 淹没出流修正</h3>
       <p>当下游水位 h_s &gt; 0（下游水面高于堰顶）时:</p>
-      <code>h_s / H_0 &gt; 0.15（宽顶堰） 或 h_s/H &gt; 临界值（薄壁堰）,进入淹没状态</code>
-      <p>淹没系数 σ 查表或用经验公式计算,本工具采用:</p>
-      <code>σ = (1 − (h_s/H)ⁿ)^0.5    (简化经验式)</code>
+      <code>宽顶堰:h_s / H₀ &gt; 0.8 进入淹没状态;薄壁堰:h_s &gt; 0 即按 Villemonte 式修正</code>
+      <p>注:薄壁堰真正形成淹没出流,还需下游水位高于堰顶且 z/P &lt; 0.7（z 为上下游水位差）;工具在 h_s &gt; 0 时即按淹没修正,偏于保守。</p>
+      <p><strong>薄壁堰（矩形 / 三角 / 梯形）</strong>采用 Villemonte 公式:</p>
+      <code>σ = [1 − (h_s/H)ⁿ]^0.385    (矩形、梯形堰 n = 1.5;三角堰 n = 2.5)</code>
+      <p><strong>宽顶堰</strong>按 h_s/H₀ 查表（线性插值）,h_s/H₀ ≤ 0.8 时 σ = 1（表值为经验值,以规范 / 手册原文为准）:</p>
+      <table>
+        <tr><th>h_s/H₀</th><td>0.80</td><td>0.85</td><td>0.90</td><td>0.95</td><td>1.00</td></tr>
+        <tr><th>σ</th><td>1.00</td><td>0.96</td><td>0.84</td><td>0.65</td><td>0</td></tr>
+      </table>
 
       <h3>⑥ 常见应用场景</h3>
       <table>
@@ -741,7 +758,7 @@
             <div class="brand-sub">WaterKit · by 登登科技</div>
           </div>
         </a>
-        <p class="footer-about">水处理工具箱(WaterKit)是海南登登科技咨询有限公司推出的水处理在线计算工具集合,由一线水处理工艺工程师开发维护。免费、无广告、持续更新。</p>
+        <p class="footer-about">水处理工具箱(WaterKit)是海南登登科技咨询有限公司推出的水处理在线计算工具集合,由一线水处理工艺工程师开发维护。免费、持续更新。</p>
       </div>
       <div class="footer-col">
         <h4>水力计算</h4>
@@ -758,7 +775,11 @@
           <li><a href="aeration-calculator.html">曝气量</a></li>
           <li><a href="sludge-production-calculator.html">污泥产量</a></li>
           <li><a href="dosing-calculator.html">加药量</a></li>
+          <li><a href="activated-sludge-process-calculator.html">活性污泥工艺</a></li>
+          <li><a href="mbbr-design.html">MBBR 工程设计</a></li>
+          <li><a href="mbr-design.html">MBR 工程设计</a></li>
           <li><a href="pump-selection-calculator.html">水泵选型</a></li>
+          <li><a href="blower-selection-calculator.html">鼓风机选型</a></li>
           <li><a href="water-quality-unit-converter.html">水质换算</a></li>
         </ul>
       </div>
@@ -837,7 +858,7 @@
     if (weir === 'rect') {
       const b = num('b'), B = num('B'), P = num('P');
       // Rehbock 流量系数
-      const m0 = 0.403 + 0.053 * H / Math.max(P, 0.001) + 0.0007 / Math.max(H, 0.001);
+      const m0 = 0.403 + 0.053 * H / P + 0.0007 / Math.max(H, 0.001);
       // 侧收缩
       let eps = 1;
       if (B > b) {
@@ -850,13 +871,16 @@
     }
 
     if (weir === 'tri') {
-      const theta = num('theta') * Math.PI / 180;
-      const Cd = 0.585;  // 标准三角堰
-      const Q = (8/15) * Cd * Math.tan(theta/2) * Math.sqrt(2*g) * Math.pow(H, 2.5);
+      // Kindsvater-Shen（USBR / ISO 1438）:Ce、kh 随顶角 θ（°）的多项式拟合,适用 20°–100°
+      const thDeg = num('theta');
+      const theta = thDeg * Math.PI / 180;
+      const Cd = 0.607165052 - 0.000874466963 * thDeg + 6.10393334e-6 * thDeg * thDeg;
+      const kh = (0.0144902648 - 0.00033955535 * thDeg + 3.29819003e-6 * thDeg * thDeg - 1.06215442e-8 * Math.pow(thDeg, 3)) * 0.3048; // ft → m
+      const Q = (8/15) * Cd * Math.tan(theta/2) * Math.sqrt(2*g) * Math.pow(H + kh, 2.5);
       // 流速按等效矩形估算
       const area_eq = Math.tan(theta/2) * H * H;
       const v = area_eq > 0 ? Q / area_eq : 0;
-      return {Q, m0: Cd, eps: 1, v};
+      return {Q, m0: Cd, eps: 1, v, kh};
     }
 
     if (weir === 'trap') {
@@ -874,23 +898,25 @@
     if (weir === 'broad') {
       const b = num('b'), delta = num('delta'), B = num('B'), P = num('P');
       // 流量系数按 δ/H 判断
+      // 直角进口按 δ/H 分档;圆角进口简化取常数 0.36（实际随 r/H 变化）
       let m0;
       const ratio = delta / Math.max(H, 0.001);
-      if (ratio < 2) m0 = 0.36;
+      if ($('broad_inlet').value === 'round') m0 = 0.36;
       else if (ratio < 4) m0 = 0.36;
       else if (ratio < 10) m0 = 0.34;
       else m0 = 0.32;
 
-      // 考虑行近流速:迭代求解
+      // 侧收缩（经验式,先算出供行近流速迭代使用）
+      let eps = 1;
+      if (B > b) eps = Math.max(0.7, 1 - 0.1 * 2 * H / Math.max(b, 0.001));
+
+      // 考虑行近流速:迭代求解（Q_tmp 计入 ε,使 H₀ 与最终 Q 自洽）
       let H0 = H, v0 = 0;
       for (let k = 0; k < 10; k++) {
-        const Q_tmp = m0 * b * Math.sqrt(2*g) * Math.pow(H0, 1.5);
+        const Q_tmp = m0 * eps * b * Math.sqrt(2*g) * Math.pow(H0, 1.5);
         v0 = B > 0 && (P+H) > 0 ? Q_tmp / (B * (P + H)) : 0;
         H0 = H + v0*v0/(2*g);
       }
-      // 侧收缩
-      let eps = 1;
-      if (B > b) eps = Math.max(0.7, 1 - 0.1 * 2 * H / Math.max(b, 0.001));
 
       const Q = m0 * eps * b * Math.sqrt(2*g) * Math.pow(H0, 1.5);
       const v = b > 0 ? Q / (b * H) : 0;
@@ -900,29 +926,58 @@
     return {Q:0, m0:0, eps:1, v:0};
   }
 
-  // 淹没系数
-  function submergenceSigma(H) {
+  // 淹没系数（w 为堰型;宽顶堰可传入全水头 H0,缺省时自动计算）
+  function submergenceSigma(H, w, H0) {
     if (!$('submerged').checked) return 1;
+    w = w || weir;
     const hs = num('hs');
     if (hs <= 0) return 1;
-    if (hs >= H) return 0.1; // 严重淹没
-    // 简化经验式
+
+    if (w === 'broad') {
+      // 宽顶堰:按 hs/H0 查表,≤0.8 不淹没;>0.8 线性插值
+      if (H0 === undefined) H0 = (Q_free(H).H0) || H;
+      const ratio = hs / Math.max(H0, 1e-9);
+      if (ratio <= 0.8) return 1;
+      if (ratio >= 1) return 0;
+      const tbl = [[0.80,1.00],[0.85,0.96],[0.90,0.84],[0.95,0.65],[1.0,0]];
+      for (let i = 0; i < tbl.length - 1; i++) {
+        const [x1,y1] = tbl[i], [x2,y2] = tbl[i+1];
+        if (ratio >= x1 && ratio <= x2) return y1 + (y2 - y1) * (ratio - x1) / (x2 - x1);
+      }
+      return 0;
+    }
+
+    // 薄壁堰:Villemonte 公式 σ = [1 − (hs/H)^n]^0.385,矩形/梯形 n=1.5,三角 n=2.5
+    if (hs >= H) return 0;
+    const n = (w === 'tri') ? 2.5 : 1.5;
     const ratio = hs / H;
-    return Math.sqrt(Math.max(0.1, 1 - Math.pow(ratio, 3)));
+    return Math.pow(1 - Math.pow(ratio, n), 0.385);
   }
 
   // 已知 Q 求 H（二分法）
   function H_from_Q(Q_target) {
-    let lo = 0.001, hi = 3.0;
+    let lo = 0.001, hi = H_SEARCH_MAX;
     for (let k = 0; k < 80; k++) {
       const mid = (lo + hi) / 2;
       const r = Q_free(mid);
-      const sigma = submergenceSigma(mid);
+      const sigma = submergenceSigma(mid, weir, r.H0);
       const q = r.Q * sigma;
       if (q < Q_target) lo = mid; else hi = mid;
       if (hi - lo < 1e-6) break;
     }
     return (lo + hi) / 2;
+  }
+  const H_SEARCH_MAX = 3.0;
+
+  function clearResults(msg) {
+    ['r_Q','r_Q_h','r_H','r_H2','r_m0','r_eps','r_sigma','r_v','r_v0'].forEach(id => $(id).textContent = '—');
+    const ck1 = $('check_H');
+    ck1.className = 'check-box check-bad';
+    ck1.innerHTML = `✗ <b>输入无效</b> · ${msg}`;
+    const ck2 = $('check_sub');
+    ck2.className = 'check-box check-info';
+    ck2.innerHTML = 'ℹ 请先修正输入参数。';
+    $('check_delta').style.display = 'none';
   }
 
   // ============ 绘制示意图 ============
@@ -1034,10 +1089,31 @@
   function calc() {
     let H_val, Q_val;
 
+    // ============ 输入校验 ============
+    document.querySelectorAll('.invalid').forEach(el => el.classList.remove('invalid'));
+    const bad = [];
+    const need = (id, name) => { if (!(num(id) > 0)) { $(id).classList.add('invalid'); bad.push(`请输入大于 0 的${name}`); } };
+    if (mode === 'Q') need('H', '堰上水头 H'); else need('Q', '流量 Q');
+    need('P', '堰高 P');
+    if (weir !== 'tri') {
+      need('b', '堰宽 b');
+      need('B', '上游渠宽 B');
+      if (num('b') > 0 && num('B') > 0 && num('B') < num('b')) {
+        $('B').classList.add('invalid');
+        bad.push('上游渠宽 B 不得小于堰宽 b（B = b 为无侧收缩）');
+      }
+    }
+    if (weir === 'broad') need('delta', '堰顶长度 δ');
+    if (bad.length) {
+      clearResults(bad.join(';') + '。');
+      drawWeir();
+      return;
+    }
+
     if (mode === 'Q') {
       H_val = num('H');
       const r = Q_free(H_val);
-      const sigma = submergenceSigma(H_val);
+      const sigma = submergenceSigma(H_val, weir, r.H0);
       Q_val = r.Q * sigma;
       $('Q').value = Q_val.toFixed(4);
 
@@ -1053,7 +1129,7 @@
       $('H').value = H_val.toFixed(4);
 
       const r = Q_free(H_val);
-      const sigma = submergenceSigma(H_val);
+      const sigma = submergenceSigma(H_val, weir, r.H0);
       $('r_m0').textContent = r.m0.toFixed(3);
       $('r_eps').textContent = r.eps.toFixed(3);
       $('r_sigma').textContent = sigma.toFixed(3);
@@ -1093,6 +1169,46 @@
       ck1.className = 'check-box check-warn';
       ck1.innerHTML = `⚠ <b>水头偏高</b> · H = ${H_val.toFixed(3)} m &gt; ${c.max} m,超出该堰型推荐范围,建议选宽顶堰或加大堰宽。`;
     }
+    if (mode === 'H' && H_val >= H_SEARCH_MAX - 1e-3) {
+      ck1.className = 'check-box check-bad';
+      ck1.innerHTML = `✗ <b>超出求解范围</b> · 所需堰上水头已超过求解上限 ${H_SEARCH_MAX} m,H 被截断在 ${H_SEARCH_MAX} m,结果不可信。请加大堰宽 b 或改用其他堰型。`;
+    }
+
+    // 矩形薄壁堰 Rehbock 适用范围 H/P ≤ 1（ISO 1438）
+    if (weir === 'rect') {
+      const hp = H_val / num('P');
+      if (hp > 1) {
+        if (ck1.className.indexOf('check-ok') >= 0) ck1.className = 'check-box check-warn';
+        ck1.innerHTML += `<br>⚠ <b>超出 Rehbock 适用范围</b> · H/P = ${hp.toFixed(2)} &gt; 1（ISO 1438 要求 H/P ≤ 1）,流量系数 m₀ 外推,结果仅供参考,建议加高堰板 P。`;
+      }
+    }
+    // 三角堰 Kindsvater-Shen 拟合式适用 20°–100°
+    if (weir === 'tri') {
+      const th = num('theta');
+      if (th < 20 || th > 100) {
+        if (ck1.className.indexOf('check-ok') >= 0) ck1.className = 'check-box check-warn';
+        ck1.innerHTML += `<br>⚠ <b>顶角超出适用范围</b> · θ = ${th}° 不在 Kindsvater-Shen 拟合式适用范围 20°–100° 内,C_e、k_h 为外推值,结果仅供参考。`;
+      }
+    }
+
+    // 宽顶堰 δ/H 适用性
+    const ckd = $('check_delta');
+    if (weir === 'broad') {
+      const dr = num('delta') / H_val;
+      ckd.style.display = '';
+      if (dr < 2.5) {
+        ckd.className = 'check-box check-warn';
+        ckd.innerHTML = `⚠ <b>δ/H = ${dr.toFixed(2)} &lt; 2.5</b> · 不属宽顶堰,宜按实用堰/薄壁堰计算,当前结果仅供参考。`;
+      } else if (dr > 10) {
+        ckd.className = 'check-box check-warn';
+        ckd.innerHTML = `⚠ <b>δ/H = ${dr.toFixed(2)} &gt; 10</b> · 属长堰,需计入堰顶沿程水头损失,本公式会高估流量。`;
+      } else {
+        ckd.className = 'check-box check-ok';
+        ckd.innerHTML = `✓ <b>δ/H = ${dr.toFixed(2)}</b> · 在宽顶堰范围 2.5-10 内,${$('broad_inlet').value === 'round' ? '圆角进口 m = 0.36（按常数简化）' : '直角进口 m 按 δ/H 分档取值'}。`;
+      }
+    } else {
+      ckd.style.display = 'none';
+    }
 
     // 淹没校核
     const ck2 = $('check_sub');
@@ -1101,16 +1217,34 @@
       ck2.innerHTML = `ℹ <b>自由出流状态</b> · 下游水位低于堰顶,流量不受下游影响。若下游水位上升应启用淹没修正。`;
     } else {
       const hs_val = num('hs');
+      if (weir === 'broad') {
+        // 宽顶堰:以 hs/H0 判别,阈值 0.8
+        const H0b = (Q_free(H_val).H0) || H_val;
+        const ratio = H0b > 0 ? hs_val / H0b : 0;
+        const sig = submergenceSigma(H_val, weir, H0b);
+        if (ratio <= 0.8) {
+          ck2.className = 'check-box check-ok';
+          ck2.innerHTML = `✓ <b>未淹没</b> · h_s/H₀ = ${ratio.toFixed(3)} ≤ 0.8,宽顶堰仍为自由出流,σ = 1。`;
+        } else if (ratio < 0.95) {
+          ck2.className = 'check-box check-warn';
+          ck2.innerHTML = `⚠ <b>淹没出流</b> · h_s/H₀ = ${ratio.toFixed(3)} &gt; 0.8,流量已受下游影响,淹没系数 σ = ${sig.toFixed(3)}（查表插值）。`;
+        } else {
+          ck2.className = 'check-box check-bad';
+          ck2.innerHTML = `✗ <b>深度淹没</b> · h_s/H₀ = ${ratio.toFixed(3)} ≥ 0.95,σ = ${sig.toFixed(3)},堰失去量水功能,工程上不推荐此运行工况。`;
+        }
+      } else {
       const ratio = H_val > 0 ? hs_val / H_val : 0;
+      const zNote = ' 注:薄壁堰形成淹没出流另需满足下游水位高于堰顶且 z/P&lt;0.7（z 为上下游水位差）。';
       if (ratio < 0.15) {
         ck2.className = 'check-box check-ok';
-        ck2.innerHTML = `✓ <b>轻微淹没</b> · h_s/H = ${ratio.toFixed(3)} &lt; 0.15,淹没影响很小。`;
+        ck2.innerHTML = `✓ <b>轻微淹没</b> · h_s/H = ${ratio.toFixed(3)} &lt; 0.15,淹没影响很小（σ = ${submergenceSigma(H_val, weir).toFixed(3)}）。` + zNote;
       } else if (ratio < 0.7) {
         ck2.className = 'check-box check-warn';
-        ck2.innerHTML = `⚠ <b>显著淹没</b> · h_s/H = ${ratio.toFixed(3)},流量已受下游影响,淹没系数 σ = ${submergenceSigma(H_val).toFixed(3)}。`;
+        ck2.innerHTML = `⚠ <b>显著淹没</b> · h_s/H = ${ratio.toFixed(3)},流量已受下游影响,淹没系数 σ = ${submergenceSigma(H_val, weir).toFixed(3)}。` + zNote;
       } else {
         ck2.className = 'check-box check-bad';
-        ck2.innerHTML = `✗ <b>深度淹没</b> · h_s/H = ${ratio.toFixed(3)} &gt; 0.7,堰失去量水功能,工程上不推荐此运行工况。`;
+        ck2.innerHTML = `✗ <b>深度淹没</b> · h_s/H = ${ratio.toFixed(3)} &gt; 0.7,堰失去量水功能,工程上不推荐此运行工况。` + zNote;
+      }
       }
     }
 
@@ -1120,10 +1254,12 @@
   function copyResults() {
     const names = {rect:'矩形薄壁堰', tri:`${num('theta')}°三角堰`, trap:'Cipoletti梯形堰', broad:'宽顶堰'};
     let params = '';
+    const triNote = weir === 'tri' ? `（Kindsvater-Shen,k_h = ${((Q_free(num('H')).kh || 0) * 1000).toFixed(2)} mm）` : '';
     if (weir === 'rect') params = `堰宽 b = ${num('b')} m,上游渠宽 B = ${num('B')} m`;
     else if (weir === 'tri') params = `顶角 θ = ${num('theta')}°`;
-    else if (weir === 'trap') params = `堰宽 b = ${num('b')} m,边坡 1:4`;
-    else if (weir === 'broad') params = `堰宽 b = ${num('b')} m,堰顶 δ = ${num('delta')} m`;
+    else if (weir === 'trap') params = `堰宽 b = ${num('b')} m,边坡 1:4,上游渠宽 B = ${num('B')} m`;
+    else if (weir === 'broad') params = `堰宽 b = ${num('b')} m,堰顶 δ = ${num('delta')} m,${$('broad_inlet').value === 'round' ? '圆角进口' : '直角进口'},上游渠宽 B = ${num('B')} m`;
+    if ($('submerged').checked) params += `\n下游水深 h_s = ${num('hs')} m`;
 
     const txt = `堰流计算结果 · ${names[weir]}
 ————————————————
@@ -1133,10 +1269,13 @@ ${params}
 流量 Q = ${$('r_Q').textContent} m³/s (${$('r_Q_h').textContent} m³/h)
 堰上水头 H = ${$('r_H').textContent} m (${$('r_H2').textContent} mm)
 
-流量系数 = ${$('r_m0').textContent}
+流量系数 = ${$('r_m0').textContent}${triNote}
 侧收缩系数 ε = ${$('r_eps').textContent}
 淹没系数 σ = ${$('r_sigma').textContent}
-堰口流速 = ${$('r_v').textContent} m/s`;
+名义流速 Q/(bH) = ${$('r_v').textContent} m/s
+上游行近流速 v₀ = ${$('r_v0').textContent} m/s
+
+适用性校核:${$('check_H').innerText}`;
     navigator.clipboard.writeText(txt).then(() => {
       alert('结果已复制');
     }).catch(() => {

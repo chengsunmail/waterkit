@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>孔口管嘴出流计算器 | 水处理工具箱</title>
+<title>孔口管嘴出流计算器 | 水处理工具箱 · WaterKit</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230891b2'/%3E%3Ctext x='16' y='22.5' font-size='18' font-weight='700' text-anchor='middle' fill='white' font-family='Arial,sans-serif'%3EW%3C/text%3E%3C/svg%3E">
+<meta name="description" content="在线孔口管嘴出流计算：薄壁小孔、圆柱外管嘴、锥形收缩管嘴、大孔口的恒定水头流量，以及水池变水头泄流（排空）时间计算。">
+<link rel="canonical" href="https://waterkit.cn/orifice-nozzle-calculator.html">
 <style>
   :root {
     --brand: #0891b2;
@@ -21,8 +24,11 @@
     --border-soft: #f1f5f9;
   }
   body {
-    background: var(--bg) !important;
-    padding: 0 !important;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: #1f2937;
+    line-height: 1.6;
+    padding: 0;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -156,6 +162,8 @@
   .footer-bottom a:hover { color: var(--brand); }
 
   /* 工具内部的小footer */
+  .invalid { border-color: #ef4444 !important; background: #fef2f2 !important; }
+
   .tool-inner-footer {
     text-align: center;
     padding: 16px;
@@ -165,13 +173,6 @@
 
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: #f5f7fa;
-    color: #1f2937;
-    line-height: 1.6;
-    padding: 16px;
-  }
   .container {
     max-width: 860px;
     margin: 0 auto;
@@ -445,15 +446,8 @@
     color: #92400e;
     border-left: 3px solid #f59e0b;
   }
-  footer {
-    text-align: center;
-    padding: 16px;
-    font-size: 12px;
-    color: #9ca3af;
-  }
   @media (max-width: 480px) {
     .main-wrap { padding: 8px; }
-    ..main-wrap { padding: 16px; }
     header.tool-header { padding: 18px; }
     header.tool-header h1 { font-size: 19px; }
     .result-value { font-size: 17px; }
@@ -541,7 +535,7 @@
 
       <!-- 孔口形状选择 -->
       <div class="field" id="shape_field">
-        <label>孔口形状</label>
+        <label for="shape">孔口形状</label>
         <select id="shape" onchange="calc()">
           <option value="circle" selected>圆形</option>
           <option value="rect">矩形</option>
@@ -550,59 +544,59 @@
 
       <!-- 圆形:直径 -->
       <div class="field shape-circle">
-        <label>孔径 d <span class="unit">m</span></label>
+        <label for="d">孔径 d <span class="unit">m</span></label>
         <input type="number" id="d" value="0.1" step="0.01">
       </div>
 
       <!-- 矩形:宽高 -->
       <div class="field shape-rect" style="display:none;">
-        <label>孔宽 a <span class="unit">m</span></label>
+        <label for="a">孔宽 a <span class="unit">m</span></label>
         <input type="number" id="a" value="0.1" step="0.01">
       </div>
       <div class="field shape-rect" style="display:none;">
-        <label>孔高 e <span class="unit">m</span></label>
+        <label for="e">孔高 e <span class="unit">m</span></label>
         <input type="number" id="e" value="0.1" step="0.01">
       </div>
 
       <!-- 水头 -->
       <div class="field" id="f_H_scene_steady">
-        <label>作用水头 H <span class="unit">m</span></label>
+        <label for="H">作用水头 H <span class="unit">m</span></label>
         <input type="number" id="H" value="3.0" step="0.1">
-        <div class="helper">自由出流:上游水面到孔口中心的高度<br>淹没出流:上下游水位差</div>
+        <div class="helper" id="H_helper">自由出流:上游水面到孔口中心的高度<br>淹没出流:上下游水位差</div>
       </div>
 
       <!-- 变水头泄流参数 -->
       <div class="field scene-draining" id="f_A_tank" style="display:none;">
-        <label>池面面积 A_池 <span class="unit">m²</span></label>
+        <label for="A_tank">池面面积 A_池 <span class="unit">m²</span></label>
         <input type="number" id="A_tank" value="100" step="10">
         <div class="helper">按平均水面面积取值</div>
       </div>
       <div class="field scene-draining" id="f_H1" style="display:none;">
-        <label>初始水头 H₁ <span class="unit">m</span></label>
+        <label for="H1">初始水头 H₁ <span class="unit">m</span></label>
         <input type="number" id="H1" value="3.0" step="0.1">
       </div>
       <div class="field scene-draining" id="f_H2" style="display:none;">
-        <label>终了水头 H₂ <span class="unit">m</span></label>
+        <label for="H2">终了水头 H₂ <span class="unit">m</span></label>
         <input type="number" id="H2" value="0.1" step="0.1">
         <div class="helper">完全排空取 0 或孔口中心处</div>
       </div>
 
       <!-- 流量系数 -->
       <div class="field">
-        <label>流量系数 μ <span class="unit" id="mu_source">自动</span></label>
+        <label for="mu">流量系数 μ <span class="unit" id="mu_source">自动</span></label>
         <input type="number" id="mu" value="0.62" step="0.01" disabled>
       </div>
 
       <!-- 管嘴长度(仅圆柱管嘴显示) -->
       <div class="field type-cylin" style="display:none;">
-        <label>管嘴长度 L <span class="unit">m</span></label>
+        <label for="L">管嘴长度 L <span class="unit">m</span></label>
         <input type="number" id="L" value="0.4" step="0.05">
         <div class="helper">圆柱管嘴适用:L = (3-4)·d</div>
       </div>
 
       <!-- 大孔口的孔顶水头 -->
       <div class="field type-large" style="display:none;">
-        <label>孔顶以上水头 H_顶 <span class="unit">m</span></label>
+        <label for="H_top">孔顶以上水头 H_顶 <span class="unit">m</span></label>
         <input type="number" id="H_top" value="2.0" step="0.1">
         <div class="helper">大孔口按 H_顶 和 H_底 积分</div>
       </div>
@@ -708,11 +702,10 @@
       <h3>② 四种出流形式的系数</h3>
       <table>
         <tr><th>出流形式</th><th>ε</th><th>φ</th><th>μ</th><th>适用条件</th></tr>
-        <tr><td>薄壁小孔（圆形）</td><td>0.64</td><td>0.97</td><td>0.62</td><td>L &lt; 0.5d 或锐边,H &gt; 5d</td></tr>
+        <tr><td>薄壁小孔（圆形）</td><td>0.64</td><td>0.97</td><td>0.62</td><td>锐边薄壁,H ≥ 10d（矩形孔按孔高 e）</td></tr>
         <tr><td>圆柱外管嘴</td><td>1.00</td><td>0.82</td><td>0.82</td><td>L = (3~4)d,H &lt; 9m 避免气蚀</td></tr>
         <tr><td>锥形收缩管嘴（θ=13°）</td><td>0.98</td><td>0.96</td><td>0.94</td><td>收敛角约 13°24′</td></tr>
-        <tr><td>锥形扩散管嘴</td><td>1.00</td><td>0.45-0.50</td><td>0.45</td><td>流速低但流量大</td></tr>
-        <tr><td>大孔口（矩形）</td><td>0.70</td><td>0.97</td><td>0.60-0.65</td><td>d &gt; H/10,按积分式</td></tr>
+        <tr><td>大孔口（矩形）</td><td>0.70</td><td>0.97</td><td>0.60-0.65</td><td>e &gt; H/10（即 H/e &lt; 10）,按积分式</td></tr>
       </table>
       <p>注：管嘴（圆柱外）μ 比同尺寸薄壁孔大约 32%,因为出口断面恢复为整个孔面积,同时内部形成真空增强吸入。</p>
 
@@ -721,9 +714,10 @@
       <code>Q = μ·A·√(2g·ΔH)</code>
 
       <h3>④ 大孔口（按积分式计算）</h3>
-      <p>当孔口高度相对水头较大（e &gt; H/10）时,不能按平均水头简化,需积分：</p>
-      <code>Q = (2/3)·μ·b·√(2g)·(H₁^1.5 − H₂^1.5)</code>
-      <p>其中 b 为孔宽,H₁ 为孔顶水头,H₂ 为孔底水头。</p>
+      <p>当孔口高度相对水头较大（e &gt; H/10,即 H/d 或 H/e &lt; 10）时,不能按孔心水头简化,需积分：</p>
+      <code>Q = (2/3)·μ·b·√(2g)·(H_底^1.5 − H_顶^1.5)</code>
+      <p>其中 b 为孔宽（= a）,H_顶 为孔顶水头,H_底 = H_顶 + e 为孔底水头。大孔口模式下"作用水头 H"自动取孔心水头 H_顶 + e/2（只读）,仅用于计算流速 v。</p>
+      <p>变水头泄流工况下,大孔口按孔心水头简化为 Q = μ·A·√(2gH),未采用积分式。</p>
 
       <h3>⑤ 变水头泄流时间（容器排空）</h3>
       <p>假设容器截面面积 A_池 不随水深变化：</p>
@@ -768,7 +762,7 @@
             <div class="brand-sub">WaterKit · by 登登科技</div>
           </div>
         </a>
-        <p class="footer-about">水处理工具箱(WaterKit)是海南登登科技咨询有限公司推出的水处理在线计算工具集合,由一线水处理工艺工程师开发维护。免费、无广告、持续更新。</p>
+        <p class="footer-about">水处理工具箱(WaterKit)是海南登登科技咨询有限公司推出的水处理在线计算工具集合,由一线水处理工艺工程师开发维护。免费、持续更新。</p>
       </div>
       <div class="footer-col">
         <h4>水力计算</h4>
@@ -785,7 +779,11 @@
           <li><a href="aeration-calculator.html">曝气量</a></li>
           <li><a href="sludge-production-calculator.html">污泥产量</a></li>
           <li><a href="dosing-calculator.html">加药量</a></li>
+          <li><a href="activated-sludge-process-calculator.html">活性污泥工艺</a></li>
+          <li><a href="mbbr-design.html">MBBR 工程设计</a></li>
+          <li><a href="mbr-design.html">MBR 工程设计</a></li>
           <li><a href="pump-selection-calculator.html">水泵选型</a></li>
+          <li><a href="blower-selection-calculator.html">鼓风机选型</a></li>
           <li><a href="water-quality-unit-converter.html">水质换算</a></li>
         </ul>
       </div>
@@ -822,6 +820,8 @@
 
   let type = 'thin';
   let scene = 'steady';
+  let userShape = null;   // 进入大孔口前用户选择的孔口形状
+  let userH = null;       // 进入大孔口前用户输入的作用水头 H
 
   // 默认系数表
   const coefficients = {
@@ -837,14 +837,22 @@
     document.querySelector(`[data-type="${t}"]`).classList.add('active');
 
     document.querySelectorAll('.type-cylin').forEach(el => el.style.display = (t==='cylin') ? '' : 'none');
-    document.querySelectorAll('.type-large').forEach(el => el.style.display = (t==='large') ? '' : 'none');
+    document.querySelectorAll('.type-large').forEach(el => el.style.display = (t==='large' && scene==='steady') ? '' : 'none');
 
-    // 大孔口强制矩形
+    // 大孔口强制矩形,H 由 H_顶 + e/2 自动计算（只读）;离开时恢复用户此前的选择
     if (t === 'large') {
+      if (userShape === null) userShape = $('shape').value;
+      if (userH === null) userH = $('H').value;
       $('shape').value = 'rect';
       $('shape').disabled = true;
+      $('H').disabled = true;
+      $('H_helper').innerHTML = '大孔口:自动取孔心水头 H = H_顶 + e/2（只读）,用于计算流速';
     } else {
+      if (userShape !== null) { $('shape').value = userShape; userShape = null; }
+      if (userH !== null) { $('H').value = userH; userH = null; }
       $('shape').disabled = false;
+      $('H').disabled = false;
+      $('H_helper').innerHTML = '自由出流:上游水面到孔口中心的高度<br>淹没出流:上下游水位差';
     }
     updateShape();
 
@@ -865,6 +873,7 @@
     $('f_H_scene_steady').style.display = (s==='steady') ? '' : 'none';
     $('group_steady').style.display = (s==='steady') ? '' : 'none';
     $('group_draining').style.display = (s==='draining') ? '' : 'none';
+    document.querySelectorAll('.type-large').forEach(el => el.style.display = (type==='large' && s==='steady') ? '' : 'none');
 
     calc();
   }
@@ -1003,15 +1012,45 @@
     const coef = coefficients[type];
     const eps = coef.eps, phi = coef.phi;
 
+    const ck = $('check_info');
+    updateShape();
+
+    // ============ 输入校验 ============
+    document.querySelectorAll('.invalid').forEach(el => el.classList.remove('invalid'));
+    const bad = [];
+    const need = (id, name, allowZero) => {
+      const v = parseFloat($(id).value);
+      if (isNaN(v) || v < 0 || (!allowZero && v === 0)) { $(id).classList.add('invalid'); bad.push(`请输入${allowZero ? '不小于' : '大于'} 0 的${name}`); }
+    };
+    const isRect = (type === 'large' || $('shape').value === 'rect');
+    if (isRect) { need('a', '孔宽 a'); need('e', '孔高 e'); } else need('d', '孔径 d');
+    need('mu', '流量系数 μ');
+    if (scene === 'steady') {
+      if (type === 'large') need('H_top', '孔顶以上水头 H_顶', true);
+      else need('H', '作用水头 H');
+    } else {
+      need('A_tank', '池面面积 A_池');
+    }
+    if (bad.length) {
+      document.querySelectorAll('.results .result-value').forEach(el => el.textContent = '—');
+      ck.className = 'check-box check-warn';
+      ck.innerHTML = `⚠ <b>输入无效</b> · ${bad.join(';')}。`;
+      drawViz();
+      return;
+    }
+    const subNote = $('submerged').checked ? ' <b>淹没出流</b>:H 取上下游水位差（μ 取值不变）。' : '';
+
     $('r_A').textContent = A.toFixed(5);
     $('r_mu').textContent = mu.toFixed(3);
     $('r_eps').textContent = eps.toFixed(2);
     $('r_phi').textContent = phi.toFixed(2);
 
-    const ck = $('check_info');
-
     if (scene === 'steady') {
       // 恒定水头
+      if (type === 'large') {
+        // 大孔口:作用水头取孔心水头 H_顶 + e/2（只读显示）,与积分式口径一致
+        $('H').value = +(num('H_top') + num('e') / 2).toFixed(4);
+      }
       const H = num('H');
       const v_t = Math.sqrt(2 * g * Math.max(H, 0));
       const v_r = phi * v_t;
@@ -1038,18 +1077,22 @@
         ck.className = 'check-box check-warn';
         ck.innerHTML = `⚠ <b>气蚀风险</b> · 圆柱管嘴在 H = ${H.toFixed(1)} m 下容易气蚀断流（临界水头约 9 m）,建议改用薄壁孔或锥形管嘴。`;
       } else if (type === 'thin') {
-        const d = num('d');
-        const ratio = H / Math.max(d, 0.001);
-        if (ratio < 5) {
+        // 小孔口判别:H/d ≥ 10（矩形孔按孔高 e）
+        const isR = $('shape').value === 'rect';
+        const dim = isR ? num('e') : num('d');
+        const lbl = isR ? 'H/e' : 'H/d';
+        const ratio = H / dim;
+        if (ratio < 10) {
           ck.className = 'check-box check-warn';
-          ck.innerHTML = `⚠ <b>小水头</b> · H/d = ${ratio.toFixed(1)} &lt; 5,可能属于大孔口范畴,建议切换到"大孔口"模式积分计算。`;
+          ck.innerHTML = `⚠ <b>小水头</b> · ${lbl} = ${ratio.toFixed(1)} &lt; 10,属大孔口范畴,建议切换到"大孔口"模式积分计算。`;
         } else {
           ck.className = 'check-box check-ok';
-          ck.innerHTML = `✓ <b>薄壁小孔适用</b> · H/d = ${ratio.toFixed(1)} ≥ 5,按完全淹没收缩计算,μ = ${mu}。`;
+          ck.innerHTML = `✓ <b>薄壁小孔适用</b> · ${lbl} = ${ratio.toFixed(1)} ≥ 10,按小孔口完全收缩计算,μ = ${mu}。`;
         }
       } else if (type === 'cylin') {
-        const d = num('d'), L = num('L');
-        const Ld = L / Math.max(d, 0.001);
+        const isR = $('shape').value === 'rect';
+        const d = isR ? num('e') : num('d'), L = num('L');
+        const Ld = L / d;
         if (Ld < 3 || Ld > 4) {
           ck.className = 'check-box check-warn';
           ck.innerHTML = `⚠ <b>管嘴长度不匹配</b> · L/d = ${Ld.toFixed(2)},推荐 3-4 之间。过短内部收缩未恢复,过长摩擦增加。`;
@@ -1057,10 +1100,14 @@
           ck.className = 'check-box check-ok';
           ck.innerHTML = `✓ <b>圆柱管嘴适用</b> · L/d = ${Ld.toFixed(2)},μ = ${mu}。管嘴内形成真空增强吸入,出流能力比薄壁孔大约 32%。`;
         }
+      } else if (type === 'large') {
+        ck.className = 'check-box check-info';
+        ck.innerHTML = `ℹ <b>大孔口</b> · 按积分式计算,H_顶 = ${num('H_top')} m,H_底 = ${(num('H_top') + num('e')).toFixed(3)} m;流速按孔心水头 H = ${H} m 计算。μ = ${mu}。`;
       } else {
         ck.className = 'check-box check-info';
         ck.innerHTML = `ℹ <b>${coef.name}</b> · 流量系数 μ = ${mu},理论流速 ${v_t.toFixed(2)} m/s,实际流速 ${v_r.toFixed(2)} m/s。`;
       }
+      ck.innerHTML += subNote;
     } else {
       // 变水头泄流
       const H1 = num('H1'), H2 = num('H2'), A_tank = num('A_tank');
@@ -1112,7 +1159,7 @@
       }
 
       ck.className = 'check-box check-ok';
-      ck.innerHTML = `✓ <b>池面积 ${A_tank} m² 的水池,由 ${H1} m 泄放到 ${H2} m</b>,共排水 ${V.toFixed(1)} m³,初始流量 ${Q1.toFixed(3)} m³/s,终了流量 ${Q2.toFixed(3)} m³/s,泄流时间见上。假设池面积恒定。`;
+      ck.innerHTML = `✓ <b>池面积 ${A_tank} m² 的水池,由 ${H1} m 泄放到 ${H2} m</b>,共排水 ${V.toFixed(1)} m³,初始流量 ${Q1.toFixed(3)} m³/s,终了流量 ${Q2.toFixed(3)} m³/s,泄流时间见上。假设池面积恒定。${type === 'large' ? ' 大孔口在变水头工况按孔心水头简化（Q = μ·A·√(2gH),未用积分式）。' : ''}` + subNote;
     }
 
     drawViz();
@@ -1125,7 +1172,7 @@
       txt = `孔口管嘴出流计算 · ${typeName}（恒定水头）
 ————————————————
 孔口面积 A = ${$('r_A').textContent} m²
-作用水头 H = ${num('H')} m
+作用水头 H = ${num('H')} m${type === 'large' ? `（孔心水头;H_顶 = ${num('H_top')} m,孔高 e = ${num('e')} m）` : ''}${$('submerged').checked ? '（淹没出流,取上下游水位差）' : ''}
 流量系数 μ = ${$('r_mu').textContent}
 
 理论流速 = ${$('r_v_t').textContent} m/s

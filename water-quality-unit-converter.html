@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>水质单位换算器 | 水处理工具箱</title>
+<title>水质单位换算器 | 水处理工具箱 · WaterKit</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230891b2'/%3E%3Ctext x='16' y='22.5' font-size='18' font-weight='700' text-anchor='middle' fill='white' font-family='Arial,sans-serif'%3EW%3C/text%3E%3C/svg%3E">
+<meta name="description" content="水质单位在线换算：硬度（mg/L CaCO₃、mmol/L、°dH、°fH、°e、gpg、meq/L）、碱度、pH 与 H⁺/OH⁻、氮磷形态（以 N/P 计与以离子计）、电导率/TDS/盐度、常见离子 mg/L↔mmol/L↔meq/L，改任意一格实时联动。">
+<link rel="canonical" href="https://waterkit.cn/water-quality-unit-converter.html">
 <style>
   :root {
     --brand: #0891b2;
@@ -19,13 +22,6 @@
     --bg-section: #f1f5f9;
     --border: #e2e8f0;
     --border-soft: #f1f5f9;
-  }
-  body {
-    background: var(--bg) !important;
-    padding: 0 !important;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
   }
 
   /* 统一顶部导航 */
@@ -167,10 +163,13 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: #f5f7fa;
+    background: var(--bg);
     color: #1f2937;
     line-height: 1.6;
-    padding: 16px;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
   }
   .container {
     max-width: 860px;
@@ -332,6 +331,17 @@
   }
 
   /* 硬度分级颜色 */
+  .invalid{border-color:#ef4444!important;background:#fef2f2!important}
+  .conv-warn {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: #fef2f2;
+    border-left: 3px solid #ef4444;
+    border-radius: 6px;
+    font-size: 12.5px;
+    color: #991b1b;
+  }
+  .conv-warn:empty { display: none; }
   .badge {
     display: inline-block;
     padding: 2px 10px;
@@ -428,7 +438,7 @@
     color: #92400e;
     border-left: 3px solid #f59e0b;
   }
-  footer {
+  .tool-inner-footer {
     text-align: center;
     padding: 16px;
     font-size: 12px;
@@ -436,7 +446,6 @@
   }
   @media (max-width: 480px) {
     .main-wrap { padding: 8px; }
-    ..main-wrap { padding: 16px; }
     header.tool-header { padding: 18px; }
     header.tool-header h1 { font-size: 19px; }
     .conv-row {
@@ -525,8 +534,8 @@
 
       <div class="conv-row" data-group="hardness" data-unit="mmolL">
         <div class="conv-label">
-          <span class="name">mmol/L（以 1/2 Ca²⁺ 计）</span>
-          <span class="desc">化学式计量常用</span>
+          <span class="name">mmol/L（以 Ca²⁺ / CaCO₃ 计）</span>
+          <span class="desc">化学式计量常用；1/2 Ca²⁺ 口径 = meq/L 行</span>
         </div>
         <div class="conv-input">
           <input type="number" step="any" value="1.5" oninput="convertHardness('mmolL', this.value)">
@@ -556,6 +565,17 @@
         </div>
       </div>
 
+      <div class="conv-row" data-group="hardness" data-unit="eH">
+        <div class="conv-label">
+          <span class="name">°e（英国度 / Clark 度）</span>
+          <span class="desc">1°e = 14.25 mg/L CaCO₃</span>
+        </div>
+        <div class="conv-input">
+          <input type="number" step="any" value="10.53" oninput="convertHardness('eH', this.value)">
+          <span class="unit">°e</span>
+        </div>
+      </div>
+
       <div class="conv-row" data-group="hardness" data-unit="gpg">
         <div class="conv-label">
           <span class="name">gpg（美国度）</span>
@@ -577,6 +597,8 @@
           <span class="unit">meq/L</span>
         </div>
       </div>
+
+      <div class="conv-warn" id="warn_hardness" role="alert"></div>
 
       <div id="hardness_level" style="margin-top:14px;font-size:14px;color:#374151;">
         硬度等级：<span class="badge badge-soft" id="hardness_badge">软水</span>
@@ -641,6 +663,7 @@
           <span class="unit">°dH</span>
         </div>
       </div>
+      <div class="conv-warn" id="warn_alk" role="alert"></div>
     </div>
 
     <!-- ============ pH/H+ ============ -->
@@ -672,7 +695,7 @@
       <div class="conv-row" data-group="ph" data-unit="H_mgL">
         <div class="conv-label">
           <span class="name">[H⁺] 质量浓度</span>
-          <span class="desc">mg/L</span>
+          <span class="desc">mg/L，M(H⁺)=1.008</span>
         </div>
         <div class="conv-input">
           <input type="number" step="any" value="1e-4" oninput="convertPH('H_mgL', this.value)">
@@ -702,6 +725,8 @@
         </div>
       </div>
 
+      <div class="conv-warn" id="warn_ph" role="alert"></div>
+
       <div class="ph-scale">
         <div style="font-size:13px;color:#475569;margin-bottom:6px;">
           水质定性：<span class="badge badge-soft" id="ph_badge">中性</span>
@@ -723,9 +748,10 @@
         <div class="title">选择形态</div>
         <div class="params-grid">
           <div class="field">
-            <label>氮形态</label>
+            <label for="n_form">氮形态</label>
             <select id="n_form" onchange="convertN()">
-              <option value="NH3" selected>氨氮 NH₃-N（M_ion=18, M_N=14）</option>
+              <option value="NH3" selected>氨氮 NH₃-N，以 NH₄⁺ 计（M=18.04）</option>
+              <option value="NH3m">氨氮 NH₃-N，以 NH₃ 计（M=17.03）</option>
               <option value="NO2">亚硝酸盐 NO₂⁻-N（M_ion=46, M_N=14）</option>
               <option value="NO3">硝酸盐 NO₃⁻-N（M_ion=62, M_N=14）</option>
             </select>
@@ -766,6 +792,8 @@
         </div>
       </div>
 
+      <div class="conv-warn" id="warn_n" role="alert"></div>
+
       <hr style="margin:20px 0;border:none;border-top:1px solid #e5e7eb;">
       <div class="panel-intro" style="margin-top:0;">磷的形态：TP、PO₄³⁻-P、P₂O₅（化肥行业）</div>
 
@@ -773,7 +801,7 @@
         <div class="title">磷形态</div>
         <div class="params-grid">
           <div class="field">
-            <label>磷形态</label>
+            <label for="p_form">磷形态</label>
             <select id="p_form" onchange="convertP()">
               <option value="PO4" selected>正磷酸盐 PO₄³⁻-P（M_ion=95, M_P=31）</option>
               <option value="P2O5">五氧化二磷 P₂O₅（化肥/岩相）</option>
@@ -811,9 +839,10 @@
         </div>
         <div class="conv-input">
           <input type="number" step="any" value="0.0323" oninput="convertP('mmolL', this.value)">
-          <span class="unit">mmol/L</span>
+          <span class="unit" id="p_mmol_unit">mmol/L</span>
         </div>
       </div>
+      <div class="conv-warn" id="warn_p" role="alert"></div>
     </div>
 
     <!-- ============ 盐度/电导 ============ -->
@@ -824,7 +853,7 @@
         <div class="title">换算参数</div>
         <div class="params-grid">
           <div class="field">
-            <label>TDS 换算系数 K</label>
+            <label for="tds_K">TDS 换算系数 K</label>
             <select id="tds_K" onchange="convertSalinity()">
               <option value="0.5">0.5（NaCl 标定）</option>
               <option value="0.64" selected>0.64（常规淡水）</option>
@@ -833,16 +862,17 @@
             </select>
           </div>
           <div class="field">
-            <label>水温（电导温补）</label>
+            <label for="temp">水温 ℃（电导温补，按 2%/℃ 折算到 25 ℃）</label>
             <input type="number" id="temp" value="25" step="1" oninput="convertSalinity()">
           </div>
         </div>
+        <div style="margin-top:8px;font-size:12px;color:#713f12;">EC 行为水温 T 下的实测值；TDS / 盐度 / 电阻率按 EC₂₅ = EC_T / [1 + 0.02·(T − 25)] 折算后计算。当前 EC₂₅ = <b id="ec25_show">—</b></div>
       </div>
 
       <div class="conv-row" data-group="sal" data-unit="EC_uS">
         <div class="conv-label">
           <span class="name">电导率 EC</span>
-          <span class="desc">25℃ 标定</span>
+          <span class="desc">水温 T 下实测值</span>
         </div>
         <div class="conv-input">
           <input type="number" step="any" value="1000" oninput="convertSalinity('EC_uS', this.value)">
@@ -894,6 +924,8 @@
         </div>
       </div>
 
+      <div class="conv-warn" id="warn_sal" role="alert"></div>
+
       <div id="salinity_category" style="margin-top:14px;font-size:14px;color:#374151;">
         水质分类：<span class="badge badge-info" id="salinity_badge">—</span>
       </div>
@@ -907,7 +939,7 @@
         <div class="title">选择离子</div>
         <div class="params-grid">
           <div class="field">
-            <label>离子</label>
+            <label for="ion_sel">离子</label>
             <select id="ion_sel" onchange="updateIonParams()">
               <optgroup label="阳离子">
                 <option value="Na">Na⁺（23, 1价）</option>
@@ -936,11 +968,11 @@
             </select>
           </div>
           <div class="field">
-            <label>摩尔质量 (g/mol)</label>
+            <label for="ion_M">摩尔质量 (g/mol)</label>
             <input type="number" id="ion_M" value="35.5" step="0.1" oninput="convertIon()">
           </div>
           <div class="field">
-            <label>价数</label>
+            <label for="ion_v">价数</label>
             <input type="number" id="ion_v" value="1" step="1" oninput="convertIon()">
           </div>
         </div>
@@ -1000,6 +1032,7 @@
           <span class="unit">ppm</span>
         </div>
       </div>
+      <div class="conv-warn" id="warn_ion" role="alert"></div>
     </div>
 
     <div class="buttons">
@@ -1011,10 +1044,11 @@
       <h3>① 硬度换算系数</h3>
       <table>
         <tr><th>单位</th><th>= mg/L CaCO₃</th></tr>
-        <tr><td>1 mmol/L（1/2 Ca）</td><td>100 mg/L</td></tr>
+        <tr><td>1 mmol/L（Ca²⁺）</td><td>100 mg/L CaCO₃ = 2 meq/L（1/2 Ca²⁺ 口径 = meq/L 行）</td></tr>
         <tr><td>1 °dH（德国度）</td><td>17.848 mg/L</td></tr>
         <tr><td>1 °fH（法国度）</td><td>10 mg/L</td></tr>
-        <tr><td>1 gpg（美国度）</td><td>17.1 mg/L</td></tr>
+        <tr><td>1 °e（英国度 / Clark 度）</td><td>14.25 mg/L</td></tr>
+        <tr><td>1 gpg（美国度）</td><td>17.118 mg/L</td></tr>
         <tr><td>1 meq/L</td><td>50 mg/L</td></tr>
       </table>
 
@@ -1027,11 +1061,13 @@
         <tr><td>硬水</td><td>300-450</td><td>16.8-25.2</td></tr>
         <tr><td>极硬水</td><td>&gt; 450</td><td>&gt; 25.2</td></tr>
       </table>
+      <p style="margin-top:6px;font-size:12px;color:#64748b;">注：本表为常用工程分级，WHO/USGS 等标准分级不同，饮用水总硬度限值见 GB 5749（450 mg/L）。</p>
 
       <h3>③ 氮形态换算（以 N 计 ↔ 以离子计）</h3>
       <table>
         <tr><th>形态</th><th>换算系数（离子→N）</th></tr>
-        <tr><td>NH₃-N（NH₄⁺）</td><td>× 14/18 = 0.778</td></tr>
+        <tr><td>NH₃-N（以 NH₄⁺ 计）</td><td>× 14/18 = 0.778</td></tr>
+        <tr><td>NH₃-N（以 NH₃ 计）</td><td>× 14/17.03 = 0.822</td></tr>
         <tr><td>NO₂⁻-N</td><td>× 14/46 = 0.304</td></tr>
         <tr><td>NO₃⁻-N</td><td>× 14/62 = 0.226</td></tr>
       </table>
@@ -1040,7 +1076,7 @@
       <table>
         <tr><th>形态</th><th>换算系数</th></tr>
         <tr><td>PO₄³⁻ → P</td><td>× 31/95 = 0.326</td></tr>
-        <tr><td>P₂O₅ → P</td><td>× 62/142 = 0.437</td></tr>
+        <tr><td>P₂O₅ → P</td><td>× 62/142 = 0.437（mmol 行按 P 原子计，单位 mmol P/L）</td></tr>
       </table>
 
       <h3>⑤ 电导率-TDS-盐度</h3>
@@ -1067,7 +1103,7 @@
     </div>
 
     <div class="note">
-      ⚠️ 本工具用于快速换算与参考，严格分析请以实验数据为准。电导率-TDS、电导率-盐度为估算关系，高精度应用须结合水质特性测定换算系数。
+      ⚠️ 本工具用于快速换算与参考，严格分析请以实验数据为准。电导率-TDS、电导率-盐度为估算关系，高精度应用须结合水质特性测定换算系数。<br>摩尔质量取整（如 Cl 35.5、Ca 40、SO₄ 96、HCO₃ 61、NO₃ 62、PO₄ 95、NH₄ 18，CaCO₃ 当量按 50 / 100），误差 &lt;0.3%。
     </div>
 
   </div>
@@ -1088,7 +1124,7 @@
             <div class="brand-sub">WaterKit · by 登登科技</div>
           </div>
         </a>
-        <p class="footer-about">水处理工具箱(WaterKit)是海南登登科技咨询有限公司推出的水处理在线计算工具集合,由一线水处理工艺工程师开发维护。免费、无广告、持续更新。</p>
+        <p class="footer-about">水处理工具箱(WaterKit)是海南登登科技咨询有限公司推出的水处理在线计算工具集合,由一线水处理工艺工程师开发维护。免费、持续更新。</p>
       </div>
       <div class="footer-col">
         <h4>水力计算</h4>
@@ -1105,7 +1141,11 @@
           <li><a href="aeration-calculator.html">曝气量</a></li>
           <li><a href="sludge-production-calculator.html">污泥产量</a></li>
           <li><a href="dosing-calculator.html">加药量</a></li>
+          <li><a href="activated-sludge-process-calculator.html">活性污泥工艺</a></li>
+          <li><a href="mbbr-design.html">MBBR 工程设计</a></li>
+          <li><a href="mbr-design.html">MBR 工程设计</a></li>
           <li><a href="pump-selection-calculator.html">水泵选型</a></li>
+          <li><a href="blower-selection-calculator.html">鼓风机选型</a></li>
           <li><a href="water-quality-unit-converter.html">水质换算</a></li>
         </ul>
       </div>
@@ -1172,18 +1212,50 @@
     }
   }
 
+  // ======== 输入校验提示 ========
+  const WARN_EXTRA = { ion: ['ion_M', 'ion_v'] };
+  function showWarn(g, msg, el) {
+    const box = $('warn_' + g);
+    if (box) box.textContent = msg || '';
+    document.querySelectorAll(`[data-group="${g}"] input`).forEach(i => i.classList.remove('invalid'));
+    (WARN_EXTRA[g] || []).forEach(id => $(id).classList.remove('invalid'));
+    if (el) el.classList.add('invalid');
+  }
+  function srcInput(g, unit) {
+    const row = document.querySelector(`[data-group="${g}"][data-unit="${unit}"]`);
+    return row ? row.querySelector('input') : null;
+  }
+  // 输入无效时清空同组其它行，避免显示旧值
+  function clearOthers(g, unit) {
+    document.querySelectorAll(`[data-group="${g}"]`).forEach(r => {
+      if (r.dataset.unit === unit) return;
+      const i = r.querySelector('input');
+      if (i !== document.activeElement) i.value = '';
+    });
+  }
+  // 负值统一处理：返回 true 表示已拦截
+  function rejectNegative(g, unit, v, what) {
+    if (v >= 0) return false;
+    showWarn(g, what + '不能为负值，请输入 ≥ 0 的数值', srcInput(g, unit));
+    clearOthers(g, unit);
+    return true;
+  }
+
   // ======== 硬度 ========
   // 基准：mg/L CaCO3
   function convertHardness(fromUnit, val) {
     markSource('hardness', fromUnit);
     const v = parseFloat(val);
     if (!isFinite(v)) return;
+    if (rejectNegative('hardness', fromUnit, v, '硬度')) return;
+    showWarn('hardness', '');
     let caco3;  // mg/L CaCO3
     switch(fromUnit) {
       case 'mgL_CaCO3': caco3 = v; break;
       case 'mmolL':     caco3 = v * 100; break;
       case 'dH':        caco3 = v * 17.848; break;
       case 'fH':        caco3 = v * 10; break;
+      case 'eH':        caco3 = v * 14.25; break;   // 英国度（Clark）
       case 'gpg':       caco3 = v * 17.118; break;
       case 'meqL':      caco3 = v * 50; break;
     }
@@ -1191,6 +1263,7 @@
     if (fromUnit !== 'mmolL')     setVal('hardness', 'mmolL', caco3/100);
     if (fromUnit !== 'dH')        setVal('hardness', 'dH', caco3/17.848);
     if (fromUnit !== 'fH')        setVal('hardness', 'fH', caco3/10);
+    if (fromUnit !== 'eH')        setVal('hardness', 'eH', caco3/14.25);
     if (fromUnit !== 'gpg')       setVal('hardness', 'gpg', caco3/17.118);
     if (fromUnit !== 'meqL')      setVal('hardness', 'meqL', caco3/50);
 
@@ -1209,6 +1282,8 @@
     markSource('alk', fromUnit);
     const v = parseFloat(val);
     if (!isFinite(v)) return;
+    if (rejectNegative('alk', fromUnit, v, '碱度')) return;
+    showWarn('alk', '');
     let caco3;
     switch(fromUnit) {
       case 'mgL_CaCO3': caco3 = v; break;
@@ -1229,27 +1304,38 @@
     markSource('ph', fromUnit);
     const v = parseFloat(val);
     if (!isFinite(v)) return;
+    if ((fromUnit === 'H_molL' || fromUnit === 'H_mgL' || fromUnit === 'OH_molL') && v <= 0) {
+      showWarn('ph', '浓度必须大于 0（pH 按对数计算，0 或负值无意义）', srcInput('ph', fromUnit));
+      clearOthers('ph', fromUnit);
+      return;
+    }
     let pH;
     switch(fromUnit) {
       case 'pH':       pH = v; break;
-      case 'H_molL':   pH = v > 0 ? -Math.log10(v) : 14; break;
-      case 'H_mgL':    pH = v > 0 ? -Math.log10(v/1000) : 14; break;  // H+摩尔质量=1
-      case 'OH_molL':  pH = v > 0 ? 14 + Math.log10(v) : 0; break;
+      case 'H_molL':   pH = -Math.log10(v); break;
+      case 'H_mgL':    pH = -Math.log10(v/1008); break;  // M(H⁺)=1.008 g/mol → mg/L ÷ 1008 = mol/L
+      case 'OH_molL':  pH = 14 + Math.log10(v); break;
       case 'pOH':      pH = 14 - v; break;
     }
-    pH = Math.max(0, Math.min(14, pH));
+    // 超出 0–14 不再静默钳位：照常换算，但给出提示
+    if (pH < 0 || pH > 14) {
+      showWarn('ph', `对应 pH = ${pH.toFixed(2)}，超出 0–14 常规范围（浓酸/浓碱中活度 ≠ 浓度，结果仅供参考）`);
+    } else {
+      showWarn('ph', '');
+    }
     const H_mol = Math.pow(10, -pH);
     const OH_mol = Math.pow(10, pH - 14);
     const pOH = 14 - pH;
 
     if (fromUnit !== 'pH')      setVal('ph', 'pH', pH);
     if (fromUnit !== 'H_molL')  setVal('ph', 'H_molL', H_mol);
-    if (fromUnit !== 'H_mgL')   setVal('ph', 'H_mgL', H_mol * 1000);
+    if (fromUnit !== 'H_mgL')   setVal('ph', 'H_mgL', H_mol * 1008);
     if (fromUnit !== 'OH_molL') setVal('ph', 'OH_molL', OH_mol);
     if (fromUnit !== 'pOH')     setVal('ph', 'pOH', pOH);
 
     // 指针与标签
-    $('ph_pointer').style.left = `calc(${(pH/14)*100}% - 2px)`;
+    const pHbar = Math.max(0, Math.min(14, pH));   // 仅指针位置限制在色条范围内
+    $('ph_pointer').style.left = `calc(${(pHbar/14)*100}% - 2px)`;
     const b = $('ph_badge');
     if (pH < 4.5)      { b.className = 'badge badge-hard';   b.textContent = '强酸'; }
     else if (pH < 6.5) { b.className = 'badge badge-medium'; b.textContent = '酸性'; }
@@ -1261,7 +1347,8 @@
 
   // ======== 氮磷 ========
   const N_params = {
-    NH3: {M_ion: 18, M_N: 14, label: 'NH₄⁺'},
+    NH3: {M_ion: 18, M_N: 14, label: 'NH₄⁺'},      // 以 NH₄⁺ 计（取整 18，精确 18.04）
+    NH3m: {M_ion: 17.03, M_N: 14, label: 'NH₃'},    // 以 NH₃ 计
     NO2: {M_ion: 46, M_N: 14, label: 'NO₂⁻'},
     NO3: {M_ion: 62, M_N: 14, label: 'NO₃⁻'}
   };
@@ -1279,6 +1366,8 @@
     }
     const v = parseFloat(val);
     if (!isFinite(v)) return;
+    if (rejectNegative('n', fromUnit, v, '浓度')) return;
+    showWarn('n', '');
 
     let N_mgL;
     switch(fromUnit) {
@@ -1300,6 +1389,7 @@
     const form = $('p_form').value;
     const p = P_params[form];
     $('p_ion_unit').textContent = 'mg/L as ' + p.label;
+    $('p_mmol_unit').textContent = form === 'P2O5' ? 'mmol P/L' : 'mmol/L';   // P₂O₅ 模式下按 P 原子计
 
     if (fromUnit !== undefined) markSource('p', fromUnit);
     if (val === undefined) {
@@ -1308,6 +1398,8 @@
     }
     const v = parseFloat(val);
     if (!isFinite(v)) return;
+    if (rejectNegative('p', fromUnit, v, '浓度')) return;
+    showWarn('p', '');
 
     let P_mgL;
     switch(fromUnit) {
@@ -1323,6 +1415,10 @@
   // ======== 盐度/电导 ========
   function convertSalinity(fromUnit, val) {
     const K = parseFloat($('tds_K').value);
+    // 电导温补：EC25 = EC_T / (1 + 0.02·(T − 25))，线性 2%/℃
+    let T = parseFloat($('temp').value);
+    if (!isFinite(T)) T = 25;
+    const tf = Math.max(0.1, 1 + 0.02 * (T - 25));
     if (fromUnit !== undefined) markSource('sal', fromUnit);
     if (val === undefined) {
       val = document.querySelector('[data-group="sal"][data-unit="EC_uS"] input').value;
@@ -1330,23 +1426,28 @@
     }
     const v = parseFloat(val);
     if (!isFinite(v)) return;
+    if (rejectNegative('sal', fromUnit, v, '该参数')) return;
+    showWarn('sal', '');
 
-    let EC_uS;  // 基准：μS/cm
+    // EC 行为水温 T 下的实测值；TDS / 盐度 / 电阻率均按折算到 25 ℃ 的 EC25 计算
+    let EC25;   // 基准：μS/cm @25℃
     switch(fromUnit) {
-      case 'EC_uS':      EC_uS = v; break;
-      case 'EC_mS':      EC_uS = v * 1000; break;
-      case 'TDS':        EC_uS = K > 0 ? v / K : 0; break;
-      case 'salinity':   EC_uS = K > 0 ? v * 1000 / K : 0; break;
-      case 'resistivity': EC_uS = v > 0 ? 1e6 / v : 0; break;
+      case 'EC_uS':      EC25 = v / tf; break;
+      case 'EC_mS':      EC25 = v * 1000 / tf; break;
+      case 'TDS':        EC25 = K > 0 ? v / K : 0; break;
+      case 'salinity':   EC25 = K > 0 ? v * 1000 / K : 0; break;
+      case 'resistivity': EC25 = v > 0 ? 1e6 / v : 0; break;
     }
+    const EC_uS = EC25 * tf;  // 水温 T 下的电导率
 
     if (fromUnit !== 'EC_uS')       setVal('sal', 'EC_uS', EC_uS);
     if (fromUnit !== 'EC_mS')       setVal('sal', 'EC_mS', EC_uS / 1000);
-    if (fromUnit !== 'TDS')         setVal('sal', 'TDS', EC_uS * K);
-    if (fromUnit !== 'salinity')    setVal('sal', 'salinity', EC_uS * K / 1000);
-    if (fromUnit !== 'resistivity') setVal('sal', 'resistivity', EC_uS > 0 ? 1e6 / EC_uS : 0);
+    if (fromUnit !== 'TDS')         setVal('sal', 'TDS', EC25 * K);
+    if (fromUnit !== 'salinity')    setVal('sal', 'salinity', EC25 * K / 1000);
+    if (fromUnit !== 'resistivity') setVal('sal', 'resistivity', EC25 > 0 ? 1e6 / EC25 : 0);
+    $('ec25_show').textContent = EC25.toPrecision(4) + ' μS/cm';
 
-    const tds = EC_uS * K;
+    const tds = EC25 * K;
     const b = $('salinity_badge');
     if (tds < 0.5)        { b.className='badge badge-info'; b.textContent='超纯水'; }
     else if (tds < 30)    { b.className='badge badge-info'; b.textContent='纯净水/RO产水'; }
@@ -1384,7 +1485,19 @@
       fromUnit = 'mgL';
     }
     const v = parseFloat(val);
-    if (!isFinite(v) || M <= 0) return;
+    if (!isFinite(M) || M <= 0) {
+      showWarn('ion', '请输入大于 0 的摩尔质量', $('ion_M'));
+      clearOthers('ion', fromUnit);
+      return;
+    }
+    if (!isFinite(z) || z <= 0) {
+      showWarn('ion', '请输入大于 0 的价数', $('ion_v'));
+      clearOthers('ion', fromUnit);
+      return;
+    }
+    if (!isFinite(v)) return;
+    if (rejectNegative('ion', fromUnit, v, '浓度')) return;
+    showWarn('ion', '');
 
     let mgL;
     switch(fromUnit) {
@@ -1408,11 +1521,25 @@
       nitrogen: '氮磷换算', salinity: '盐度/电导换算', ion: '通用离子换算'
     };
     let txt = '水质单位换算 - ' + titles[currentTab] + '\n————————————————\n';
+    // 换算参数（氮/磷形态、TDS 系数、水温、离子及 M/价数）
+    panel.querySelectorAll('.params-box .field').forEach(f => {
+      const lab = f.querySelector('label').innerText.trim();
+      const ctl = f.querySelector('select, input');
+      const val = ctl.tagName === 'SELECT' ? ctl.options[ctl.selectedIndex].text : ctl.value;
+      txt += `[参数] ${lab}: ${val}\n`;
+    });
     panel.querySelectorAll('.conv-row').forEach(row => {
       const name = row.querySelector('.name').innerText.trim();
       const val = row.querySelector('input').value;
       const unit = row.querySelector('.unit').innerText.trim();
       txt += `${name}: ${val} ${unit}\n`;
+    });
+    if (panel.querySelector('#ec25_show')) txt += `折算 EC₂₅: ${$('ec25_show').textContent}\n`;
+    panel.querySelectorAll('.badge').forEach(b => {
+      txt += `${b.parentElement.firstChild.textContent.trim()}${b.textContent}\n`;
+    });
+    panel.querySelectorAll('.conv-warn').forEach(w => {
+      if (w.textContent.trim()) txt += `⚠ ${w.textContent.trim()}\n`;
     });
     navigator.clipboard.writeText(txt).then(() => {
       alert('已复制当前换算结果');

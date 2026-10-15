@@ -8,7 +8,7 @@
 
 ## ✨ 特点
 
-- **纯静态 · 即开即用** — 17 个 HTML 文件,双击即可离线使用
+- **纯静态 · 即开即用** — 13 个工具页 + 首页,双击即可离线使用
 - **规范优先** — 每个工具都标注依据的国标、行业标准与公式出处
 - **实时联动** — 改任意输入结果立即重算,像 Excel 一样顺滑
 - **移动适配** — 工地、水厂、会议室、手机上都能用
@@ -24,7 +24,6 @@
 | [明渠水力](open-channel-calculator.html) | Manning 公式 · 梯形/矩形/圆形断面 · 临界水深 · Fr 判流 |
 | [堰流计算](weir-flow-calculator.html) | 矩形 / 三角 / 梯形 / 宽顶 四种堰型 · 淹没出流修正 |
 | [孔口管嘴出流](orifice-nozzle-calculator.html) | 薄壁孔 / 圆柱管嘴 / 锥形管嘴 / 大孔口 · 变水头泄流时间 |
-| [管道水力(加强版)](pipe-hydraulic-pro.html) | 9 种管材 × 32 个壁厚/压力等级的真实内径 · 23 项管件阻力库(Crane / Idelchik 溯源) · Manning 重力流反解定径与坡度求解 · PN 承压校核 |
 
 ### 工艺计算 · Process
 
@@ -33,12 +32,16 @@
 | [曝气量](aeration-calculator.html) | 活性污泥法 AOR/SOR · α-β 修正 · 碳化+硝化需氧 |
 | [污泥产量](sludge-production-calculator.html) | 生物+化学+原生污泥 · 脱水前后体积 · 处置成本 |
 | [加药量](dosing-calculator.html) | PAC/PAM/次氯酸钠/碳源/除磷/pH 调节 六大类药剂 |
+| [活性污泥工艺](activated-sludge-process-calculator.html) | AAO / A/O / SBR / 氧化沟 池容 · 回流 · 需氧 · 剩余污泥(Beta) |
+| [MBBR / IFAS / RAS](mbbr-design.html) | 纯 MBBR 段组合 · IFAS · 循环水养殖 · 填料选型(Beta) |
+| [MBR](mbr-design.html) | 池容 · 膜面积 · 清洗 · 能耗(Beta) |
 
 ### 设备选型 · Equipment
 
 | 工具 | 说明 |
 |------|------|
 | [水泵选型](pump-selection-calculator.html) | 系统扬程 / 轴功率 / NPSH 校核 / 并联变频 |
+| [鼓风机选型](blower-selection-calculator.html) | 绝热压缩功率 · 海拔修正 · 机型建议 · 年电费 |
 
 ### 基础换算 · Utilities
 
@@ -49,7 +52,7 @@
 ## 🚀 本地运行
 
 ```bash
-git clone https://github.com/<your-username>/waterkit.git
+git clone https://github.com/chengsunmail/waterkit.git
 cd waterkit
 # 双击 index.html 即可,无需任何构建或依赖
 ```
@@ -66,6 +69,15 @@ npx serve .
 # 然后访问 http://localhost:8000
 ```
 
+## ☁️ 部署
+
+站点部署在 Cloudflare Workers Static Assets(见 `wrangler.toml`):
+
+- `wrangler deploy` 发布仓库根目录的静态文件
+- `.assetsignore` 列出不对外发布的文件(README、配置等)
+- `_redirects` 维护旧地址的 301 重定向
+- 不存在的地址返回 `404.html`
+
 ## 📋 技术说明
 
 - 纯原生 HTML + CSS + JavaScript,**零依赖**
@@ -78,13 +90,7 @@ npx serve .
 本工具计算基于以下现行国家/行业标准:
 
 - **GB 50013** 室外给水设计标准
-- **GB 50014** 室外排水设计标准(最大设计充满度 / 最小设计流速 / 最小管径)
-- **GB/T 3091** 低压流体输送用焊接钢管 · **ASME B36.10M** 焊接与无缝锻铁管
-- **EN 10255** 螺纹连接用非合金钢管(原 DIN 2440 / BS 1387)
-- **ISO 2531 / EN 545 / GB/T 13295** 球墨铸铁管 · **ISO 4179** 水泥砂浆内衬
-- **GB/T 13663 / EN 12201(ISO 4427)** 给水用聚乙烯(PE)管道系统
-- **GB/T 10002.1 / EN ISO 1452** 给水用硬聚氯乙烯(PVC-U)管材
-- **Crane TP-410** Flow of Fluids · **Idelchik** Handbook of Hydraulic Resistance
+- **GB 50014** 室外排水设计标准
 - **HJ 576** 厌氧-缺氧-好氧活性污泥法污水处理工程技术规范
 - **GB 18918** 城镇污水处理厂污染物排放标准
 - **GB 5749** 生活饮用水卫生标准
@@ -99,7 +105,7 @@ npx serve .
 
 欢迎提 Issue 报告计算错误、建议新工具或改进用户体验。
 
-想贡献新工具?请在 [Issues](../../issues) 开一个讨论说明想做的工具类型和计算依据,我们一起评估。
+想贡献新工具?请在 [Issues](https://github.com/chengsunmail/waterkit/issues) 开一个讨论说明想做的工具类型和计算依据,我们一起评估。
 
 ## 📄 License
 

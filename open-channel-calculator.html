@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>明渠水力计算器 | 水处理工具箱</title>
+<title>明渠水力计算器 | 水处理工具箱 · WaterKit</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230891b2'/%3E%3Ctext x='16' y='22.5' font-size='18' font-weight='700' text-anchor='middle' fill='white' font-family='Arial,sans-serif'%3EW%3C/text%3E%3C/svg%3E">
+<meta name="description" content="明渠水力计算器：按 Manning 公式计算梯形、矩形、圆形断面的流量、正常水深或底坡，求临界水深、临界坡度与弗劳德数，给出水力最佳断面和圆管充满度校核。">
+<link rel="canonical" href="https://waterkit.cn/open-channel-calculator.html">
 <style>
   :root {
     --brand: #0891b2;
@@ -19,13 +22,6 @@
     --bg-section: #f1f5f9;
     --border: #e2e8f0;
     --border-soft: #f1f5f9;
-  }
-  body {
-    background: var(--bg) !important;
-    padding: 0 !important;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
   }
 
   /* 统一顶部导航 */
@@ -167,11 +163,15 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: #f5f7fa;
+    background: var(--bg);
     color: #1f2937;
     line-height: 1.6;
-    padding: 16px;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
   }
+  .invalid { border-color: #ef4444 !important; background: #fef2f2 !important; }
   .container {
     max-width: 860px;
     margin: 0 auto;
@@ -428,15 +428,8 @@
     color: #92400e;
     border-left: 3px solid #f59e0b;
   }
-  footer {
-    text-align: center;
-    padding: 16px;
-    font-size: 12px;
-    color: #9ca3af;
-  }
   @media (max-width: 480px) {
     .main-wrap { padding: 8px; }
-    ..main-wrap { padding: 16px; }
     header.tool-header { padding: 18px; }
     header.tool-header h1 { font-size: 19px; }
     .result-value { font-size: 17px; }
@@ -513,36 +506,36 @@
     <div class="grid" id="paramsGrid">
       <!-- 梯形/矩形参数 -->
       <div class="field shape-rect shape-trap">
-        <label>底宽 b <span class="unit">m</span></label>
+        <label for="b">底宽 b <span class="unit">m</span></label>
         <input type="number" id="b" value="2.0" step="0.1">
       </div>
       <div class="field shape-trap">
-        <label>边坡系数 m <span class="unit">横:竖</span></label>
+        <label for="m">边坡系数 m <span class="unit">横:竖</span></label>
         <input type="number" id="m" value="1.5" step="0.1">
       </div>
 
       <!-- 圆形参数 -->
       <div class="field shape-circ" style="display:none;">
-        <label>管径 D <span class="unit">m</span></label>
+        <label for="D">管径 D <span class="unit">m</span></label>
         <input type="number" id="D" value="1.0" step="0.1">
       </div>
 
       <!-- 共用 -->
       <div class="field" id="f_h">
-        <label>水深 h <span class="unit">m</span></label>
+        <label for="h">水深 h <span class="unit">m</span></label>
         <input type="number" id="h" value="1.0" step="0.05">
       </div>
       <div class="field" id="f_Q">
-        <label>流量 Q <span class="unit">m³/s</span></label>
+        <label for="Q">流量 Q <span class="unit">m³/s</span></label>
         <input type="number" id="Q" value="2.5" step="0.1">
       </div>
       <div class="field" id="f_i">
-        <label>底坡 i <span class="unit">— (如 0.001)</span></label>
+        <label for="i">底坡 i <span class="unit">— (如 0.001)</span></label>
         <input type="number" id="i" value="0.001" step="0.0001">
       </div>
 
       <div class="field">
-        <label>曼宁粗糙系数 n</label>
+        <label for="n_preset">曼宁粗糙系数 n</label>
         <select id="n_preset" onchange="updateN()">
           <option value="0.011">光滑水泥抹面 (n=0.011)</option>
           <option value="0.013" selected>混凝土 (n=0.013)</option>
@@ -557,7 +550,7 @@
         </select>
       </div>
       <div class="field">
-        <label>n 值 <span class="unit">曼宁</span></label>
+        <label for="n">n 值 <span class="unit">曼宁</span></label>
         <input type="number" id="n" value="0.013" step="0.001">
       </div>
     </div>
@@ -634,7 +627,7 @@
           <span><span class="result-value" id="r_b_best">—</span><span class="result-unit">m</span></span>
         </div>
         <div class="result-row">
-          <span class="result-label">宽深比 β</span>
+          <span class="result-label" id="r_beta_l">宽深比 β</span>
           <span><span class="result-value" id="r_beta">—</span><span class="result-unit">—</span></span>
         </div>
         <div class="check-box check-info" id="bestHint">最佳断面提示</div>
@@ -684,7 +677,9 @@
       <p><strong>矩形</strong>：h = b/2（宽深比 β = b/h = 2）</p>
       <p><strong>梯形</strong>：β = b/h = 2·(√(1+m²) − m)</p>
       <p>例如 m=1.5 时,最佳 β ≈ 0.606,即 b/h ≈ 0.606。</p>
-      <p><strong>圆形</strong>：充满度 h/D = 0.813 时流量最大（非满流效应）。</p>
+      <p><strong>圆形</strong>：充满度 h/D = 0.938 时流量最大（0.813 时流速最大）,为非满流效应;超过 0.938 后流量反而减小,满流退化为压力流。圆形断面时该栏显示充满度 h/D。</p>
+      <p><strong>圆管设计充满度校核</strong>（GB 50014,污水管,仅作提示）：DN200–300 ≤ 0.55;DN350–450 ≤ 0.65;DN500–900 ≤ 0.70;≥ DN1000 ≤ 0.75。</p>
+      <p>梯形/矩形求正常水深与临界水深的二分搜索上界为 20 m,超出时页面给出提示。</p>
 
       <h3>⑥ 常用曼宁 n 值（GB 50014 / 水力学手册）</h3>
       <table>
@@ -725,7 +720,7 @@
             <div class="brand-sub">WaterKit · by 登登科技</div>
           </div>
         </a>
-        <p class="footer-about">水处理工具箱(WaterKit)是海南登登科技咨询有限公司推出的水处理在线计算工具集合,由一线水处理工艺工程师开发维护。免费、无广告、持续更新。</p>
+        <p class="footer-about">水处理工具箱(WaterKit)是海南登登科技咨询有限公司推出的水处理在线计算工具集合,由一线水处理工艺工程师开发维护。免费、持续更新。</p>
       </div>
       <div class="footer-col">
         <h4>水力计算</h4>
@@ -742,7 +737,11 @@
           <li><a href="aeration-calculator.html">曝气量</a></li>
           <li><a href="sludge-production-calculator.html">污泥产量</a></li>
           <li><a href="dosing-calculator.html">加药量</a></li>
+          <li><a href="activated-sludge-process-calculator.html">活性污泥工艺</a></li>
+          <li><a href="mbbr-design.html">MBBR 工程设计</a></li>
+          <li><a href="mbr-design.html">MBR 工程设计</a></li>
           <li><a href="pump-selection-calculator.html">水泵选型</a></li>
+          <li><a href="blower-selection-calculator.html">鼓风机选型</a></li>
           <li><a href="water-quality-unit-converter.html">水质换算</a></li>
         </ul>
       </div>
@@ -854,9 +853,28 @@
     return (1/n) * g1.A * Math.pow(g1.R, 2/3) * Math.sqrt(i);
   }
 
+  // 圆形断面超过无压过流能力时记录 Q_max(null 表示未超)
+  let circOverCapacity = null;
+  // 梯形/矩形二分上界(m)及超界标记
+  const H_UPPER = 20.0;
+  let hOverBound = false, hcOverBound = false;
+
   // 已知 Q、i,求 h（二分法）
   function h_from_Qi(Q_target, i) {
-    let lo = 0.001, hi = (shape === 'circular') ? num('D') * 0.999 : 20.0;
+    circOverCapacity = null;
+    let lo = 0.001, hi = (shape === 'circular') ? num('D') * 0.938 : H_UPPER;
+    if (shape !== 'circular' && Q_from_hi(hi, i) < Q_target) {
+      hOverBound = true;
+      return hi;
+    }
+    if (shape === 'circular') {
+      // 无压圆管最大流量出现在充满度 0.938
+      const Q_max = Q_from_hi(hi, i);
+      if (Q_target > Q_max) {
+        circOverCapacity = Q_max;
+        return hi;
+      }
+    }
     for (let k = 0; k < 80; k++) {
       const mid = (lo + hi) / 2;
       const q = Q_from_hi(mid, i);
@@ -877,7 +895,14 @@
 
   // 临界水深:α Q² B / (g A³) = 1
   function criticalDepth(Q_val) {
-    let lo = 0.001, hi = (shape === 'circular') ? num('D') * 0.999 : 20.0;
+    let lo = 0.001, hi = (shape === 'circular') ? num('D') * 0.999 : H_UPPER;
+    if (shape !== 'circular') {
+      const gh = geom(hi);
+      if (gh.A > 0 && Q_val * Q_val * gh.B / (g * Math.pow(gh.A, 3)) > 1) {
+        hcOverBound = true;
+        return hi;
+      }
+    }
     for (let k = 0; k < 80; k++) {
       const mid = (lo + hi) / 2;
       const gm = geom(mid);
@@ -902,6 +927,12 @@
         <pattern id="waterWaves" patternUnits="userSpaceOnUse" width="8" height="8">
           <path d="M0,4 Q2,2 4,4 T8,4" fill="none" stroke="#0891b2" stroke-width="0.5" opacity="0.3"/>
         </pattern>
+        <marker id="arrL" viewBox="0 0 6 6" refX="1" refY="3" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M6,0 L0,3 L6,6" fill="none" stroke="#333" stroke-width="1"/>
+        </marker>
+        <marker id="arrR" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0,0 L6,3 L0,6" fill="none" stroke="#333" stroke-width="1"/>
+        </marker>
       </defs>
     `;
 
@@ -961,9 +992,56 @@
   }
 
   // ============ 主计算 ============
+  // GB 50014 污水管设计最大充满度(按管径 mm)
+  function maxFullness(D_mm) {
+    if (D_mm < 200) return null;
+    if (D_mm < 350) return {lim: 0.55, rng: 'DN200–300'};
+    if (D_mm < 500) return {lim: 0.65, rng: 'DN350–450'};
+    if (D_mm < 1000) return {lim: 0.70, rng: 'DN500–900'};
+    return {lim: 0.75, rng: '≥DN1000'};
+  }
+
+  // 输入无效:结果置"—"并提示
+  function showInvalid(ids, msg) {
+    ids.forEach(id => $(id).classList.add('invalid'));
+    document.querySelectorAll('.results [id^="r_"]').forEach(el => {
+      if (el.classList.contains('result-value') || el.id === 'r_Fr_state') el.textContent = '—';
+    });
+    const cb = $('flowCheck');
+    cb.className = 'check-box check-bad';
+    cb.textContent = '✗ ' + msg;
+    $('bestHint').className = 'check-box check-info';
+    $('bestHint').textContent = '—';
+  }
+
   function calc() {
     const n = num('n');
     let h_val, Q_val, i_val;
+    circOverCapacity = null;
+    hOverBound = false; hcOverBound = false;
+
+    // ============ 输入校验 ============
+    document.querySelectorAll('.invalid').forEach(el => el.classList.remove('invalid'));
+    const names = {n: '曼宁系数 n', b: '底宽 b', D: '管径 D', h: '水深 h', Q: '流量 Q', i: '底坡 i'};
+    const need = ['n'];
+    if (shape === 'circular') need.push('D'); else need.push('b');
+    if (mode === 'Q') need.push('h', 'i');
+    else if (mode === 'h') need.push('Q', 'i');
+    else need.push('Q', 'h');
+    const bad = need.filter(id => !(num(id) > 0));
+    if (bad.length) {
+      showInvalid(bad, `请输入大于 0 的${bad.map(id => names[id]).join('、')}`);
+      return;
+    }
+    if (shape === 'trapezoidal' && num('m') < 0) {
+      showInvalid(['m'], '边坡系数 m 不能为负');
+      return;
+    }
+    if (shape === 'circular' && mode !== 'h' && num('h') > num('D')) {
+      showInvalid(['h'], `水深 h (${num('h')} m) 大于管径 D (${num('D')} m):已为满管压力流,Manning 无压流公式不适用,请改用管道水力计算器`);
+      drawSection();
+      return;
+    }
 
     if (mode === 'Q') {
       h_val = num('h'); i_val = num('i');
@@ -1010,7 +1088,15 @@
 
     const st = $('r_Fr_state');
     const cb = $('flowCheck');
-    if (Fr < 0.95) {
+    if (hOverBound) {
+      st.textContent = Fr < 0.95 ? '缓流' : (Fr > 1.05 ? '急流' : '临界流');
+      cb.className = 'check-box check-bad';
+      cb.innerHTML = `✗ <b>超出计算范围</b> · 目标 Q = ${Q_val.toFixed(3)} m³/s 超过水深 ${H_UPPER} m 时的过流能力（求解上界）,结果按 h = ${H_UPPER} m 给出,不可用。请检查流量、底宽或底坡。`;
+    } else if (circOverCapacity !== null) {
+      st.textContent = Fr < 0.95 ? '缓流' : (Fr > 1.05 ? '急流' : '临界流');
+      cb.className = 'check-box check-bad';
+      cb.innerHTML = `✗ <b>超过无压过流能力</b> · 目标 Q = ${Q_val.toFixed(3)} m³/s &gt; Q_max = ${circOverCapacity.toFixed(3)} m³/s（h/D = 0.938 时）,需加大管径或坡度。结果按 h = 0.938D 给出。`;
+    } else if (Fr < 0.95) {
       st.textContent = '缓流';
       cb.className = 'check-box check-ok';
       cb.innerHTML = `✓ <b>缓流 (Subcritical)</b> · Fr = ${Fr.toFixed(3)} &lt; 1, h (${h_val.toFixed(2)} m) &gt; h_c (${hc.toFixed(2)} m),扰动可向上游传播,常见于平原渠道、水处理主流渠。`;
@@ -1024,8 +1110,17 @@
       cb.innerHTML = `ℹ <b>临界流 (Critical)</b> · Fr ≈ 1,流态不稳,工程上应避免此状态作为正常运行工况。`;
     }
 
+    if (shape === 'circular' && circOverCapacity === null && !(gm.B > 1e-9)) {
+      st.textContent = '—';
+      cb.className = 'check-box check-info';
+      cb.innerHTML = `ℹ <b>满管</b> · h = D,水面宽 B = 0,弗劳德数与流态判定不适用;满管时按压力流考虑,建议改用管道水力计算器。`;
+    }
+    if (hcOverBound) {
+      cb.innerHTML += `<br>⚠ 临界水深超过求解上界 ${H_UPPER} m,h_c、i_c 及流态判定不可靠。`;
+    }
+
     // ============ 水力最佳断面 ============
-    let h_best = 0, b_best = 0, beta = 0, hint = '';
+    let h_best = 0, b_best = 0, beta = 0, hint = '', hintCls = 'check-info';
     if (shape === 'rectangular') {
       // b = 2h, A = 2h²,v = (1/n)·(h/2)^(2/3)·√i
       // Q = (1/n)·2h²·(h/2)^(2/3)·√i  →  h = [Q·n/(2·(1/2)^(2/3)·√i)]^(3/8)
@@ -1050,15 +1145,29 @@
       }
     } else { // circular
       const D = num('D');
-      h_best = 0.813 * D;   // 最大流量对应充满度
+      h_best = 0.938 * D;   // 最大流量对应充满度
       b_best = D;
       beta = h_best / D;
-      hint = `圆形最大流量充满度 h/D = 0.813,即 h=${h_best.toFixed(2)} m (D=${D.toFixed(2)} m)。当前充满度 h/D = ${(h_val/D).toFixed(3)}。注意:最大流速对应 h/D≈0.81,最大流量对应 h/D≈0.938,满流后退化为压力流。`;
+      hint = `圆形断面充满度 h/D = 0.938 时流量最大（0.813 时流速最大）,即 h=${h_best.toFixed(2)} m (D=${D.toFixed(2)} m)。当前充满度 h/D = ${(h_val/D).toFixed(3)}。满流后退化为压力流。`;
+      // GB 50014 设计充满度校核(仅提示)
+      const mf = maxFullness(D * 1000), fr = h_val / D;
+      if (mf) {
+        if (fr > mf.lim + 1e-9) {
+          hintCls = 'check-warn';
+          hint += `<br>⚠ 设计充满度校核：GB 50014 污水管 ${mf.rng} 最大设计充满度 ${mf.lim},当前 ${fr.toFixed(3)} 超限（仅提示,不影响计算结果）。`;
+        } else {
+          hint += `<br>✓ 设计充满度校核：GB 50014 污水管 ${mf.rng} 最大设计充满度 ${mf.lim},当前 ${fr.toFixed(3)} 满足。`;
+        }
+      } else {
+        hint += `<br>管径小于 DN200,不在 GB 50014 设计充满度表内。`;
+      }
     }
     $('r_h_best').textContent = h_best > 0 ? h_best.toFixed(3) : '—';
     $('r_b_best').textContent = b_best > 0 ? b_best.toFixed(3) : '—';
     $('r_beta').textContent = beta > 0 ? beta.toFixed(3) : '—';
+    $('bestHint').className = 'check-box ' + hintCls;
     $('bestHint').innerHTML = hint;
+    $('r_beta_l').textContent = shape === 'circular' ? '充满度 h/D' : '宽深比 β';
 
     // 重绘断面(圆形水深变化时)
     if (shape === 'circular') drawSection();
@@ -1088,7 +1197,12 @@ Fr = ${$('r_Fr').textContent} (${$('r_Fr_state').textContent})
 
 【最佳断面参考】
 推荐 h = ${$('r_h_best').textContent} m
-推荐 b = ${$('r_b_best').textContent} m`;
+推荐 b = ${$('r_b_best').textContent} m
+${$('r_beta_l').textContent} = ${$('r_beta').textContent}
+
+【校核】
+${$('flowCheck').innerText}
+${$('bestHint').innerText}`;
     navigator.clipboard.writeText(txt).then(() => {
       alert('结果已复制');
     }).catch(() => {

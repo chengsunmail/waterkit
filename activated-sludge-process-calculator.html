@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>活性污泥法工艺计算器 | 水处理工具箱 · WaterKit</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230891b2'/%3E%3Ctext x='16' y='22.5' font-size='18' font-weight='700' text-anchor='middle' fill='white' font-family='Arial,sans-serif'%3EW%3C/text%3E%3C/svg%3E">
 <meta name="description" content="AAO / A²O / AO / SBR / MBR / MBBR / 氧化沟 七种主流活性污泥法工艺在线设计计算,同步脱氮除磷,城镇污水与工业废水双预设,依据GB 50014/HJ 576/Metcalf & Eddy。">
+<link rel="canonical" href="https://waterkit.cn/activated-sludge-process-calculator.html">
 <meta name="keywords" content="AAO计算,A2O设计,活性污泥法,污水处理工艺,脱氮除磷,SBR计算,MBR设计,MBBR,氧化沟,污水厂设计">
 <style>
   :root {
@@ -452,6 +454,8 @@
     font-weight: 700;
     font-size: 14px;
   }
+  .invalid{border-color:#ef4444!important;background:#fef2f2!important}
+  .score-note { font-size: 11px; color: var(--text-faint); margin-top: 4px; }
   .check-ok { background: #dcfce7; color: #166534; border-left-color: #22c55e; }
   .check-warn { background: #fef3c7; color: #92400e; border-left-color: #f59e0b; }
   .check-bad { background: #fee2e2; color: #991b1b; border-left-color: #ef4444; }
@@ -877,36 +881,36 @@
       <div class="section-title"><span class="num">3</span>进水条件</div>
       <div class="grid">
         <div class="field">
-          <label>设计规模 Q <span class="unit">万 m³/d</span></label>
+          <label for="Q">设计规模 Q <span class="unit">万 m³/d</span></label>
           <input type="number" id="Q" value="5" step="0.5" min="0.01">
         </div>
         <div class="field">
-          <label>水温 T <span class="unit">°C</span></label>
+          <label for="T">水温 T <span class="unit">°C</span></label>
           <input type="number" id="T" value="15" step="1" min="5" max="35">
           <div class="helper">冬季低温取 8-12℃, 夏季取 20-25℃</div>
         </div>
         <div class="field">
-          <label>COD₀ <span class="unit">mg/L</span></label>
+          <label for="COD0">COD₀ <span class="unit">mg/L</span></label>
           <input type="number" id="COD0" value="400" step="10">
         </div>
         <div class="field">
-          <label>BOD₅₀ <span class="unit">mg/L</span></label>
+          <label for="BOD0">BOD₅₀ <span class="unit">mg/L</span></label>
           <input type="number" id="BOD0" value="180" step="5">
         </div>
         <div class="field">
-          <label>SS₀ <span class="unit">mg/L</span></label>
+          <label for="SS0">SS₀ <span class="unit">mg/L</span></label>
           <input type="number" id="SS0" value="200" step="10">
         </div>
         <div class="field">
-          <label>TN₀ <span class="unit">mg/L</span></label>
+          <label for="TN0">TN₀ <span class="unit">mg/L</span></label>
           <input type="number" id="TN0" value="45" step="1">
         </div>
         <div class="field">
-          <label>NH₄-N₀ <span class="unit">mg/L</span></label>
+          <label for="NH40">NH₄-N₀ <span class="unit">mg/L</span></label>
           <input type="number" id="NH40" value="35" step="1">
         </div>
         <div class="field">
-          <label>TP₀ <span class="unit">mg/L</span></label>
+          <label for="TP0">TP₀ <span class="unit">mg/L</span></label>
           <input type="number" id="TP0" value="5" step="0.2">
         </div>
       </div>
@@ -915,33 +919,33 @@
       <div class="section-title"><span class="num">4</span>出水目标</div>
       <div class="grid">
         <div class="field">
-          <label>排放标准</label>
+          <label for="standard">排放标准</label>
           <select id="standard" onchange="applyStandard()">
             <option value="1A">一级 A (GB 18918)</option>
             <option value="1B">一级 B (GB 18918)</option>
-            <option value="grade4">地表 IV 类(准 IV)</option>
+            <option value="grade4">准 IV 类(地方标准, 限值按所在地调整)</option>
             <option value="grade3">地表 III 类</option>
             <option value="custom">自定义</option>
           </select>
         </div>
         <div class="field">
-          <label>COD出 <span class="unit">mg/L</span></label>
+          <label for="CODe">COD出 <span class="unit">mg/L</span></label>
           <input type="number" id="CODe" value="50" step="1">
         </div>
         <div class="field">
-          <label>BOD出 <span class="unit">mg/L</span></label>
+          <label for="BODe">BOD出 <span class="unit">mg/L</span></label>
           <input type="number" id="BODe" value="10" step="0.5">
         </div>
         <div class="field">
-          <label>NH₄-N出 <span class="unit">mg/L</span></label>
+          <label for="NH4e">NH₄-N出 <span class="unit">mg/L</span></label>
           <input type="number" id="NH4e" value="5" step="0.5">
         </div>
         <div class="field">
-          <label>TN出 <span class="unit">mg/L</span></label>
+          <label for="TNe">TN出 <span class="unit">mg/L</span></label>
           <input type="number" id="TNe" value="15" step="0.5">
         </div>
         <div class="field">
-          <label>TP出 <span class="unit">mg/L</span></label>
+          <label for="TPe">TP出 <span class="unit">mg/L</span></label>
           <input type="number" id="TPe" value="0.5" step="0.1">
         </div>
       </div>
@@ -950,29 +954,30 @@
       <div class="section-title"><span class="num">5</span>设计参数</div>
       <div class="grid">
         <div class="field">
-          <label>MLSS <span class="unit">mg/L</span></label>
+          <label for="MLSS">MLSS <span class="unit">mg/L</span></label>
           <input type="number" id="MLSS" value="3500" step="100">
           <div class="helper">城镇污水 3000-4500</div>
         </div>
         <div class="field">
-          <label>MLVSS/MLSS 比 <span class="unit">—</span></label>
+          <label for="VSS_SS">MLVSS/MLSS 比 <span class="unit">—</span></label>
           <input type="number" id="VSS_SS" value="0.75" step="0.01" min="0.4" max="0.9">
         </div>
         <div class="field">
-          <label>污泥回流 MLSS₁ <span class="unit">mg/L</span></label>
+          <label for="MLSSr">污泥回流 MLSS₁ <span class="unit">mg/L</span></label>
           <input type="number" id="MLSSr" value="10000" step="500">
           <div class="helper">二沉池底部浓度, 常取 8000-12000</div>
         </div>
         <div class="field linked">
-          <label>泥龄 SRT <span class="unit">d (自动推荐)</span></label>
+          <label for="SRT">好氧泥龄 SRT_O <span class="unit">d (自动推荐)</span></label>
           <input type="number" id="SRT" value="15" step="0.5">
+          <div class="helper">好氧段泥龄, V_O 按此计算; 系统总泥龄见结果区</div>
         </div>
         <div class="field">
-          <label>SRT 安全系数 <span class="unit">—</span></label>
+          <label for="SF_SRT">SRT 安全系数 <span class="unit">—</span></label>
           <input type="number" id="SF_SRT" value="2.0" step="0.1" min="1.2" max="5">
         </div>
         <div class="field">
-          <label>厌氧段 HRT <span class="unit">h</span></label>
+          <label for="HRT_AN">厌氧段 HRT <span class="unit">h</span></label>
           <input type="number" id="HRT_AN" value="1.5" step="0.1" min="0.5" max="3">
           <div class="helper">释磷时间, 1-2h 为常用</div>
         </div>
@@ -1007,36 +1012,41 @@
       <div class="advanced-params" id="advanced-params">
         <div class="grid">
           <div class="field">
-            <label>Y (产泥系数) <span class="unit">kgVSS/kgBOD</span></label>
+            <label for="Y">Y (产泥系数) <span class="unit">kgVSS/kgBOD</span></label>
             <input type="number" id="Y" value="0.6" step="0.05">
           </div>
           <div class="field">
-            <label>Kd (衰减系数) <span class="unit">1/d @20℃</span></label>
+            <label for="Kd">Kd (衰减系数) <span class="unit">1/d @20℃</span></label>
             <input type="number" id="Kd" value="0.06" step="0.01">
           </div>
           <div class="field">
-            <label>μ_max (硝化菌) <span class="unit">1/d @20℃</span></label>
+            <label for="mu_max">μ_max (硝化菌) <span class="unit">1/d @20℃</span></label>
             <input type="number" id="mu_max" value="0.75" step="0.05">
           </div>
           <div class="field">
-            <label>Kn (饱和常数) <span class="unit">mgN/L</span></label>
+            <label for="Kn">Kn (饱和常数) <span class="unit">mgN/L</span></label>
             <input type="number" id="Kn" value="1.0" step="0.1">
           </div>
           <div class="field">
-            <label>SDNR₂₀ (反硝化速率) <span class="unit">gN/gVSS·d</span></label>
+            <label for="SDNR20">SDNR₂₀ (反硝化速率) <span class="unit">gN/gVSS·d</span></label>
             <input type="number" id="SDNR20" value="0.08" step="0.01">
           </div>
           <div class="field">
-            <label>θ_T 温度修正 <span class="unit">—</span></label>
+            <label for="theta_T">θ_T 温度修正 <span class="unit">—</span></label>
             <input type="number" id="theta_T" value="1.103" step="0.001">
           </div>
           <div class="field">
-            <label>α (氧传质修正) <span class="unit">—</span></label>
+            <label for="alpha">α (氧传质修正) <span class="unit">—</span></label>
             <input type="number" id="alpha" value="0.7" step="0.05">
           </div>
           <div class="field">
-            <label>β (溶氧饱和修正) <span class="unit">—</span></label>
+            <label for="beta">β (溶氧饱和修正) <span class="unit">—</span></label>
             <input type="number" id="beta" value="0.95" step="0.01">
+          </div>
+          <div class="field">
+            <label for="H_diff">曝气器淹没深度 H_d <span class="unit">m</span></label>
+            <input type="number" id="H_diff" value="5.5" step="0.1" min="0">
+            <div class="helper">SOR 水深修正用; 0 = 表面曝气不修正</div>
           </div>
         </div>
       </div>
@@ -1100,11 +1110,11 @@
           </div>
           <div class="result-row highlight-row">
             <span class="result-label"><b>内回流比 R</b> <span class="sub">(好氧→缺氧 · 由 TN 目标反算)</span></span>
-            <span><span class="result-value big" id="r_R">—</span><span class="result-unit">倍</span></span>
+            <span><span class="result-value big" id="r_R">—</span><span class="result-unit"></span></span>
           </div>
           <div class="result-row highlight-row">
             <span class="result-label"><b>外回流比 r</b> <span class="sub">(二沉→厌氧 · 由 MLSS 平衡反算)</span></span>
-            <span><span class="result-value big" id="r_r">—</span><span class="result-unit">倍</span></span>
+            <span><span class="result-value big" id="r_r">—</span><span class="result-unit"></span></span>
           </div>
           <div class="result-row">
             <span class="result-label">内回流流量 Q_R</span>
@@ -1115,11 +1125,15 @@
             <span><span class="result-value" id="r_Qr">—</span><span class="result-unit">万 m³/d</span></span>
           </div>
           <div class="result-row">
-            <span class="result-label">推荐泥龄 SRT</span>
+            <span class="result-label">设计好氧泥龄 SRT_O <span class="sub">(V_O 按此计算)</span></span>
             <span><span class="result-value" id="r_SRT">—</span><span class="result-unit">d</span></span>
           </div>
           <div class="result-row">
-            <span class="result-label">最小泥龄 SRT_min</span>
+            <span class="result-label">系统总泥龄 SRT_总 <span class="sub">(≈ MLVSS·V_总/ΔX_VSS)</span></span>
+            <span><span class="result-value" id="r_SRTtot">—</span><span class="result-unit">d</span></span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">最小泥龄 SRT_min <span class="sub">(硝化, 好氧)</span></span>
             <span><span class="result-value" id="r_SRTmin">—</span><span class="result-unit">d</span></span>
           </div>
         </div>
@@ -1152,7 +1166,7 @@
             <span><span class="result-value big" id="r_dX">—</span><span class="result-unit">kg DS/d</span></span>
           </div>
           <div class="result-row">
-            <span class="result-label">F/M 比(污泥负荷)</span>
+            <span class="result-label">F/M 污泥负荷 <span class="sub">(Q·S₀/(V_总·MLSS))</span></span>
             <span><span class="result-value" id="r_FM">—</span><span class="result-unit">kgBOD/kgMLSS·d</span></span>
           </div>
         </div>
@@ -1192,6 +1206,7 @@
             <div>
               <div class="score-title" id="scoreTitle">设计合理性评分</div>
               <div class="score-label" id="scoreDesc">综合泥龄、池容比、回流比、碳氮磷比 5 项综合评估</div>
+              <div class="score-note">经验评分，仅供方案比选参考</div>
             </div>
           </div>
         </div>
@@ -1209,26 +1224,30 @@
         <h3>① 泥龄 SRT 推导(Monod + Arrhenius)</h3>
         <code>μ_max(T) = μ_max(20) × θ_T^(T-20)</code>
         <code>SRT_min = 1 / [μ_max(T) × NH4/(Kn+NH4) - Kd]</code>
-        <code>SRT_设计 = SF × SRT_min</code>
+        <code>Kn(T) = Kn(20) × 1.05^(T-20),  Kd(T) = Kd(20) × 1.04^(T-20),  NH4 取 max(NH4出, 0.5)</code>
+        <code>SRT_O,设计 = SF × SRT_min  (好氧泥龄; 自动推荐时不低于 GB 50014 下限 10 d, T&lt;15℃ 时 15 d)</code>
         <p>依据: Metcalf & Eddy 第 4 版 Ch.8, θ_T = 1.103, SF 安全系数 1.5-3。</p>
 
         <h3>② 好氧段池容(BOD 降解 + MLSS 平衡)</h3>
-        <code>V_O = SRT × Q × Y × (S₀ - Sₑ) / [X × (1 + Kd × SRT)]</code>
-        <p>X = MLVSS = MLSS × f_vss, 通常取 0.7-0.75。</p>
+        <code>V_O = SRT_O × Q × Y × (S₀ - Sₑ) / [X × (1 + Kd × SRT_O)]</code>
+        <code>系统总泥龄 SRT_总 ≈ X × V_总 / ΔX_VSS</code>
+        <p>X = MLVSS = MLSS × f_vss, 通常取 0.7-0.75。输入的 SRT 为好氧泥龄 SRT_O; GB 50014 表中 AAO 泥龄 10-20 d 指全池(系统)泥龄, 二者口径不同。</p>
 
         <h3>③ 内回流比 R(反硝化需求反算)</h3>
-        <code>NOx生成 = Q × (TN₀ - 0.12 × ΔVSS - NH4出) = 需反硝化的 N</code>
+        <code>NH4可硝化 = NH4₀ + 0.9 × (TN₀ - NH4₀)  (有机氮氨化率取 0.9)</code>
+        <code>NOx生成 = NH4可硝化 - 0.12 × Y_obs × (S₀ - Sₑ) - NH4出</code>
+        <code>NO3允许 = TN出 - NH4出 - 1  (出水有机氮约 1 mg/L)</code>
         <code>出水 NO3 ≈ NOx生成 / (1 + R + r)</code>
-        <code>R = NOx生成 / NO3出 - 1 - r</code>
-        <p>控制范围: R = 200%-400%, 实际 ≤ 600%。</p>
+        <code>R = NOx生成 / NO3允许 - 1 - r  (限 50%-800%)</code>
+        <p>常规范围: R = 100%-400%; &gt; 400% 偏高, &gt; 600% 水力冲击大。</p>
 
         <h3>④ 缺氧段池容(反硝化)</h3>
-        <code>SDNR(T) = SDNR(20) × 1.08^(T-20)</code>
+        <code>SDNR(T) = SDNR(20) × 1.08^(T-20)  (θ=1.08 依据 GB 50014)</code>
         <code>V_A = Q × NOx_还原 / (SDNR × X)</code>
         <p>SDNR 比反硝化速率, 与 BOD/NO3 比相关, 见 Metcalf 表 8-12。</p>
 
         <h3>⑤ 厌氧段池容(释磷时间)</h3>
-        <code>V_AN = (Q + Q_r) × HRT_AN</code>
+        <code>V_AN = Q × HRT_AN  (按设计进水流量 Q 计, 不含回流)</code>
         <p>HRT_AN 释磷时间, 1-2h, 温度低时取上限。</p>
 
         <h3>⑥ 外回流比 r(污泥浓度平衡)</h3>
@@ -1237,31 +1256,39 @@
         <p>常用范围 50%-100%, GB 50014 限值 100%。</p>
 
         <h3>⑦ 实际需氧量 AOR</h3>
-        <code>AOR_BOD = a' × Q × (BOD₀ - BODₑ) = 0.42-0.53 × BOD去除</code>
+        <code>AOR_BOD = 1.47 × Q × (BOD₀ - BODₑ) - 1.42 × ΔX_VSS  (GB 50014 式 6.6.17, 取 ≥ 0)</code>
         <code>AOR_N = 4.57 × Q × NH4硝化</code>
-        <code>AOR_DN = -2.86 × Q × NOx反硝化(反硝化回收 O₂)</code>
+        <code>AOR_DN = 2.86 × Q × NOx反硝化  (反硝化回收 O₂, 下式中扣除)</code>
         <code>AOR = AOR_BOD + AOR_N - AOR_DN</code>
 
-        <h3>⑧ 标准需氧量 SOR(α-β 修正)</h3>
-        <code>SOR = AOR × C_s20 / [α × (β × C_sT - C_L) × 1.024^(T-20)]</code>
-        <p>C_L 池内溶氧, 一般取 2 mg/L; α 氧传质修正 0.6-0.8; β 盐度修正 0.9-0.98。</p>
+        <h3>⑧ 标准需氧量 SOR(α-β + 水深修正)</h3>
+        <code>SOR = AOR × C_s(20) / [α × (β × C_sm(T) - C_L) × 1.024^(T-20)]</code>
+        <code>C_s(T) = 14.652 - 0.41022T + 0.007991T² - 0.000077774T³  (分子 C_s(20) 用同一式, ≈ 9.02 mg/L)</code>
+        <code>C_sm = C_s(T) × (P_b / 2.026×10⁵ + O_t / 42),  P_b = 101325 + 9810 × H_d (Pa)</code>
+        <code>O_t = 21(1 - E_A) / [79 + 21(1 - E_A)] × 100%,  E_A 氧利用率取 20%</code>
+        <p>H_d 曝气器淹没深度(高级参数, 默认 5.5 m; 取 0 视为表面曝气, C_sm = C_s(T))。C_L 池内溶氧取 2 mg/L; α 氧传质修正 0.6-0.8; β 盐度修正 0.9-0.98。</p>
 
         <h3>⑨ 剩余污泥量</h3>
-        <code>ΔX = Y_obs × Q × (BOD₀ - BODₑ)</code>
+        <code>ΔX_VSS = Y_obs × Q × (BOD₀ - BODₑ)</code>
         <code>Y_obs = Y / (1 + Kd × SRT)</code>
-        <p>硝化菌产泥一般占比 &lt; 5%, 可并入考虑。</p>
+        <code>ΔX = ΔX_VSS + f_ss × Q × (SS₀ - SSₑ)  (GB 50014 式 6.6.19)</code>
+        <p>f_ss 为 SS 污泥转换率 0.5–0.7 (本工具取 0.5), SSₑ 出水 SS 取 10 mg/L。硝化菌产泥一般占比 &lt; 5%, 可并入考虑。</p>
 
-        <h3>⑩ 校核依据</h3>
+        <h3>⑩ F/M 污泥负荷</h3>
+        <code>F/M = Q × S₀ / (V_总 × MLSS)  [kgBOD₅/(kgMLSS·d)]</code>
+        <p>按进水 BOD₅、全池容积与 MLSS 计 (设计手册常用口径)。</p>
+
+        <h3>⑪ 校核依据</h3>
         <table>
           <tr><th>指标</th><th>正常范围</th><th>警告阈值</th></tr>
-          <tr><td>BOD/TN</td><td>≥ 4</td><td>&lt; 3.5 需加碳源</td></tr>
+          <tr><td>BOD/TN</td><td>4-8</td><td>&lt; 4 偏低; &lt; 3 需加碳源</td></tr>
           <tr><td>BOD/TP</td><td>≥ 20</td><td>&lt; 17 除磷困难, 建议投 PAC</td></tr>
-          <tr><td>SRT</td><td>10-20 d</td><td>&lt; SRT_min × SF 硝化不稳</td></tr>
-          <tr><td>F/M</td><td>0.05-0.15</td><td>&gt; 0.3 污泥膨胀风险</td></tr>
-          <tr><td>HRT 总</td><td>8-20 h</td><td>&lt; 6h 反应不充分</td></tr>
-          <tr><td>水温</td><td>≥ 12℃ 硝化正常</td><td>&lt; 10℃ SRT 需延长</td></tr>
-          <tr><td>R 内回流</td><td>200-400%</td><td>&gt; 600% 水力冲击大</td></tr>
-          <tr><td>r 外回流</td><td>50-100%</td><td>&gt; 100% 二沉浓缩失效</td></tr>
+          <tr><td>好氧泥龄 SRT_O</td><td>≥ SRT_min × SF, ≤ 25 d</td><td>&lt; SRT_min × SF 硝化不稳; &gt; 25 d 老化</td></tr>
+          <tr><td>F/M (Q·S₀/(V·MLSS))</td><td>0.05-0.15</td><td>0.15-0.3 偏高(提示); &gt; 0.3 污泥膨胀风险</td></tr>
+          <tr><td>HRT 总</td><td>6-24 h</td><td>&lt; 6h 反应不充分</td></tr>
+          <tr><td>水温</td><td>≥ 12℃ 硝化正常</td><td>&lt; 12℃ 警告; &lt; 10℃ 严重</td></tr>
+          <tr><td>R 内回流</td><td>100-400%</td><td>&gt; 400% 偏高; &gt; 600% 水力冲击大</td></tr>
+          <tr><td>r 外回流</td><td>50-100%</td><td>&gt; 100% 达上限; &gt; 120% 二沉浓缩不足</td></tr>
         </table>
 
         <h3>参考规范与文献</h3>
@@ -1292,66 +1319,69 @@
       <!-- 进水 -->
       <div class="section-title"><span class="num">3</span>进水条件</div>
       <div class="grid">
-        <div class="field"><label>设计规模 Q <span class="unit">万 m³/d</span></label>
+        <div class="field"><label for="aoan_Q">设计规模 Q <span class="unit">万 m³/d</span></label>
           <input type="number" id="aoan_Q" value="5" step="0.5" min="0.01"></div>
-        <div class="field"><label>水温 T <span class="unit">°C</span></label>
+        <div class="field"><label for="aoan_T">水温 T <span class="unit">°C</span></label>
           <input type="number" id="aoan_T" value="15" step="1"></div>
-        <div class="field"><label>COD₀ <span class="unit">mg/L</span></label>
+        <div class="field"><label for="aoan_COD0">COD₀ <span class="unit">mg/L</span></label>
           <input type="number" id="aoan_COD0" value="400" step="10"></div>
-        <div class="field"><label>BOD₅₀ <span class="unit">mg/L</span></label>
+        <div class="field"><label for="aoan_BOD0">BOD₅₀ <span class="unit">mg/L</span></label>
           <input type="number" id="aoan_BOD0" value="180" step="5"></div>
-        <div class="field"><label>SS₀ <span class="unit">mg/L</span></label>
+        <div class="field"><label for="aoan_SS0">SS₀ <span class="unit">mg/L</span></label>
           <input type="number" id="aoan_SS0" value="200" step="10"></div>
-        <div class="field"><label>TN₀ <span class="unit">mg/L</span></label>
+        <div class="field"><label for="aoan_TN0">TN₀ <span class="unit">mg/L</span></label>
           <input type="number" id="aoan_TN0" value="40" step="1"></div>
-        <div class="field"><label>NH₄-N₀ <span class="unit">mg/L</span></label>
+        <div class="field"><label for="aoan_NH40">NH₄-N₀ <span class="unit">mg/L</span></label>
           <input type="number" id="aoan_NH40" value="30" step="1"></div>
       </div>
 
       <!-- 出水目标 -->
       <div class="section-title"><span class="num">4</span>出水目标</div>
       <div class="grid">
-        <div class="field"><label>排放标准</label>
+        <div class="field"><label for="aoan_standard">排放标准</label>
           <select id="aoan_standard" onchange="applyStandardAOAN()">
             <option value="1A">一级 A</option><option value="1B">一级 B</option>
-            <option value="grade4">地表 IV 类</option><option value="grade3">地表 III 类</option>
+            <option value="grade4">准 IV 类(地方标准, 限值按所在地调整)</option><option value="grade3">地表 III 类</option>
             <option value="custom">自定义</option>
           </select></div>
-        <div class="field"><label>COD出 <span class="unit">mg/L</span></label>
+        <div class="field"><label for="aoan_CODe">COD出 <span class="unit">mg/L</span></label>
           <input type="number" id="aoan_CODe" value="50" step="1"></div>
-        <div class="field"><label>BOD出 <span class="unit">mg/L</span></label>
+        <div class="field"><label for="aoan_BODe">BOD出 <span class="unit">mg/L</span></label>
           <input type="number" id="aoan_BODe" value="10" step="0.5"></div>
-        <div class="field"><label>NH₄-N出 <span class="unit">mg/L</span></label>
+        <div class="field"><label for="aoan_NH4e">NH₄-N出 <span class="unit">mg/L</span></label>
           <input type="number" id="aoan_NH4e" value="5" step="0.5"></div>
-        <div class="field"><label>TN出 <span class="unit">mg/L</span></label>
+        <div class="field"><label for="aoan_TNe">TN出 <span class="unit">mg/L</span></label>
           <input type="number" id="aoan_TNe" value="15" step="0.5"></div>
       </div>
 
       <!-- 设计参数 -->
       <div class="section-title"><span class="num">5</span>设计参数</div>
       <div class="grid">
-        <div class="field"><label>MLSS <span class="unit">mg/L</span></label>
+        <div class="field"><label for="aoan_MLSS">MLSS <span class="unit">mg/L</span></label>
           <input type="number" id="aoan_MLSS" value="3500" step="100"></div>
-        <div class="field"><label>MLVSS/MLSS</label>
+        <div class="field"><label for="aoan_VSS_SS">MLVSS/MLSS</label>
           <input type="number" id="aoan_VSS_SS" value="0.75" step="0.01"></div>
-        <div class="field"><label>污泥回流 MLSS_r <span class="unit">mg/L</span></label>
+        <div class="field"><label for="aoan_MLSSr">污泥回流 MLSS_r <span class="unit">mg/L</span></label>
           <input type="number" id="aoan_MLSSr" value="10000" step="500"></div>
-        <div class="field"><label>泥龄 SRT <span class="unit">d</span></label>
+        <div class="field"><label for="aoan_SRT">好氧泥龄 SRT_O <span class="unit">d</span></label>
           <input type="number" id="aoan_SRT" value="15" step="0.5"></div>
-        <div class="field"><label>SF 安全系数</label>
+        <div class="field"><label for="aoan_SF_SRT">SF 安全系数</label>
           <input type="number" id="aoan_SF_SRT" value="2.0" step="0.1"></div>
-        <div class="field"><label>Y <span class="unit">kgVSS/kgBOD</span></label>
+        <div class="field"><label for="aoan_Y">Y <span class="unit">kgVSS/kgBOD</span></label>
           <input type="number" id="aoan_Y" value="0.6" step="0.05"></div>
-        <div class="field"><label>Kd <span class="unit">1/d</span></label>
+        <div class="field"><label for="aoan_Kd">Kd <span class="unit">1/d</span></label>
           <input type="number" id="aoan_Kd" value="0.06" step="0.01"></div>
-        <div class="field"><label>SDNR₂₀ <span class="unit">gN/gVSS·d</span></label>
+        <div class="field"><label for="aoan_SDNR20">SDNR₂₀ <span class="unit">gN/gVSS·d</span></label>
           <input type="number" id="aoan_SDNR20" value="0.08" step="0.01"></div>
-        <div class="field"><label>μ_max <span class="unit">1/d</span></label>
+        <div class="field"><label for="aoan_mu_max">μ_max <span class="unit">1/d</span></label>
           <input type="number" id="aoan_mu_max" value="0.75" step="0.05"></div>
-        <div class="field"><label>α <span class="unit">氧传质</span></label>
+        <div class="field"><label for="aoan_alpha">α <span class="unit">氧传质</span></label>
           <input type="number" id="aoan_alpha" value="0.7" step="0.05"></div>
-        <div class="field"><label>β <span class="unit">饱和修正</span></label>
+        <div class="field"><label for="aoan_beta">β <span class="unit">饱和修正</span></label>
           <input type="number" id="aoan_beta" value="0.95" step="0.01"></div>
+        <div class="field"><label for="aoan_H_diff">曝气器淹没深度 H_d <span class="unit">m</span></label>
+          <input type="number" id="aoan_H_diff" value="5.5" step="0.1" min="0">
+          <div class="helper">SOR 水深修正; 0 = 表面曝气</div></div>
       </div>
 
       <div class="auto-calc-notice">
@@ -1391,11 +1421,13 @@
         <div class="result-group">
           <div class="result-group-title"><span class="ic">🔄</span> 回流系统<span class="auto-tag">AUTO</span></div>
           <div class="result-row highlight-row"><span class="result-label"><b>内回流比 R</b> <span class="sub">(好氧→缺氧)</span></span>
-            <span><span class="result-value big" id="aoan_r_R">—</span><span class="result-unit">倍</span></span></div>
+            <span><span class="result-value big" id="aoan_r_R">—</span><span class="result-unit"></span></span></div>
           <div class="result-row highlight-row"><span class="result-label"><b>外回流比 r</b> <span class="sub">(二沉→缺氧首端)</span></span>
-            <span><span class="result-value big" id="aoan_r_r">—</span><span class="result-unit">倍</span></span></div>
-          <div class="result-row"><span class="result-label">推荐泥龄 SRT</span>
+            <span><span class="result-value big" id="aoan_r_r">—</span><span class="result-unit"></span></span></div>
+          <div class="result-row"><span class="result-label">设计好氧泥龄 SRT_O</span>
             <span><span class="result-value" id="aoan_r_SRT">—</span><span class="result-unit">d</span></span></div>
+          <div class="result-row"><span class="result-label">系统总泥龄 SRT_总 <span class="sub">(≈ MLVSS·V_总/ΔX_VSS)</span></span>
+            <span><span class="result-value" id="aoan_r_SRTtot">—</span><span class="result-unit">d</span></span></div>
           <div class="result-row"><span class="result-label">最小泥龄 SRT_min</span>
             <span><span class="result-value" id="aoan_r_SRTmin">—</span><span class="result-unit">d</span></span></div>
         </div>
@@ -1408,7 +1440,7 @@
             <span><span class="result-value" id="aoan_r_SOR">—</span><span class="result-unit">kg O₂/d</span></span></div>
           <div class="result-row highlight-row"><span class="result-label"><b>剩余污泥 ΔX</b></span>
             <span><span class="result-value big" id="aoan_r_dX">—</span><span class="result-unit">kg DS/d</span></span></div>
-          <div class="result-row"><span class="result-label">F/M 比</span>
+          <div class="result-row"><span class="result-label">F/M 污泥负荷 <span class="sub">(Q·S₀/(V_总·MLSS))</span></span>
             <span><span class="result-value" id="aoan_r_FM">—</span><span class="result-unit">kgBOD/kgMLSS·d</span></span></div>
         </div>
 
@@ -1418,7 +1450,8 @@
           <div class="score-ring">
             <div><div class="score-num" id="aoan_scoreNum">—</div><div class="score-label">/ 100</div></div>
             <div><div class="score-title" id="aoan_scoreTitle">设计合理性评分</div>
-              <div class="score-label" id="aoan_scoreDesc">综合评估</div></div>
+              <div class="score-label" id="aoan_scoreDesc">综合评估</div>
+              <div class="score-note">经验评分，仅供方案比选参考</div></div>
           </div>
         </div>
 
@@ -1446,7 +1479,7 @@
       <!-- 含硝化氮模式开关 -->
       <div class="mode-switch">
         <label class="switch-label">
-          <input type="checkbox" id="aop_includeN" onchange="calc()">
+          <input type="checkbox" id="aop_includeN">
           <span class="switch-slider"></span>
           <span class="switch-text"><b>含硝化氮模式</b> · 勾选后考虑硝化影响和出水硝酸盐估算(默认仅除磷不考虑氮)</span>
         </label>
@@ -1454,63 +1487,66 @@
 
       <div class="section-title"><span class="num">3</span>进水条件</div>
       <div class="grid">
-        <div class="field"><label>设计规模 Q <span class="unit">万 m³/d</span></label>
+        <div class="field"><label for="aop_Q">设计规模 Q <span class="unit">万 m³/d</span></label>
           <input type="number" id="aop_Q" value="3" step="0.5"></div>
-        <div class="field"><label>水温 T <span class="unit">°C</span></label>
+        <div class="field"><label for="aop_T">水温 T <span class="unit">°C</span></label>
           <input type="number" id="aop_T" value="15" step="1"></div>
-        <div class="field"><label>COD₀ <span class="unit">mg/L</span></label>
+        <div class="field"><label for="aop_COD0">COD₀ <span class="unit">mg/L</span></label>
           <input type="number" id="aop_COD0" value="350" step="10"></div>
-        <div class="field"><label>BOD₅₀ <span class="unit">mg/L</span></label>
+        <div class="field"><label for="aop_BOD0">BOD₅₀ <span class="unit">mg/L</span></label>
           <input type="number" id="aop_BOD0" value="160" step="5"></div>
-        <div class="field"><label>TN₀ <span class="unit">mg/L</span></label>
+        <div class="field"><label for="aop_TN0">TN₀ <span class="unit">mg/L</span></label>
           <input type="number" id="aop_TN0" value="25" step="1"></div>
-        <div class="field"><label>NH₄-N₀ <span class="unit">mg/L</span></label>
+        <div class="field"><label for="aop_NH40">NH₄-N₀ <span class="unit">mg/L</span></label>
           <input type="number" id="aop_NH40" value="20" step="1"></div>
-        <div class="field"><label>TP₀ <span class="unit">mg/L</span></label>
+        <div class="field"><label for="aop_TP0">TP₀ <span class="unit">mg/L</span></label>
           <input type="number" id="aop_TP0" value="6" step="0.2"></div>
       </div>
 
       <div class="section-title"><span class="num">4</span>出水目标</div>
       <div class="grid">
-        <div class="field"><label>排放标准</label>
+        <div class="field"><label for="aop_standard">排放标准</label>
           <select id="aop_standard" onchange="applyStandardAOP()">
             <option value="1A">一级 A</option><option value="1B">一级 B</option>
-            <option value="grade4">地表 IV 类</option><option value="custom">自定义</option>
+            <option value="grade4">准 IV 类(地方标准, 限值按所在地调整)</option><option value="custom">自定义</option>
           </select></div>
-        <div class="field"><label>COD出 <span class="unit">mg/L</span></label>
+        <div class="field"><label for="aop_CODe">COD出 <span class="unit">mg/L</span></label>
           <input type="number" id="aop_CODe" value="50" step="1"></div>
-        <div class="field"><label>BOD出 <span class="unit">mg/L</span></label>
+        <div class="field"><label for="aop_BODe">BOD出 <span class="unit">mg/L</span></label>
           <input type="number" id="aop_BODe" value="10" step="0.5"></div>
-        <div class="field"><label>NH₄-N出 <span class="unit">mg/L</span></label>
+        <div class="field"><label for="aop_NH4e">NH₄-N出 <span class="unit">mg/L</span></label>
           <input type="number" id="aop_NH4e" value="5" step="0.5"></div>
-        <div class="field"><label>TP出 <span class="unit">mg/L</span></label>
+        <div class="field"><label for="aop_TPe">TP出 <span class="unit">mg/L</span></label>
           <input type="number" id="aop_TPe" value="0.5" step="0.1"></div>
       </div>
 
       <div class="section-title"><span class="num">5</span>设计参数</div>
       <div class="grid">
-        <div class="field"><label>MLSS <span class="unit">mg/L</span></label>
+        <div class="field"><label for="aop_MLSS">MLSS <span class="unit">mg/L</span></label>
           <input type="number" id="aop_MLSS" value="3000" step="100"></div>
-        <div class="field"><label>MLVSS/MLSS</label>
+        <div class="field"><label for="aop_VSS_SS">MLVSS/MLSS</label>
           <input type="number" id="aop_VSS_SS" value="0.75" step="0.01"></div>
-        <div class="field"><label>污泥回流 MLSS_r</label>
+        <div class="field"><label for="aop_MLSSr">污泥回流 MLSS_r</label>
           <input type="number" id="aop_MLSSr" value="9000" step="500"></div>
-        <div class="field"><label>泥龄 SRT <span class="unit">d</span></label>
+        <div class="field"><label for="aop_SRT">好氧泥龄 SRT_O <span class="unit">d</span></label>
           <input type="number" id="aop_SRT" value="12" step="0.5"></div>
-        <div class="field"><label>SF</label>
+        <div class="field"><label for="aop_SF_SRT">SF</label>
           <input type="number" id="aop_SF_SRT" value="2.0" step="0.1"></div>
-        <div class="field"><label>厌氧 HRT <span class="unit">h</span></label>
+        <div class="field"><label for="aop_HRT_AN">厌氧 HRT <span class="unit">h</span></label>
           <input type="number" id="aop_HRT_AN" value="1.5" step="0.1"></div>
-        <div class="field"><label>Y</label>
+        <div class="field"><label for="aop_Y">Y</label>
           <input type="number" id="aop_Y" value="0.65" step="0.05"></div>
-        <div class="field"><label>Kd</label>
+        <div class="field"><label for="aop_Kd">Kd</label>
           <input type="number" id="aop_Kd" value="0.06" step="0.01"></div>
-        <div class="field"><label>μ_max</label>
+        <div class="field"><label for="aop_mu_max">μ_max</label>
           <input type="number" id="aop_mu_max" value="0.75" step="0.05"></div>
-        <div class="field"><label>α</label>
+        <div class="field"><label for="aop_alpha">α</label>
           <input type="number" id="aop_alpha" value="0.7" step="0.05"></div>
-        <div class="field"><label>β</label>
+        <div class="field"><label for="aop_beta">β</label>
           <input type="number" id="aop_beta" value="0.95" step="0.01"></div>
+        <div class="field"><label for="aop_H_diff">曝气器淹没深度 H_d <span class="unit">m</span></label>
+          <input type="number" id="aop_H_diff" value="5.5" step="0.1" min="0">
+          <div class="helper">SOR 水深修正; 0 = 表面曝气</div></div>
       </div>
 
       <div class="auto-calc-notice">
@@ -1549,9 +1585,11 @@
         <div class="result-group">
           <div class="result-group-title"><span class="ic">🔄</span> 回流系统<span class="auto-tag">AUTO</span></div>
           <div class="result-row highlight-row"><span class="result-label"><b>外回流比 r</b></span>
-            <span><span class="result-value big" id="aop_r_r">—</span><span class="result-unit">倍</span></span></div>
-          <div class="result-row"><span class="result-label">推荐泥龄</span>
+            <span><span class="result-value big" id="aop_r_r">—</span><span class="result-unit"></span></span></div>
+          <div class="result-row"><span class="result-label">设计好氧泥龄 SRT_O</span>
             <span><span class="result-value" id="aop_r_SRT">—</span><span class="result-unit">d</span></span></div>
+          <div class="result-row"><span class="result-label">系统总泥龄 SRT_总 <span class="sub">(≈ MLVSS·V_总/ΔX_VSS)</span></span>
+            <span><span class="result-value" id="aop_r_SRTtot">—</span><span class="result-unit">d</span></span></div>
           <div class="result-row"><span class="result-label">最小泥龄</span>
             <span><span class="result-value" id="aop_r_SRTmin">—</span><span class="result-unit">d</span></span></div>
         </div>
@@ -1559,7 +1597,7 @@
         <div class="result-group">
           <div class="result-group-title"><span class="ic">🧪</span> 脱氮 & 除磷效果</div>
           <div class="result-row highlight-row"><span class="result-label"><b>TP 去除率(估算)</b></span>
-            <span><span class="result-value big" id="aop_r_TPr">—</span><span class="result-unit">%</span></span></div>
+            <span><span class="result-value big" id="aop_r_TPr">—</span><span class="result-unit"></span></span></div>
           <div class="result-row"><span class="result-label">出水 TP(估算)</span>
             <span><span class="result-value" id="aop_r_TPe">—</span><span class="result-unit">mg/L</span></span></div>
           <div class="result-row"><span class="result-label">出水 NO₃-N(含硝化时)</span>
@@ -1567,7 +1605,7 @@
           <div class="result-row"><span class="result-label">出水 TN(估算)</span>
             <span><span class="result-value" id="aop_r_TNe">—</span><span class="result-unit">mg/L</span></span></div>
           <div class="result-row"><span class="result-label">TN 去除率(仅合成)</span>
-            <span><span class="result-value" id="aop_r_TNr">—</span><span class="result-unit">%</span></span></div>
+            <span><span class="result-value" id="aop_r_TNr">—</span><span class="result-unit"></span></span></div>
         </div>
 
         <div class="result-group">
@@ -1578,7 +1616,7 @@
             <span><span class="result-value" id="aop_r_SOR">—</span><span class="result-unit">kg O₂/d</span></span></div>
           <div class="result-row highlight-row"><span class="result-label"><b>剩余污泥 ΔX</b></span>
             <span><span class="result-value big" id="aop_r_dX">—</span><span class="result-unit">kg DS/d</span></span></div>
-          <div class="result-row"><span class="result-label">F/M 比</span>
+          <div class="result-row"><span class="result-label">F/M 污泥负荷 <span class="sub">(Q·S₀/(V_总·MLSS))</span></span>
             <span><span class="result-value" id="aop_r_FM">—</span><span class="result-unit">kgBOD/kgMLSS·d</span></span></div>
         </div>
 
@@ -1588,7 +1626,8 @@
           <div class="score-ring">
             <div><div class="score-num" id="aop_scoreNum">—</div><div class="score-label">/ 100</div></div>
             <div><div class="score-title" id="aop_scoreTitle">设计合理性评分</div>
-              <div class="score-label" id="aop_scoreDesc">综合评估</div></div>
+              <div class="score-label" id="aop_scoreDesc">综合评估</div>
+              <div class="score-note">经验评分，仅供方案比选参考</div></div>
           </div>
         </div>
 
@@ -1626,65 +1665,65 @@
 
       <div class="section-title"><span class="num">3</span>进水条件</div>
       <div class="grid">
-        <div class="field"><label>设计规模 Q <span class="unit">万 m³/d</span></label>
+        <div class="field"><label for="sbr_Q">设计规模 Q <span class="unit">万 m³/d</span></label>
           <input type="number" id="sbr_Q" value="2" step="0.5"></div>
-        <div class="field"><label>水温 T <span class="unit">°C</span></label>
+        <div class="field"><label for="sbr_T">水温 T <span class="unit">°C</span></label>
           <input type="number" id="sbr_T" value="15" step="1"></div>
-        <div class="field"><label>COD₀ <span class="unit">mg/L</span></label>
+        <div class="field"><label for="sbr_COD0">COD₀ <span class="unit">mg/L</span></label>
           <input type="number" id="sbr_COD0" value="400" step="10"></div>
-        <div class="field"><label>BOD₅₀ <span class="unit">mg/L</span></label>
+        <div class="field"><label for="sbr_BOD0">BOD₅₀ <span class="unit">mg/L</span></label>
           <input type="number" id="sbr_BOD0" value="180" step="5"></div>
-        <div class="field"><label>TN₀ <span class="unit">mg/L</span></label>
+        <div class="field"><label for="sbr_TN0">TN₀ <span class="unit">mg/L</span></label>
           <input type="number" id="sbr_TN0" value="45" step="1"></div>
-        <div class="field"><label>NH₄-N₀ <span class="unit">mg/L</span></label>
+        <div class="field"><label for="sbr_NH40">NH₄-N₀ <span class="unit">mg/L</span></label>
           <input type="number" id="sbr_NH40" value="35" step="1"></div>
-        <div class="field"><label>TP₀ <span class="unit">mg/L</span></label>
+        <div class="field"><label for="sbr_TP0">TP₀ <span class="unit">mg/L</span></label>
           <input type="number" id="sbr_TP0" value="5" step="0.2"></div>
       </div>
 
       <div class="section-title"><span class="num">4</span>出水目标</div>
       <div class="grid">
-        <div class="field"><label>排放标准</label>
+        <div class="field"><label for="sbr_standard">排放标准</label>
           <select id="sbr_standard" onchange="applyStandardSBR()">
             <option value="1A">一级 A</option><option value="1B">一级 B</option>
-            <option value="grade4">地表 IV 类</option><option value="custom">自定义</option>
+            <option value="grade4">准 IV 类(地方标准, 限值按所在地调整)</option><option value="custom">自定义</option>
           </select></div>
-        <div class="field"><label>COD出 <span class="unit">mg/L</span></label>
+        <div class="field"><label for="sbr_CODe">COD出 <span class="unit">mg/L</span></label>
           <input type="number" id="sbr_CODe" value="50" step="1"></div>
-        <div class="field"><label>BOD出 <span class="unit">mg/L</span></label>
+        <div class="field"><label for="sbr_BODe">BOD出 <span class="unit">mg/L</span></label>
           <input type="number" id="sbr_BODe" value="10" step="0.5"></div>
-        <div class="field"><label>NH₄-N出 <span class="unit">mg/L</span></label>
+        <div class="field"><label for="sbr_NH4e">NH₄-N出 <span class="unit">mg/L</span></label>
           <input type="number" id="sbr_NH4e" value="5" step="0.5"></div>
-        <div class="field"><label>TN出 <span class="unit">mg/L</span></label>
+        <div class="field"><label for="sbr_TNe">TN出 <span class="unit">mg/L</span></label>
           <input type="number" id="sbr_TNe" value="15" step="0.5"></div>
-        <div class="field"><label>TP出 <span class="unit">mg/L</span></label>
+        <div class="field"><label for="sbr_TPe">TP出 <span class="unit">mg/L</span></label>
           <input type="number" id="sbr_TPe" value="0.5" step="0.1"></div>
       </div>
 
       <!-- SBR 特有参数 -->
       <div class="section-title"><span class="num">5</span>间歇式特有参数</div>
       <div class="grid">
-        <div class="field"><label>周期数 m <span class="unit">次/d</span></label>
+        <div class="field"><label for="sbr_m">周期数 m <span class="unit">次/d</span></label>
           <input type="number" id="sbr_m" value="4" step="1" min="1" max="12">
           <div class="helper">SBR 3-6, CASS 6-8, UNITANK 6</div>
         </div>
-        <div class="field"><label>池数 N <span class="unit">个</span></label>
+        <div class="field"><label for="sbr_N">池数 N <span class="unit">个</span></label>
           <input type="number" id="sbr_N" value="2" step="1" min="1" max="8">
           <div class="helper">分池并联, 大规模建议 4-6</div>
         </div>
-        <div class="field"><label>排出比 1/n</label>
+        <div class="field"><label for="sbr_ratio">排出比 1/n</label>
           <input type="number" id="sbr_ratio" value="0.30" step="0.01" min="0.15" max="0.5">
           <div class="helper">每次排水占池容比例, 常 0.25-0.33</div>
         </div>
-        <div class="field"><label>进水时段 <span class="unit">h/周期</span></label>
+        <div class="field"><label for="sbr_tfill">进水时段 <span class="unit">h/周期</span></label>
           <input type="number" id="sbr_tfill" value="1.0" step="0.1"></div>
-        <div class="field"><label>反应时段(含曝气+缺氧) <span class="unit">h</span></label>
+        <div class="field"><label for="sbr_treact">反应时段(含曝气+缺氧) <span class="unit">h</span></label>
           <input type="number" id="sbr_treact" value="3.0" step="0.1"></div>
-        <div class="field"><label>沉淀时段 <span class="unit">h</span></label>
+        <div class="field"><label for="sbr_tsettle">沉淀时段 <span class="unit">h</span></label>
           <input type="number" id="sbr_tsettle" value="1.0" step="0.1"></div>
-        <div class="field"><label>排水时段 <span class="unit">h</span></label>
+        <div class="field"><label for="sbr_tdraw">排水时段 <span class="unit">h</span></label>
           <input type="number" id="sbr_tdraw" value="0.5" step="0.1"></div>
-        <div class="field"><label>闲置时段 <span class="unit">h</span></label>
+        <div class="field"><label for="sbr_tidle">闲置时段 <span class="unit">h</span></label>
           <input type="number" id="sbr_tidle" value="0.5" step="0.1"></div>
       </div>
 
@@ -1695,22 +1734,28 @@
       </div>
       <div class="advanced-params" id="sbrAdv">
         <div class="grid">
-          <div class="field"><label>MLSS <span class="unit">mg/L</span></label>
+          <div class="field"><label for="sbr_MLSS">MLSS <span class="unit">mg/L</span></label>
             <input type="number" id="sbr_MLSS" value="3500" step="100"></div>
-          <div class="field"><label>MLVSS/MLSS</label>
+          <div class="field"><label for="sbr_VSS_SS">MLVSS/MLSS</label>
             <input type="number" id="sbr_VSS_SS" value="0.75" step="0.01"></div>
-          <div class="field"><label>泥龄 SRT <span class="unit">d</span></label>
+          <div class="field"><label for="sbr_SRT">泥龄 SRT <span class="unit">d</span></label>
             <input type="number" id="sbr_SRT" value="15" step="0.5"></div>
-          <div class="field"><label>Y</label>
+          <div class="field"><label for="sbr_Y">Y</label>
             <input type="number" id="sbr_Y" value="0.6" step="0.05"></div>
-          <div class="field"><label>Kd</label>
+          <div class="field"><label for="sbr_Kd">Kd</label>
             <input type="number" id="sbr_Kd" value="0.06" step="0.01"></div>
-          <div class="field"><label>μ_max</label>
+          <div class="field"><label for="sbr_mu_max">μ_max</label>
             <input type="number" id="sbr_mu_max" value="0.75" step="0.05"></div>
-          <div class="field"><label>α</label>
+          <div class="field"><label for="sbr_alpha">α</label>
             <input type="number" id="sbr_alpha" value="0.7" step="0.05"></div>
-          <div class="field"><label>β</label>
+          <div class="field"><label for="sbr_beta">β</label>
             <input type="number" id="sbr_beta" value="0.95" step="0.01"></div>
+          <div class="field"><label for="sbr_H_diff">曝气器淹没深度 H_d <span class="unit">m</span></label>
+            <input type="number" id="sbr_H_diff" value="5.5" step="0.1" min="0">
+            <div class="helper">SOR 水深修正; 0 = 表面曝气</div></div>
+          <div class="field"><label for="sbr_Ls">污泥负荷 Ls (校核用) <span class="unit">kgBOD/kgMLSS·d</span></label>
+            <input type="number" id="sbr_Ls" value="0.1" step="0.01" min="0.01">
+            <div class="helper">GB 50014 污泥负荷法校核 V ≥ Q·S₀/(Ls·X), 不改池容</div></div>
         </div>
       </div>
 
@@ -1735,6 +1780,8 @@
             <span><span class="result-value" id="sbr_r_Tcycle">—</span><span class="result-unit">h</span></span></div>
           <div class="result-row"><span class="result-label">单池平均 HRT</span>
             <span><span class="result-value" id="sbr_r_HRT">—</span><span class="result-unit">h</span></span></div>
+          <div class="result-row"><span class="result-label">污泥负荷法所需池容 <span class="sub">(Q·S₀/(Ls·X), 校核)</span></span>
+            <span><span class="result-value" id="sbr_r_VLs">—</span><span class="result-unit">m³</span></span></div>
         </div>
 
         <div class="result-group">
@@ -1761,7 +1808,7 @@
             <span><span class="result-value" id="sbr_r_SOR">—</span><span class="result-unit">kg O₂/d</span></span></div>
           <div class="result-row highlight-row"><span class="result-label"><b>剩余污泥 ΔX</b></span>
             <span><span class="result-value big" id="sbr_r_dX">—</span><span class="result-unit">kg DS/d</span></span></div>
-          <div class="result-row"><span class="result-label">F/M 比</span>
+          <div class="result-row"><span class="result-label">F/M 污泥负荷 <span class="sub">(Q·S₀/(V_总·MLSS))</span></span>
             <span><span class="result-value" id="sbr_r_FM">—</span><span class="result-unit">kgBOD/kgMLSS·d</span></span></div>
         </div>
 
@@ -1771,7 +1818,8 @@
           <div class="score-ring">
             <div><div class="score-num" id="sbr_scoreNum">—</div><div class="score-label">/ 100</div></div>
             <div><div class="score-title" id="sbr_scoreTitle">设计合理性评分</div>
-              <div class="score-label" id="sbr_scoreDesc">综合评估</div></div>
+              <div class="score-label" id="sbr_scoreDesc">综合评估</div>
+              <div class="score-note">经验评分，仅供方案比选参考</div></div>
           </div>
         </div>
 
@@ -1809,56 +1857,56 @@
 
       <div class="section-title"><span class="num">3</span>进水条件</div>
       <div class="grid">
-        <div class="field"><label>Q <span class="unit">万 m³/d</span></label>
+        <div class="field"><label for="oxi_Q">Q <span class="unit">万 m³/d</span></label>
           <input type="number" id="oxi_Q" value="5" step="0.5"></div>
-        <div class="field"><label>T <span class="unit">°C</span></label>
+        <div class="field"><label for="oxi_T">T <span class="unit">°C</span></label>
           <input type="number" id="oxi_T" value="15" step="1"></div>
-        <div class="field"><label>COD₀ <span class="unit">mg/L</span></label>
+        <div class="field"><label for="oxi_COD0">COD₀ <span class="unit">mg/L</span></label>
           <input type="number" id="oxi_COD0" value="400" step="10"></div>
-        <div class="field"><label>BOD₅₀ <span class="unit">mg/L</span></label>
+        <div class="field"><label for="oxi_BOD0">BOD₅₀ <span class="unit">mg/L</span></label>
           <input type="number" id="oxi_BOD0" value="180" step="5"></div>
-        <div class="field"><label>TN₀ <span class="unit">mg/L</span></label>
+        <div class="field"><label for="oxi_TN0">TN₀ <span class="unit">mg/L</span></label>
           <input type="number" id="oxi_TN0" value="45" step="1"></div>
-        <div class="field"><label>NH₄-N₀ <span class="unit">mg/L</span></label>
+        <div class="field"><label for="oxi_NH40">NH₄-N₀ <span class="unit">mg/L</span></label>
           <input type="number" id="oxi_NH40" value="35" step="1"></div>
-        <div class="field"><label>TP₀ <span class="unit">mg/L</span></label>
+        <div class="field"><label for="oxi_TP0">TP₀ <span class="unit">mg/L</span></label>
           <input type="number" id="oxi_TP0" value="5" step="0.2"></div>
       </div>
 
       <div class="section-title"><span class="num">4</span>出水目标</div>
       <div class="grid">
-        <div class="field"><label>排放标准</label>
+        <div class="field"><label for="oxi_standard">排放标准</label>
           <select id="oxi_standard" onchange="applyStandardOXI()">
             <option value="1A">一级 A</option><option value="1B">一级 B</option>
-            <option value="grade4">地表 IV 类</option><option value="custom">自定义</option>
+            <option value="grade4">准 IV 类(地方标准, 限值按所在地调整)</option><option value="custom">自定义</option>
           </select></div>
-        <div class="field"><label>COD出</label><input type="number" id="oxi_CODe" value="50" step="1"></div>
-        <div class="field"><label>BOD出</label><input type="number" id="oxi_BODe" value="10" step="0.5"></div>
-        <div class="field"><label>NH₄-N出</label><input type="number" id="oxi_NH4e" value="5" step="0.5"></div>
-        <div class="field"><label>TN出</label><input type="number" id="oxi_TNe" value="15" step="0.5"></div>
+        <div class="field"><label for="oxi_CODe">COD出</label><input type="number" id="oxi_CODe" value="50" step="1"></div>
+        <div class="field"><label for="oxi_BODe">BOD出</label><input type="number" id="oxi_BODe" value="10" step="0.5"></div>
+        <div class="field"><label for="oxi_NH4e">NH₄-N出</label><input type="number" id="oxi_NH4e" value="5" step="0.5"></div>
+        <div class="field"><label for="oxi_TNe">TN出</label><input type="number" id="oxi_TNe" value="15" step="0.5"></div>
       </div>
 
       <div class="section-title"><span class="num">5</span>氧化沟特有参数</div>
       <div class="grid">
-        <div class="field"><label>MLSS <span class="unit">mg/L</span></label>
+        <div class="field"><label for="oxi_MLSS">MLSS <span class="unit">mg/L</span></label>
           <input type="number" id="oxi_MLSS" value="3500" step="100">
           <div class="helper">氧化沟常 2500-4500</div></div>
-        <div class="field"><label>MLVSS/MLSS</label>
+        <div class="field"><label for="oxi_VSS_SS">MLVSS/MLSS</label>
           <input type="number" id="oxi_VSS_SS" value="0.75" step="0.01"></div>
-        <div class="field"><label>污泥回流 MLSS_r</label>
+        <div class="field"><label for="oxi_MLSSr">污泥回流 MLSS_r</label>
           <input type="number" id="oxi_MLSSr" value="8000" step="500"></div>
-        <div class="field"><label>泥龄 SRT <span class="unit">d</span></label>
+        <div class="field"><label for="oxi_SRT">泥龄 SRT <span class="unit">d</span></label>
           <input type="number" id="oxi_SRT" value="25" step="1">
           <div class="helper">氧化沟泥龄较长,常 20-30d</div></div>
-        <div class="field"><label>SF 安全系数</label>
+        <div class="field"><label for="oxi_SF_SRT">SF 安全系数</label>
           <input type="number" id="oxi_SF_SRT" value="2.5" step="0.1"></div>
-        <div class="field"><label>沟内流速 v <span class="unit">m/s</span></label>
+        <div class="field"><label for="oxi_v">沟内流速 v <span class="unit">m/s</span></label>
           <input type="number" id="oxi_v" value="0.35" step="0.01">
           <div class="helper">≥0.3 m/s 防污泥沉积</div></div>
-        <div class="field"><label>沟深 H <span class="unit">m</span></label>
+        <div class="field"><label for="oxi_H">沟深 H <span class="unit">m</span></label>
           <input type="number" id="oxi_H" value="3.5" step="0.1">
           <div class="helper">卡鲁塞尔 3-5m</div></div>
-        <div class="field"><label>沟宽/深比 B/H</label>
+        <div class="field"><label for="oxi_BH">沟宽/深比 B/H</label>
           <input type="number" id="oxi_BH" value="2.0" step="0.1">
           <div class="helper">常 1.5-3</div></div>
       </div>
@@ -1869,15 +1917,18 @@
       </div>
       <div class="advanced-params" id="oxiAdv">
         <div class="grid">
-          <div class="field"><label>Y</label><input type="number" id="oxi_Y" value="0.6" step="0.05"></div>
-          <div class="field"><label>Kd</label><input type="number" id="oxi_Kd" value="0.06" step="0.01"></div>
-          <div class="field"><label>μ_max</label><input type="number" id="oxi_mu_max" value="0.75" step="0.05"></div>
-          <div class="field"><label>SDNR₂₀</label><input type="number" id="oxi_SDNR20" value="0.05" step="0.01"></div>
-          <div class="field"><label>α</label><input type="number" id="oxi_alpha" value="0.65" step="0.05"></div>
-          <div class="field"><label>β</label><input type="number" id="oxi_beta" value="0.95" step="0.01"></div>
-          <div class="field"><label>手动 anoxRatio 覆盖 <span class="unit">% (0=自动)</span></label>
+          <div class="field"><label for="oxi_Y">Y</label><input type="number" id="oxi_Y" value="0.6" step="0.05"></div>
+          <div class="field"><label for="oxi_Kd">Kd</label><input type="number" id="oxi_Kd" value="0.06" step="0.01"></div>
+          <div class="field"><label for="oxi_mu_max">μ_max</label><input type="number" id="oxi_mu_max" value="0.75" step="0.05"></div>
+          <div class="field"><label for="oxi_SDNR20">SDNR₂₀</label><input type="number" id="oxi_SDNR20" value="0.05" step="0.01"></div>
+          <div class="field"><label for="oxi_alpha">α</label><input type="number" id="oxi_alpha" value="0.65" step="0.05"></div>
+          <div class="field"><label for="oxi_beta">β</label><input type="number" id="oxi_beta" value="0.95" step="0.01"></div>
+          <div class="field"><label for="oxi_anoxOverride">手动 anoxRatio 覆盖 <span class="unit">% (0=自动)</span></label>
             <input type="number" id="oxi_anoxOverride" value="0" step="1" min="0" max="70">
             <div class="helper">0=按 v/H/F-M 自动算, 否则用此值</div></div>
+          <div class="field"><label for="oxi_H_diff">曝气器淹没深度 H_d <span class="unit">m</span></label>
+            <input type="number" id="oxi_H_diff" value="0" step="0.1" min="0">
+            <div class="helper">转刷/表曝机取 0 (不作水深修正); 底部微孔曝气取实际淹没深度</div></div>
         </div>
       </div>
 
@@ -1896,7 +1947,7 @@
 
         <div class="result-group">
           <div class="result-group-title"><span class="ic">📐</span> 沟体设计</div>
-          <div class="result-row highlight-row"><span class="result-label"><b>总池容 V_总</b></span>
+          <div class="result-row highlight-row"><span class="result-label"><b>总池容 V_总</b> <span class="sub">(V_好氧/(1−0.3·anoxRatio), 0.3 为经验值)</span></span>
             <span><span class="result-value big" id="oxi_r_Vtotal">—</span><span class="result-unit">m³</span></span></div>
           <div class="result-row highlight-row"><span class="result-label"><b>HRT</b></span>
             <span><span class="result-value big" id="oxi_r_HRT">—</span><span class="result-unit">h</span></span></div>
@@ -1904,16 +1955,20 @@
             <span><span class="result-value" id="oxi_r_anoxRatio">—</span><span class="result-unit">%</span></span></div>
           <div class="result-row"><span class="result-label">沟道断面积 A</span>
             <span><span class="result-value" id="oxi_r_area">—</span><span class="result-unit">m²</span></span></div>
-          <div class="result-row"><span class="result-label">沟道总长度 L</span>
+          <div class="result-row"><span class="result-label">沟道总长度 L_总 <span class="sub">(V_总/A)</span></span>
             <span><span class="result-value" id="oxi_r_length">—</span><span class="result-unit">m</span></span></div>
+          <div class="result-row"><span class="result-label">沟道数 n <span class="sub">(单沟 ≤ 400 m)</span></span>
+            <span><span class="result-value" id="oxi_r_nch">—</span><span class="result-unit">条</span></span></div>
+          <div class="result-row"><span class="result-label">单沟长度 <span class="sub">(L_总/n)</span></span>
+            <span><span class="result-value" id="oxi_r_lenSingle">—</span><span class="result-unit">m</span></span></div>
           <div class="result-row"><span class="result-label">循环流量 Q_循</span>
             <span><span class="result-value" id="oxi_r_Qcycle">—</span><span class="result-unit">m³/h</span></span></div>
-          <div class="result-row"><span class="result-label">循环时间</span>
+          <div class="result-row"><span class="result-label">循环时间 <span class="sub">(单沟)</span></span>
             <span><span class="result-value" id="oxi_r_tcycle">—</span><span class="result-unit">min</span></span></div>
         </div>
 
         <div class="result-group">
-          <div class="result-group-title"><span class="ic">🌊</span> anoxRatio 修正推导 <span class="auto-tag" id="oxi_anoxTag">AUTO</span></div>
+          <div class="result-group-title"><span class="ic">🌊</span> anoxRatio 修正推导 <span class="sub" style="font-weight:400;font-size:11px;color:var(--text-faint);">(经验系数, 仅供方案比选)</span> <span class="auto-tag" id="oxi_anoxTag">AUTO</span></div>
           <div class="result-row"><span class="result-label">亚型基准值 <span class="sub">(Carrousel/Orbal/传统)</span></span>
             <span><span class="result-value" id="oxi_r_anoxBase">—</span><span class="result-unit">%</span></span></div>
           <div class="result-row"><span class="result-label">流速修正因子 v_factor <span class="sub">(v↓→缺氧扩大)</span></span>
@@ -1931,7 +1986,7 @@
         <div class="result-group">
           <div class="result-group-title"><span class="ic">🔄</span> 回流系统<span class="auto-tag">AUTO</span></div>
           <div class="result-row highlight-row"><span class="result-label"><b>外回流比 r</b></span>
-            <span><span class="result-value big" id="oxi_r_r">—</span><span class="result-unit">倍</span></span></div>
+            <span><span class="result-value big" id="oxi_r_r">—</span><span class="result-unit"></span></span></div>
           <div class="result-row"><span class="result-label">推荐泥龄</span>
             <span><span class="result-value" id="oxi_r_SRT">—</span><span class="result-unit">d</span></span></div>
           <div class="result-row"><span class="result-label">最小泥龄</span>
@@ -1946,7 +2001,7 @@
             <span><span class="result-value" id="oxi_r_SOR">—</span><span class="result-unit">kg O₂/d</span></span></div>
           <div class="result-row highlight-row"><span class="result-label"><b>剩余污泥</b></span>
             <span><span class="result-value big" id="oxi_r_dX">—</span><span class="result-unit">kg DS/d</span></span></div>
-          <div class="result-row"><span class="result-label">F/M 比</span>
+          <div class="result-row"><span class="result-label">F/M 污泥负荷 <span class="sub">(Q·S₀/(V_总·MLSS))</span></span>
             <span><span class="result-value" id="oxi_r_FM">—</span><span class="result-unit">kgBOD/kgMLSS·d</span></span></div>
         </div>
 
@@ -1956,7 +2011,8 @@
           <div class="score-ring">
             <div><div class="score-num" id="oxi_scoreNum">—</div><div class="score-label">/ 100</div></div>
             <div><div class="score-title" id="oxi_scoreTitle">设计合理性评分</div>
-              <div class="score-label" id="oxi_scoreDesc">综合评估</div></div>
+              <div class="score-label" id="oxi_scoreDesc">综合评估</div>
+              <div class="score-note">经验评分，仅供方案比选参考</div></div>
           </div>
         </div>
       </div>
@@ -2019,7 +2075,7 @@
           <div style="padding:10px;background:white;border-radius:6px;">📜 发展史</div>
           <div style="padding:10px;background:white;border-radius:6px;font-weight:600;color:#0891b2;">⭐ IFAS 混合工艺</div>
         </div>
-        <a href="pure-mbbr-design.html" 
+        <a href="mbbr-design.html"
            style="display:inline-block;padding:12px 32px;background:#0891b2;color:white;text-decoration:none;border-radius:6px;font-weight:600;font-size:14px;box-shadow:0 2px 6px rgba(8,145,178,0.3);">
            → 打开 MBBR 工程设计平台
         </a>
@@ -2057,7 +2113,7 @@
             <div class="brand-sub">WaterKit · by 登登科技</div>
           </div>
         </a>
-        <p class="footer-about">水处理工具箱(WaterKit)是海南登登科技咨询有限公司推出的水处理在线计算工具集合,由一线水处理工艺工程师开发维护。免费、无广告、持续更新。</p>
+        <p class="footer-about">水处理工具箱(WaterKit)是海南登登科技咨询有限公司推出的水处理在线计算工具集合,由一线水处理工艺工程师开发维护。免费、持续更新。</p>
       </div>
       <div class="footer-col">
         <h4>水力计算</h4>
@@ -2075,7 +2131,10 @@
           <li><a href="sludge-production-calculator.html">污泥产量</a></li>
           <li><a href="dosing-calculator.html">加药量</a></li>
           <li><a href="activated-sludge-process-calculator.html">活性污泥工艺</a></li>
+          <li><a href="mbbr-design.html">MBBR 工程设计</a></li>
+          <li><a href="mbr-design.html">MBR 工程设计</a></li>
           <li><a href="pump-selection-calculator.html">水泵选型</a></li>
+          <li><a href="blower-selection-calculator.html">鼓风机选型</a></li>
           <li><a href="water-quality-unit-converter.html">水质换算</a></li>
         </ul>
       </div>
@@ -2110,6 +2169,75 @@
 
 const $ = id => document.getElementById(id);
 const num = id => parseFloat($(id).value) || 0;
+const fx = (v, d) => (typeof v === 'number' && isFinite(v)) ? v.toFixed(d) : '—';
+
+// ============ 标准需氧量 SOR (GB 50014 第 6.8 节) ============
+// SOR = AOR·Cs(20) / [α·(β·Csm(T) − C_L)·1.024^(T−20)]
+// Cs(T): 清水表面饱和溶解氧(三次多项式); 分子 Cs(20) 与分母同口径, 取 Cs(T=20)
+// 鼓风曝气水深修正: Csm = Cs(T)·(Pb/2.026×10⁵ + Ot/42), Pb = 101325 + 9810·H_d (Pa)
+// Ot = 21(1−E_A)/[79 + 21(1−E_A)]×100 (%), E_A 氧利用率取 20%
+// H_d ≤ 0 视为表面曝气(转刷/表曝机), 不作水深修正
+const SOR_EA = 0.20;
+function csSat(T) { return 14.652 - 0.41022 * T + 0.007991 * T*T - 0.000077774 * T*T*T; }
+function calcSORstd(AOR, T, alpha, beta, Hd, CL) {
+  const Cs20 = csSat(20), CsT = csSat(T);
+  let Csm = CsT;
+  if (Hd > 0) {
+    const Pb = 101325 + 9810 * Hd;
+    const Ot = 21 * (1 - SOR_EA) / (79 + 21 * (1 - SOR_EA)) * 100;
+    Csm = CsT * (Pb / 2.026e5 + Ot / 42);
+  }
+  const den = alpha * (beta * Csm - CL) * Math.pow(1.024, T - 20);
+  return den > 0 ? AOR * Cs20 / den : NaN;
+}
+
+// ============ 输入校验 ============
+// specs: [输入框 id, 名称, 'pos' (须 > 0) | 'nonneg' (不得为负, 允许 0/留空)]
+function validateInputs(specs, bod) {
+  const msgs = [];
+  specs.forEach(([id, name, mode]) => {
+    const el = $(id); if (!el) return;
+    const v = parseFloat(el.value);
+    const ok = mode === 'nonneg' ? (isNaN(v) || v >= 0) : (!isNaN(v) && v > 0);
+    el.classList.toggle('invalid', !ok);
+    if (!ok) msgs.push(mode === 'nonneg' ? `请输入不小于 0 的 ${name}` : `请输入大于 0 的 ${name}`);
+  });
+  // 进水 BOD 须大于出水 BOD, 否则池容为负
+  if (bod && msgs.length === 0) {
+    const b0 = parseFloat($(bod[0]).value), be = parseFloat($(bod[1]).value) || 0;
+    const ok = b0 > be;
+    $(bod[0]).classList.toggle('invalid', !ok);
+    if (!ok) msgs.push('进水 BOD₅ 须大于出水 BOD₅');
+  } else if (bod) {
+    $(bod[0]).classList.remove('invalid');
+  }
+  return msgs;
+}
+function showInvalid(panelId, checkListId, msgs) {
+  document.querySelectorAll('#' + panelId + ' .result-value').forEach(e => e.textContent = '—');
+  const svg = document.querySelector('#' + panelId + ' .flow-diagram svg'); if (svg) svg.innerHTML = '';
+  const sn = document.querySelector('#' + panelId + ' .score-num'); if (sn) sn.textContent = '—';
+  $(checkListId).innerHTML = msgs.map(m =>
+    `<div class="check-item check-bad"><span class="ic">✗</span><span>${m}</span></div>`).join('');
+}
+function specsFor(prefix, pos, nonneg) {
+  return pos.map(([id, n]) => [prefix + id, n, 'pos']).concat(nonneg.map(([id, n]) => [prefix + id, n, 'nonneg']));
+}
+const CONC_SPECS = [['COD0','COD₀'],['BOD0','BOD₅'],['SS0','SS₀'],['TN0','TN₀'],['NH40','NH₄-N₀'],['TP0','TP₀'],
+  ['CODe','出水 COD'],['BODe','出水 BOD'],['NH4e','出水 NH₄-N'],['TNe','出水 TN'],['TPe','出水 TP'],
+  ['SRT','泥龄 SRT'],['Kd','Kd'],['mu_max','μ_max'],['Kn','Kn'],['H_diff','曝气器淹没深度'],['HRT_AN','厌氧 HRT']];
+const VALID_AAO = specsFor('', [['Q','设计规模 Q'],['MLSS','MLSS'],['VSS_SS','MLVSS/MLSS'],['MLSSr','回流污泥浓度'],
+  ['Y','产泥系数 Y'],['SDNR20','SDNR₂₀'],['theta_T','θ_T'],['SF_SRT','SRT 安全系数'],['alpha','α'],['beta','β']], CONC_SPECS);
+const VALID_AOAN = specsFor('aoan_', [['Q','设计规模 Q'],['MLSS','MLSS'],['VSS_SS','MLVSS/MLSS'],['MLSSr','回流污泥浓度'],
+  ['Y','产泥系数 Y'],['SDNR20','SDNR₂₀'],['SF_SRT','SRT 安全系数'],['alpha','α'],['beta','β']], CONC_SPECS);
+const VALID_AOP = specsFor('aop_', [['Q','设计规模 Q'],['MLSS','MLSS'],['VSS_SS','MLVSS/MLSS'],['MLSSr','回流污泥浓度'],
+  ['Y','产泥系数 Y'],['SF_SRT','SRT 安全系数'],['alpha','α'],['beta','β']], CONC_SPECS);
+const VALID_SBR = specsFor('sbr_', [['Q','设计规模 Q'],['MLSS','MLSS'],['VSS_SS','MLVSS/MLSS'],['Y','产泥系数 Y'],
+  ['alpha','α'],['beta','β'],['m','周期数 m'],['N','池数 N'],['ratio','排出比 1/n'],['Ls','污泥负荷 Ls']],
+  CONC_SPECS.concat([['tfill','进水时段'],['treact','反应时段'],['tsettle','沉淀时段'],['tdraw','排水时段'],['tidle','闲置时段']]));
+const VALID_OXI = specsFor('oxi_', [['Q','设计规模 Q'],['MLSS','MLSS'],['VSS_SS','MLVSS/MLSS'],['MLSSr','回流污泥浓度'],
+  ['Y','产泥系数 Y'],['SDNR20','SDNR₂₀'],['SF_SRT','SRT 安全系数'],['alpha','α'],['beta','β'],
+  ['v','沟内流速 v'],['H','沟深 H'],['BH','沟宽/深比']], CONC_SPECS.concat([['anoxOverride','anoxRatio 覆盖值']]));
 
 // ============ 水种预设 ============
 const PRESETS = {
@@ -2139,7 +2267,7 @@ const PRESETS = {
 const STANDARDS = {
   '1A':    { CODe: 50,  BODe: 10, NH4e: 5,  TNe: 15, TPe: 0.5 },
   '1B':    { CODe: 60,  BODe: 20, NH4e: 8,  TNe: 20, TPe: 1.0 },
-  'grade4':{ CODe: 30,  BODe: 6,  NH4e: 1.5,TNe: 10, TPe: 0.3 },
+  'grade4':{ CODe: 30,  BODe: 6,  NH4e: 1.5,TNe: 10, TPe: 0.3 },  // 准 IV 类: 地方标准, 限值按项目所在地调整
   'grade3':{ CODe: 20,  BODe: 4,  NH4e: 1.0,TNe: 5,  TPe: 0.2 }
 };
 
@@ -2148,8 +2276,6 @@ let currentProcess = 'aao';
 let sbrSubtype = 'sbr';
 let aopIncludeN = false;
 let oxiSubtype = 'carrousel';      // carrousel / orbal / conventional
-let mbrBioConfig = 'aao';          // aao / ao_an / single_o
-let mbbrMode = 'new';              // new / retrofit
 
 // ============ 设置工艺 ============
 function setProcess(proc) {
@@ -2168,6 +2294,28 @@ function setProcess(proc) {
   calc();
 }
 
+// ============ SRT 自动填入(含规范下限) ============
+// GB 50014 6.6.x: 脱氮工艺设计泥龄 T<15℃ 不宜小于 15 d, 否则不宜小于 10 d
+function fillSRT(inputId, SRT_rec, T) {
+  const floorSRT = T < 15 ? 15 : 10;
+  const SRT_design = Math.round(Math.max(SRT_rec, floorSRT) * 2) / 2; // 取 0.5 的倍数
+  const el = $(inputId);
+  el.value = SRT_design;
+  // 在标签旁提示是否已按规范下限调整
+  let tip = el.parentElement.querySelector('.srt-floor-tip');
+  if (!tip) {
+    tip = document.createElement('div');
+    tip.className = 'helper srt-floor-tip';
+    el.parentElement.appendChild(tip);
+  }
+  if (SRT_rec < floorSRT) {
+    tip.textContent = `已按规范下限调整: 推算 ${SRT_rec.toFixed(1)} d → ${SRT_design} d (GB 50014, T${T < 15 ? '<' : '≥'}15℃ 不宜小于 ${floorSRT} d)`;
+    console.info(`[${inputId}] SRT 已按规范下限调整: ${SRT_rec.toFixed(1)} → ${SRT_design} d`);
+  } else {
+    tip.textContent = '';
+  }
+}
+
 // ============ 应用水种预设 ============
 function setPreset(key) {
   currentPreset = key;
@@ -2181,7 +2329,7 @@ function setPreset(key) {
   // 切换预设后,先用默认值计算一次得到推荐 SRT,再自动填入
   const r = calcAAO();
   if (r.SRT_rec > 0 && r.SRT_rec < 30) {
-    $('SRT').value = Math.round(r.SRT_rec * 2) / 2; // 取 0.5 的倍数
+    fillSRT('SRT', r.SRT_rec, num('T'));
   }
   calc();
 }
@@ -2196,7 +2344,7 @@ function applyStandard() {
   // 出水标准变更后,推荐 SRT 也可能变,重算后自动填
   const r = calcAAO();
   if (r.SRT_rec > 0 && r.SRT_rec < 30) {
-    $('SRT').value = Math.round(r.SRT_rec * 2) / 2;
+    fillSRT('SRT', r.SRT_rec, num('T'));
   }
   calc();
 }
@@ -2241,11 +2389,12 @@ function calcAAO() {
   const theta_T = num('theta_T');
   const alpha = num('alpha');
   const beta = num('beta');
+  const H_diff = num('H_diff');   // 曝气器淹没深度 (m), SOR 水深修正
 
   // 温度修正
   const mu_max_T = mu_max20 * Math.pow(theta_T, T - 20);
   const Kd_T = Kd20 * Math.pow(1.04, T - 20);
-  const SDNR_T = SDNR20 * Math.pow(1.08, T - 20);
+  const SDNR_T = SDNR20 * Math.pow(1.08, T - 20);  // θ=1.08 依据 GB 50014: Kde(T)=Kde(20)·1.08^(T−20)
   const Kn = Kn20 * Math.pow(1.05, T - 20);  // P1: Kn 温度修正
 
   // ========== 1. 泥龄 SRT 推导 ==========
@@ -2336,23 +2485,32 @@ function calcAAO() {
   const NH4_nit = NOx_produced * Q / 1000;      // kg/d  (硝化转化的N)
   const NO3_DN = NOx_to_DN * Q / 1000;          // kg/d
 
-  const O_BOD = 0.5 * BOD_removed;       // COD氧化需氧系数取0.5
+  // 生物污泥产量(提前算,需氧量公式要用)
+  const dX_VSS = Yobs * BOD_removed;  // kg VSS/d
+  // GB 50014 6.6.17: O_BOD = 1.47×ΔBOD − 1.42×ΔX_VSS (碳氧化需氧扣除污泥合成)
+  const O_BOD = Math.max(0, 1.47 * BOD_removed - 1.42 * dX_VSS);
   const O_N = 4.57 * NH4_nit;            // 硝化每kgN需氧4.57kg
   const O_DN = 2.86 * NO3_DN;            // 反硝化每kgN回收2.86kgO2
   const AOR = Math.max(0, O_BOD + O_N - O_DN);
 
-  // ========== 10. SOR 标准需氧量(海平面,20℃) ==========
-  const C_s20 = 9.17;  // mg/L
-  const C_sT = 14.652 - 0.41022 * T + 0.007991 * T*T - 0.000077774 * T*T*T;
+  // ========== 10. SOR 标准需氧量(20℃ 清水, 含水深修正) ==========
   const C_L = 2.0;     // 池内控制溶氧
-  const SOR = AOR * C_s20 / (alpha * (beta * C_sT - C_L) * Math.pow(1.024, T - 20));
+  const SOR = calcSORstd(AOR, T, alpha, beta, H_diff, C_L);
 
   // ========== 11. 剩余污泥量 ==========
-  const dX_VSS = Yobs * BOD_removed;  // kg VSS/d
-  const dX_SS = dX_VSS / VSS_SS;      // kg DS/d (总干污泥)
+  // GB 50014 6.6.19: ΔX = ΔX_VSS + f_ss×Q×(SS0−SSe), f_ss SS 污泥转换率 0.5–0.7
+  // (生物污泥按 VSS 计, 进水惰性 SS 由 f_ss 项计入, 不再除以 VSS/SS)
+  const f_ss = 0.5;
+  const SSe = 10;  // 出水 SS mg/L (常量)
+  const dX_SS = dX_VSS + f_ss * Q * Math.max(0, SS0 - SSe) / 1000;  // kg DS/d (总干污泥)
 
-  // ========== 12. F/M 比 ==========
-  const F_over_M = (BOD_removed) / (V_O * MLVSS / 1000);
+  // ========== 12. F/M 污泥负荷 ==========
+  // 设计手册常用口径: Ls = Q·S₀ / (V_总·MLSS)  [kgBOD₅/(kgMLSS·d)]
+  const F_over_M = (Q * BOD0 / 1000) / (V_total * MLSS / 1000);
+
+  // ========== 12b. 系统总泥龄 ==========
+  // 输入 SRT 为好氧泥龄 SRT_O (V_O 按其计算); 全池总泥龄 ≈ MLVSS·V_总 / ΔX_VSS
+  const SRT_total = dX_VSS > 0 ? (MLVSS * V_total / 1000) / dX_VSS : NaN;
 
   // ========== 13. BOD/TN, BOD/TP 比 ==========
   const BOD_TN = BOD0 / Math.max(TN0, 1);
@@ -2361,7 +2519,7 @@ function calcAAO() {
   // ========== 返回结果 ==========
   return {
     // 基础
-    Q, Q_wan, T, SRT, SRT_min, SRT_rec,
+    Q, Q_wan, T, SRT, SRT_min, SRT_rec, SRT_total,
     // 池容
     V_AN, V_A, V_O, V_total,
     HRT_AN_calc, HRT_A, HRT_O, HRT_total,
@@ -2420,16 +2578,16 @@ function checkAAO(r) {
     checks.push({ type: 'bad', ic: '✗', text: `<b>硝化难以维持</b>: 在 T=${T}℃ 下,最小泥龄 SRT_min = ${r.SRT_min.toFixed(1)}d 已超出工程可行范围,需提高温度或投加硝化菌。` });
     score -= 30;
   } else if (SRT_user < SRT_safe * 0.85) {
-    checks.push({ type: 'bad', ic: '✗', text: `<b>泥龄不足</b>: 当前 SRT=${SRT_user}d 明显低于安全泥龄 ${SRT_safe.toFixed(1)}d (= SRT_min × SF), 硝化稳定性不足。建议 SRT ≥ ${SRT_safe.toFixed(1)}d。` });
+    checks.push({ type: 'bad', ic: '✗', text: `<b>泥龄不足</b>: 当前好氧泥龄 SRT_O=${SRT_user}d 明显低于安全泥龄 ${SRT_safe.toFixed(1)}d (= SRT_min × SF), 硝化稳定性不足。建议 SRT ≥ ${SRT_safe.toFixed(1)}d。` });
     score -= 20;
   } else if (SRT_user < SRT_safe) {
-    checks.push({ type: 'warn', ic: '⚠', text: `<b>泥龄接近临界</b>: SRT=${SRT_user}d, 推荐安全泥龄 ${SRT_safe.toFixed(1)}d (= SRT_min ${r.SRT_min.toFixed(1)} × SF ${num('SF_SRT')})。差距 ${(SRT_safe-SRT_user).toFixed(1)}d, 低温冲击时可能硝化不稳。` });
+    checks.push({ type: 'warn', ic: '⚠', text: `<b>泥龄接近临界</b>: 好氧泥龄 SRT_O=${SRT_user}d, 推荐安全泥龄 ${SRT_safe.toFixed(1)}d (= SRT_min ${r.SRT_min.toFixed(1)} × SF ${num('SF_SRT')})。差距 ${(SRT_safe-SRT_user).toFixed(1)}d, 低温冲击时可能硝化不稳。` });
     score -= 15;
   } else if (SRT_user > 25) {
-    checks.push({ type: 'warn', ic: '⚠', text: `<b>泥龄偏高</b>: SRT=${SRT_user}d 偏长,污泥老化风险,可能影响活性。多数情况下 15-20d 已足够。` });
+    checks.push({ type: 'warn', ic: '⚠', text: `<b>泥龄偏高</b>: 好氧泥龄 SRT_O=${SRT_user}d 偏长 (系统总泥龄 ≈ ${fx(r.SRT_total, 1)}d), 污泥老化风险,可能影响活性。多数情况下好氧泥龄 15-20d 已足够。` });
     score -= 5;
   } else {
-    checks.push({ type: 'ok', ic: '✓', text: `<b>泥龄合理</b>: SRT=${SRT_user}d ≥ 安全泥龄 ${SRT_safe.toFixed(1)}d (SRT_min × SF), 硝化稳定。` });
+    checks.push({ type: 'ok', ic: '✓', text: `<b>泥龄合理</b>: 好氧泥龄 SRT_O=${SRT_user}d ≥ 安全泥龄 ${SRT_safe.toFixed(1)}d (SRT_min × SF), 硝化稳定; 系统总泥龄 ≈ ${fx(r.SRT_total, 1)}d (GB 50014 AAO 10-20d 指全池泥龄)。` });
   }
 
   // 2. 水温
@@ -2448,10 +2606,11 @@ function checkAAO(r) {
     const BOD_needed = 5 * TN0_v;          // 目标 BOD浓度
     const BOD_add = Math.max(0, BOD_needed - BOD0_v);   // 需补充浓度
     const BOD_add_kg = BOD_add * Q_v * 10; // 日需补BOD (kg/d, Q单位万m³/d→m³/d÷1000→×10000÷1000)
-    // 甲醇 COD 当量:1 kg 甲醇 = 1.5 kg BOD;乙酸钠:0.68 kg BOD
+    // 碳源当量 (补充 BOD 按易降解 COD 计): 甲醇 1.5 kg COD/kg; 乙酸钠 0.78 kg COD/kg (全站统一, 按无水乙酸钠计;
+    // 商品药剂再乘有效含量, 如三水乙酸钠固体约 58% → 0.45 kg COD/kg 商品)
     const methanol_kg = BOD_add_kg / 1.5;
-    const sodium_acetate_kg = BOD_add_kg / 0.68;
-    checks.push({ type: 'bad', ic: '✗', text: `<b>碳源严重不足</b>: BOD/TN = ${r.BOD_TN.toFixed(2)} &lt; 3, 反硝化无法完成,必须投加外加碳源。建议补 BOD ≈ ${BOD_add.toFixed(0)} mg/L (${BOD_add_kg.toFixed(0)} kg/d),对应甲醇 ≈ ${methanol_kg.toFixed(0)} kg/d 或乙酸钠 ≈ ${sodium_acetate_kg.toFixed(0)} kg/d。` });
+    const sodium_acetate_kg = BOD_add_kg / 0.78;
+    checks.push({ type: 'bad', ic: '✗', text: `<b>碳源严重不足</b>: BOD/TN = ${r.BOD_TN.toFixed(2)} &lt; 3, 反硝化无法完成,必须投加外加碳源。建议补 BOD ≈ ${BOD_add.toFixed(0)} mg/L (${BOD_add_kg.toFixed(0)} kg/d),对应甲醇 ≈ ${methanol_kg.toFixed(0)} kg/d 或乙酸钠(按无水计, 0.78 gCOD/g) ≈ ${sodium_acetate_kg.toFixed(0)} kg/d。` });
     score -= 20;
   } else if (r.BOD_TN < 4) {
     checks.push({ type: 'warn', ic: '⚠', text: `<b>碳氮比偏低</b>: BOD/TN = ${r.BOD_TN.toFixed(2)} &lt; 4, 反硝化接近极限,建议考虑加少量碳源或采用预缺氧工艺。` });
@@ -2484,7 +2643,7 @@ function checkAAO(r) {
     checks.push({ type: 'warn', ic: '⚠', text: `<b>内回流偏低</b>: R=${(r.R*100).toFixed(0)}% &lt; 100%, 反硝化受限,可能有硝酸盐剩余。` });
     score -= 5;
   } else {
-    checks.push({ type: 'ok', ic: '✓', text: `<b>内回流合理</b>: R=${(r.R*100).toFixed(0)}%, 在常规 200-400% 区间内。` });
+    checks.push({ type: 'ok', ic: '✓', text: `<b>内回流合理</b>: R=${(r.R*100).toFixed(0)}%, 在 100-400% 区间内。` });
   }
 
   // 6. 外回流比 r
@@ -2502,17 +2661,20 @@ function checkAAO(r) {
   } else if (r.HRT_total > 24) {
     checks.push({ type: 'info', ic: 'ℹ', text: `<b>HRT 较长</b>: ${r.HRT_total.toFixed(1)}h, 设计保守,基建投资偏大。可通过提高 MLSS 压缩池容。` });
   } else {
-    checks.push({ type: 'ok', ic: '✓', text: `<b>HRT 合理</b>: 总 ${r.HRT_total.toFixed(1)}h, 在 8-20h 常规范围内。` });
+    checks.push({ type: 'ok', ic: '✓', text: `<b>HRT 合理</b>: 总 ${r.HRT_total.toFixed(1)}h, 在 6-24h 范围内。` });
   }
 
-  // 8. F/M 比
+  // 8. F/M 污泥负荷 (Q·S₀/(V_总·MLSS), GB 50014 AAO 常规 0.05-0.15)
+  const FMs = r.F_over_M.toFixed(3);
   if (r.F_over_M > 0.3) {
-    checks.push({ type: 'warn', ic: '⚠', text: `<b>F/M 偏高</b>: ${r.F_over_M.toFixed(3)} kgBOD/kgMLSS·d, 污泥膨胀风险。` });
+    checks.push({ type: 'warn', ic: '⚠', text: `<b>F/M 偏高</b>: ${FMs} kgBOD/kgMLSS·d &gt; 0.3, 污泥膨胀风险。` });
     score -= 8;
+  } else if (r.F_over_M > 0.15) {
+    checks.push({ type: 'info', ic: 'ℹ', text: `<b>F/M 略高</b>: ${FMs} kgBOD/kgMLSS·d, 高于常规 0.05-0.15 区间 (尚未到 0.3 膨胀警戒), 硝化/脱氮余量偏小。` });
   } else if (r.F_over_M < 0.05) {
-    checks.push({ type: 'info', ic: 'ℹ', text: `<b>F/M 偏低</b>: ${r.F_over_M.toFixed(3)}, 微生物饥饿,可能出现泡沫与反硝化受限。` });
+    checks.push({ type: 'info', ic: 'ℹ', text: `<b>F/M 偏低</b>: ${FMs} kgBOD/kgMLSS·d &lt; 0.05, 微生物饥饿,可能出现泡沫与反硝化受限。` });
   } else {
-    checks.push({ type: 'ok', ic: '✓', text: `<b>F/M 合适</b>: ${r.F_over_M.toFixed(3)} kgBOD/kgMLSS·d, 在 0.05-0.15 常规区间内。` });
+    checks.push({ type: 'ok', ic: '✓', text: `<b>F/M 合适</b>: ${FMs} kgBOD/kgMLSS·d, 在 0.05-0.15 常规区间内。` });
   }
 
   // 9. 厌氧 HRT
@@ -2712,6 +2874,8 @@ function calc() {
 }
 
 function calcAndRenderAAO() {
+  const bad = validateInputs(VALID_AAO, ['BOD0', 'BODe']);
+  if (bad.length) { showInvalid('panel-aao', 'checkList', bad); $('scoreTitle').textContent = '设计合理性评分'; $('scoreDesc').textContent = '请先修正输入'; return; }
   const r = calcAAO();
   const chk = checkAAO(r);
 
@@ -2731,9 +2895,10 @@ function calcAndRenderAAO() {
   $('r_Qr').textContent = r.Qr_wan.toFixed(2);
   $('r_SRT').textContent = r.SRT.toFixed(1);
   $('r_SRTmin').textContent = r.SRT_min < 100 ? r.SRT_min.toFixed(2) : '> 30';
+  $('r_SRTtot').textContent = fx(r.SRT_total, 1);
 
   $('r_AOR').textContent = r.AOR.toFixed(0);
-  $('r_SOR').textContent = r.SOR.toFixed(0);
+  $('r_SOR').textContent = fx(r.SOR, 0);
   $('r_O_BOD').textContent = r.O_BOD.toFixed(0);
   $('r_O_N').textContent = r.O_N.toFixed(0);
   $('r_O_DN').textContent = r.O_DN.toFixed(0);
@@ -2780,7 +2945,12 @@ function calcAndRenderAAO() {
 
 // ============ 复制结果 ============
 function copyResults() {
-  if (currentProcess !== 'aao') { alert('仅 AAO 工艺已启用'); return; }
+  const pmap = { ao_an: 'panel-ao-an', ao_p: 'panel-ao-p', sbr: 'panel-sbr', oxi: 'panel-oxi' };
+  if (currentProcess !== 'aao') {
+    if (pmap[currentProcess]) writeClipboard(panelCopyText(pmap[currentProcess]));
+    return;
+  }
+  if (validateInputs(VALID_AAO, ['BOD0', 'BODe']).length) { alert('输入有误, 请先修正后再复制'); return; }
   const r = calcAAO();
   const chk = checkAAO(r);
   const txt = `AAO (A²/O) 工艺设计计算结果
@@ -2807,28 +2977,58 @@ COD/BOD/NH4/TN/TP = ${num('CODe')}/${num('BODe')}/${num('NH4e')}/${num('TNe')}/$
 【回流系统】
 内回流比 R = ${(r.R*100).toFixed(0)}%  (Q_R = ${r.QR_wan.toFixed(2)} 万m³/d)
 外回流比 r = ${(r.r*100).toFixed(0)}%  (Q_r = ${r.Qr_wan.toFixed(2)} 万m³/d)
-推荐泥龄 SRT = ${r.SRT.toFixed(1)} d (最小 ${r.SRT_min < 100 ? r.SRT_min.toFixed(2) : '> 30'} d)
+好氧泥龄 SRT_O = ${r.SRT.toFixed(1)} d (最小 ${r.SRT_min < 100 ? r.SRT_min.toFixed(2) : '> 30'} d)
+系统总泥龄 ≈ ${fx(r.SRT_total, 1)} d (MLVSS·V_总/ΔX_VSS)
 
 【需氧与污泥】
 实际需氧量 AOR = ${r.AOR.toFixed(0)} kg O₂/d
-标准需氧量 SOR = ${r.SOR.toFixed(0)} kg O₂/d
+标准需氧量 SOR = ${fx(r.SOR, 0)} kg O₂/d (曝气器水深 ${num('H_diff')} m)
   COD去除需氧  ${r.O_BOD.toFixed(0)} kg/d
   硝化需氧    ${r.O_N.toFixed(0)} kg/d
   反硝化回收  ${r.O_DN.toFixed(0)} kg/d
 剩余污泥(干) = ${r.dX_SS.toFixed(0)} kg DS/d
-F/M 比 = ${r.F_over_M.toFixed(3)} kgBOD/kgMLSS·d
+F/M 污泥负荷 = ${r.F_over_M.toFixed(3)} kgBOD/kgMLSS·d (Q·S₀/(V_总·MLSS))
 
-【设计评分 ${chk.score}/100】
+【设计评分 ${chk.score}/100】(经验评分, 仅供方案比选参考)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ${chk.checks.map(c => c.ic + ' ' + c.text.replace(/<[^>]+>/g, '')).join('\n')}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 水处理工具箱 WaterKit · waterkit.cn
 by 海南登登科技咨询有限公司`;
+  writeClipboard(txt);
+}
 
-  navigator.clipboard.writeText(txt).then(() => {
-    alert('结果已复制到剪贴板');
-  }).catch(() => {
+// 非 AAO 面板: 按结果区 DOM 读取 标签 + 数值 + 单位 拼接
+function panelCopyText(panelId) {
+  const panel = $(panelId);
+  const clean = el => el ? el.textContent.replace(/\s+/g, ' ').trim() : '';
+  const h2 = panel.querySelector('.results > h2');
+  const lines = [clean(h2).replace(/^🎯\s*/, ''), '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'];
+  panel.querySelectorAll('.results .result-group').forEach(g => {
+    const t = g.querySelector('.result-group-title');
+    if (t) {
+      const head = t.cloneNode(true);
+      head.querySelectorAll('.ic, .auto-tag').forEach(e => e.remove());
+      lines.push('', '【' + clean(head) + '】');
+    }
+    g.querySelectorAll('.result-row').forEach(row => {
+      const lab = row.querySelector('.result-label'), val = row.querySelector('.result-value');
+      if (!lab || !val) return;
+      lines.push(`${clean(lab)} = ${clean(val)} ${clean(row.querySelector('.result-unit'))}`.trim());
+    });
+    g.querySelectorAll('.check-item').forEach(c => {
+      lines.push(clean(c.querySelector('.ic')) + ' ' + clean(c.lastElementChild));
+    });
+    const sn = g.querySelector('.score-num');
+    if (sn) lines.push(`设计评分 ${clean(sn)}/100 (经验评分, 仅供方案比选参考)`);
+  });
+  lines.push('', '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', '水处理工具箱 WaterKit · waterkit.cn', 'by 海南登登科技咨询有限公司');
+  return lines.join('\n');
+}
+
+function writeClipboard(txt) {
+  const fallback = () => {
     const ta = document.createElement('textarea');
     ta.value = txt;
     document.body.appendChild(ta);
@@ -2836,7 +3036,11 @@ by 海南登登科技咨询有限公司`;
     document.execCommand('copy');
     document.body.removeChild(ta);
     alert('结果已复制');
-  });
+  };
+  if (!navigator.clipboard) { fallback(); return; }
+  navigator.clipboard.writeText(txt).then(() => {
+    alert('结果已复制到剪贴板');
+  }).catch(fallback);
 }
 
 // ============================================================
@@ -2864,7 +3068,7 @@ function setPresetAOAN(key) {
   const p = PRESETS_AOAN[key];
   Object.keys(p).forEach(k => { if ($(k)) $(k).value = p[k]; });
   const r = calcAOAN();
-  if (r.SRT_rec > 0 && r.SRT_rec < 30) $('aoan_SRT').value = Math.round(r.SRT_rec * 2) / 2;
+  if (r.SRT_rec > 0 && r.SRT_rec < 30) fillSRT('aoan_SRT', r.SRT_rec, num('aoan_T'));
   calc();
 }
 
@@ -2876,14 +3080,14 @@ function applyStandardAOAN() {
   $('aoan_CODe').value = s.CODe; $('aoan_BODe').value = s.BODe;
   $('aoan_NH4e').value = s.NH4e; $('aoan_TNe').value = s.TNe;
   const r = calcAOAN();
-  if (r.SRT_rec > 0 && r.SRT_rec < 30) $('aoan_SRT').value = Math.round(r.SRT_rec * 2) / 2;
+  if (r.SRT_rec > 0 && r.SRT_rec < 30) fillSRT('aoan_SRT', r.SRT_rec, num('aoan_T'));
   calc();
 }
 
 function calcAOAN() {
   const get = id => parseFloat($('aoan_' + id).value) || 0;
   const Q_wan = get('Q'), Q = Q_wan * 10000, T = get('T');
-  const COD0 = get('COD0'), BOD0 = get('BOD0');
+  const COD0 = get('COD0'), BOD0 = get('BOD0'), SS0 = get('SS0');
   const TN0 = get('TN0'), NH40 = get('NH40');
   const CODe = get('CODe'), BODe = get('BODe'), NH4e = get('NH4e'), TNe = get('TNe');
   const MLSS = get('MLSS'), VSS_SS = get('VSS_SS'), MLSSr = get('MLSSr');
@@ -2895,7 +3099,7 @@ function calcAOAN() {
 
   const mu_max_T = mu_max20 * Math.pow(theta_T, T - 20);
   const Kd_T = Kd20 * Math.pow(1.04, T - 20);
-  const SDNR_T = SDNR20 * Math.pow(1.08, T - 20);
+  const SDNR_T = SDNR20 * Math.pow(1.08, T - 20);  // θ=1.08 依据 GB 50014: Kde(T)=Kde(20)·1.08^(T−20)
 
   const NH4_use = Math.max(NH4e, 0.5);
   const mu_net = mu_max_T * NH4_use / (Kn + NH4_use) - Kd_T;
@@ -2927,21 +3131,26 @@ function calcAOAN() {
   const HRT_O = V_O / Q * 24, HRT_A = V_A / Q * 24, HRT_total = V_total / Q * 24;
 
   const BOD_rem = (BOD0 - BODe) * Q / 1000;
-  const O_BOD = 0.5 * BOD_rem;
+  const dX_VSS = Yobs * BOD_rem;  // kg VSS/d
+  // GB 50014 6.6.17: O_BOD = 1.47×ΔBOD − 1.42×ΔX_VSS
+  const O_BOD = Math.max(0, 1.47 * BOD_rem - 1.42 * dX_VSS);
   const O_N = 4.57 * NOx_prod * Q / 1000;
   const O_DN = 2.86 * NOx_DN * Q / 1000;
   const AOR = Math.max(0, O_BOD + O_N - O_DN);
 
-  const C_s20 = 9.17;
-  const C_sT = 14.652 - 0.41022*T + 0.007991*T*T - 0.000077774*T*T*T;
-  const SOR = AOR * C_s20 / (alpha * (beta * C_sT - 2) * Math.pow(1.024, T - 20));
+  const SOR = calcSORstd(AOR, T, alpha, beta, get('H_diff'), 2);
 
-  const dX_SS = (Yobs * BOD_rem) / VSS_SS;
-  const F_over_M = BOD_rem / (V_O * MLVSS / 1000);
+  // GB 50014 6.6.19: f_ss SS 污泥转换率 0.5–0.7, SSe 出水 SS 取 10 mg/L
+  const f_ss = 0.5, SSe = 10;
+  const dX_SS = dX_VSS + f_ss * Q * Math.max(0, SS0 - SSe) / 1000;
+  // F/M 污泥负荷 = Q·S₀/(V_总·MLSS)
+  const F_over_M = (Q * BOD0 / 1000) / (V_total * MLSS / 1000);
+  // 系统总泥龄 ≈ MLVSS·V_总/ΔX_VSS (输入 SRT 为好氧泥龄)
+  const SRT_total = dX_VSS > 0 ? (MLVSS * V_total / 1000) / dX_VSS : NaN;
   const BOD_TN = BOD0 / Math.max(TN0, 1);
 
   return {
-    Q, Q_wan, T, SRT, SRT_min, SRT_rec,
+    Q, Q_wan, T, SRT, SRT_min, SRT_rec, SRT_total,
     V_A, V_O, V_total, HRT_A, HRT_O, HRT_total,
     R, r: r_est, QR_wan: Q * R / 10000, Qr_wan: Q * r_est / 10000,
     AOR, SOR, dX_SS, F_over_M, BOD_TN, Yobs,
@@ -2967,9 +3176,9 @@ function checkAOAN(r) {
   // SRT
   const SRT_safe = r.SRT_min * SF;
   if (r.SRT_min > 30) { checks.push({type:'bad', ic:'✗', text:`<b>硝化难维持</b>: SRT_min=${r.SRT_min.toFixed(1)}d`}); score -= 30; }
-  else if (SRT < SRT_safe * 0.85) { checks.push({type:'bad', ic:'✗', text:`<b>泥龄不足</b>: 建议≥${SRT_safe.toFixed(1)}d`}); score -= 20; }
-  else if (SRT < SRT_safe) { checks.push({type:'warn', ic:'⚠', text:`<b>泥龄接近临界</b>: 推荐 ${SRT_safe.toFixed(1)}d`}); score -= 15; }
-  else { checks.push({type:'ok', ic:'✓', text:`<b>泥龄合理</b>: ${SRT}d`}); }
+  else if (SRT < SRT_safe * 0.85) { checks.push({type:'bad', ic:'✗', text:`<b>泥龄不足</b>: 好氧泥龄建议≥${SRT_safe.toFixed(1)}d`}); score -= 20; }
+  else if (SRT < SRT_safe) { checks.push({type:'warn', ic:'⚠', text:`<b>泥龄接近临界</b>: 好氧泥龄推荐 ${SRT_safe.toFixed(1)}d`}); score -= 15; }
+  else { checks.push({type:'ok', ic:'✓', text:`<b>泥龄合理</b>: 好氧泥龄 ${SRT}d (系统总泥龄 ≈ ${fx(r.SRT_total, 1)}d)`}); }
 
   // BOD/TN
   if (r.BOD_TN < 3) {
@@ -3072,6 +3281,8 @@ function drawAOANFlow(r, ratios) {
 }
 
 function calcAndRenderAOAN() {
+  const bad = validateInputs(VALID_AOAN, ['aoan_BOD0', 'aoan_BODe']);
+  if (bad.length) { showInvalid('panel-ao-an', 'aoan_checkList', bad); return; }
   const r = calcAOAN();
   const chk = checkAOAN(r);
   $('aoan_r_Vtotal').textContent = r.V_total.toFixed(0);
@@ -3084,8 +3295,9 @@ function calcAndRenderAOAN() {
   $('aoan_r_r').textContent = (r.r*100).toFixed(0) + '%';
   $('aoan_r_SRT').textContent = r.SRT.toFixed(1);
   $('aoan_r_SRTmin').textContent = r.SRT_min < 100 ? r.SRT_min.toFixed(2) : '>30';
+  $('aoan_r_SRTtot').textContent = fx(r.SRT_total, 1);
   $('aoan_r_AOR').textContent = r.AOR.toFixed(0);
-  $('aoan_r_SOR').textContent = r.SOR.toFixed(0);
+  $('aoan_r_SOR').textContent = fx(r.SOR, 0);
   $('aoan_r_dX').textContent = r.dX_SS.toFixed(0);
   $('aoan_r_FM').textContent = r.F_over_M.toFixed(3);
 
@@ -3134,7 +3346,7 @@ function setPresetAOP(key) {
   const p = PRESETS_AOP[key];
   Object.keys(p).forEach(k => { if ($(k)) $(k).value = p[k]; });
   const r = calcAOP();
-  if (r.SRT_rec > 0 && r.SRT_rec < 30) $('aop_SRT').value = Math.round(r.SRT_rec * 2) / 2;
+  if (r.SRT_rec > 0 && r.SRT_rec < 30) fillSRT('aop_SRT', r.SRT_rec, num('aop_T'));
   calc();
 }
 
@@ -3182,7 +3394,7 @@ function calcAOP() {
   const r_est = MLSS / Math.max(MLSSr - MLSS, 100);
 
   // ========== 除磷效果估算 ==========
-  // 生物除磷:每去除100 mgBOD 可除磷约 1.5-2.5 mg(A/O厌氧-好氧典型)
+  // 生物除磷:每去除100 mgBOD 可除磷约 1.5-2.5 mg(A/O厌氧-好氧典型) 【经验值, 无规范出处】
   // 生物除磷稳定下限约 0.3 mg/L (若进水TP更低则按进水处理)
   // ⚠️ 温度修正:PAO 活性强烈依赖水温(Metcalf & Eddy 第5章 PAO 温度敏感性)
   //    T≥20℃: 系数 1.0 (最优), T=15℃: 0.75, T=10℃: 0.5, T<8℃: 0.4
@@ -3210,29 +3422,36 @@ function calcAOP() {
     NOx_produced = Math.max(0, NH4_rem);
     NO3_e = NOx_produced; // 无反硝化,全部出水
     TN_e = NH4e + NO3_e + 1;
-    TN_removal = (TN0 - TN_e) / TN0;
   } else {
     // 简化:不硝化,出水 NH4 较高
     TN_e = Math.max(NH4e, NH4_total - N_assim) + 1;
-    TN_removal = (TN0 - TN_e) / TN0;
   }
+  // TN₀ 未填/为 0 时无法估算去除率 (返回 null, 页面显示 "—"); 去除率不出负值
+  TN_removal = TN0 > 0 ? Math.max(0, (TN0 - TN_e) / TN0) : null;
+  if (!(TN0 > 0)) TN_e = null;
 
   // ========== 需氧量 ==========
   const BOD_rem_kg = BOD_rem_conc * Q / 1000;
-  const O_BOD = 0.5 * BOD_rem_kg;
+  const dX_VSS = Yobs * BOD_rem_kg;  // kg VSS/d
+  // GB 50014 6.6.17: O_BOD = 1.47×ΔBOD − 1.42×ΔX_VSS
+  const O_BOD = Math.max(0, 1.47 * BOD_rem_kg - 1.42 * dX_VSS);
   const O_N = includeN ? 4.57 * NOx_produced * Q / 1000 : 0;
   const AOR = Math.max(0, O_BOD + O_N);
 
-  const C_s20 = 9.17;
-  const C_sT = 14.652 - 0.41022*T + 0.007991*T*T - 0.000077774*T*T*T;
-  const SOR = AOR * C_s20 / (alpha * (beta * C_sT - 2) * Math.pow(1.024, T - 20));
+  const SOR = calcSORstd(AOR, T, alpha, beta, get('H_diff'), 2);
 
-  const dX_SS = (Yobs * BOD_rem_kg) / VSS_SS;
-  const F_over_M = BOD_rem_kg / (V_O * MLVSS / 1000);
+  // GB 50014 6.6.19: f_ss SS 污泥转换率 0.5–0.7, SSe 出水 SS 取 10 mg/L
+  // 本面板无 SS₀ 输入, 借用 AAO 面板的 SS₀ 值
+  const f_ss = 0.5, SSe = 10, SS0 = num('SS0');
+  const dX_SS = dX_VSS + f_ss * Q * Math.max(0, SS0 - SSe) / 1000;
+  // F/M 污泥负荷 = Q·S₀/(V_总·MLSS)
+  const F_over_M = (Q * BOD0 / 1000) / (V_total * MLSS / 1000);
+  // 系统总泥龄 ≈ MLVSS·V_总/ΔX_VSS (输入 SRT 为好氧泥龄)
+  const SRT_total = dX_VSS > 0 ? (MLVSS * V_total / 1000) / dX_VSS : NaN;
   const BOD_TP = BOD0 / Math.max(TP0, 0.1);
 
   return {
-    Q, Q_wan, T, SRT, SRT_min, SRT_rec,
+    Q, Q_wan, T, SRT, SRT_min, SRT_rec, SRT_total,
     V_AN, V_O, V_total, HRT_AN, HRT_O, HRT_total,
     r: r_est, Qr_wan: Q * r_est / 10000,
     AOR, SOR, dX_SS, F_over_M, BOD_TP, Yobs,
@@ -3258,9 +3477,9 @@ function checkAOP(r) {
 
   // SRT
   const SRT_safe = r.SRT_min * SF;
-  if (SRT < SRT_safe) { checks.push({type:'warn', ic:'⚠', text:`<b>泥龄接近临界</b>: 推荐 ${SRT_safe.toFixed(1)}d`}); score -= 10; }
-  else if (SRT > 20) { checks.push({type:'warn', ic:'⚠', text:`<b>SRT 偏长</b>: ${SRT}d, PAO 易老化,除磷效率下降`}); score -= 8; }
-  else { checks.push({type:'ok', ic:'✓', text:`<b>泥龄合理</b>: ${SRT}d`}); }
+  if (SRT < SRT_safe) { checks.push({type:'warn', ic:'⚠', text:`<b>泥龄接近临界</b>: 好氧泥龄推荐 ${SRT_safe.toFixed(1)}d`}); score -= 10; }
+  else if (SRT > 20) { checks.push({type:'warn', ic:'⚠', text:`<b>SRT 偏长</b>: 好氧泥龄 ${SRT}d (系统总泥龄 ≈ ${fx(r.SRT_total, 1)}d), PAO 易老化,除磷效率下降`}); score -= 8; }
+  else { checks.push({type:'ok', ic:'✓', text:`<b>泥龄合理</b>: 好氧泥龄 ${SRT}d (系统总泥龄 ≈ ${fx(r.SRT_total, 1)}d)`}); }
 
   // BOD/TP
   if (r.BOD_TP < 15) { checks.push({type:'bad', ic:'✗', text:`<b>BOD/TP 不足</b>: ${r.BOD_TP.toFixed(1)} &lt; 15, 生物除磷效率低,建议化学除磷(PAC/PAFC)`}); score -= 20; }
@@ -3277,7 +3496,10 @@ function checkAOP(r) {
   }
 
   // 含硝化氮模式提醒
-  if (r.includeN) {
+  if (r.TN_removal === null) {
+    checks.push({type:'info', ic:'ℹ', text:`<b>TN₀ 未填写或为 0</b>: 无法估算出水 TN 与 TN 去除率, 请输入进水 TN₀。`});
+  }
+  if (r.includeN && r.TN_removal !== null) {
     checks.push({type:'info', ic:'ℹ', text:`<b>含硝化氮模式已启用</b>: 出水 NO₃-N ≈ ${r.NO3_e.toFixed(1)} mg/L, 总 TN ≈ ${r.TN_e.toFixed(1)} mg/L。无反硝化,TN 去除 ${(r.TN_removal*100).toFixed(0)}% 仅靠合成。`});
     if (r.TN_e > 20) { checks.push({type:'warn', ic:'⚠', text:`<b>出水 TN 偏高</b>: ${r.TN_e.toFixed(1)} mg/L, 若 TN 有要求需选 AAO`}); score -= 10; }
   } else if (get('TN0') > 30) {
@@ -3353,6 +3575,8 @@ function drawAOPFlow(r, ratios) {
 }
 
 function calcAndRenderAOP() {
+  const bad = validateInputs(VALID_AOP, ['aop_BOD0', 'aop_BODe']);
+  if (bad.length) { showInvalid('panel-ao-p', 'aop_checkList', bad); return; }
   const r = calcAOP();
   const chk = checkAOP(r);
   $('aop_r_Vtotal').textContent = r.V_total.toFixed(0);
@@ -3364,15 +3588,16 @@ function calcAndRenderAOP() {
   $('aop_r_r').textContent = (r.r*100).toFixed(0) + '%';
   $('aop_r_SRT').textContent = r.SRT.toFixed(1);
   $('aop_r_SRTmin').textContent = r.SRT_min < 100 ? r.SRT_min.toFixed(2) : '>30';
+  $('aop_r_SRTtot').textContent = fx(r.SRT_total, 1);
 
   $('aop_r_TPr').textContent = (r.TP_removal_rate * 100).toFixed(0) + '%';
   $('aop_r_TPe').textContent = r.TPe_est.toFixed(2);
   $('aop_r_NO3e').textContent = r.includeN ? r.NO3_e.toFixed(1) : '—';
-  $('aop_r_TNe').textContent = r.TN_e.toFixed(1);
-  $('aop_r_TNr').textContent = (r.TN_removal * 100).toFixed(0) + '%';
+  $('aop_r_TNe').textContent = r.TN_e === null ? '—' : r.TN_e.toFixed(1);
+  $('aop_r_TNr').textContent = r.TN_removal === null ? '—' : (r.TN_removal * 100).toFixed(0) + '%';
 
   $('aop_r_AOR').textContent = r.AOR.toFixed(0);
-  $('aop_r_SOR').textContent = r.SOR.toFixed(0);
+  $('aop_r_SOR').textContent = fx(r.SOR, 0);
   $('aop_r_dX').textContent = r.dX_SS.toFixed(0);
   $('aop_r_FM').textContent = r.F_over_M.toFixed(3);
 
@@ -3526,7 +3751,9 @@ function calcSBR() {
   // SBR 反应段含缺氧期 ⇒ 反硝化一部分
   const NO3_allow = Math.max(0, TNe - NH4e - 1);
   const NOx_DN = Math.max(0, NOx_prod - NO3_allow);
-  const O_BOD = 0.5 * BOD_rem_kg;
+  const dX_VSS = Yobs * BOD_rem_kg;  // kg VSS/d
+  // GB 50014 6.6.17: O_BOD = 1.47×ΔBOD − 1.42×ΔX_VSS
+  const O_BOD = Math.max(0, 1.47 * BOD_rem_kg - 1.42 * dX_VSS);
   const O_N = 4.57 * NOx_prod * Q / 1000;
   const O_DN = 2.86 * NOx_DN * Q / 1000;
   const AOR = Math.max(0, O_BOD + O_N - O_DN);
@@ -3536,19 +3763,25 @@ function calcSBR() {
   const t_aeration_per_day = treact * m; // h/d
   const AOR_peak = t_aeration_per_day > 0 ? AOR / t_aeration_per_day : 0; // kg/h
 
-  const C_s20 = 9.17;
-  const C_sT = 14.652 - 0.41022*T + 0.007991*T*T - 0.000077774*T*T*T;
-  const SOR = AOR * C_s20 / (alpha * (beta * C_sT - 2) * Math.pow(1.024, T - 20));
+  const SOR = calcSORstd(AOR, T, alpha, beta, get('H_diff'), 2);
 
-  const dX_SS = (Yobs * BOD_rem_kg) / VSS_SS;
-  const F_over_M = BOD_rem_kg / (V_single * N * MLVSS / 1000);
+  // GB 50014 6.6.19: f_ss SS 污泥转换率 0.5–0.7, SSe 出水 SS 取 10 mg/L
+  // 本面板无 SS₀ 输入, 借用 AAO 面板的 SS₀ 值
+  const f_ss = 0.5, SSe = 10, SS0 = num('SS0');
+  const dX_SS = dX_VSS + f_ss * Q * Math.max(0, SS0 - SSe) / 1000;
+  // F/M 污泥负荷 = Q·S₀/(V_总·MLSS)
+  const F_over_M = (Q * BOD0 / 1000) / (V_total * MLSS / 1000);
+
+  // GB 50014 污泥负荷法校核 (简化式): V ≥ Q·S₀/(Ls·X), 仅校核, 不改池容
+  const Ls = get('Ls');
+  const V_Ls = Ls > 0 ? (Q * BOD0 / 1000) / (Ls * MLSS / 1000) : NaN;
 
   return {
     Q, Q_wan, T, SRT, SRT_min, N, m, ratio_1n,
     V_single, V_total, V_fill, V_draw,
     T_cycle, T_cycle_target, HRT,
     tfill, treact, tsettle, tdraw, tidle,
-    AOR, AOR_peak, SOR, dX_SS, F_over_M,
+    AOR, AOR_peak, SOR, dX_SS, F_over_M, Ls, V_Ls,
     BOD_TN: BOD0 / Math.max(TN0, 1), BOD_TP: BOD0 / Math.max(TP0, 0.1),
     BOD0, BODe, COD0, TP0, TN0, NH40, NH4e, TNe, Yobs
   };
@@ -3599,6 +3832,16 @@ function checkSBR(r) {
   if (r.HRT < 8) { checks.push({type:'bad', ic:'✗', text:`<b>平均HRT 不足</b>: ${r.HRT.toFixed(1)}h`}); score -= 15; }
   else if (r.HRT > 30) { checks.push({type:'info', ic:'ℹ', text:`<b>HRT 较长</b>: ${r.HRT.toFixed(1)}h, 池容较大`}); }
   else { checks.push({type:'ok', ic:'✓', text:`<b>HRT 合理</b>: ${r.HRT.toFixed(1)}h`}); }
+
+  // 污泥负荷法校核 (GB 50014, 只做提示, 池容仍按水力法)
+  if (isFinite(r.V_Ls)) {
+    if (r.V_total < r.V_Ls) {
+      checks.push({type:'warn', ic:'⚠', text:`<b>污泥负荷法校核未满足</b>: 按 V ≥ Q·S₀/(Ls·X) = ${r.V_Ls.toFixed(0)} m³ (Ls=${r.Ls}), 当前总池容 ${r.V_total.toFixed(0)} m³ 偏小, 建议增加池数/降低排出比或提高 MLSS`});
+      score -= 5;
+    } else {
+      checks.push({type:'ok', ic:'✓', text:`<b>污泥负荷法校核</b>: 总池容 ${r.V_total.toFixed(0)} m³ ≥ Q·S₀/(Ls·X) = ${r.V_Ls.toFixed(0)} m³ (Ls=${r.Ls})`});
+    }
+  }
 
   // 沉淀时间
   if (r.tsettle < 0.5) { checks.push({type:'warn', ic:'⚠', text:`<b>沉淀时间偏短</b>: ${r.tsettle}h, 建议≥0.5h`}); score -= 5; }
@@ -3688,7 +3931,11 @@ function drawSBRTimePhases(r) {
 
 function drawCASSLayout(r) {
   const ink = '#0f172a', muted = '#64748b';
-  let h = `<text x="450" y="22" font-size="13" font-weight="600" fill="${ink}" text-anchor="middle">CASS 工艺 · 三区池横断面 + 周期时序</text>`;
+  let h = `<defs>
+    <marker id="sbrArr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0891b2"/></marker>
+  </defs>`;
+  h += `<text x="450" y="22" font-size="13" font-weight="600" fill="${ink}" text-anchor="middle">CASS 工艺 · 三区池横断面 + 周期时序</text>`;
   // 三区池
   const poolX = 120, poolY = 60, totalW = 420, poolH = 100;
   const w1 = totalW * 0.15, w2 = totalW * 0.20, w3 = totalW * 0.65;
@@ -3709,10 +3956,10 @@ function drawCASSLayout(r) {
     h += `<circle cx="${bx}" cy="${poolY + poolH - 8}" r="2" fill="${c3}" opacity="0.6"/>`;
   }
   // 进水箭头
-  h += `<line x1="40" y1="${poolY + 50}" x2="${poolX - 6}" y2="${poolY + 50}" stroke="#0891b2" stroke-width="2" marker-end="url(#aoanArr)"/>`;
+  h += `<line x1="40" y1="${poolY + 50}" x2="${poolX - 6}" y2="${poolY + 50}" stroke="#0891b2" stroke-width="2" marker-end="url(#sbrArr)"/>`;
   h += `<text x="40" y="${poolY + 40}" font-size="11" fill="${ink}" font-weight="500">进水 (连续)</text>`;
   // 出水箭头(虚线,周期排水)
-  h += `<line x1="${poolX + totalW}" y1="${poolY + 50}" x2="${poolX + totalW + 50}" y2="${poolY + 50}" stroke="#0891b2" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#aoanArr)"/>`;
+  h += `<line x1="${poolX + totalW}" y1="${poolY + 50}" x2="${poolX + totalW + 50}" y2="${poolY + 50}" stroke="#0891b2" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#sbrArr)"/>`;
   h += `<text x="${poolX + totalW + 55}" y="${poolY + 55}" font-size="11" fill="${ink}" font-weight="500">周期排水</text>`;
   // 池信息
   h += `<text x="${poolX + totalW/2}" y="${poolY + poolH + 20}" font-size="11" fill="${muted}" text-anchor="middle">单池 V=${r.V_single.toFixed(0)} m³ × ${r.N} 个 = 总 ${r.V_total.toFixed(0)} m³</text>`;
@@ -3739,7 +3986,11 @@ function drawCASSLayout(r) {
 
 function drawUNITANKLayout(r) {
   const ink = '#0f172a', muted = '#64748b';
-  let h = `<text x="450" y="22" font-size="13" font-weight="600" fill="${ink}" text-anchor="middle">UNITANK 工艺 · 三联池轮流切换</text>`;
+  let h = `<defs>
+    <marker id="sbrArr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0891b2"/></marker>
+  </defs>`;
+  h += `<text x="450" y="22" font-size="13" font-weight="600" fill="${ink}" text-anchor="middle">UNITANK 工艺 · 三联池轮流切换</text>`;
   // 三联池
   const poolX = 150, poolY = 60, eachW = 150, poolH = 100, gap = 8;
   const colors = ['#8b5cf6', '#22c55e', '#06b6d4'];
@@ -3763,10 +4014,10 @@ function drawUNITANKLayout(r) {
     h += `<line x1="${lx}" y1="${poolY + poolH/2}" x2="${lx + gap}" y2="${poolY + poolH/2}" stroke="${ink}" stroke-width="2"/>`;
   }
   // 进水/出水
-  h += `<line x1="60" y1="${poolY + 40}" x2="${poolX - 6}" y2="${poolY + 40}" stroke="#0891b2" stroke-width="2" marker-end="url(#aoanArr)"/>`;
+  h += `<line x1="60" y1="${poolY + 40}" x2="${poolX - 6}" y2="${poolY + 40}" stroke="#0891b2" stroke-width="2" marker-end="url(#sbrArr)"/>`;
   h += `<text x="60" y="${poolY + 30}" font-size="11" fill="${ink}" font-weight="500">进水 (切换左/右)</text>`;
   const rightX = poolX + 3 * eachW + 2 * gap;
-  h += `<line x1="${rightX}" y1="${poolY + 60}" x2="${rightX + 50}" y2="${poolY + 60}" stroke="#0891b2" stroke-width="2" marker-end="url(#aoanArr)"/>`;
+  h += `<line x1="${rightX}" y1="${poolY + 60}" x2="${rightX + 50}" y2="${poolY + 60}" stroke="#0891b2" stroke-width="2" marker-end="url(#sbrArr)"/>`;
   h += `<text x="${rightX + 55}" y="${poolY + 65}" font-size="11" fill="${ink}" font-weight="500">出水 (切换右/左)</text>`;
   // 池信息
   h += `<text x="${poolX + (3*eachW + 2*gap)/2}" y="${poolY + poolH + 20}" font-size="11" fill="${muted}" text-anchor="middle">总池容 ${r.V_total.toFixed(0)} m³ · 半周期 ${r.T_cycle/2} h 切换</text>`;
@@ -3781,6 +4032,8 @@ function drawUNITANKLayout(r) {
 }
 
 function calcAndRenderSBR() {
+  const bad = validateInputs(VALID_SBR, ['sbr_BOD0', 'sbr_BODe']);
+  if (bad.length) { showInvalid('panel-sbr', 'sbr_checkList', bad); return; }
   const r = calcSBR();
   const chk = checkSBR(r);
   $('sbr_r_Vsingle').textContent = r.V_single.toFixed(0);
@@ -3796,7 +4049,8 @@ function calcAndRenderSBR() {
   $('sbr_r_tidle').textContent = r.tidle.toFixed(1);
   $('sbr_r_AOR').textContent = r.AOR.toFixed(0);
   $('sbr_r_AORpeak').textContent = r.AOR_peak.toFixed(1);
-  $('sbr_r_SOR').textContent = r.SOR.toFixed(0);
+  $('sbr_r_SOR').textContent = fx(r.SOR, 0);
+  $('sbr_r_VLs').textContent = fx(r.V_Ls, 0);
   $('sbr_r_dX').textContent = r.dX_SS.toFixed(0);
   $('sbr_r_FM').textContent = r.F_over_M.toFixed(3);
 
@@ -3898,7 +4152,7 @@ function calcOXI() {
 
   const Kd_T = Kd20 * Math.pow(1.04, T - 20);
   const mu_max_T = mu_max20 * Math.pow(theta_T, T - 20);
-  const SDNR_T = SDNR20 * Math.pow(1.08, T - 20);
+  const SDNR_T = SDNR20 * Math.pow(1.08, T - 20);  // θ=1.08 依据 GB 50014: Kde(T)=Kde(20)·1.08^(T−20)
 
   const NH4_use = Math.max(NH4e, 0.5);
   const mu_net = mu_max_T * NH4_use / (Kn + NH4_use) - Kd_T;
@@ -3911,6 +4165,8 @@ function calcOXI() {
   const V_active = (SRT * Q * Y * (BOD0 - BODe)) / (MLVSS * (1 + Kd_T * SRT));
 
   // ========== anoxRatio 多因素修正 ==========
+  // 【经验值】本节基准值、修正指数/系数 (0.4 / 0.05 / 2 / 上限 0.6) 及下方池容折算系数 0.3
+  //  均为工程经验估算, 无规范出处, 仅供方案比选; 以实测 DO 分布 / 设计手册为准
   // 基准值(按亚型):Carrousel 0.35 / Orbal 0.45 / 传统 0.20
   // 手动覆盖优先级最高
   const anoxOverride = get('anoxOverride') / 100;
@@ -3940,7 +4196,7 @@ function calcOXI() {
     anoxSource = 'auto';
   }
 
-  // 氧化沟实际池容:缺氧+好氧一体,按 anoxRatio 折算
+  // 氧化沟实际池容:缺氧+好氧一体,按 anoxRatio 折算 (系数 0.3 为经验值, 无规范出处)
   const V_total = V_active / (1 - anoxRatio * 0.3);
   const HRT_total = V_total / Q * 24;
 
@@ -3949,12 +4205,11 @@ function calcOXI() {
   // 实际 V = area × L,但水流循环一圈就是 L
   // 环形跑道周长 L = V / area,但实际工程多沟并联,单沟长度应适中
   // 典型 Carrousel 单沟周长 300-500m, 多沟数量 N_ch = total_length/single_length
-  const total_length = V_total / area; // m
-  const single_length = Math.min(total_length, 400); // 单沟限制 400m
-  const n_channels = Math.ceil(total_length / single_length);
-  const length = single_length;  // 显示单沟长度
+  const total_length = V_total / area; // m, 沟道总长度(真实值, 不截断)
+  const n_channels = Math.max(1, Math.ceil(total_length / 400)); // 单沟周长宜 ≤ 400 m
+  const length = total_length / n_channels;  // 平均单沟长度
   const Q_cycle = area * v * 3600; // m³/h 循环流量
-  const t_cycle_min = length / v / 60; // min 循环时间
+  const t_cycle_min = length / v / 60; // min 单沟循环一圈时间
 
   // 氮平衡与 AAO 一致
   const organic_N_in = Math.max(0, TN0 - NH40);
@@ -3963,28 +4218,35 @@ function calcOXI() {
   const NOx_prod = Math.max(0, NH4_total - NH4e - N_assim);
   const NO3_allow = Math.max(0, TNe - NH4e - 1);
   const NOx_DN = Math.max(0, NOx_prod - NO3_allow);
+  // 缺氧区容积校核: 所需 V_A = Q·NOx_DN/(SDNR_T·MLVSS), 与沟内缺氧区 anoxRatio·V_总 比较
+  const V_anox_req = Q * NOx_DN / (SDNR_T * MLVSS);
+  const V_anox = anoxRatio * V_total;
 
   const r = MLSS / Math.max(MLSSr - MLSS, 100);
 
   const BOD_rem = (BOD0 - BODe) * Q / 1000;
-  const O_BOD = 0.5 * BOD_rem;
+  const dX_VSS = Yobs * BOD_rem;  // kg VSS/d
+  // GB 50014 6.6.17: O_BOD = 1.47×ΔBOD − 1.42×ΔX_VSS
+  const O_BOD = Math.max(0, 1.47 * BOD_rem - 1.42 * dX_VSS);
   const O_N = 4.57 * NOx_prod * Q / 1000;
   const O_DN = 2.86 * NOx_DN * Q / 1000;
   const AOR = Math.max(0, O_BOD + O_N - O_DN);
 
-  const C_s20 = 9.17;
-  const C_sT = 14.652 - 0.41022*T + 0.007991*T*T - 0.000077774*T*T*T;
-  const SOR = AOR * C_s20 / (alpha * (beta * C_sT - 2) * Math.pow(1.024, T - 20));
+  const SOR = calcSORstd(AOR, T, alpha, beta, get('H_diff'), 2);
 
-  const dX_SS = (Yobs * BOD_rem) / VSS_SS;
-  const F_over_M = BOD_rem / (V_total * MLVSS / 1000);
+  // GB 50014 6.6.19: f_ss SS 污泥转换率 0.5–0.7, SSe 出水 SS 取 10 mg/L
+  // 本面板无 SS₀ 输入, 借用 AAO 面板的 SS₀ 值
+  const f_ss = 0.5, SSe = 10, SS0 = num('SS0');
+  const dX_SS = dX_VSS + f_ss * Q * Math.max(0, SS0 - SSe) / 1000;
+  // F/M 污泥负荷 = Q·S₀/(V_总·MLSS)
+  const F_over_M = (Q * BOD0 / 1000) / (V_total * MLSS / 1000);
 
   return {
     Q, Q_wan, T, SRT, SRT_min, SRT_rec,
     V_total, HRT_total, anoxRatio, anoxRatio_base, anoxRatio_auto, anoxSource,
     v_factor, H_factor, FM_factor,
     area, length, total_length, n_channels, Q_cycle, t_cycle_min,
-    r, AOR, SOR, dX_SS, F_over_M, v, H, BH,
+    r, AOR, SOR, dX_SS, F_over_M, v, H, BH, V_anox_req, V_anox, NOx_DN,
     BOD_TN: BOD0/Math.max(TN0,1), Yobs, BOD_rem
   };
 }
@@ -4013,7 +4275,7 @@ function checkOXI(r) {
   else { checks.push({type:'ok', ic:'✓', text:`<b>沟深合理</b>: ${r.H} m`}); }
 
   // HRT
-  if (r.HRT_total < 12) { checks.push({type:'warn', ic:'⚠', text:`<b>HRT 偏短</b>: ${r.HRT_total.toFixed(1)}h, 氧化沟通常 ≥ 12h`}); score -= 8; }
+  if (r.HRT_total < 12) { checks.push({type:'info', ic:'ℹ', text:`<b>HRT 偏短</b>: 氧化沟 HRT 一般 12–24 h, 当前 ${r.HRT_total.toFixed(1)} h, 偏短 (提示)`}); }
   else if (r.HRT_total > 30) { checks.push({type:'info', ic:'ℹ', text:`<b>HRT 较长</b>: ${r.HRT_total.toFixed(1)}h`}); }
   else { checks.push({type:'ok', ic:'✓', text:`<b>HRT 合理</b>: ${r.HRT_total.toFixed(1)}h`}); }
 
@@ -4026,12 +4288,26 @@ function checkOXI(r) {
   if (r.BOD_TN < 4) { checks.push({type:'warn', ic:'⚠', text:`<b>碳氮比偏低</b>: BOD/TN=${r.BOD_TN.toFixed(2)}`}); score -= 10; }
   else { checks.push({type:'ok', ic:'✓', text:`<b>碳氮比合适</b>: ${r.BOD_TN.toFixed(2)}`}); }
 
+  // 沟道分段
+  if (r.n_channels > 1) {
+    checks.push({type:'info', ic:'ℹ', text:`<b>沟道总长 ${r.total_length.toFixed(0)} m</b>: 单沟周长宜 ≤ 400 m, 宜分 ${r.n_channels} 条沟道 (每条约 ${r.length.toFixed(0)} m)`});
+  }
+
+  // 缺氧区容积校核 (参考, 不计分)
+  if (r.NOx_DN > 0 && isFinite(r.V_anox_req)) {
+    if (r.V_anox < r.V_anox_req) {
+      checks.push({type:'info', ic:'ℹ', text:`<b>缺氧区容积校核</b>: 反硝化所需 V_A = Q·NOx/(SDNR_T·MLVSS) ≈ ${r.V_anox_req.toFixed(0)} m³, 沟内缺氧区约 ${r.V_anox.toFixed(0)} m³ (anoxRatio × V_总), 偏小, 出水 TN 可能偏高; 可设前置缺氧区或提高缺氧占比`});
+    } else {
+      checks.push({type:'ok', ic:'✓', text:`<b>缺氧区容积校核</b>: 沟内缺氧区约 ${r.V_anox.toFixed(0)} m³ ≥ 反硝化所需 ${r.V_anox_req.toFixed(0)} m³`});
+    }
+  }
+
   // 循环时间
   if (r.t_cycle_min > 15) { checks.push({type:'warn', ic:'⚠', text:`<b>循环时间偏长</b>: ${r.t_cycle_min.toFixed(1)} min, 沟过长或流速过低`}); score -= 5; }
   else { checks.push({type:'ok', ic:'✓', text:`<b>循环时间合理</b>: ${r.t_cycle_min.toFixed(1)} min`}); }
 
   // F/M
-  if (r.F_over_M > 0.15) { checks.push({type:'warn', ic:'⚠', text:`<b>F/M 偏高</b>: ${r.F_over_M.toFixed(3)}, 氧化沟通常 &lt; 0.1`}); score -= 5; }
+  if (r.F_over_M > 0.15) { checks.push({type:'warn', ic:'⚠', text:`<b>F/M 偏高</b>: ${r.F_over_M.toFixed(3)} kgBOD/kgMLSS·d &gt; 0.15, 氧化沟一般 0.05–0.15 (延时曝气 &lt; 0.1)`}); score -= 5; }
   else { checks.push({type:'ok', ic:'✓', text:`<b>F/M 合适</b>: ${r.F_over_M.toFixed(3)} (氧化沟典型低负荷)`}); }
 
   score = Math.max(0, Math.min(100, score));
@@ -4120,6 +4396,8 @@ function drawOXIFlow(r) {
 }
 
 function calcAndRenderOXI() {
+  const bad = validateInputs(VALID_OXI, ['oxi_BOD0', 'oxi_BODe']);
+  if (bad.length) { showInvalid('panel-oxi', 'oxi_checkList', bad); return; }
   const r = calcOXI();
   const chk = checkOXI(r);
   $('oxi_r_Vtotal').textContent = r.V_total.toFixed(0);
@@ -4137,14 +4415,16 @@ function calcAndRenderOXI() {
     ? 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)' 
     : 'linear-gradient(135deg, #0891b2 0%, #0e7490 100%)';
   $('oxi_r_area').textContent = r.area.toFixed(1);
-  $('oxi_r_length').textContent = r.length.toFixed(0);
+  $('oxi_r_length').textContent = r.total_length.toFixed(0);
+  $('oxi_r_nch').textContent = r.n_channels;
+  $('oxi_r_lenSingle').textContent = r.length.toFixed(0);
   $('oxi_r_Qcycle').textContent = r.Q_cycle.toFixed(0);
   $('oxi_r_tcycle').textContent = r.t_cycle_min.toFixed(1);
   $('oxi_r_r').textContent = (r.r*100).toFixed(0) + '%';
   $('oxi_r_SRT').textContent = r.SRT.toFixed(1);
   $('oxi_r_SRTmin').textContent = r.SRT_min < 100 ? r.SRT_min.toFixed(2) : '>30';
   $('oxi_r_AOR').textContent = r.AOR.toFixed(0);
-  $('oxi_r_SOR').textContent = r.SOR.toFixed(0);
+  $('oxi_r_SOR').textContent = fx(r.SOR, 0);
   $('oxi_r_dX').textContent = r.dX_SS.toFixed(0);
   $('oxi_r_FM').textContent = r.F_over_M.toFixed(3);
 
@@ -4159,42 +4439,15 @@ function calcAndRenderOXI() {
   drawOXIFlow(r);
 }
 
-// ============================================================
-// ============= MBR (+ AAO/+AO缺氧/+单好氧) ===================
-// ============================================================
-
-const PRESETS_MBR = {
-  municipal: {
-    mbr_COD0: 400, mbr_BOD0: 180, mbr_TN0: 45, mbr_NH40: 35, mbr_TP0: 5,
-    mbr_MLSS: 10000, mbr_VSS_SS: 0.72,
-    mbr_Y: 0.55, mbr_Kd: 0.05, mbr_mu_max: 0.75, mbr_SDNR20: 0.08,
-    mbr_SF_SRT: 2.5, mbr_HRT_AN: 1.0,
-    mbr_J: 22, mbr_peakFactor: 1.3, mbr_runRatio: 95,
-    mbr_singleArea: 30, mbr_TMP: 30,
-    mbr_alpha: 0.55, mbr_beta: 0.95,
-    mbr_energyMembrane: 0.25, mbr_cleanCycle: 6
-  },
-  industrial: {
-    mbr_COD0: 1000, mbr_BOD0: 400, mbr_TN0: 70, mbr_NH40: 50, mbr_TP0: 10,
-    mbr_MLSS: 12000, mbr_VSS_SS: 0.68,
-    mbr_Y: 0.40, mbr_Kd: 0.04, mbr_mu_max: 0.5, mbr_SDNR20: 0.04,
-    mbr_SF_SRT: 3.0, mbr_HRT_AN: 1.5,
-    mbr_J: 18, mbr_peakFactor: 1.3, mbr_runRatio: 92,
-    mbr_singleArea: 30, mbr_TMP: 40,
-    mbr_alpha: 0.50, mbr_beta: 0.92,
-    mbr_energyMembrane: 0.35, mbr_cleanCycle: 4
-  }
-};
-
-const MBR_CONFIG_INFO = {
-  aao: { title: 'MBR + AAO', shortTitle: 'AAO (厌氧+缺氧+好氧+膜)', hasVAN: true, hasVA: true },
-  ao_an: { title: 'MBR + AO缺氧', shortTitle: 'AO缺氧 (缺氧+好氧+膜)', hasVAN: false, hasVA: true },
-  single_o: { title: 'MBR + 单好氧', shortTitle: '单好氧 (只好氧+膜)', hasVAN: false, hasVA: false }
-};
-
 // ============ 恢复默认 ============
 function resetDefaults() {
   if (confirm('确定重置所有参数为城镇污水默认值吗?')) {
+    // 先把所有输入/下拉/复选框恢复为 HTML 默认值, 避免浏览器在刷新后自动恢复表单内容
+    document.querySelectorAll('input, select').forEach(el => {
+      if (el.type === 'checkbox' || el.type === 'radio') el.checked = el.defaultChecked;
+      else if (el.tagName === 'SELECT') [...el.options].forEach(o => o.selected = o.defaultSelected);
+      else el.value = el.defaultValue;
+    });
     location.reload();
   }
 }

@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>加药量计算器 | 水处理工具箱</title>
+<title>加药量计算器 | 水处理工具箱 · WaterKit</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230891b2'/%3E%3Ctext x='16' y='22.5' font-size='18' font-weight='700' text-anchor='middle' fill='white' font-family='Arial,sans-serif'%3EW%3C/text%3E%3C/svg%3E">
+<meta name="description" content="在线计算 PAC、PAM、次氯酸钠、碳源、除磷剂与 pH 调节剂的投加量、药液体积、计量泵流量、日/月用量及年采购与吨水药剂成本。">
+<link rel="canonical" href="https://waterkit.cn/dosing-calculator.html">
 <style>
   :root {
     --brand: #0891b2;
@@ -20,14 +23,6 @@
     --border: #e2e8f0;
     --border-soft: #f1f5f9;
   }
-  body {
-    background: var(--bg) !important;
-    padding: 0 !important;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-
   /* 统一顶部导航 */
   .topbar {
     background: rgba(255, 255, 255, 0.92);
@@ -167,10 +162,13 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: #f5f7fa;
+    background: var(--bg);
     color: #1f2937;
     line-height: 1.6;
-    padding: 16px;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
   }
   .container {
     max-width: 860px;
@@ -381,21 +379,17 @@
     color: #92400e;
     border-left: 3px solid #f59e0b;
   }
-  footer {
-    text-align: center;
-    padding: 16px;
-    font-size: 12px;
-    color: #9ca3af;
-  }
   @media (max-width: 480px) {
     .main-wrap { padding: 8px; }
-    ..main-wrap { padding: 16px; }
     header.tool-header { padding: 18px; }
     header.tool-header h1 { font-size: 19px; }
     .result-value { font-size: 17px; }
     .result-value.big { font-size: 20px; }
     .drug-tab { font-size: 11.5px; min-width: 70px; padding: 8px 4px; }
   }
+  .invalid{border-color:#ef4444!important;background:#fef2f2!important}
+  .warn-box{margin-top:12px;padding:10px 12px;background:#fef2f2;border-left:3px solid #ef4444;border-radius:6px;font-size:12.5px;color:#991b1b;line-height:1.7}
+  .warn-box.soft{background:#fffbeb;border-left-color:#f59e0b;color:#92400e}
 </style>
 </head>
 <body>
@@ -443,11 +437,11 @@
       <h2>📌 共用参数（所有药剂共享）</h2>
       <div class="grid">
         <div class="field">
-          <label>处理水量 Q <span class="unit">m³/h</span></label>
+          <label for="Q">处理水量 Q <span class="unit" style="color:#0e7490;font-weight:600;">m³/h（按小时，非 m³/d）</span></label>
           <input type="number" id="Q" value="500" step="10">
         </div>
         <div class="field">
-          <label>每天运行时间 <span class="unit">h/d</span></label>
+          <label for="hours">每天运行时间 <span class="unit">h/d</span></label>
           <input type="number" id="hours" value="24" step="1">
         </div>
       </div>
@@ -480,23 +474,23 @@
       <div class="section-title">混凝剂 PAC（聚合氯化铝）参数</div>
       <div class="grid">
         <div class="field">
-          <label>投药浓度（以商品药剂计） <span class="unit">mg/L</span></label>
+          <label for="pac_dose">投药浓度（以商品药剂计） <span class="unit">mg/L</span></label>
           <input type="number" id="pac_dose" value="30" step="5">
         </div>
         <div class="field">
-          <label>商品药剂 Al₂O₃ 含量 <span class="unit">%</span></label>
+          <label for="pac_al2o3">商品药剂 Al₂O₃ 含量 <span class="unit">%</span></label>
           <input type="number" id="pac_al2o3" value="30" step="1">
         </div>
         <div class="field">
-          <label>药液配制浓度 <span class="unit">%（W/V）</span></label>
+          <label for="pac_conc">药液配制浓度 <span class="unit">%（W/W）</span></label>
           <input type="number" id="pac_conc" value="10" step="1">
         </div>
         <div class="field">
-          <label>药液密度 <span class="unit">kg/L</span></label>
+          <label for="pac_rho">药液密度 <span class="unit">kg/L</span></label>
           <input type="number" id="pac_rho" value="1.08" step="0.01">
         </div>
         <div class="field">
-          <label>采购单价 <span class="unit">元/t</span></label>
+          <label for="pac_price">采购单价 <span class="unit">元/t</span></label>
           <input type="number" id="pac_price" value="1800" step="50">
         </div>
       </div>
@@ -544,7 +538,7 @@
       <div class="section-title">絮凝剂 PAM（聚丙烯酰胺）参数</div>
       <div class="grid">
         <div class="field">
-          <label>离子类型</label>
+          <label for="pam_type">离子类型</label>
           <select id="pam_type">
             <option value="cation">阳离子（CPAM）—— 污泥脱水常用</option>
             <option value="anion">阴离子（APAM）—— 给水/矿山常用</option>
@@ -552,30 +546,30 @@
           </select>
         </div>
         <div class="field">
-          <label>应用场景</label>
+          <label for="pam_use">应用场景</label>
           <select id="pam_use">
             <option value="water">给水/污水助凝（按水量投加）</option>
             <option value="sludge">污泥脱水（按干泥量投加）</option>
           </select>
         </div>
         <div class="field" id="pam_dose_water_field">
-          <label>投药浓度（按水量） <span class="unit">mg/L</span></label>
+          <label for="pam_dose_water">投药浓度（按水量） <span class="unit">mg/L</span></label>
           <input type="number" id="pam_dose_water" value="1.0" step="0.1">
         </div>
         <div class="field" id="pam_dose_sludge_field" style="display:none;">
-          <label>投药比（按干泥量） <span class="unit">kg药/tDS</span></label>
+          <label for="pam_dose_sludge">投药比（按干泥量） <span class="unit">kg药/tDS</span></label>
           <input type="number" id="pam_dose_sludge" value="5" step="0.5">
         </div>
         <div class="field" id="pam_sludge_q_field" style="display:none;">
-          <label>干泥处理量 <span class="unit">kgDS/h</span></label>
+          <label for="pam_sludge_q">干泥处理量 <span class="unit">kgDS/h</span></label>
           <input type="number" id="pam_sludge_q" value="100" step="10">
         </div>
         <div class="field">
-          <label>药液配制浓度 <span class="unit">‰ (g/L)</span></label>
+          <label for="pam_conc">药液配制浓度 <span class="unit">‰ (g/L)</span></label>
           <input type="number" id="pam_conc" value="2" step="0.5">
         </div>
         <div class="field">
-          <label>采购单价 <span class="unit">元/kg</span></label>
+          <label for="pam_price">采购单价 <span class="unit">元/kg</span></label>
           <input type="number" id="pam_price" value="22" step="1">
         </div>
       </div>
@@ -606,6 +600,10 @@
           <span class="result-label"><b>年采购成本</b></span>
           <span><span class="result-value big" id="pam_r_year_cost">—</span><span class="result-unit">万元/a</span></span>
         </div>
+        <div class="result-row">
+          <span class="result-label">吨水药剂成本<span id="pam_unit_note"></span></span>
+          <span><span class="result-value" id="pam_r_unit_cost">—</span><span class="result-unit">元/m³水</span></span>
+        </div>
       </div>
       <div class="info-box">💡 PAM 常规投加：助凝 0.5-2.0 mg/L；污泥脱水 CPAM 3-8 kg/tDS。药液配制浓度宜 0.1-0.3%，熟化时间≥30min，不宜过浓否则不易溶解。</div>
     </div>
@@ -615,19 +613,19 @@
       <div class="section-title">消毒剂 次氯酸钠（NaClO）参数</div>
       <div class="grid">
         <div class="field">
-          <label>投加浓度（以有效氯计） <span class="unit">mg/L</span></label>
+          <label for="cl_dose">投加浓度（以有效氯计） <span class="unit">mg/L</span></label>
           <input type="number" id="cl_dose" value="5" step="0.5">
         </div>
         <div class="field">
-          <label>商品溶液有效氯含量 <span class="unit">%</span></label>
+          <label for="cl_active">商品溶液有效氯含量 <span class="unit">%</span></label>
           <input type="number" id="cl_active" value="10" step="1">
         </div>
         <div class="field">
-          <label>商品溶液密度 <span class="unit">kg/L</span></label>
+          <label for="cl_rho">商品溶液密度 <span class="unit">kg/L</span></label>
           <input type="number" id="cl_rho" value="1.20" step="0.01">
         </div>
         <div class="field">
-          <label>采购单价 <span class="unit">元/t（商品液）</span></label>
+          <label for="cl_price">采购单价 <span class="unit">元/t（商品液）</span></label>
           <input type="number" id="cl_price" value="900" step="50">
         </div>
       </div>
@@ -671,7 +669,7 @@
       <div class="section-title">外加碳源参数（反硝化脱氮）</div>
       <div class="grid">
         <div class="field">
-          <label>碳源类型</label>
+          <label for="c_type">碳源类型</label>
           <select id="c_type" onchange="updateCarbon()">
             <option value="methanol">甲醇（CH₃OH）</option>
             <option value="acetate">乙酸钠（CH₃COONa）</option>
@@ -680,31 +678,31 @@
           </select>
         </div>
         <div class="field">
-          <label>待反硝化 NO₃⁻-N 量 <span class="unit">mg/L</span></label>
+          <label for="c_N">待反硝化 NO₃⁻-N 量 <span class="unit">mg/L</span></label>
           <input type="number" id="c_N" value="20" step="1">
         </div>
         <div class="field">
-          <label>C/N 比（COD基） <span class="unit">—</span></label>
+          <label for="c_cn">C/N 比（COD基） <span class="unit">—</span></label>
           <input type="number" id="c_cn" value="4.5" step="0.5">
         </div>
         <div class="field">
-          <label>进水可用 COD <span class="unit">mg/L</span></label>
+          <label for="c_cod_in">进水可用 COD <span class="unit">mg/L</span></label>
           <input type="number" id="c_cod_in" value="20" step="5">
         </div>
         <div class="field">
-          <label>药剂 COD 当量 <span class="unit">gCOD/g药</span></label>
+          <label for="c_cod_eq">药剂 COD 当量（按纯物质） <span class="unit">gCOD/g</span></label>
           <input type="number" id="c_cod_eq" value="1.5" step="0.05">
         </div>
         <div class="field">
-          <label>商品药剂浓度 <span class="unit">% 或 含量</span></label>
+          <label for="c_conc">商品药剂有效含量 <span class="unit">%</span></label>
           <input type="number" id="c_conc" value="100" step="5">
         </div>
-        <div class="field">
-          <label>药剂密度 <span class="unit">kg/L</span></label>
+        <div class="field" id="c_rho_field">
+          <label for="c_rho">药剂密度（液体药剂） <span class="unit">kg/L</span></label>
           <input type="number" id="c_rho" value="0.79" step="0.01">
         </div>
         <div class="field">
-          <label>采购单价 <span class="unit">元/t</span></label>
+          <label for="c_price">采购单价 <span class="unit">元/t</span></label>
           <input type="number" id="c_price" value="2800" step="100">
         </div>
       </div>
@@ -727,7 +725,7 @@
           <span class="result-label"><b>外加药剂量（商品）</b></span>
           <span><span class="result-value big" id="c_r_solid">—</span><span class="result-unit">kg/h</span></span>
         </div>
-        <div class="result-row">
+        <div class="result-row" id="c_liquid_row">
           <span class="result-label">药剂体积量（液体药剂）</span>
           <span><span class="result-value" id="c_r_liquid">—</span><span class="result-unit">L/h</span></span>
         </div>
@@ -744,7 +742,7 @@
           <span><span class="result-value" id="c_r_unit_cost">—</span><span class="result-unit">元/m³水</span></span>
         </div>
       </div>
-      <div class="info-box">💡 典型 COD 当量：甲醇 1.5、乙酸钠 0.68、葡萄糖 1.07、复合碳源 1.0-1.4（视产品而定）。理论反硝化 C/N ≈ 2.86（以 COD/NO₃-N 计），工程实际取 4-6 用于完全反硝化。</div>
+      <div class="info-box">💡 典型 COD 当量：甲醇 1.5、乙酸钠 0.78（按无水乙酸钠计；固体三水乙酸钠有效含量约 58%，折合约 0.45 gCOD/g 商品）、葡萄糖 1.07、复合碳源 1.0-1.4（视产品而定）。商品药剂用量 = 缺口 COD ÷ COD 当量 ÷ 有效含量。理论反硝化 C/N ≈ 2.86（以 COD/NO₃-N 计），工程实际取 4-6 用于完全反硝化。</div>
     </div>
 
     <!-- ===================== 除磷剂 ===================== -->
@@ -752,7 +750,7 @@
       <div class="section-title">化学除磷剂参数</div>
       <div class="grid">
         <div class="field">
-          <label>除磷剂类型</label>
+          <label for="p_type">除磷剂类型</label>
           <select id="p_type" onchange="updateP()">
             <option value="PAC">PAC（聚合氯化铝）</option>
             <option value="PFS">PFS（聚合硫酸铁）</option>
@@ -761,27 +759,27 @@
           </select>
         </div>
         <div class="field">
-          <label>进水 TP <span class="unit">mg/L</span></label>
+          <label for="p_TPo">进水 TP <span class="unit">mg/L</span></label>
           <input type="number" id="p_TPo" value="4" step="0.5">
         </div>
         <div class="field">
-          <label>出水 TP（目标） <span class="unit">mg/L</span></label>
+          <label for="p_TPe">出水 TP（目标） <span class="unit">mg/L</span></label>
           <input type="number" id="p_TPe" value="0.3" step="0.1">
         </div>
         <div class="field">
-          <label>生物除磷贡献 <span class="unit">mg/L</span></label>
+          <label for="p_bio">生物除磷贡献 <span class="unit">mg/L</span></label>
           <input type="number" id="p_bio" value="1.5" step="0.5">
         </div>
         <div class="field">
-          <label>金属/磷 摩尔比 <span class="unit">—</span></label>
+          <label for="p_mole">金属/磷 摩尔比 <span class="unit">—</span></label>
           <input type="number" id="p_mole" value="1.5" step="0.1">
         </div>
         <div class="field">
-          <label>有效金属含量 <span class="unit">%</span></label>
+          <label for="p_metal">有效含量 <span class="unit">%（PAC 按 Al₂O₃ 计，铁盐按 Fe 计）</span></label>
           <input type="number" id="p_metal" value="10" step="1">
         </div>
         <div class="field">
-          <label>采购单价 <span class="unit">元/t</span></label>
+          <label for="p_price">采购单价 <span class="unit">元/t</span></label>
           <input type="number" id="p_price" value="1800" step="100">
         </div>
       </div>
@@ -829,14 +827,14 @@
       <div class="section-title">pH 调节药剂参数（简化估算）</div>
       <div class="grid">
         <div class="field">
-          <label>调节方向</label>
+          <label for="ph_dir">调节方向</label>
           <select id="ph_dir" onchange="updatePH()">
             <option value="up">偏酸 → 碱性（加碱）</option>
             <option value="down">偏碱 → 酸性（加酸）</option>
           </select>
         </div>
         <div class="field">
-          <label>药剂类型</label>
+          <label for="ph_chem">药剂类型</label>
           <select id="ph_chem">
             <option value="NaOH">NaOH（液碱 32%）</option>
             <option value="Ca(OH)2">Ca(OH)₂（石灰）</option>
@@ -846,42 +844,50 @@
           </select>
         </div>
         <div class="field">
-          <label>进水 pH</label>
+          <label for="ph_in">进水 pH</label>
           <input type="number" id="ph_in" value="5.5" step="0.1">
         </div>
         <div class="field">
-          <label>目标 pH</label>
+          <label for="ph_target">目标 pH</label>
           <input type="number" id="ph_target" value="7.5" step="0.1">
         </div>
         <div class="field">
-          <label>待中和酸/碱度 <span class="unit">mmol/L</span></label>
+          <label for="ph_alk">待中和酸/碱度 <span class="unit">mmol/L</span></label>
           <input type="number" id="ph_alk" value="3" step="0.5">
         </div>
         <div class="field">
-          <label>药剂纯度/浓度 <span class="unit">%</span></label>
+          <label for="ph_purity">药剂纯度/浓度 <span class="unit">%</span></label>
           <input type="number" id="ph_purity" value="32" step="1">
         </div>
         <div class="field">
-          <label>药剂密度 <span class="unit">kg/L</span></label>
+          <label for="ph_rho">药剂密度 <span class="unit">kg/L</span></label>
           <input type="number" id="ph_rho" value="1.35" step="0.01">
         </div>
         <div class="field">
-          <label>采购单价 <span class="unit">元/t</span></label>
+          <label for="ph_price">采购单价 <span class="unit">元/t</span></label>
           <input type="number" id="ph_price" value="1200" step="50">
+        </div>
+        <div class="field">
+          <label for="ph_safety">投加安全系数 <span class="unit">—</span></label>
+          <input type="number" id="ph_safety" value="1.2" step="0.05">
         </div>
       </div>
 
       <div class="results">
         <h2>pH 调节剂投加计算结果</h2>
         <div class="result-row">
+          <span class="result-label">pH 调节幅度 ΔpH（目标 − 进水，仅作校核，不参与计算）</span>
+          <span><span class="result-value" id="ph_r_dph">—</span><span class="result-unit"></span></span>
+        </div>
+        <div class="result-row">
           <span class="result-label">需中和物质量</span>
           <span><span class="result-value" id="ph_r_mol">—</span><span class="result-unit">mol/h</span></span>
         </div>
         <div class="result-row highlight-row">
-          <span class="result-label"><b>商品药剂投加量</b></span>
+          <span class="result-label"><b>商品药剂投加量</b>（已含安全系数 ×<span id="ph_sf_lbl">1.2</span>）</span>
           <span><span class="result-value big" id="ph_r_mass">—</span><span class="result-unit">kg/h</span></span>
         </div>
-        <div class="result-row">
+        <div class="result-row" id="ph_vol_row">
           <span class="result-label">液体药剂投加体积</span>
           <span><span class="result-value" id="ph_r_vol">—</span><span class="result-unit">L/h</span></span>
         </div>
@@ -898,8 +904,11 @@
           <span><span class="result-value big" id="ph_r_year_cost">—</span><span class="result-unit">万元/a</span></span>
         </div>
       </div>
-      <div class="info-box">💡 pH 调节需考虑水中碳酸缓冲能力（碱度/酸度），不是单纯 pH 差值就能算。建议通过实验确定实际投药量，本工具按碱度/酸度中和估算，投加 1.2-1.5 倍安全系数。</div>
+      <div class="info-box">💡 pH 调节需考虑水中碳酸缓冲能力（碱度/酸度），不是单纯 pH 差值就能算。建议通过实验确定实际投药量，本工具按碱度/酸度中和估算，结果已乘以上方填写的安全系数（建议 1.2-1.5），请勿重复放大。进水/目标 pH 仅用于方向校核与显示 ΔpH，不参与投加量计算。</div>
     </div>
+
+    <div class="warn-box" id="warnBox" style="display:none;"></div>
+    <div class="warn-box soft" id="hintBox" style="display:none;"></div>
 
     <div class="buttons">
       <button class="btn btn-primary" onclick="copyResults()">📋 复制结果</button>
@@ -914,23 +923,24 @@
 
       <h3>② 药液配制与液体投加</h3>
       <code>V_液 = M / (ρ_液 × ω)  [L/h]</code>
-      <p>ρ_液 药液密度 [kg/L]，ω 配制浓度（质量分数，小数）。计量泵选型一般取 1.2-1.5 倍安全系数。</p>
+      <p>ρ_液 药液密度 [kg/L]，ω 配制浓度（质量分数，小数）。计量泵选型一般取 1.2-1.5 倍安全系数，本工具取 1.3。</p>
 
       <h3>③ 碳源投加（反硝化脱氮）</h3>
       <p>理论反硝化化学计量：每 1 kg NO₃⁻-N 被还原需 2.86 kg COD。</p>
       <code>COD_外加 = Q × [C/N × NO₃⁻-N − 可用COD] / 1000  [kgCOD/h]</code>
       <code>药剂量 = COD_外加 / COD当量 / 有效含量  [kg/h]</code>
-      <p>C/N 比工程值 4-6（考虑合成细胞消耗）。</p>
+      <p>C/N 比工程值 4-6（考虑合成细胞消耗）。COD 当量按纯物质计（乙酸钠 0.78 gCOD/g 按无水乙酸钠计），商品药剂再除以有效含量：如三水乙酸钠有效含量 58% 时折合 0.78 × 0.58 ≈ 0.45 gCOD/g 商品。</p>
 
       <h3>④ 化学除磷（Me/P 摩尔比法）</h3>
       <code>Δ P = TP_o − TP_e − 生物贡献  [mg/L]</code>
       <code>金属投加量 = Δ P × M_Me/M_P × Me/P 摩尔比  [mg/L]</code>
-      <p>M_Al = 27，M_Fe = 55.85，M_P = 31。</p>
+      <code>商品药剂量 = 金属投加量 / 有效金属含量；PAC 有效金属含量 = Al₂O₃ 含量 × 0.529（2×27/102）</code>
+      <p>M_Al = 27，M_Fe = 55.85，M_P = 31。PAC 商品标示的是 Al₂O₃ 含量，需换算为 Al 含量；铁盐（PFS、FeCl₃、FeSO₄）直接按 Fe 含量计。</p>
 
       <h3>⑤ pH 调节（碱度/酸度法）</h3>
-      <code>n = Q × 碱度(或酸度) [mmol/L] × 1000 / 1000  [mol/h]</code>
-      <code>药剂质量 = n × M_eq / 有效含量 / 价数  [kg/h]</code>
-      <p>M_eq：NaOH=40、Ca(OH)₂=74（2价）、HCl=36.5、H₂SO₄=98（2价）。</p>
+      <code>n = Q [m³/h] × 碱度(或酸度) [mmol/L]  [mol/h]</code>
+      <code>药剂质量 = n × M / 价数 / 有效含量 / 1000 × 安全系数  [kg/h]</code>
+      <p>M（摩尔质量）与价数：NaOH=40（1价）、Ca(OH)₂=74（2价）、Na₂CO₃=106（按 1 价计：中和至中性附近时 CO₃²⁻ 只转化为 HCO₃⁻，每 mol 仅消耗 1 mol H⁺）、HCl=36.5（1价）、H₂SO₄=98（2价）。安全系数默认 1.2，可在面板中修改；进水/目标 pH 仅作方向校核。</p>
 
       <h3>常用药剂参数速查</h3>
       <table>
@@ -970,7 +980,7 @@
             <div class="brand-sub">WaterKit · by 登登科技</div>
           </div>
         </a>
-        <p class="footer-about">水处理工具箱(WaterKit)是海南登登科技咨询有限公司推出的水处理在线计算工具集合,由一线水处理工艺工程师开发维护。免费、无广告、持续更新。</p>
+        <p class="footer-about">水处理工具箱(WaterKit)是海南登登科技咨询有限公司推出的水处理在线计算工具集合,由一线水处理工艺工程师开发维护。免费、持续更新。</p>
       </div>
       <div class="footer-col">
         <h4>水力计算</h4>
@@ -987,7 +997,11 @@
           <li><a href="aeration-calculator.html">曝气量</a></li>
           <li><a href="sludge-production-calculator.html">污泥产量</a></li>
           <li><a href="dosing-calculator.html">加药量</a></li>
+          <li><a href="activated-sludge-process-calculator.html">活性污泥工艺</a></li>
+          <li><a href="mbbr-design.html">MBBR 工程设计</a></li>
+          <li><a href="mbr-design.html">MBR 工程设计</a></li>
           <li><a href="pump-selection-calculator.html">水泵选型</a></li>
+          <li><a href="blower-selection-calculator.html">鼓风机选型</a></li>
           <li><a href="water-quality-unit-converter.html">水质换算</a></li>
         </ul>
       </div>
@@ -1046,12 +1060,21 @@
     }
   });
 
+  // 固体碳源（乙酸钠三水合物、葡萄糖）不显示体积量与密度
+  const SOLID_CARBON = ['acetate', 'glucose'];
+  function syncCarbonForm() {
+    const solid = SOLID_CARBON.includes($('c_type').value);
+    $('c_rho_field').style.display = solid ? 'none' : 'flex';
+    $('c_liquid_row').style.display = solid ? 'none' : 'flex';
+  }
+  const SOLID_PH = ['Ca(OH)2', 'Na2CO3'];
+
   // 碳源类型切换默认参数
   function updateCarbon() {
     const t = $('c_type').value;
     const defaults = {
       methanol: {cod_eq: 1.5, conc: 100, rho: 0.79, price: 2800},
-      acetate:  {cod_eq: 0.68, conc: 58, rho: 1.05, price: 2000},
+      acetate:  {cod_eq: 0.78, conc: 58, rho: 1.05, price: 2000},  // 0.78 gCOD/g 按无水 CH3COONa 计；conc=58% 为三水乙酸钠有效含量 → 0.45 gCOD/g 商品
       glucose:  {cod_eq: 1.07, conc: 100, rho: 1.0, price: 3500},
       compound: {cod_eq: 1.2, conc: 100, rho: 1.10, price: 2500}
     };
@@ -1060,6 +1083,7 @@
     $('c_conc').value = d.conc;
     $('c_rho').value = d.rho;
     $('c_price').value = d.price;
+    syncCarbonForm();
     calc();
   }
 
@@ -1067,7 +1091,7 @@
   function updateP() {
     const t = $('p_type').value;
     const defaults = {
-      PAC:   {metal: 10, price: 1800},  // 10% Al2O3 ≈ 5.3% Al, 简化按10%标示Al2O3基
+      PAC:   {metal: 10, price: 1800},  // 按 Al2O3 标示含量，calc() 内乘 0.529 换算为 Al
       PFS:   {metal: 11, price: 1200},
       FeCl3: {metal: 13, price: 1500},
       FeSO4: {metal: 20, price: 800}
@@ -1076,6 +1100,22 @@
     $('p_metal').value = d.metal;
     $('p_price').value = d.price;
     calc();
+  }
+
+  // pH 药剂默认纯度/密度/单价（单价为参考价，仅作占位）
+  const phChemDefaults = {
+    'NaOH':    {purity: 32, rho: 1.35, price: 1200},
+    'HCl':     {purity: 31, rho: 1.16, price: 600},
+    'H2SO4':   {purity: 98, rho: 1.84, price: 800},
+    'Ca(OH)2': {purity: 90, rho: 1.0,  price: 500},
+    'Na2CO3':  {purity: 99, rho: 1.0,  price: 1500}
+  };
+  function syncPHDefaults() {
+    const d = phChemDefaults[$('ph_chem').value];
+    if (!d) return;
+    $('ph_purity').value = d.purity;
+    $('ph_rho').value = d.rho;
+    $('ph_price').value = d.price;
   }
 
   // pH 药剂切换默认
@@ -1093,12 +1133,61 @@
         <option value="HCl">HCl（盐酸 31%）</option>
         <option value="H2SO4">H₂SO₄（硫酸 98%）</option>`;
     }
+    syncPHDefaults();
     calc();
+  }
+
+  // 输入校验规则：pos 须 > 0；nn 不能为负；ph 0–14
+  const RULES = {
+    PAC:    [['pac_dose','投药浓度','nn'],['pac_al2o3','Al₂O₃ 含量','nn'],['pac_conc','药液配制浓度','pos'],['pac_rho','药液密度','pos'],['pac_price','采购单价','nn']],
+    PAM:    [['pam_dose_water','投药浓度','nn'],['pam_dose_sludge','投药比','nn'],['pam_sludge_q','干泥处理量','nn'],['pam_conc','药液配制浓度','pos'],['pam_price','采购单价','nn']],
+    NaClO:  [['cl_dose','投加浓度','nn'],['cl_active','有效氯含量','pos'],['cl_rho','商品溶液密度','pos'],['cl_price','采购单价','nn']],
+    carbon: [['c_N','NO₃⁻-N 量','nn'],['c_cn','C/N 比','nn'],['c_cod_in','进水可用 COD','nn'],['c_cod_eq','COD 当量','pos'],['c_conc','商品药剂有效含量','pos'],['c_rho','药剂密度','pos'],['c_price','采购单价','nn']],
+    P:      [['p_TPo','进水 TP','nn'],['p_TPe','出水 TP','nn'],['p_bio','生物除磷贡献','nn'],['p_mole','金属/磷摩尔比','nn'],['p_metal','有效含量','pos'],['p_price','采购单价','nn']],
+    pH:     [['ph_in','进水 pH','ph'],['ph_target','目标 pH','ph'],['ph_alk','待中和酸/碱度','nn'],['ph_purity','药剂纯度','pos'],['ph_rho','药剂密度','pos'],['ph_price','采购单价','nn'],['ph_safety','投加安全系数','pos']]
+  };
+  function showMsg(id, html) {
+    const el = $(id);
+    el.innerHTML = html || '';
+    el.style.display = html ? 'block' : 'none';
+  }
+  function validate(drug) {
+    document.querySelectorAll('.invalid').forEach(el => el.classList.remove('invalid'));
+    const rules = [['Q','处理水量 Q','pos'],['hours','每天运行时间','pos']].concat(RULES[drug] || []);
+    const errs = [];
+    rules.forEach(([id, name, rule]) => {
+      const el = $(id);
+      if (!el || el.closest('.field').style.display === 'none') return;  // 隐藏的输入不校验
+      const v = parseFloat(el.value);
+      let msg = '';
+      if (isNaN(v)) msg = `请输入${name}`;
+      else if (rule === 'pos' && v <= 0) msg = `请输入大于 0 的${name}`;
+      else if (rule === 'nn' && v < 0) msg = `${name}不能为负值`;
+      else if (rule === 'ph' && (v < 0 || v > 14)) msg = `${name}应在 0–14 之间`;
+      if (msg) { el.classList.add('invalid'); errs.push(msg); }
+    });
+    if (num('hours') > 24) { $('hours').classList.add('invalid'); errs.push('每天运行时间不应超过 24 h'); }
+    if (drug === 'pH' && SOLID_PH.includes($('ph_chem').value)) {
+      // 固体药剂不需要密度，撤销其校验错误
+      const i = errs.findIndex(e => e.includes('药剂密度'));
+      if (i >= 0) { errs.splice(i, 1); $('ph_rho').classList.remove('invalid'); }
+    }
+    return errs;
   }
 
   function calc() {
     const Q = num('Q');           // m³/h
     const hours = num('hours');
+    syncCarbonForm();
+    $('ph_vol_row').style.display = SOLID_PH.includes($('ph_chem').value) ? 'none' : 'flex';
+    showMsg('hintBox', '');
+    const errs = validate(currentDrug);
+    if (errs.length) {
+      $('panel-' + currentDrug).querySelectorAll('.result-value').forEach(el => el.textContent = '—');
+      showMsg('warnBox', '⚠️ ' + errs.join('；'));
+      return;
+    }
+    showMsg('warnBox', '');
 
     // ========== PAC ==========
     if (currentDrug === 'PAC') {
@@ -1142,6 +1231,9 @@
       const day = solid * hours;
       const month = day * 30;
       const year_cost = day * 365 * price / 10000;
+      const unit_cost = (day * price) / (Q * hours);  // 元/m³水
+      $('pam_unit_note').textContent = use === 'sludge' ? '（按共用水量 Q 摊销）' : '';
+      if (use === 'sludge') showMsg('hintBox', '💡 污泥脱水模式下 PAM 用量按干泥量计算，共用参数“处理水量 Q”仅用于吨水成本摊销。');
 
       $('pam_r_solid').textContent = solid.toFixed(3);
       $('pam_r_liquid').textContent = liquid.toFixed(1);
@@ -1149,6 +1241,7 @@
       $('pam_r_day').textContent = day.toFixed(2);
       $('pam_r_month').textContent = month.toFixed(1);
       $('pam_r_year_cost').textContent = year_cost.toFixed(2);
+      $('pam_r_unit_cost').textContent = unit_cost.toFixed(4);
     }
 
     // ========== NaClO ==========
@@ -1204,7 +1297,9 @@
     if (currentDrug === 'P') {
       const type = $('p_type').value;
       const TPo = num('p_TPo'), TPe = num('p_TPe'), bio = num('p_bio');
-      const mole = num('p_mole'), metal_content = num('p_metal')/100;
+      const mole = num('p_mole');
+      // PAC 商品按 Al2O3 标示，换算为 Al：2×27/102 = 0.529；铁盐直接按 Fe 含量
+      const metal_content = num('p_metal')/100 * (type === 'PAC' ? 0.529 : 1);
       const price = num('p_price');
 
       const dP = Math.max(TPo - TPe - bio, 0);  // mg/L 需化学除
@@ -1216,7 +1311,6 @@
       const metal_mass = Q * metal_dose_mgL / 1000;  // kg金属/h
 
       const solid = metal_content>0 ? metal_mass / metal_content : 0;  // kg商品/h
-      // PAC标识常按Al2O3，本工具按金属计含量百分比
       const dose_eq = Q>0 ? solid * 1000 / Q : 0;  // mg/L
       const day = solid * hours;
       const year_cost = day * 365 * price / 1000 / 10000;
@@ -1244,19 +1338,27 @@
       const chemData = {
         'NaOH':    {M: 40,    valence: 1},
         'Ca(OH)2': {M: 74,    valence: 2},
-        'Na2CO3':  {M: 106,   valence: 2},
+        'Na2CO3':  {M: 106,   valence: 1},  // 中和至中性：CO3²⁻ → HCO3⁻，只消耗 1 个当量
         'HCl':     {M: 36.5,  valence: 1},
         'H2SO4':   {M: 98,    valence: 2}
       };
       const cd = chemData[chem] || {M: 40, valence: 1};
       const n = Q * alk;  // mol/h (Q m³/h × mmol/L × 1000/1000 = mol/h)
-      const safety = 1.2;
+      const safety = num('ph_safety');
+      const ph_in = num('ph_in'), ph_target = num('ph_target');
+      const dph = ph_target - ph_in;
+      const dir = $('ph_dir').value;
+      if ((dir === 'up' && dph <= 0) || (dir === 'down' && dph >= 0)) {
+        showMsg('hintBox', `💡 调节方向与 pH 不一致：当前为“${dir === 'up' ? '加碱（目标 pH 应高于进水 pH）' : '加酸（目标 pH 应低于进水 pH）'}”，进水 pH ${ph_in} → 目标 pH ${ph_target}，请核对调节方向或 pH 输入。`);
+      }
       const mass = n * cd.M / cd.valence / purity / 1000 * safety;  // kg/h
       const vol = rho>0 ? mass/rho : 0;  // L/h
       const dose_eq = Q>0 ? mass * 1000 / Q : 0;
       const day = mass * hours;
       const year_cost = day * 365 * price / 1000 / 10000;
 
+      $('ph_r_dph').textContent = (dph > 0 ? '+' : '') + dph.toFixed(1);
+      $('ph_sf_lbl').textContent = safety;
       $('ph_r_mol').textContent = n.toFixed(1);
       $('ph_r_mass').textContent = mass.toFixed(2);
       $('ph_r_vol').textContent = vol.toFixed(1);
@@ -1271,11 +1373,13 @@
     txt += `处理水量: ${num('Q')} m³/h, 日运行: ${num('hours')} h\n\n`;
     const panel = $('panel-'+currentDrug);
     panel.querySelectorAll('.result-row').forEach(row => {
+      if (row.style.display === 'none') return;
       const label = row.querySelector('.result-label').innerText.trim();
       const value = row.querySelector('.result-value').textContent;
       const unit = row.querySelector('.result-unit').textContent;
       txt += `${label}: ${value} ${unit}\n`;
     });
+    ['warnBox', 'hintBox'].forEach(id => { if ($(id).style.display !== 'none') txt += '\n' + $(id).textContent + '\n'; });
     navigator.clipboard.writeText(txt).then(() => {
       alert('结果已复制到剪贴板');
     }).catch(() => {
@@ -1290,13 +1394,28 @@
   }
 
   function resetDefaults() {
-    location.reload();
+    // 恢复 HTML 中的默认值（不用 reload，避免浏览器回填表单且保留当前药剂页签）
+    $('ph_dir').value = 'up';
+    updatePH();
+    document.querySelectorAll('input').forEach(el => { el.value = el.defaultValue; });
+    document.querySelectorAll('select').forEach(sel => {
+      const def = [...sel.options].find(o => o.defaultSelected) || sel.options[0];
+      sel.value = def.value;
+    });
+    const isSludge = $('pam_use').value === 'sludge';
+    $('pam_dose_water_field').style.display = isSludge ? 'none' : 'flex';
+    $('pam_dose_sludge_field').style.display = isSludge ? 'flex' : 'none';
+    $('pam_sludge_q_field').style.display = isSludge ? 'flex' : 'none';
+    calc();
   }
 
   function toggleFormula() {
     const box = $('formulaBox');
     box.style.display = box.style.display === 'none' ? 'block' : 'none';
   }
+
+  // ph_chem 切换时先同步默认纯度/密度/单价，再计算（需注册在通用 calc 监听之前）
+  $('ph_chem').addEventListener('change', syncPHDefaults);
 
   document.querySelectorAll('input, select').forEach(el => {
     el.addEventListener('input', calc);

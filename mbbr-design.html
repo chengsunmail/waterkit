@@ -2,9 +2,10 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-<title>MBBR / IFAS / RAS 工程设计平台 | WaterKit</title>
-<meta name="description" content="MBBR(移动床生物膜反应器)工程设计平台,覆盖微观生物膜扩散/填料选型/曝气系统/工艺段组合/典型案例/挂膜启动/发展史。依据 Metcalf&Eddy / Ødegaard / HJ 576。">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MBBR / IFAS / RAS 工程设计平台 | 水处理工具箱 · WaterKit</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230891b2'/%3E%3Ctext x='16' y='22.5' font-size='18' font-weight='700' text-anchor='middle' fill='white' font-family='Arial,sans-serif'%3EW%3C/text%3E%3C/svg%3E">
+<meta name="description" content="MBBR / IFAS / RAS 工程设计平台：按 SALR/SNR 表面负荷计算纯 MBBR 池容与 7 种段组合，含需氧量、曝气器与风机选型、产泥与药剂，另有 IFAS、循环水养殖 RAS 硝化与填料选型。">
 <meta name="keywords" content="纯MBBR,pure MBBR,移动床生物膜,生物膜反应器,SALR,填料选型,AnoxKaldnes,Kaldnes,城镇污水提标,渗滤液,水产养殖,工业废水,WaterKit,登登科技">
 <meta name="author" content="海南登登科技咨询有限公司">
 <link rel="canonical" href="https://waterkit.cn/mbbr-design.html">
@@ -937,20 +938,116 @@ body {
   margin: 10px 0;
 }
 
-/* 页脚 */
-.footer {
-  border-top: 1px solid var(--border);
-  padding: 32px 24px 24px;
-  background: var(--bg-section);
-  margin-top: 48px;
-}
-.footer-inner {
-  max-width: 1280px; margin: 0 auto;
-  font-size: 13px; color: var(--text-muted);
-  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px;
-}
-.footer a { color: var(--text); text-decoration: none; }
-.footer a:hover { color: var(--brand); }
+/* ===== 统一页脚 ===== */
+  .site-footer {
+    background: var(--bg-section);
+    border-top: 1px solid var(--border);
+    padding: 56px 32px 32px;
+    margin-top: auto;
+  }
+  .footer-inner { max-width: 1280px; margin: 0 auto; }
+  .footer-main {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
+    gap: 40px;
+    padding-bottom: 32px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  @media (max-width: 720px) {
+    .footer-main { grid-template-columns: 1fr 1fr; gap: 28px; }
+  }
+  .footer-about-col .brand { margin-bottom: 14px; }
+  .footer-col h4 {
+    font-size: 11.5px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+  .footer-col ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .footer-col li { font-size: 13px; color: var(--text); }
+  .footer-col a {
+    font-size: 13px;
+    color: var(--text);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .footer-col a:hover { color: var(--brand); }
+  .footer-about {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    max-width: 340px;
+  }
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--text-muted);
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .footer-bottom a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--border);
+    text-underline-offset: 2px;
+  }
+  .footer-bottom a:hover { color: var(--brand); }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .brand-mark {
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: -1px;
+    box-shadow: 0 2px 6px rgba(8, 145, 178, 0.25);
+  }
+  .brand-name {
+    font-weight: 600;
+    font-size: 16.5px;
+    color: var(--ink);
+    letter-spacing: -0.2px;
+  }
+  .brand-sub {
+    font-size: 11px;
+    color: var(--text-faint);
+    margin-top: 1px;
+  }
+/* 免责声明（原页脚内，独立保留） */
+.page-disclaimer { max-width:1280px; margin:32px auto 0; padding:0 24px; }
+.page-disclaimer > div { padding:12px 16px; background:#fef9c3; border-left:3px solid #ca8a04; border-radius:4px; font-size:12px; color:#713f12; line-height:1.6; }
+/* Beta 提示条 */
+.beta-bar { background:#fff7ed; border-bottom:1px solid #fed7aa; color:#9a3412; font-size:12.5px; line-height:1.5; }
+.beta-bar .beta-inner { max-width:1280px; margin:0 auto; padding:8px 24px; }
+.beta-bar a { color:#c2410c; }
+/* 输入校验 */
+.invalid{border-color:#ef4444!important;background:#fef2f2!important}
+/* 非阻塞提示 */
+.wk-toast { position:fixed; left:50%; bottom:28px; transform:translateX(-50%) translateY(20px); max-width:min(92vw,520px);
+  background:#0f172a; color:#fff; padding:12px 18px; border-radius:10px; font-size:13.5px; line-height:1.6;
+  box-shadow:0 10px 25px rgba(15,23,42,.25); opacity:0; transition:opacity .2s, transform .2s; z-index:1000; white-space:pre-line; pointer-events:none; }
+.wk-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+/* 容积比归一警示 */
+.vol-sum-err { margin-top:8px; padding:10px 14px; background:#fef2f2; border:1px solid #fca5a5; border-left:4px solid #dc2626; border-radius:6px; color:#991b1b; font-size:13px; font-weight:600; }
 
 /* ========== Tab 6 挂膜与启动 ========== */
 .stage-intro-grid {
@@ -1392,16 +1489,18 @@ body {
     <div class="nav-links">
       <a href="index.html">全部工具</a>
       <a href="activated-sludge-process-calculator.html">活性污泥工艺</a>
+      <a href="mbr-design.html">MBR 平台</a>
       <a href="https://dengdengtech.cn" target="_blank" rel="noopener">登登科技 ↗</a>
     </div>
   </div>
 </nav>
+<div class="beta-bar" role="note"><div class="beta-inner">🚧 <b>Beta · 开发中</b>：本平台仍在持续校核与迭代，计算结果仅供方案估算参考，工程设计请以正式设计文件为准。发现问题欢迎 <a href="https://github.com/chengsunmail/waterkit/issues" target="_blank" rel="noopener">反馈 Issue</a>。</div></div>
 
 <!-- ========== Hero ========== -->
 <section class="hero">
   <div class="hero-inner">
     <div class="breadcrumb">
-      <a href="index.html">WaterKit</a> / <a href="activated-sludge-process-calculator.html">工艺计算</a> / MBBR 工程设计平台
+      <a href="index.html">WaterKit</a> / <a href="index.html#cat-process">工艺计算</a> / MBBR 工程设计平台
     </div>
     <div class="hero-badge">🧬 MBBR 工程设计</div>
     <h1 class="hero-title">MBBR 工程设计平台</h1>
@@ -1410,9 +1509,9 @@ body {
       依据 Metcalf&Eddy / Ødegaard / HJ 576,覆盖城镇污水提标、垃圾渗滤液、水产养殖、工业废水等场景。
     </p>
     <div class="hero-meta">
-      <span>📘 <b>温度修正 θ=1.09</b></span>
+      <span>📘 <b>温度修正 θ</b> BOD 1.07 / 硝化 1.09</span>
       <span>🧪 <b>生物膜扩散</b> 微观动力学</span>
-      <span>🧱 <b>10 种填料</b> 对比选型</span>
+      <span>🧱 <b>11 种填料</b> 对比选型</span>
       <span>🔧 <b>设计院级</b> 参数深度</span>
     </div>
   </div>
@@ -1461,34 +1560,36 @@ body {
       <button class="preset-tab" data-st-preset="leachate" onclick="setStPreset('leachate')">垃圾渗滤液</button>
       <button class="preset-tab" data-st-preset="aqua" onclick="setStPreset('aqua')">水产养殖尾水</button>
       <button class="preset-tab" data-st-preset="industrial" onclick="setStPreset('industrial')">工业废水</button>
+      <button class="preset-tab" type="button" onclick="resetStDefaults()" title="恢复本 Tab 全部输入（含高级参数、容积比、曝气与风机参数）为页面初始默认值">↺ 恢复默认</button>
     </div>
     <div class="grid">
-      <div class="field"><label>Q <span class="unit">万 m³/d</span></label>
+      <div class="field"><label for="st_Q">Q <span class="unit">万 m³/d</span></label>
         <input type="number" id="st_Q" value="1" step="0.1" oninput="calcStages()"></div>
-      <div class="field"><label>T <span class="unit">°C</span></label>
+      <div class="field"><label for="st_T">T <span class="unit">°C</span></label>
         <input type="number" id="st_T" value="20" step="1" oninput="calcStages()"></div>
-      <div class="field"><label>BOD₀ <span class="unit">mg/L</span></label>
+      <div class="field"><label for="st_BOD0">BOD₀ <span class="unit">mg/L</span></label>
         <input type="number" id="st_BOD0" value="180" step="5" oninput="calcStages()"></div>
-      <div class="field"><label>NH₄-N₀ <span class="unit">mg/L</span></label>
+      <div class="field"><label for="st_NH40">NH₄-N₀ <span class="unit">mg/L</span></label>
         <input type="number" id="st_NH40" value="35" step="1" oninput="calcStages()"></div>
-      <div class="field"><label>TN₀ <span class="unit">mg/L</span></label>
+      <div class="field"><label for="st_TN0">TN₀ <span class="unit">mg/L</span></label>
         <input type="number" id="st_TN0" value="45" step="1" oninput="calcStages()"></div>
-      <div class="field"><label>TP₀ <span class="unit">mg/L</span></label>
+      <div class="field"><label for="st_TP0">TP₀ <span class="unit">mg/L</span></label>
         <input type="number" id="st_TP0" value="5" step="0.2" oninput="calcStages()"></div>
     </div>
     <div class="grid">
-      <div class="field"><label>排放标准</label>
+      <div class="field"><label for="st_standard">排放标准</label>
         <select id="st_standard" onchange="applyStStandard()">
           <option value="1A">一级 A (GB 18918)</option>
-          <option value="grade4">地表 IV 类</option>
-          <option value="grade3">地表 III 类</option>
+          <option value="grade4">准 IV 类（地方标准）</option>
+          <option value="grade3">准 III 类（地方标准）</option>
           <option value="custom">自定义</option>
-        </select></div>
-      <div class="field"><label>出水 NH₄-N <span class="unit">mg/L</span></label>
+        </select>
+        <div class="helper">准 IV 类为地方标准（TN 10 等），限值按项目所在地调整</div></div>
+      <div class="field"><label for="st_NH4e">出水 NH₄-N <span class="unit">mg/L</span></label>
         <input type="number" id="st_NH4e" value="5" step="0.5" oninput="calcStages()"></div>
-      <div class="field"><label>出水 TN <span class="unit">mg/L</span></label>
+      <div class="field"><label for="st_TNe">出水 TN <span class="unit">mg/L</span></label>
         <input type="number" id="st_TNe" value="15" step="0.5" oninput="calcStages()"></div>
-      <div class="field"><label>出水 TP <span class="unit">mg/L</span></label>
+      <div class="field"><label for="st_TPe">出水 TP <span class="unit">mg/L</span></label>
         <input type="number" id="st_TPe" value="0.5" step="0.1" oninput="calcStages()"></div>
     </div>
 
@@ -1547,25 +1648,25 @@ body {
     <!-- 工艺参数 -->
     <div class="section-title"><span class="num">4</span>工艺设计参数</div>
     <div class="grid">
-      <div class="field"><label>总池容 V <span class="unit">m³</span></label>
-        <input type="number" id="st_V_total" value="0" step="50" onchange="calcStages()" placeholder="留空自动估算">
-        <div class="helper">留 0 则按 SALR 自动估算</div></div>
-      <div class="field"><label>SALR₂₀ <span class="unit">g BOD/m²·d</span></label>
+      <div class="field"><label for="st_V_total">总池容 V <span class="unit">m³</span></label>
+        <input type="number" id="st_V_total" value="" step="50" onchange="calcStages()" placeholder="留空自动估算">
+        <div class="helper">留空则按 max(BOD 面积/SALR_T, 硝化面积/(SNR_T×DO 修正)) ÷ 好氧段占比 自动估算</div></div>
+      <div class="field"><label for="st_SALR20">SALR₂₀ <span class="unit">g BOD/m²·d</span></label>
         <input type="number" id="st_SALR20" value="7" step="0.5" onchange="calcStages()">
         <div class="helper">BOD 去除 5-10，硝化 0.5-2</div></div>
-      <div class="field"><label>填充率 <span class="unit">%</span></label>
+      <div class="field"><label for="st_fillRatio">填充率 <span class="unit">%</span></label>
         <input type="number" id="st_fillRatio" value="45" step="5" onchange="calcStages()">
         <div class="helper">常 30-60%，上限 67%</div></div>
-      <div class="field"><label>比表面积 <span class="unit">m²/m³</span></label>
+      <div class="field"><label for="st_specArea">比表面积 <span class="unit">m²/m³</span></label>
         <input type="number" id="st_specArea" value="500" step="50" onchange="calcStages()">
         <div class="helper">K3=500，K5=800，BWT=650</div></div>
-      <div class="field"><label>SNR₂₀ <span class="unit">g NH₄/m²·d</span></label>
+      <div class="field"><label for="st_SNR20">SNR₂₀ <span class="unit">g NH₄/m²·d</span></label>
         <input type="number" id="st_SNR20" value="1.0" step="0.1" onchange="calcStages()">
         <div class="helper">硝化表面负荷，常 0.5-1.5</div></div>
-      <div class="field"><label>后置沉淀 HRT <span class="unit">h</span></label>
+      <div class="field"><label for="st_settleHRT">后置沉淀 HRT <span class="unit">h</span></label>
         <input type="number" id="st_settleHRT" value="1.5" step="0.5" onchange="calcStages()">
-        <div class="helper">典型 1.5-2.5 h</div></div>
-      <div class="field"><label>好氧池有效水深 H <span class="unit">m</span></label>
+        <div class="helper">典型 1.5-2.5 h；用于估算后置沉淀池容积</div></div>
+      <div class="field"><label for="st_poolH">好氧池有效水深 H <span class="unit">m</span></label>
         <input type="number" id="st_poolH" value="5.0" step="0.5" onchange="calcStages()">
         <div class="helper">影响鼓风机静压；MBBR 常 4-6 m</div></div>
     </div>
@@ -1573,17 +1674,19 @@ body {
     <!-- 高级参数（折叠） -->
     <div class="advanced-toggle" id="stAdvToggle" onclick="toggleStAdv()">
       <span class="chev" id="stAdvChev">▸</span>
-      <span>高级参数（θ温度修正 / α·β曝气修正 / 动力学 / 填料生物膜）</span>
+      <span>高级参数（θ温度修正 / α·β曝气修正 / 动力学 / DO 修正 / 填料生物膜）</span>
     </div>
     <div class="advanced-params" id="stAdvParams">
       <div style="background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:8px;">
         <div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:10px;">🌡️ 温度修正</div>
         <div class="grid">
-          <div class="field"><label>θ (SALR/SNR 温度系数)</label>
-            <input type="number" id="st_theta" value="1.09" step="0.01" onchange="calcStages()">
-            <div class="helper">MBBR 常温 1.05-1.09，低温保守取 1.09</div></div>
-            <div class="helper" style="font-size:10.5px;color:#0891b2;margin-top:2px;">📖 Ødegaard：BOD去除 θ≈1.07，硝化 θ≈1.09；低温（&lt;10°C）取高值；范围 1.04-1.12</div>
-          <div class="field"><label>θ_O₂ (好氧速率温度系数)</label>
+          <div class="field"><label for="st_theta">θ_BOD (SALR 温度系数)</label>
+            <input type="number" id="st_theta" value="1.07" step="0.01" onchange="calcStages()">
+            <div class="helper">📖 Ødegaard：BOD 去除 θ≈1.07（范围 1.04-1.09）</div></div>
+          <div class="field"><label for="st_theta_N">θ_N (SNR 硝化温度系数)</label>
+            <input type="number" id="st_theta_N" value="1.09" step="0.01" onchange="calcStages()">
+            <div class="helper">📖 硝化 θ≈1.09；低温（&lt;10°C）取高值，范围 1.06-1.12</div></div>
+          <div class="field"><label for="st_theta_o2">θ_O₂ (好氧速率温度系数)</label>
             <input type="number" id="st_theta_o2" value="1.024" step="0.001" onchange="calcStages()">
             <div class="helper">鼓风曝气传质 1.016-1.025，取 1.024</div></div>
         </div>
@@ -1591,19 +1694,19 @@ body {
       <div style="background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:8px;">
         <div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:10px;">💨 曝气修正系数 (SOR 计算)</div>
         <div class="grid">
-          <div class="field"><label>α（污水修正）</label>
+          <div class="field"><label for="st_alpha">α（污水修正）</label>
             <input type="number" id="st_alpha" value="0.70" step="0.05" onchange="calcStages()">
             <div class="helper">城镇污水 0.65-0.75，工业废水 0.4-0.6</div></div>
-          <div class="field"><label>β（水质修正）</label>
+          <div class="field"><label for="st_beta">β（水质修正）</label>
             <input type="number" id="st_beta" value="0.95" step="0.01" onchange="calcStages()">
             <div class="helper">含盐量低时取 0.95-1.0</div></div>
-          <div class="field"><label>DO 设计值 <span class="unit">mg/L</span></label>
+          <div class="field"><label for="st_DO">DO 设计值 <span class="unit">mg/L</span></label>
             <input type="number" id="st_DO" value="2.0" step="0.5" onchange="calcStages()">
             <div class="helper">好氧段维持 DO，常 2-3 mg/L</div></div>
-          <div class="field"><label>曝气效率 EE <span class="unit">%</span></label>
-            <input type="number" id="st_EE" value="25" step="1" onchange="calcStages()">
-            <div class="helper">粗孔曝气 20-28%，微孔 25-35%</div></div>
-          <div class="field"><label>搅拌气量强度 <span class="unit">Nm³/m²·h</span></label>
+          <div class="field"><label for="st_EE">曝气效率 EE <span class="unit">%</span></label>
+            <input type="number" id="st_EE" value="25" step="1" readonly tabindex="-1" style="background:#f1f5f9;">
+            <div class="helper">自动 = OTE × 淹没深度(H−0.2 m)，限 5-40%；改曝气器类型/OTE 即变</div></div>
+          <div class="field"><label for="st_airIntMin">搅拌气量强度 <span class="unit">Nm³/m²·h</span></label>
             <input type="number" id="st_airIntMin" value="12" step="1" onchange="calcStages()">
             <div class="helper">确保填料流化，MBBR 常 10-15</div></div>
         </div>
@@ -1611,35 +1714,32 @@ body {
       <div style="background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:8px;">
         <div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:10px;">🧬 生物动力学参数</div>
         <div class="grid">
-          <div class="field"><label>Y <span class="unit">g VSS/g BOD</span></label>
+          <div class="field"><label for="st_Y">Y <span class="unit">g VSS/g BOD</span></label>
             <input type="number" id="st_Y" value="0.60" step="0.05" onchange="calcStages()">
             <div class="helper">产率系数，好氧 0.5-0.7</div></div>
-          <div class="field"><label>Kd <span class="unit">d⁻¹</span></label>
+          <div class="field"><label for="st_Kd">Kd <span class="unit">d⁻¹</span></label>
             <input type="number" id="st_Kd" value="0.04" step="0.01" onchange="calcStages()">
             <div class="helper">内源衰减，20°C 典型 0.04-0.06</div></div>
-          <div class="field"><label>参考 SRT <span class="unit">d</span></label>
+          <div class="field"><label for="st_SRT">参考 SRT <span class="unit">d</span></label>
             <input type="number" id="st_SRT" value="15" step="1" onchange="calcStages()">
-            <div class="helper">MBBR 生物膜更新周期，用于 Yobs 估算</div></div>
-          <div class="field"><label>SDNR₂₀ <span class="unit">g N/g VSS·d</span></label>
+            <div class="helper">MBBR 生物膜更新周期，仅供参考（碳化需氧已改按 GB 式用生物膜产泥量计算）</div></div>
+          <div class="field"><label for="st_SDNR20">SDNR₂₀ <span class="unit">g N/g VSS·d</span></label>
             <input type="number" id="st_SDNR20" value="0.08" step="0.01" onchange="calcStages()">
-            <div class="helper">反硝化速率，常 0.06-0.10</div></div>
-          <div class="field"><label>VSS/SS 比</label>
+            <div class="helper">生物膜反硝化速率（θ=1.08 修正，依据 GB 50014：Kde(T)=Kde(20)·1.08^(T−20)），用于缺氧段反硝化能力校核，常 0.06-0.10</div></div>
+          <div class="field"><label for="st_VSS_SS">VSS/SS 比</label>
             <input type="number" id="st_VSS_SS" value="0.75" step="0.05" onchange="calcStages()">
             <div class="helper">挥发性污泥比，常 0.70-0.80</div></div>
+          <div class="field"><label for="st_KO">K_O 氧半饱和常数 <span class="unit">mg/L</span></label>
+            <input type="number" id="st_KO" value="1.0" step="0.1" onchange="calcStages()">
+            <div class="helper">硝化速率 DO 修正 SNR×DO/(K_O+DO)，生物膜扩散限制取 0.5-1.5；DO 取上方"DO 设计值"</div></div>
         </div>
       </div>
       <div style="background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:14px;">
         <div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:10px;">🧱 填料生物膜参数</div>
         <div class="grid">
-          <div class="field"><label>生物膜厚度 Lf <span class="unit">μm</span></label>
-            <input type="number" id="st_biofilmL" value="200" step="10" onchange="calcStages()">
-            <div class="helper">典型 150-300 μm，厚则扩散限制</div></div>
-          <div class="field"><label>生物膜量 X <span class="unit">g VSS/m²</span></label>
+          <div class="field"><label for="st_biofilmX">生物膜量 X <span class="unit">g VSS/m²</span></label>
             <input type="number" id="st_biofilmX" value="20" step="5" onchange="calcStages()">
             <div class="helper">K3 稳定运行典型 15-40 g VSS/m²；等效 SRT 越长（20-60d）值越大；低值→高产泥，高值→低产泥</div></div>
-          <div class="field"><label>剥落系数</label>
-            <input type="number" id="st_sloughCoef" value="0.55" step="0.05" onchange="calcStages()">
-            <div class="helper">剥落量占生物膜量比例，0.4-0.7</div></div>
         </div>
       </div>
     </div>
@@ -1647,21 +1747,21 @@ body {
     <!-- 容积分配(可手动微调) -->
     <div class="section-title"><span class="num">5</span>容积分配比(%) <span class="sub">(手动调整，各段之和须 = 100)</span></div>
     <div class="grid" id="volRatioGrid">
-      <div class="field" data-stage="preAnox"><label>预缺氧 %</label>
+      <div class="field" data-stage="preAnox"><label for="st_r_preAnox">预缺氧 %</label>
         <input type="number" id="st_r_preAnox" value="0" step="5" onchange="calcStages()"></div>
-      <div class="field" data-stage="nitrif_hi"><label>高负荷MBBR %</label>
+      <div class="field" data-stage="nitrif_hi"><label for="st_r_nitrif_hi">高负荷MBBR %</label>
         <input type="number" id="st_r_nitrif_hi" value="0" step="5" onchange="calcStages()"></div>
-      <div class="field" data-stage="nitrif"><label>硝化 %</label>
+      <div class="field" data-stage="nitrif"><label for="st_r_nitrif">硝化 %</label>
         <input type="number" id="st_r_nitrif" value="100" step="5" onchange="calcStages()"></div>
-      <div class="field" data-stage="nitrif_lo"><label>低负荷MBBR %</label>
+      <div class="field" data-stage="nitrif_lo"><label for="st_r_nitrif_lo">低负荷MBBR %</label>
         <input type="number" id="st_r_nitrif_lo" value="0" step="5" onchange="calcStages()"></div>
-      <div class="field" data-stage="partNitrif"><label>短程硝化 %</label>
+      <div class="field" data-stage="partNitrif"><label for="st_r_partNitrif">短程硝化 %</label>
         <input type="number" id="st_r_partNitrif" value="0" step="5" onchange="calcStages()"></div>
-      <div class="field" data-stage="anammox"><label>Anammox %</label>
+      <div class="field" data-stage="anammox"><label for="st_r_anammox">Anammox %</label>
         <input type="number" id="st_r_anammox" value="0" step="5" onchange="calcStages()"></div>
-      <div class="field" data-stage="postAnox"><label>后缺氧 %</label>
+      <div class="field" data-stage="postAnox"><label for="st_r_postAnox">后缺氧 %</label>
         <input type="number" id="st_r_postAnox" value="0" step="5" onchange="calcStages()"></div>
-      <div class="field" data-stage="chemP"><label>化除磷 %</label>
+      <div class="field" data-stage="chemP"><label for="st_r_chemP">化除磷 %</label>
         <input type="number" id="st_r_chemP" value="0" step="5" onchange="calcStages()"></div>
     </div>
     <div id="volSumWarn"></div>
@@ -1676,13 +1776,13 @@ body {
         </div>
       </div>
       <div class="grid">
-        <div class="field"><label>内回流比 MLR <span class="unit">%(相对进水 Q)</span></label>
+        <div class="field"><label for="st_MLR">内回流比 MLR <span class="unit">%(相对进水 Q)</span></label>
           <input type="number" id="st_MLR" value="200" step="25" min="0" max="500" onchange="calcStages()">
           <div class="helper">常 200-400%,高标准取 300-400%</div></div>
-        <div class="field"><label>回流泵效率 <span class="unit">%</span></label>
+        <div class="field"><label for="st_pumpEff">回流泵效率 <span class="unit">%</span></label>
           <input type="number" id="st_pumpEff" value="65" step="5" onchange="calcStages()">
           <div class="helper">潜水泵 60-70</div></div>
-        <div class="field"><label>回流扬程 <span class="unit">m</span></label>
+        <div class="field"><label for="st_pumpH">回流扬程 <span class="unit">m</span></label>
           <input type="number" id="st_pumpH" value="2" step="0.5" onchange="calcStages()">
           <div class="helper">常 1.5-3,仅克服管道阻力</div></div>
       </div>
@@ -1691,21 +1791,27 @@ body {
     <!-- 碳源与药剂 -->
     <div class="section-title"><span class="num">7</span>外加药剂参数</div>
     <div class="grid">
-      <div class="field"><label>后缺氧碳源类型</label>
+      <div class="field"><label for="st_carbonSrc">后缺氧碳源类型</label>
         <select id="st_carbonSrc" onchange="calcStages()">
           <option value="methanol">甲醇(COD=1.5 g/g · 最经济)</option>
-          <option value="acetate">乙酸钠(COD=0.67 g/g · 启动快)</option>
+          <option value="acetate">乙酸钠(无水 COD=0.78 g/g × 有效含量 · 启动快)</option>
           <option value="glucose">葡萄糖(COD=1.07 g/g)</option>
         </select></div>
-      <div class="field"><label>BOD/NO₃ 比 <span class="unit">g BOD/g N</span></label>
+      <div class="field"><label for="st_acetatePurity">乙酸钠有效含量 <span class="unit">%</span></label>
+        <input type="number" id="st_acetatePurity" value="58" step="1" onchange="calcStages()">
+        <div class="helper">固体三水乙酸钠约 58%（折合 0.45 gCOD/g 商品）；液体按标称含量；仅选乙酸钠时生效</div></div>
+      <div class="field"><label for="st_c_n_ratio">BOD/NO₃ 比 <span class="unit">g BOD/g N</span></label>
         <input type="number" id="st_c_n_ratio" value="4" step="0.5" onchange="calcStages()">
         <div class="helper">反硝化理论 2.86, 实际 4-6</div></div>
-      <div class="field"><label>PAC 投加量 <span class="unit">mg/L</span></label>
-        <input type="number" id="st_PAC" value="30" step="5" onchange="calcStages()">
-        <div class="helper">依 TP 量调整</div></div>
-      <div class="field"><label>PAC 单价 <span class="unit">元/kg</span></label>
+      <div class="field"><label for="st_PAC">PAC 投加量 <span class="unit">mg/L（留空按化学计量自动）</span></label>
+        <input type="number" id="st_PAC" value="" placeholder="自动" step="5" onchange="calcStages()">
+        <div class="helper">化学计量：PAC = ΔTP_chem × (Al/P) × 27/31 ÷ 0.0529（PAC 含 Al₂O₃ 10% → Al 5.29%）</div></div>
+      <div class="field"><label for="st_AlP">Al/P 摩尔比</label>
+        <input type="number" id="st_AlP" value="2" step="0.1" onchange="calcStages()">
+        <div class="helper">化学除磷 Al/P 摩尔比，常取 1.5-3，默认 2</div></div>
+      <div class="field"><label for="st_PAC_price">PAC 单价 <span class="unit">元/kg</span></label>
         <input type="number" id="st_PAC_price" value="3" step="0.5" onchange="calcStages()"></div>
-      <div class="field"><label>碳源单价 <span class="unit">元/kg</span></label>
+      <div class="field"><label for="st_carbon_price">碳源单价 <span class="unit">元/kg</span></label>
         <input type="number" id="st_carbon_price" value="5" step="0.5" onchange="calcStages()">
         <div class="helper">甲醇 3-5, 乙酸钠 5-8</div></div>
     </div>
@@ -1717,10 +1823,10 @@ body {
       </div>
     </div>
     <div class="grid">
-      <div class="field"><label>脱水后泥饼含水率 <span class="unit">%</span></label>
+      <div class="field"><label for="st_sludge_mc">脱水后泥饼含水率 <span class="unit">%</span></label>
         <input type="number" id="st_sludge_mc" value="80" step="1" onchange="calcStages()">
         <div class="helper">板框压滤 75-80%，离心 78-82%</div></div>
-      <div class="field"><label>污泥处置费用 <span class="unit">元/t（湿）</span></label>
+      <div class="field"><label for="st_sludge_price">污泥处置费用 <span class="unit">元/t（湿）</span></label>
         <input type="number" id="st_sludge_price" value="300" step="50" onchange="calcStages()">
         <div class="helper">卫生填埋 200-400，好氧堆肥 150-300</div></div>
     </div>
@@ -1731,16 +1837,16 @@ body {
     <!-- 曝气器选型 -->
     <div class="section-title"><span class="num">8</span>曝气器选型与风机 <span class="sub">基于上方AOR/SOR计算</span></div>
     <div class="aerator-tabs">
-      <button class="aerator-tab active" data-aer="coarse" onclick="setAeratorType('coarse')">
+      <button class="aerator-tab active" data-aer="coarse" onclick="setAeratorType('coarse','a')">
         <b>粗孔旋混</b><span>专为 MBBR 优化 · 抗堵</span>
       </button>
-      <button class="aerator-tab" data-aer="disc" onclick="setAeratorType('disc')">
+      <button class="aerator-tab" data-aer="disc" onclick="setAeratorType('disc','a')">
         <b>盘式微孔</b><span>氧传质最高 · 易堵塞</span>
       </button>
-      <button class="aerator-tab" data-aer="tube" onclick="setAeratorType('tube')">
+      <button class="aerator-tab" data-aer="tube" onclick="setAeratorType('tube','a')">
         <b>管式曝气</b><span>大气量 · 安装方便</span>
       </button>
-      <button class="aerator-tab" data-aer="jet" onclick="setAeratorType('jet')">
+      <button class="aerator-tab" data-aer="jet" onclick="setAeratorType('jet','a')">
         <b>射流曝气</b><span>小规模/深池 · 无堵塞</span>
       </button>
     </div>
@@ -1748,16 +1854,16 @@ body {
     <!-- 曝气器特性参数 -->
     <div class="section-title"><span class="num">9</span>曝气器性能参数</div>
     <div class="grid">
-      <div class="field"><label>单个曝气器气量 <span class="unit">Nm³/h</span></label>
+      <div class="field"><label for="a_perDevice">单个曝气器气量 <span class="unit">Nm³/h</span></label>
         <input type="number" id="a_perDevice" value="8" step="1" onchange="calcAeration()">
         <div class="helper" id="a_perDevice_help">粗孔单件 5-15</div></div>
-      <div class="field"><label>氧传质效率 OTE <span class="unit">%/m</span></label>
-        <input type="number" id="a_OTE" value="3" step="0.5" onchange="calcAeration()">
+      <div class="field"><label for="a_OTE">氧传质效率 OTE <span class="unit">%/m</span></label>
+        <input type="number" id="a_OTE" value="3" step="0.5" onchange="calcStages()">
         <div class="helper" id="a_OTE_help">粗孔 2-4 %/m 水深</div></div>
-      <div class="field"><label>曝气器布置间距 <span class="unit">m</span></label>
+      <div class="field"><label for="a_spacing">曝气器布置间距 <span class="unit">m</span></label>
         <input type="number" id="a_spacing" value="0.8" step="0.1" onchange="calcAeration()">
         <div class="helper">粗孔 0.6-1.0 常用</div></div>
-      <div class="field"><label>单价 <span class="unit">元/个</span></label>
+      <div class="field"><label for="a_price">单价 <span class="unit">元/个</span></label>
         <input type="number" id="a_price" value="180" step="10" onchange="calcAeration()">
         <div class="helper" id="a_price_help">粗孔 150-300 元</div></div>
     </div>
@@ -1765,21 +1871,21 @@ body {
     <!-- 风机选型参数 -->
     <div class="section-title"><span class="num">10</span>风机参数</div>
     <div class="grid">
-      <div class="field"><label>风机类型</label>
+      <div class="field"><label for="a_blowerType">风机类型</label>
         <select id="a_blowerType" onchange="calcAeration()">
           <option value="roots">罗茨风机(常规)</option>
           <option value="multistage">多级离心风机(低噪音)</option>
           <option value="magnetic">磁悬浮风机(节能最优)</option>
         </select></div>
-      <div class="field"><label>曝气池阻力 <span class="unit">kPa</span></label>
+      <div class="field"><label for="a_dp_aer">曝气池阻力 <span class="unit">kPa</span></label>
         <input type="number" id="a_dp_aer" value="5" step="0.5" onchange="calcAeration()">
         <div class="helper">微孔 3-5, 粗孔 2-3</div></div>
-      <div class="field"><label>管路阻力 <span class="unit">kPa</span></label>
+      <div class="field"><label for="a_dp_pipe">管路阻力 <span class="unit">kPa</span></label>
         <input type="number" id="a_dp_pipe" value="3" step="0.5" onchange="calcAeration()"></div>
-      <div class="field"><label>风机效率 <span class="unit">%</span></label>
+      <div class="field"><label for="a_efficiency">风机效率 <span class="unit">%</span></label>
         <input type="number" id="a_efficiency" value="65" step="1" onchange="calcAeration()">
         <div class="helper">罗茨 55-70, 磁悬浮 75-85</div></div>
-      <div class="field"><label>备用系数</label>
+      <div class="field"><label for="a_backupFactor">备用系数</label>
         <input type="number" id="a_backupFactor" value="1.2" step="0.05" onchange="calcAeration()">
         <div class="helper">1.2 = 2 用 1 备</div></div>
     </div>
@@ -1789,25 +1895,25 @@ body {
     <div class="auto-calc-notice">
       <div class="notice-head"><span class="notice-ic">ℹ️</span>
         <span>以下修正系数用于将实际需氧量 AOR 换算为标准状态需氧量 SOR，并反推校核气量。
-        <b>建议与工艺选择与计算 Tab 保持一致</b>，或点击"从工艺计算同步"自动填入。</span>
+        水温 T 自动跟随上方工艺计算的进水温度 T；α、β、θ、DO 可独立调整用于校核（建议与高级参数保持一致）。</span>
       </div>
     </div>
     <div class="grid">
-      <div class="field"><label>α（污水对清水修正）</label>
+      <div class="field"><label for="a_alpha">α（污水对清水修正）</label>
         <input type="number" id="a_alpha" value="0.70" step="0.05" onchange="calcAeration()">
         <div class="helper">城镇污水 0.65-0.75，工业废水 0.4-0.6</div></div>
-      <div class="field"><label>β（水质饱和度修正）</label>
+      <div class="field"><label for="a_beta">β（水质饱和度修正）</label>
         <input type="number" id="a_beta" value="0.95" step="0.01" onchange="calcAeration()">
         <div class="helper">含盐低时 0.95-1.0</div></div>
-      <div class="field"><label>θ（传质温度系数）</label>
+      <div class="field"><label for="a_theta">θ（传质温度系数）</label>
         <input type="number" id="a_theta" value="1.024" step="0.001" onchange="calcAeration()">
         <div class="helper">鼓风曝气 1.016-1.025</div></div>
-      <div class="field"><label>DO 设计值 <span class="unit">mg/L</span></label>
+      <div class="field"><label for="a_DO">DO 设计值 <span class="unit">mg/L</span></label>
         <input type="number" id="a_DO" value="2.0" step="0.5" onchange="calcAeration()">
         <div class="helper">好氧段维持 DO</div></div>
-      <div class="field"><label>水温 T <span class="unit">°C</span></label>
+      <div class="field"><label for="a_T">水温 T <span class="unit">°C</span></label>
         <input type="number" id="a_T" value="20" step="1" onchange="calcAeration()">
-        <div class="helper">与工艺计算 Tab 保持一致</div></div>
+        <div class="helper">自动跟随上方进水温度 T</div></div>
     </div>
 
     <!-- 结果 -->
@@ -1827,6 +1933,8 @@ body {
           <span><span class="result-value" id="ar_airMix">—</span><span class="result-unit">Nm³/h</span></span></div>
         <div class="result-row highlight-row"><span class="result-label"><b>设计气量(控制性)</b></span>
           <span><span class="result-value big" id="ar_airDesign">—</span><span class="result-unit">Nm³/h</span></span></div>
+        <div class="result-row"><span class="result-label">装机气量（含备用，× 备用系数）</span>
+          <span><span class="result-value" id="ar_airInstalled">—</span><span class="result-unit">Nm³/h</span></span></div>
         <div class="result-row"><span class="result-label">控制性因素</span>
           <span><span class="result-value" id="ar_control">—</span></span></div>
       </div>
@@ -1864,7 +1972,7 @@ body {
       <!-- 能耗 -->
       <div class="result-group">
         <div class="result-group-title"><span class="ic">⚡</span> 能耗计算</div>
-        <div class="result-row highlight-row"><span class="result-label"><b>风机轴功率 N_s</b></span>
+        <div class="result-row highlight-row"><span class="result-label"><b>风机轴功率 N_s</b> <span class="sub">绝热压缩 · 进气 20 °C、101.325 kPa</span></span>
           <span><span class="result-value big" id="ar_Ns">—</span><span class="result-unit">kW</span></span></div>
         <div class="result-row"><span class="result-label">电机功率(配备)</span>
           <span><span class="result-value" id="ar_Nmotor">—</span><span class="result-unit">kW</span></span></div>
@@ -1915,6 +2023,16 @@ body {
       <!-- 各段详情 -->
       <div class="result-group">
         <div class="result-group-title"><span class="ic">📐</span> 各段池容与参数</div>
+        <div class="result-row highlight-row"><span class="result-label"><b>采用总池容 V</b> <span id="st_r_Vsrc" style="font-size:11px;color:#64748b;"></span></span>
+          <span><span class="result-value big" id="st_r_Vtotal">—</span><span class="result-unit">m³</span></span></div>
+        <div class="result-row"><span class="result-label">BOD 所需填料面积 A_BOD <span class="sub">(SALR_T)</span></span>
+          <span><span class="result-value" id="st_r_A_BOD">—</span><span class="result-unit">m²</span></span></div>
+        <div class="result-row"><span class="result-label">硝化所需填料面积 A_nit <span class="sub">(SNR_T × DO 修正)</span></span>
+          <span><span class="result-value" id="st_r_A_nit">—</span><span class="result-unit">m²</span></span></div>
+        <div class="result-row"><span class="result-label">硝化 DO 修正系数 DO/(K_O+DO)</span>
+          <span><span class="result-value" id="st_r_DOfactor">—</span></span></div>
+        <div class="result-row"><span class="result-label">后置沉淀池容积 <span class="sub">(Q × 沉淀 HRT)</span></span>
+          <span><span class="result-value" id="st_r_Vsettle">—</span><span class="result-unit">m³</span></span></div>
         <div id="stageDetail"></div>
       </div>
 
@@ -1940,11 +2058,11 @@ body {
         <div class="result-group-title"><span class="ic">💨</span> 好氧段需氧量与曝气</div>
         <div class="result-row highlight-row"><span class="result-label"><b>AOR 实际需氧量</b></span>
           <span><span class="result-value big" id="st_r_AOR">—</span><span class="result-unit">kg O₂/d</span></span></div>
-        <div class="result-row"><span class="result-label">其中：碳化需氧 O_BOD</span>
+        <div class="result-row"><span class="result-label">其中：碳化需氧 O_BOD（GB 式 1.47·ΔBOD − 1.42·ΔX_VSS）</span>
           <span><span class="result-value" id="st_r_O_BOD">—</span><span class="result-unit">kg O₂/d</span></span></div>
         <div class="result-row"><span class="result-label">硝化需氧 O_N</span>
           <span><span class="result-value" id="st_r_O_N">—</span><span class="result-unit">kg O₂/d</span></span></div>
-        <div class="result-row"><span class="result-label">反硝化回收 O_DN</span>
+        <div class="result-row"><span class="result-label">反硝化回收 O_DN（2.86×0.5，0.5 为经验值）</span>
           <span><span class="result-value" id="st_r_O_DN">—</span><span class="result-unit">kg O₂/d</span></span></div>
         <div class="result-row highlight-row"><span class="result-label"><b>SOR 标准需氧量 (α·β·θ修正)</b></span>
           <span><span class="result-value big" id="st_r_SOR">—</span><span class="result-unit">kg O₂/d</span></span></div>
@@ -1960,7 +2078,7 @@ body {
           <span><span class="result-value" id="st_r_airRatio">—</span><span class="result-unit">Nm³/m³</span></span></div>
         <div class="result-row"><span class="result-label">单位面积气量强度</span>
           <span><span class="result-value" id="st_r_airIntensity">—</span><span class="result-unit">Nm³/m²·h</span></span></div>
-        <div class="result-row"><span class="result-label">曝气电耗 (EE=25%)</span>
+        <div class="result-row"><span class="result-label">曝气电耗 (0.3 kWh/kg O₂)</span>
           <span><span class="result-value" id="st_r_airPower">—</span><span class="result-unit">kWh/m³</span></span></div>
       </div>
 
@@ -2054,41 +2172,42 @@ body {
       <button class="preset-tab" data-preset-ifas="upgrade" onclick="setPresetIFAS('upgrade')">提标改造</button>
     </div>
     <div class="grid">
-      <div class="field"><label>Q <span class="unit">万 m³/d</span></label>
+      <div class="field"><label for="ifas_Q">Q <span class="unit">万 m³/d</span></label>
         <input type="number" id="ifas_Q" value="3" step="0.5" oninput="calcAndRenderIFAS()"></div>
-      <div class="field"><label>T <span class="unit">°C</span></label>
+      <div class="field"><label for="ifas_T">T <span class="unit">°C</span></label>
         <input type="number" id="ifas_T" value="20" step="1" oninput="calcAndRenderIFAS()"></div>
-      <div class="field"><label>BOD₀ <span class="unit">mg/L</span></label>
+      <div class="field"><label for="ifas_BOD0">BOD₀ <span class="unit">mg/L</span></label>
         <input type="number" id="ifas_BOD0" value="180" step="5" oninput="calcAndRenderIFAS()"></div>
-      <div class="field"><label>NH₄-N₀ <span class="unit">mg/L</span></label>
+      <div class="field"><label for="ifas_NH40">NH₄-N₀ <span class="unit">mg/L</span></label>
         <input type="number" id="ifas_NH40" value="35" step="1" oninput="calcAndRenderIFAS()"></div>
-      <div class="field"><label>TN₀ <span class="unit">mg/L</span></label>
+      <div class="field"><label for="ifas_TN0">TN₀ <span class="unit">mg/L</span></label>
         <input type="number" id="ifas_TN0" value="45" step="1" oninput="calcAndRenderIFAS()"></div>
-      <div class="field"><label>TP₀ <span class="unit">mg/L</span></label>
+      <div class="field"><label for="ifas_TP0">TP₀ <span class="unit">mg/L</span></label>
         <input type="number" id="ifas_TP0" value="5" step="0.2" oninput="calcAndRenderIFAS()"></div>
-      <div class="field"><label>COD₀ <span class="unit">mg/L</span></label>
+      <div class="field"><label for="ifas_COD0">COD₀ <span class="unit">mg/L</span></label>
         <input type="number" id="ifas_COD0" value="400" step="10" oninput="calcAndRenderIFAS()"></div>
-      <div class="field"><label>碱度 Alk <span class="unit">mg/L</span></label>
+      <div class="field"><label for="ifas_Alk">碱度 Alk <span class="unit">mg/L</span></label>
         <input type="number" id="ifas_Alk" value="220" step="10" oninput="calcAndRenderIFAS()">
         <div class="helper">硝化消耗 7.14 mg/mg NH₄</div></div>
     </div>
     <div class="grid">
-      <div class="field"><label>排放标准</label>
+      <div class="field"><label for="ifas_standard">排放标准</label>
         <select id="ifas_standard" onchange="applyStandardIFAS()">
           <option value="1A">一级 A (GB 18918)</option>
-          <option value="grade4">地表 IV 类</option>
-          <option value="grade3">地表 III 类</option>
+          <option value="grade4">准 IV 类（地方标准）</option>
+          <option value="grade3">准 III 类（地方标准）</option>
           <option value="custom">自定义</option>
-        </select></div>
-      <div class="field"><label>出水 NH₄-N <span class="unit">mg/L</span></label>
+        </select>
+        <div class="helper">准 IV 类为地方标准（TN 10 等），限值按项目所在地调整</div></div>
+      <div class="field"><label for="ifas_NH4e">出水 NH₄-N <span class="unit">mg/L</span></label>
         <input type="number" id="ifas_NH4e" value="5" step="0.5" oninput="calcAndRenderIFAS()"></div>
-      <div class="field"><label>出水 TN <span class="unit">mg/L</span></label>
+      <div class="field"><label for="ifas_TNe">出水 TN <span class="unit">mg/L</span></label>
         <input type="number" id="ifas_TNe" value="15" step="0.5" oninput="calcAndRenderIFAS()"></div>
-      <div class="field"><label>出水 TP <span class="unit">mg/L</span></label>
+      <div class="field"><label for="ifas_TPe">出水 TP <span class="unit">mg/L</span></label>
         <input type="number" id="ifas_TPe" value="0.5" step="0.1" oninput="calcAndRenderIFAS()"></div>
-      <div class="field"><label>出水 BOD <span class="unit">mg/L</span></label>
+      <div class="field"><label for="ifas_BODe">出水 BOD <span class="unit">mg/L</span></label>
         <input type="number" id="ifas_BODe" value="10" step="0.5" oninput="calcAndRenderIFAS()"></div>
-      <div class="field"><label>出水 COD <span class="unit">mg/L</span></label>
+      <div class="field"><label for="ifas_CODe">出水 COD <span class="unit">mg/L</span></label>
         <input type="number" id="ifas_CODe" value="50" step="1" oninput="calcAndRenderIFAS()"></div>
     </div>
 
@@ -2154,58 +2273,66 @@ body {
     <div class="section-title"><span class="num">4</span><span id="ifas_paramTitle">工艺设计参数</span></div>
     <div id="ifas_newParams">
       <div class="grid">
-        <div class="field"><label>MLSS(悬浮) <span class="unit">mg/L</span></label>
+        <div class="field"><label for="ifas_MLSS">MLSS(悬浮) <span class="unit">mg/L</span></label>
           <input type="number" id="ifas_MLSS" value="3000" step="100" oninput="calcAndRenderIFAS()">
           <div class="helper">IFAS 常 2000-4000</div></div>
-        <div class="field"><label>MLVSS/MLSS</label>
+        <div class="field"><label for="ifas_VSS_SS">MLVSS/MLSS</label>
           <input type="number" id="ifas_VSS_SS" value="0.72" step="0.01" oninput="calcAndRenderIFAS()"></div>
-        <div class="field"><label>泥龄 SRT <span class="unit">d</span></label>
+        <div class="field"><label for="ifas_SRT">泥龄 SRT <span class="unit">d</span></label>
           <input type="number" id="ifas_SRT" value="15" step="0.5" oninput="calcAndRenderIFAS()">
           <div class="helper">悬浮相 SRT，10-20d</div></div>
-        <div class="field"><label>总池容 V <span class="unit">m³（留0自动估算）</span></label>
+        <div class="field"><label for="ifas_V_input">总池容 V <span class="unit">m³（留0自动估算）</span></label>
           <input type="number" id="ifas_V_input" value="0" step="500" oninput="calcAndRenderIFAS()" placeholder="自动估算"></div>
-        <div class="field"><label>填料填充率 f <span class="unit">%</span></label>
+        <div class="field"><label for="ifas_fillRatio">填料填充率 f <span class="unit">%</span></label>
           <input type="number" id="ifas_fillRatio" value="35" step="5" oninput="calcAndRenderIFAS()">
-          <div class="helper">IFAS 常 20-40%</div></div>
-        <div class="field"><label>填料比表面积 a <span class="unit">m²/m³</span></label>
+          <div class="helper">IFAS 常 20-40%，上限 50%</div></div>
+        <div class="field"><label for="ifas_specArea">填料比表面积 a <span class="unit">m²/m³</span></label>
           <input type="number" id="ifas_specArea" value="500" step="50" oninput="calcAndRenderIFAS()"></div>
-        <div class="field"><label>填料表面生物量 <span class="unit">g VSS/m²</span></label>
+        <div class="field"><label for="ifas_biofilm">填料表面生物量 <span class="unit">g VSS/m²</span></label>
           <input type="number" id="ifas_biofilm" value="15" step="1" oninput="calcAndRenderIFAS()"></div>
-        <div class="field"><label>SALR₂₀ <span class="unit">g BOD/m²·d</span></label>
+        <div class="field"><label for="ifas_SALR">SALR₂₀ <span class="unit">g BOD/m²·d</span></label>
           <input type="number" id="ifas_SALR" value="7" step="0.5" oninput="calcAndRenderIFAS()"></div>
-        <div class="field"><label>SNR₂₀ <span class="unit">g N/m²·d</span></label>
+        <div class="field"><label for="ifas_SALR_N">SNR₂₀ <span class="unit">g N/m²·d</span></label>
           <input type="number" id="ifas_SALR_N" value="1.0" step="0.1" oninput="calcAndRenderIFAS()"></div>
-        <div class="field"><label>后置沉淀 HRT <span class="unit">h</span></label>
+        <div class="field"><label for="ifas_settleQ">二沉池表面负荷 q <span class="unit">m³/m²·h</span></label>
+          <input type="number" id="ifas_settleQ" value="1.0" step="0.1" oninput="calcAndRenderIFAS()">
+          <div class="helper">GB 50014 活性污泥二沉池 0.6-1.5；A = Q_h / q</div></div>
+        <div class="field"><label for="ifas_settleHRT">后置沉淀最小 HRT <span class="unit">h</span></label>
           <input type="number" id="ifas_settleHRT" value="2.0" step="0.5" oninput="calcAndRenderIFAS()">
-          <div class="helper">IFAS 含活性污泥，2-3h</div></div>
-        <div class="field"><label>好氧池有效水深 H <span class="unit">m</span></label>
+          <div class="helper">V = max(A×3.5 m, Q_h×HRT)；IFAS 常 1.5-4h</div></div>
+        <div class="field"><label for="ifas_poolH">好氧池有效水深 H <span class="unit">m</span></label>
           <input type="number" id="ifas_poolH" value="5.0" step="0.5" oninput="calcAndRenderIFAS()">
           <div class="helper">影响鼓风机静压；IFAS 常 4-6 m</div></div>
       </div>
     </div>
     <div id="ifas_retrofitParams" style="display:none;">
       <div class="grid">
-        <div class="field"><label>原有池容 V <span class="unit">m³</span></label>
+        <div class="field"><label for="ifas_Vexisting">原有池容 V <span class="unit">m³</span></label>
           <input type="number" id="ifas_Vexisting" value="15000" step="500" oninput="calcAndRenderIFAS()"></div>
-        <div class="field"><label>原有 MLSS <span class="unit">mg/L</span></label>
+        <div class="field"><label for="ifas_MLSSexisting">原有 MLSS <span class="unit">mg/L</span></label>
           <input type="number" id="ifas_MLSSexisting" value="3000" step="100" oninput="calcAndRenderIFAS()"></div>
-        <div class="field"><label>改造后 MLVSS/MLSS</label>
+        <div class="field"><label for="ifas_VSS_SS2">改造后 MLVSS/MLSS</label>
           <input type="number" id="ifas_VSS_SS2" value="0.72" step="0.01" oninput="calcAndRenderIFAS()"></div>
-        <div class="field"><label>改造后目标 MLSS <span class="unit">mg/L</span></label>
-          <input type="number" id="ifas_MLSS_new" value="3500" step="100" oninput="calcAndRenderIFAS()"></div>
-        <div class="field"><label>填料填充率 f <span class="unit">%</span></label>
-          <input type="number" id="ifas_fillRatio_r" value="30" step="5" oninput="calcAndRenderIFAS()"></div>
-        <div class="field"><label>填料比表面积 a <span class="unit">m²/m³</span></label>
+        <div class="field"><label for="ifas_MLSS_new">改造后目标 MLSS <span class="unit">mg/L</span></label>
+          <input type="number" id="ifas_MLSS_new" value="3500" step="100" oninput="calcAndRenderIFAS()">
+          <div class="helper">改造后悬浮相按此 MLSS 计算；改造前能力按原有 MLSS</div></div>
+        <div class="field"><label for="ifas_fillRatio_r">填料填充率 f <span class="unit">%</span></label>
+          <input type="number" id="ifas_fillRatio_r" value="30" step="5" oninput="calcAndRenderIFAS()">
+          <div class="helper">IFAS 常 20-40%，上限 50%</div></div>
+        <div class="field"><label for="ifas_specArea_r">填料比表面积 a <span class="unit">m²/m³</span></label>
           <input type="number" id="ifas_specArea_r" value="500" step="50" oninput="calcAndRenderIFAS()"></div>
-        <div class="field"><label>填料表面生物量 <span class="unit">g VSS/m²</span></label>
+        <div class="field"><label for="ifas_biofilm_r">填料表面生物量 <span class="unit">g VSS/m²</span></label>
           <input type="number" id="ifas_biofilm_r" value="12" step="1" oninput="calcAndRenderIFAS()"></div>
-        <div class="field"><label>SALR₂₀ <span class="unit">g BOD/m²·d</span></label>
+        <div class="field"><label for="ifas_SALR_r">SALR₂₀ <span class="unit">g BOD/m²·d</span></label>
           <input type="number" id="ifas_SALR_r" value="7" step="0.5" oninput="calcAndRenderIFAS()"></div>
-        <div class="field"><label>SNR₂₀ <span class="unit">g N/m²·d</span></label>
+        <div class="field"><label for="ifas_SALR_N_r">SNR₂₀ <span class="unit">g N/m²·d</span></label>
           <input type="number" id="ifas_SALR_N_r" value="1.0" step="0.1" oninput="calcAndRenderIFAS()"></div>
-        <div class="field"><label>后置沉淀 HRT <span class="unit">h</span></label>
+        <div class="field"><label for="ifas_settleQ_r">二沉池表面负荷 q <span class="unit">m³/m²·h</span></label>
+          <input type="number" id="ifas_settleQ_r" value="1.0" step="0.1" oninput="calcAndRenderIFAS()">
+          <div class="helper">GB 50014 活性污泥二沉池 0.6-1.5</div></div>
+        <div class="field"><label for="ifas_settleHRT_r">后置沉淀最小 HRT <span class="unit">h</span></label>
           <input type="number" id="ifas_settleHRT_r" value="2.0" step="0.5" oninput="calcAndRenderIFAS()"></div>
-        <div class="field"><label>好氧池有效水深 H <span class="unit">m</span></label>
+        <div class="field"><label for="ifas_poolH_r">好氧池有效水深 H <span class="unit">m</span></label>
           <input type="number" id="ifas_poolH_r" value="5.0" step="0.5" oninput="calcAndRenderIFAS()">
           <div class="helper">影响鼓风机静压</div></div>
       </div>
@@ -2214,11 +2341,11 @@ body {
     <!-- 步骤5：容积分配比 -->
     <div class="section-title"><span class="num">5</span>容积分配比(%) <span class="sub">（由工艺构型自动初始化，可手动调整）</span></div>
     <div class="grid" id="ifas_volRatioGrid">
-      <div class="field" id="ifas_volPreAnox_field"><label>预缺氧段 %</label>
+      <div class="field" id="ifas_volPreAnox_field"><label for="ifas_r_preAnox_pct">预缺氧段 %</label>
         <input type="number" id="ifas_r_preAnox_pct" value="0" step="5" oninput="calcAndRenderIFAS()"></div>
-      <div class="field"><label>好氧 IFAS 段 %</label>
+      <div class="field"><label for="ifas_r_aer_pct">好氧 IFAS 段 %</label>
         <input type="number" id="ifas_r_aer_pct" value="100" step="5" oninput="calcAndRenderIFAS()"></div>
-      <div class="field" id="ifas_volPostAnox_field"><label>后缺氧段 %</label>
+      <div class="field" id="ifas_volPostAnox_field"><label for="ifas_r_postAnox_pct">后缺氧段 %</label>
         <input type="number" id="ifas_r_postAnox_pct" value="0" step="5" oninput="calcAndRenderIFAS()"></div>
     </div>
     <div id="ifas_volSumWarn"></div>
@@ -2232,17 +2359,17 @@ body {
         </div>
       </div>
       <div class="grid">
-        <div class="field"><label>RAS 回流比 <span class="unit">%（相对Q）</span></label>
+        <div class="field"><label for="ifas_RAS">RAS 回流比 <span class="unit">%（相对Q）</span></label>
           <input type="number" id="ifas_RAS" value="100" step="25" oninput="calcAndRenderIFAS()">
           <div class="helper">典型 50-150%</div></div>
-        <div class="field" id="ifas_MLR_field"><label>MLR 内回流比 <span class="unit">%（相对Q）</span></label>
+        <div class="field" id="ifas_MLR_field"><label for="ifas_MLR">MLR 内回流比 <span class="unit">%（相对Q）</span></label>
           <input type="number" id="ifas_MLR" value="200" step="50" oninput="calcAndRenderIFAS()">
           <div class="helper">A/O：200-400%</div></div>
-        <div class="field"><label>RAS 泵扬程 <span class="unit">m</span></label>
+        <div class="field"><label for="ifas_RAS_H">RAS 泵扬程 <span class="unit">m</span></label>
           <input type="number" id="ifas_RAS_H" value="3" step="0.5" oninput="calcAndRenderIFAS()"></div>
-        <div class="field"><label>MLR 泵扬程 <span class="unit">m</span></label>
+        <div class="field"><label for="ifas_MLR_H">MLR 泵扬程 <span class="unit">m</span></label>
           <input type="number" id="ifas_MLR_H" value="2" step="0.5" oninput="calcAndRenderIFAS()"></div>
-        <div class="field"><label>泵效率 <span class="unit">%</span></label>
+        <div class="field"><label for="ifas_pumpEff">泵效率 <span class="unit">%</span></label>
           <input type="number" id="ifas_pumpEff" value="65" step="5" oninput="calcAndRenderIFAS()"></div>
       </div>
     </div>
@@ -2250,25 +2377,28 @@ body {
     <!-- 步骤7：外加药剂参数 -->
     <div class="section-title"><span class="num">7</span>外加药剂参数</div>
     <div class="grid">
-      <div class="field"><label>后缺氧碳源类型</label>
+      <div class="field"><label for="ifas_carbonSrc">后缺氧碳源类型</label>
         <select id="ifas_carbonSrc" onchange="calcAndRenderIFAS()">
           <option value="methanol">甲醇（COD系数 1.5，最经济）</option>
-          <option value="acetate">乙酸钠（COD系数 0.67，启动快）</option>
+          <option value="acetate">乙酸钠（无水 COD系数 0.78 × 有效含量，启动快）</option>
           <option value="glucose">葡萄糖（COD系数 1.07）</option>
         </select></div>
-      <div class="field"><label>碳源价格 <span class="unit">元/kg</span></label>
+      <div class="field"><label for="ifas_acetatePurity">乙酸钠有效含量 <span class="unit">%</span></label>
+        <input type="number" id="ifas_acetatePurity" value="58" step="1" oninput="calcAndRenderIFAS()">
+        <div class="helper">固体三水乙酸钠约 58%（折合 0.45 gCOD/g 商品）；液体按标称含量；仅选乙酸钠时生效</div></div>
+      <div class="field"><label for="ifas_carbonPrice">碳源价格 <span class="unit">元/kg</span></label>
         <input type="number" id="ifas_carbonPrice" value="5" step="0.5" oninput="calcAndRenderIFAS()"></div>
-      <div class="field"><label>PAC 投加量 <span class="unit">mg/L</span></label>
+      <div class="field"><label for="ifas_PAC">PAC 投加量 <span class="unit">mg/L</span></label>
         <input type="number" id="ifas_PAC" value="20" step="5" oninput="calcAndRenderIFAS()">
         <div class="helper">TP 严格时配合使用</div></div>
-      <div class="field"><label>PAC 价格 <span class="unit">元/kg</span></label>
+      <div class="field"><label for="ifas_PACprice">PAC 价格 <span class="unit">元/kg</span></label>
         <input type="number" id="ifas_PACprice" value="3" step="0.5" oninput="calcAndRenderIFAS()"></div>
-      <div class="field"><label>NaHCO₃补碱 <span class="unit">mg/L（留0自动计算）</span></label>
+      <div class="field"><label for="ifas_alkDose">NaHCO₃补碱 <span class="unit">mg/L（留0自动计算）</span></label>
         <input type="number" id="ifas_alkDose" value="0" step="10" oninput="calcAndRenderIFAS()"></div>
-      <div class="field"><label>脱水后泥饼含水率 <span class="unit">%</span></label>
+      <div class="field"><label for="ifas_sludge_mc">脱水后泥饼含水率 <span class="unit">%</span></label>
         <input type="number" id="ifas_sludge_mc" value="80" step="1" oninput="calcAndRenderIFAS()">
         <div class="helper">板框 75-80%，离心 78-82%</div></div>
-      <div class="field"><label>污泥处置费用 <span class="unit">元/t（湿）</span></label>
+      <div class="field"><label for="ifas_sludge_price">污泥处置费用 <span class="unit">元/t（湿）</span></label>
         <input type="number" id="ifas_sludge_price" value="300" step="50" oninput="calcAndRenderIFAS()">
         <div class="helper">卫生填埋 200-400</div></div>
     </div>
@@ -2276,16 +2406,16 @@ body {
     <!-- 步骤8-11：曝气器选型与风机（与MBBR一致） -->
     <div class="section-title"><span class="num">8</span>曝气器选型与风机 <span class="sub">基于IFAS双相需氧量计算</span></div>
     <div class="aerator-tabs">
-      <button class="aerator-tab active" data-aer="coarse" onclick="setAeratorType('coarse')">
+      <button class="aerator-tab active" data-aer="coarse" onclick="setAeratorType('coarse','ifa')">
         <b>粗孔旋混</b><span>专为 MBBR 优化 · 抗堵</span>
       </button>
-      <button class="aerator-tab" data-aer="disc" onclick="setAeratorType('disc')">
+      <button class="aerator-tab" data-aer="disc" onclick="setAeratorType('disc','ifa')">
         <b>盘式微孔</b><span>氧传质最高 · 易堵塞</span>
       </button>
-      <button class="aerator-tab" data-aer="tube" onclick="setAeratorType('tube')">
+      <button class="aerator-tab" data-aer="tube" onclick="setAeratorType('tube','ifa')">
         <b>管式曝气</b><span>大气量 · 安装方便</span>
       </button>
-      <button class="aerator-tab" data-aer="jet" onclick="setAeratorType('jet')">
+      <button class="aerator-tab" data-aer="jet" onclick="setAeratorType('jet','ifa')">
         <b>射流曝气</b><span>小规模/深池 · 无堵塞</span>
       </button>
     </div>
@@ -2293,16 +2423,16 @@ body {
     <!-- 曝气器特性参数 -->
     <div class="section-title"><span class="num">9</span>曝气器性能参数</div>
     <div class="grid">
-      <div class="field"><label>单个曝气器气量 <span class="unit">Nm³/h</span></label>
+      <div class="field"><label for="ifa_perDevice">单个曝气器气量 <span class="unit">Nm³/h</span></label>
         <input type="number" id="ifa_perDevice" value="8" step="1" onchange="calcAndRenderIFAS()">
         <div class="helper" id="ifa_perDevice_help">粗孔单件 5-15</div></div>
-      <div class="field"><label>氧传质效率 OTE <span class="unit">%/m</span></label>
+      <div class="field"><label for="ifa_OTE">氧传质效率 OTE <span class="unit">%/m</span></label>
         <input type="number" id="ifa_OTE" value="3" step="0.5" onchange="calcAndRenderIFAS()">
         <div class="helper" id="ifa_OTE_help">粗孔 2-4 %/m 水深</div></div>
-      <div class="field"><label>曝气器布置间距 <span class="unit">m</span></label>
+      <div class="field"><label for="ifa_spacing">曝气器布置间距 <span class="unit">m</span></label>
         <input type="number" id="ifa_spacing" value="0.8" step="0.1" onchange="calcAndRenderIFAS()">
         <div class="helper">粗孔 0.6-1.0 常用</div></div>
-      <div class="field"><label>单价 <span class="unit">元/个</span></label>
+      <div class="field"><label for="ifa_price">单价 <span class="unit">元/个</span></label>
         <input type="number" id="ifa_price" value="180" step="10" onchange="calcAndRenderIFAS()">
         <div class="helper" id="ifa_price_help">粗孔 150-300 元</div></div>
     </div>
@@ -2310,21 +2440,21 @@ body {
     <!-- 风机选型参数 -->
     <div class="section-title"><span class="num">10</span>风机参数</div>
     <div class="grid">
-      <div class="field"><label>风机类型</label>
+      <div class="field"><label for="ifa_blowerType">风机类型</label>
         <select id="ifa_blowerType" onchange="calcAndRenderIFAS()">
           <option value="roots">罗茨风机(常规)</option>
           <option value="multistage">多级离心风机(低噪音)</option>
           <option value="magnetic">磁悬浮风机(节能最优)</option>
         </select></div>
-      <div class="field"><label>曝气池阻力 <span class="unit">kPa</span></label>
+      <div class="field"><label for="ifa_dp_aer">曝气池阻力 <span class="unit">kPa</span></label>
         <input type="number" id="ifa_dp_aer" value="5" step="0.5" onchange="calcAndRenderIFAS()">
         <div class="helper">微孔 3-5, 粗孔 2-3</div></div>
-      <div class="field"><label>管路阻力 <span class="unit">kPa</span></label>
+      <div class="field"><label for="ifa_dp_pipe">管路阻力 <span class="unit">kPa</span></label>
         <input type="number" id="ifa_dp_pipe" value="3" step="0.5" onchange="calcAndRenderIFAS()"></div>
-      <div class="field"><label>风机效率 <span class="unit">%</span></label>
+      <div class="field"><label for="ifa_efficiency">风机效率 <span class="unit">%</span></label>
         <input type="number" id="ifa_efficiency" value="65" step="1" onchange="calcAndRenderIFAS()">
         <div class="helper">罗茨 55-70, 磁悬浮 75-85</div></div>
-      <div class="field"><label>备用系数</label>
+      <div class="field"><label for="ifa_backupFactor">备用系数</label>
         <input type="number" id="ifa_backupFactor" value="1.2" step="0.05" onchange="calcAndRenderIFAS()">
         <div class="helper">1.2 = 2 用 1 备</div></div>
     </div>
@@ -2334,25 +2464,22 @@ body {
     <div class="auto-calc-notice">
       <div class="notice-head"><span class="notice-ic">ℹ️</span>
         <span>以下修正系数用于将实际需氧量 AOR 换算为标准状态需氧量 SOR，并反推校核气量。
-        <b>建议与工艺选择与计算 Tab 保持一致</b>，或点击"从工艺计算同步"自动填入。</span>
+        水温 T 自动跟随上方进水水温 T；β、θ、DO 可独立调整用于校核；α 统一取高级参数中的 α（默认 0.65），不再单独设置。</span>
       </div>
     </div>
     <div class="grid">
-      <div class="field"><label>α（污水对清水修正）</label>
-        <input type="number" id="ifa_alpha" value="0.70" step="0.05" onchange="calcAndRenderIFAS()">
-        <div class="helper">城镇污水 0.65-0.75，工业废水 0.4-0.6</div></div>
-      <div class="field"><label>β（水质饱和度修正）</label>
+      <div class="field"><label for="ifa_beta">β（水质饱和度修正）</label>
         <input type="number" id="ifa_beta" value="0.95" step="0.01" onchange="calcAndRenderIFAS()">
         <div class="helper">含盐低时 0.95-1.0</div></div>
-      <div class="field"><label>θ（传质温度系数）</label>
+      <div class="field"><label for="ifa_theta">θ（传质温度系数）</label>
         <input type="number" id="ifa_theta" value="1.024" step="0.001" onchange="calcAndRenderIFAS()">
         <div class="helper">鼓风曝气 1.016-1.025</div></div>
-      <div class="field"><label>DO 设计值 <span class="unit">mg/L</span></label>
+      <div class="field"><label for="ifa_DO">DO 设计值 <span class="unit">mg/L</span></label>
         <input type="number" id="ifa_DO" value="2.0" step="0.5" onchange="calcAndRenderIFAS()">
         <div class="helper">好氧段维持 DO</div></div>
-      <div class="field"><label>水温 T <span class="unit">°C</span></label>
+      <div class="field"><label for="ifa_T">水温 T <span class="unit">°C</span></label>
         <input type="number" id="ifa_T" value="20" step="1" onchange="calcAndRenderIFAS()">
-        <div class="helper">与工艺计算 Tab 保持一致</div></div>
+        <div class="helper">自动跟随上方进水温度 T</div></div>
     </div>
 
 
@@ -2365,41 +2492,42 @@ body {
       <div style="background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:8px;">
         <div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:10px;">🌡️ 温度修正</div>
         <div class="grid">
-          <div class="field"><label>θ（SALR/SNR 温度系数）</label>
+          <div class="field"><label for="ifas_theta">θ（SALR/SNR 温度系数）</label>
             <input type="number" id="ifas_theta" value="1.09" step="0.01" oninput="calcAndRenderIFAS()">
             <div class="helper">MBBR/IFAS 常温 1.05-1.09</div></div>
-          <div class="field"><label>θ_O₂（传质温度系数）</label>
+          <div class="field"><label for="ifas_theta_o2">θ_O₂（传质温度系数）</label>
             <input type="number" id="ifas_theta_o2" value="1.024" step="0.001" oninput="calcAndRenderIFAS()"></div>
         </div>
       </div>
       <div style="background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:8px;">
         <div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:10px;">💨 曝气修正系数</div>
         <div class="grid">
-          <div class="field"><label>α（污水修正）</label>
+          <div class="field"><label for="ifas_alpha">α（污水修正）</label>
             <input type="number" id="ifas_alpha" value="0.65" step="0.05" oninput="calcAndRenderIFAS()">
-            <div class="helper">IFAS 含悬浮污泥，α 比纯 MBBR 低</div></div>
-          <div class="field"><label>β（水质修正）</label>
+            <div class="helper">IFAS 含悬浮污泥，α 比纯 MBBR 低；同时用于 §11 SOR 换算</div></div>
+          <div class="field"><label for="ifas_beta">β（水质修正）</label>
             <input type="number" id="ifas_beta" value="0.95" step="0.01" oninput="calcAndRenderIFAS()"></div>
-          <div class="field"><label>DO 设计值 <span class="unit">mg/L</span></label>
+          <div class="field"><label for="ifas_DO">DO 设计值 <span class="unit">mg/L</span></label>
             <input type="number" id="ifas_DO" value="2.0" step="0.5" oninput="calcAndRenderIFAS()"></div>
-          <div class="field"><label>曝气效率 EE <span class="unit">%</span></label>
+          <div class="field"><label for="ifas_EE">曝气效率 EE <span class="unit">%</span></label>
             <input type="number" id="ifas_EE" value="25" step="1" oninput="calcAndRenderIFAS()"></div>
         </div>
       </div>
       <div style="background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:14px;">
         <div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:10px;">🧬 生物动力学</div>
         <div class="grid">
-          <div class="field"><label>Y（悬浮相）</label>
+          <div class="field"><label for="ifas_Y">Y（悬浮相）</label>
             <input type="number" id="ifas_Y" value="0.60" step="0.05" oninput="calcAndRenderIFAS()"></div>
-          <div class="field"><label>Kd（悬浮相）<span class="unit">d⁻¹</span></label>
+          <div class="field"><label for="ifas_Kd">Kd（悬浮相）<span class="unit">d⁻¹</span></label>
             <input type="number" id="ifas_Kd" value="0.06" step="0.01" oninput="calcAndRenderIFAS()"></div>
-          <div class="field"><label>Y_bio（附着相）</label>
+          <div class="field"><label for="ifas_Y_bio">Y_bio（附着相）</label>
             <input type="number" id="ifas_Y_bio" value="0.25" step="0.05" oninput="calcAndRenderIFAS()"></div>
-          <div class="field"><label>Kd_bio（附着相）</label>
+          <div class="field"><label for="ifas_Kd_bio">Kd_bio（附着相）</label>
             <input type="number" id="ifas_Kd_bio" value="0.02" step="0.01" oninput="calcAndRenderIFAS()"></div>
-          <div class="field"><label>SDNR₂₀ <span class="unit">g N/g VSS·d</span></label>
-            <input type="number" id="ifas_SDNR" value="0.08" step="0.01" oninput="calcAndRenderIFAS()"></div>
-          <div class="field"><label>剥落系数</label>
+          <div class="field"><label for="ifas_SDNR">SDNR₂₀ <span class="unit">g N/g VSS·d</span></label>
+            <input type="number" id="ifas_SDNR" value="0.08" step="0.01" oninput="calcAndRenderIFAS()">
+            <div class="helper">温度修正 θ=1.08（依据 GB 50014：Kde(T)=Kde(20)·1.08^(T−20)）</div></div>
+          <div class="field"><label for="ifas_sloughCoef">剥落系数</label>
             <input type="number" id="ifas_sloughCoef" value="0.55" step="0.05" oninput="calcAndRenderIFAS()"></div>
         </div>
       </div>
@@ -2431,6 +2559,8 @@ body {
           <span><span class="result-value" id="ifas_r_Vsettle">—</span><span class="result-unit">m³</span></span></div>
         <div class="result-row"><span class="result-label">沉淀池表面负荷</span>
           <span><span class="result-value" id="ifas_r_surfLoad">—</span><span class="result-unit">m/h</span></span></div>
+        <div class="result-row"><span class="result-label">沉淀池面积 / HRT</span>
+          <span><span class="result-value" id="ifas_r_settleAH">—</span><span class="result-unit">m² / h</span></span></div>
       </div>
       <div class="result-group">
         <div class="result-group-title"><span class="ic">🧬</span> 双相生物量</div>
@@ -2469,7 +2599,7 @@ body {
           <span><span class="result-value" id="ifas_r_TNout">—</span><span class="result-unit">mg/L</span></span></div>
         <div class="result-row"><span class="result-label">MLR 理论 TN 去除上限</span>
           <span><span class="result-value" id="ifas_r_MLR_limit">—</span><span class="result-unit">%</span></span></div>
-        <div class="result-row"><span class="result-label">碱度剩余（硝化后）</span>
+        <div class="result-row"><span class="result-label">碱度剩余（硝化消耗 − 反硝化回收后）</span>
           <span><span class="result-value" id="ifas_r_alkRem">—</span><span class="result-unit">mg/L</span></span></div>
       </div>
       <div class="result-group">
@@ -2478,6 +2608,12 @@ body {
           <span><span class="result-value big" id="ifas_r_AOR">—</span><span class="result-unit">kg O₂/d</span></span></div>
         <div class="result-row"><span class="result-label">SOR 标准需氧量</span>
           <span><span class="result-value" id="ifas_r_SOR">—</span><span class="result-unit">kg O₂/d</span></span></div>
+        <div class="result-row"><span class="result-label">曝气器 SOR（§11 α·β·θ）/ EE（OTE×淹没深度）</span>
+          <span><span class="result-value" id="ifas_r_ifaSOR">—</span><span class="result-unit">kg O₂/d / %</span></span></div>
+        <div class="result-row highlight-row"><span class="result-label"><b>曝气器供氧气量</b></span>
+          <span><span class="result-value big" id="ifas_r_ifaAir">—</span><span class="result-unit">Nm³/h</span></span></div>
+        <div class="result-row"><span class="result-label">曝气器数量 / 投资 / 风机轴功率</span>
+          <span><span class="result-value" id="ifas_r_ifaCount">—</span><span class="result-unit">个 / 万元 / kW</span></span></div>
         <div class="result-row"><span class="result-label">SALR 实际（T°C修正）</span>
           <span><span class="result-value" id="ifas_r_SALRcheck">—</span><span class="result-unit">g/m²·d</span></span></div>
         <div class="result-row"><span class="result-label">温度修正系数 θ^(T-20)</span>
@@ -2566,16 +2702,16 @@ body {
       </div>
     </div>
     <div class="grid">
-      <div class="field"><label>每日投饲量 F <span class="unit">kg/d</span></label>
+      <div class="field"><label for="ras_feed">每日投饲量 F <span class="unit">kg/d</span></label>
         <input type="number" id="ras_feed" value="100" step="10" oninput="calcRas()">
         <div class="helper">养殖规模的核心输入，鱼体重 × 投饲率（通常 1-3%/d）</div></div>
-      <div class="field"><label>饲料蛋白含量 <span class="unit">%</span></label>
+      <div class="field"><label for="ras_protein">饲料蛋白含量 <span class="unit">%</span></label>
         <input type="number" id="ras_protein" value="45" step="1" oninput="calcRas()">
         <div class="helper">普通配合料 38-45%，高档 45-55%</div></div>
-      <div class="field"><label>TAN 转化系数 <span class="unit">g TAN/g 蛋白</span></label>
+      <div class="field"><label for="ras_tan_coef">TAN 转化系数 <span class="unit">g TAN/g 蛋白</span></label>
         <input type="number" id="ras_tan_coef" value="0.092" step="0.005" oninput="calcRas()">
         <div class="helper">每克饲料蛋白产生 TAN 约 0.08-0.10 g，默认 0.092</div></div>
-      <div class="field"><label>峰值系数 <span class="unit">×</span></label>
+      <div class="field"><label for="ras_peak">峰值系数 <span class="unit">×</span></label>
         <input type="number" id="ras_peak" value="1.5" step="0.1" oninput="calcRas()">
         <div class="helper">日内投喂高峰时 TAN 浓度峰值，建议 1.5-2.0（保守设计）</div></div>
     </div>
@@ -2588,22 +2724,22 @@ body {
     <!-- 步骤2：水质目标 -->
     <div class="section-title"><span class="num">2</span>水质目标 &amp; 系统参数</div>
     <div class="grid">
-      <div class="field"><label>水温 T <span class="unit">°C</span></label>
+      <div class="field"><label for="ras_T">水温 T <span class="unit">°C</span></label>
         <input type="number" id="ras_T" value="15" step="0.5" oninput="calcRas()">
         <div class="helper">设计按最低水温，冷水鱼可低至 8°C</div></div>
-      <div class="field"><label>目标 TAN 浓度 <span class="unit">mg/L</span></label>
+      <div class="field"><label for="ras_tan_target">目标 TAN 浓度 <span class="unit">mg/L</span></label>
         <input type="number" id="ras_tan_target" value="1.0" step="0.1" oninput="calcRas()">
         <div class="helper">三文鱼 ≤1.0，罗非鱼 ≤3.0，虾 ≤1.5</div></div>
-      <div class="field"><label>系统 pH</label>
+      <div class="field"><label for="ras_pH">系统 pH</label>
         <input type="number" id="ras_pH" value="7.2" step="0.1" oninput="calcRas()">
         <div class="helper">pH↑则 NH₃ 毒性↑，硝化最适 pH 7.0-8.0</div></div>
-      <div class="field"><label>鱼池水体 V_tank <span class="unit">m³</span></label>
+      <div class="field"><label for="ras_V_tank">鱼池水体 V_tank <span class="unit">m³</span></label>
         <input type="number" id="ras_V_tank" value="200" step="10" oninput="calcRas()">
         <div class="helper">纯养鱼池容积；系统总水体（含MBBR+管道）由系统自动计算</div></div>
-      <div class="field"><label>换水率 <span class="unit">%/d（相对总水体）</span></label>
+      <div class="field"><label for="ras_exchange_rate">换水率 <span class="unit">%/d（相对总水体）</span></label>
         <input type="number" id="ras_exchange_rate" value="5" step="1" oninput="calcRas()">
         <div class="helper">每日补充新水 / 系统总水体 V_sys（含MBBR）；用于稀释 NO₃、DOM 和补充碱度</div></div>
-      <div class="field"><label>DO 目标 <span class="unit">mg/L</span></label>
+      <div class="field"><label for="ras_DO">DO 目标 <span class="unit">mg/L</span></label>
         <input type="number" id="ras_DO" value="7" step="0.5" oninput="calcRas()">
         <div class="helper">RAS 要求 ≥6，硝化需 ≥4，鱼类适应 6-10</div></div>
     </div>
@@ -2616,19 +2752,19 @@ body {
       </div>
     </div>
     <div class="grid">
-      <div class="field"><label>SNR₂₀ <span class="unit">g TAN/m²·d</span></label>
+      <div class="field"><label for="ras_SNR20">SNR₂₀ <span class="unit">g TAN/m²·d</span></label>
         <input type="number" id="ras_SNR20" value="1.0" step="0.1" oninput="calcRas()">
         <div class="helper">RAS 典型 0.8-1.5（DO充足时可达 2.0）</div></div>
-      <div class="field"><label>θ（温度系数）</label>
+      <div class="field"><label for="ras_theta">θ（温度系数）</label>
         <input type="number" id="ras_theta" value="1.09" step="0.01" oninput="calcRas()">
         <div class="helper">Ødegaard 硝化 θ=1.09；低温冷水鱼取 1.09-1.12</div></div>
-      <div class="field"><label>填料比表面积 a <span class="unit">m²/m³</span></label>
+      <div class="field"><label for="ras_specArea">填料比表面积 a <span class="unit">m²/m³</span></label>
         <input type="number" id="ras_specArea" value="500" step="50" oninput="calcRas()">
         <div class="helper">K3=500，K5=800，RAS 优选高比表面积</div></div>
-      <div class="field"><label>填充率 f <span class="unit">%</span></label>
+      <div class="field"><label for="ras_fillRatio">填充率 f <span class="unit">%</span></label>
         <input type="number" id="ras_fillRatio" value="50" step="5" oninput="calcRas()">
-        <div class="helper">RAS 常 40-60%，不超过 70%</div></div>
-      <div class="field"><label>系统循环倍率目标 <span class="unit">次/h</span></label>
+        <div class="helper">RAS 常 40-60%，MBBR 上限 67%</div></div>
+      <div class="field"><label for="ras_circ_target">系统循环倍率目标 <span class="unit">次/h</span></label>
         <input type="number" id="ras_circ_target" value="2" step="0.5" oninput="calcRas()">
         <div class="helper">系统总水体 V_sys（鱼池+管道+MBBR）每小时循环次数，建议 1-4 次/h；换水率同样基于 V_sys，两者基准一致</div></div>
     </div>
@@ -2649,27 +2785,30 @@ body {
         </div>
       </div>
       <div class="grid">
-        <div class="field"><label>NO₃ 目标浓度 <span class="unit">mg/L</span></label>
+        <div class="field"><label for="ras_no3_target">NO₃ 目标浓度 <span class="unit">mg/L</span></label>
           <input type="number" id="ras_no3_target" value="50" step="10" oninput="calcRas()">
           <div class="helper">三文鱼 ≤100，罗非鱼 ≤200，虾 ≤50</div></div>
-        <div class="field"><label>分流比例 <span class="unit">%（占主循环）</span></label>
+        <div class="field"><label for="ras_denif_split">分流比例 <span class="unit">%（占主循环）</span></label>
           <input type="number" id="ras_denif_split" value="20" step="5" oninput="calcRas()">
           <div class="helper">典型 10-40%；决定反硝化段 HRT，不影响填料面积计算</div></div>
-        <div class="field"><label>SDNR₂₀ <span class="unit">g NO₃-N/m²·d</span></label>
+        <div class="field"><label for="ras_SDNR20">SDNR₂₀ <span class="unit">g NO₃-N/m²·d</span></label>
           <input type="number" id="ras_SDNR20" value="1.5" step="0.1" oninput="calcRas()">
-          <div class="helper">内源碳（饲料残余）1.0-2.0；外加甲醇 2.5-4.0</div></div>
-        <div class="field"><label>反硝化填充率 <span class="unit">%</span></label>
+          <div class="helper">内源碳（饲料残余）1.0-2.0；外加甲醇 2.5-4.0；温度修正 θ=1.08（依据 GB 50014）</div></div>
+        <div class="field"><label for="ras_denif_fillRatio">反硝化填充率 <span class="unit">%</span></label>
           <input type="number" id="ras_denif_fillRatio" value="50" step="5" oninput="calcRas()">
           <div class="helper">通常与硝化段相同 40-60%</div></div>
-        <div class="field"><label>碳源类型</label>
+        <div class="field"><label for="ras_carbon_type">碳源类型</label>
           <select id="ras_carbon_type" onchange="calcRas()" style="width:100%;">
             <option value="internal">内源碳（饲料残余，无需外加）</option>
             <option value="methanol">甲醇 CH₃OH（COD 系数 1.50）</option>
-            <option value="acetate">乙酸钠 CH₃COONa（COD 系数 0.78）</option>
+            <option value="acetate">乙酸钠 CH₃COONa（无水 COD 系数 0.78 × 有效含量）</option>
             <option value="glucose">葡萄糖（COD 系数 1.07）</option>
           </select>
           <div class="helper">内源碳充足时无需外加；BOD 极低时需外加</div></div>
-        <div class="field"><label>碳源单价 <span class="unit">元/kg</span></label>
+        <div class="field"><label for="ras_acetatePurity">乙酸钠有效含量 <span class="unit">%</span></label>
+          <input type="number" id="ras_acetatePurity" value="58" step="1" oninput="calcRas()">
+          <div class="helper">固体三水乙酸钠约 58%（折合 0.45 gCOD/g 商品）；液体按标称含量；仅选乙酸钠时生效</div></div>
+        <div class="field"><label for="ras_carbon_price">碳源单价 <span class="unit">元/kg</span></label>
           <input type="number" id="ras_carbon_price" value="3.5" step="0.5" oninput="calcRas()">
           <div class="helper">甲醇 2-5，乙酸钠 3-6，葡萄糖 3-5</div></div>
       </div>
@@ -2678,19 +2817,19 @@ body {
     <!-- 步骤5：曝气参数 -->
     <div class="section-title"><span class="num">5</span>曝气参数</div>
     <div class="grid">
-      <div class="field"><label>α（污水修正）</label>
+      <div class="field"><label for="ras_alpha">α（污水修正）</label>
         <input type="number" id="ras_alpha" value="0.85" step="0.05" oninput="calcRas()">
         <div class="helper">RAS 水质洁净，α 高于城镇污水（0.80-0.95）</div></div>
-      <div class="field"><label>β（水质修正）</label>
+      <div class="field"><label for="ras_beta">β（水质修正）</label>
         <input type="number" id="ras_beta" value="0.98" step="0.01" oninput="calcRas()">
         <div class="helper">淡水养殖 0.97-1.0，海水约 0.95</div></div>
-      <div class="field"><label>曝气效率 EE <span class="unit">%</span></label>
+      <div class="field"><label for="ras_EE">曝气效率 EE <span class="unit">%</span></label>
         <input type="number" id="ras_EE" value="25" step="1" oninput="calcRas()">
         <div class="helper">粗孔曝气 20-28%</div></div>
-      <div class="field"><label>搅拌气量强度 <span class="unit">Nm³/m²·h</span></label>
+      <div class="field"><label for="ras_airIntMin">搅拌气量强度 <span class="unit">Nm³/m²·h</span></label>
         <input type="number" id="ras_airIntMin" value="12" step="1" oninput="calcRas()">
         <div class="helper">确保填料流化，10-15 Nm³/m²·h</div></div>
-      <div class="field"><label>好氧池水深 H <span class="unit">m</span></label>
+      <div class="field"><label for="ras_poolH">好氧池水深 H <span class="unit">m</span></label>
         <input type="number" id="ras_poolH" value="3" step="0.5" oninput="calcRas()">
         <div class="helper">RAS MBBR 通常较浅，1.5-4 m</div></div>
     </div>
@@ -2704,7 +2843,7 @@ body {
       <div style="background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:8px;">
         <div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:10px;">🔧 系统水体估算</div>
         <div class="grid">
-          <div class="field"><label>管道+辅助设备水体系数 <span class="unit">%（相对 V_tank）</span></label>
+          <div class="field"><label for="ras_pipe_pct">管道+辅助设备水体系数 <span class="unit">%（相对 V_tank）</span></label>
             <input type="number" id="ras_pipe_pct" value="5" step="1" oninput="calcRas()">
             <div class="helper">管道、泵腔等估算为鱼池水体的 3-10%，默认 5%；影响 V_sys，进而影响循环泵流量和换水量</div></div>
         </div>
@@ -2717,13 +2856,13 @@ body {
       <div style="background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:8px;">
         <div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:10px;">☣️ NH₃ 非离子氨毒性（RAS 首要安全校核）</div>
         <div class="grid">
-          <div class="field"><label>NH₃ 安全上限 <span class="unit">mg/L</span></label>
+          <div class="field"><label for="ras_nh3_limit">NH₃ 安全上限 <span class="unit">mg/L</span></label>
             <input type="number" id="ras_nh3_limit" value="0.02" step="0.005" oninput="calcRas()">
             <div class="helper">三文鱼 0.012，罗非鱼 0.05，虾 0.01</div></div>
-          <div class="field"><label>初始碱度 Alk₀ <span class="unit">mg/L CaCO₃</span></label>
+          <div class="field"><label for="ras_alk0">初始碱度 Alk₀ <span class="unit">mg/L CaCO₃</span></label>
             <input type="number" id="ras_alk0" value="150" step="10" oninput="calcRas()">
             <div class="helper">硝化消耗 7.14 mg/mg TAN；稳态需维持 ≥80 mg/L</div></div>
-          <div class="field"><label>目标最低碱度 <span class="unit">mg/L CaCO₃</span></label>
+          <div class="field"><label for="ras_alk_target">目标最低碱度 <span class="unit">mg/L CaCO₃</span></label>
             <input type="number" id="ras_alk_target" value="100" step="10" oninput="calcRas()">
             <div class="helper">硝化最适 100-150，低于 50 硝化受抑</div></div>
         </div>
@@ -2731,17 +2870,17 @@ body {
       <div style="background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:8px;">
         <div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:10px;">🧪 补碱药剂参数</div>
         <div class="grid">
-          <div class="field"><label>补碱药剂选择</label>
+          <div class="field"><label for="ras_alkAgent">补碱药剂选择</label>
             <select id="ras_alkAgent" onchange="calcRas()">
               <option value="nahco3">碳酸氢钠 NaHCO₃（缓冲好，常用）</option>
               <option value="na2co3">碳酸钠 Na₂CO₃（效率高，需控量）</option>
               <option value="caoh2">石灰 Ca(OH)₂（最便宜，需溶解）</option>
             </select>
             <div class="helper">NaHCO₃ 最安全，1 g 提升碱度 0.84 g CaCO₃</div></div>
-          <div class="field"><label>药剂单价 <span class="unit">元/kg</span></label>
+          <div class="field"><label for="ras_alkPrice">药剂单价 <span class="unit">元/kg</span></label>
             <input type="number" id="ras_alkPrice" value="3.5" step="0.5" oninput="calcRas()">
             <div class="helper">NaHCO₃ 3-5，Na₂CO₃ 2-4，Ca(OH)₂ 0.5-1</div></div>
-          <div class="field"><label>投加方式目标碱度提升 <span class="unit">mg/L（每日补偿量）</span></label>
+          <div class="field"><label for="ras_alk_dose_override">投加方式目标碱度提升 <span class="unit">mg/L（按换水量计）</span></label>
             <input type="number" id="ras_alk_dose_override" value="0" step="10" oninput="calcRas()">
             <div class="helper">留 0 由系统自动计算；手动输入则覆盖计算值</div></div>
         </div>
@@ -2749,7 +2888,7 @@ body {
       <div style="background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:14px;">
         <div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:10px;">💨 传质修正</div>
         <div class="grid">
-          <div class="field"><label>θ_O₂（传质温度系数）</label>
+          <div class="field"><label for="ras_theta_o2">θ_O₂（传质温度系数）</label>
             <input type="number" id="ras_theta_o2" value="1.024" step="0.001" oninput="calcRas()">
             <div class="helper">鼓风曝气 1.016-1.025</div></div>
         </div>
@@ -2862,7 +3001,7 @@ body {
         <div class="result-row"><span class="result-label">净碱度缺口（需补偿）</span>
           <span><span class="result-value" id="ras_r_alk_deficit">—</span><span class="result-unit">g CaCO₃/d</span></span></div>
         <div class="result-row highlight-row"><span class="result-label"><b>补碱药剂投加量</b></span>
-          <span><span class="result-value big" id="ras_r_alkAgent_dose">—</span><span class="result-unit" id="ras_r_alkAgent_unit">g/d</span></span></div>
+          <span><span class="result-value big" id="ras_r_alkAgent_dose">—</span><span class="result-unit" id="ras_r_alkAgent_unit">kg/d</span></span></div>
         <div class="result-row"><span class="result-label">补碱药剂类型</span>
           <span><span class="result-value" id="ras_r_alkAgent_name" style="font-size:12px;">—</span></span></div>
         <div class="result-row highlight-row"><span class="result-label"><b>稳态碱度（补碱后）</b></span>
@@ -3589,93 +3728,77 @@ body {
 
 </main>
 
-<!-- ========== 页脚 ========== -->
-<footer class="footer">
-  <div class="footer-disclaimer" style="max-width:1280px;margin:0 auto 14px;padding:12px 16px;background:#fef9c3;border-left:3px solid #ca8a04;border-radius:4px;font-size:12px;color:#713f12;line-height:1.6;">
+<!-- 免责声明 -->
+<div class="page-disclaimer"><div>
     ⚠️ <b>免责声明:</b> 本工具提供的填料规格、价格区间、工艺参数等数据<b>仅供方案估算参考</b>,
     实际选型以厂家最新官方数据和项目具体情况为准。工具内涉及的品牌名和产品名仅作技术识别用途,
     不代表本工具与相关厂家有任何授权、代理或背书关系。工程项目实施请以正规设计院出具的施工图为准,
     并遵循 HJ 576 等国家行业规范。本工具不对基于其计算结果产生的任何工程问题负责。
-  </div>
+</div></div>
+
+<!-- ========== 页脚 ========== -->
+<footer class="site-footer">
   <div class="footer-inner">
-    <span>© 2025 <a href="https://dengdengtech.cn" target="_blank" rel="noopener">海南登登科技咨询</a> · WaterKit</span>
-    <span>
-      <a href="index.html">全部工具</a> · 
-      <a href="activated-sludge-process-calculator.html">活性污泥工艺</a> · 
-      <a href="https://github.com/chengsunmail/waterkit" target="_blank" rel="noopener">GitHub</a>
-    </span>
+    <div class="footer-main">
+      <div class="footer-col footer-about-col">
+        <a href="index.html" class="brand">
+          <div class="brand-mark">W</div>
+          <div>
+            <div class="brand-name">水处理工具箱</div>
+            <div class="brand-sub">WaterKit · by 登登科技</div>
+          </div>
+        </a>
+        <p class="footer-about">水处理工具箱(WaterKit)是海南登登科技咨询有限公司推出的水处理在线计算工具集合,由一线水处理工艺工程师开发维护。免费、持续更新。</p>
+      </div>
+      <div class="footer-col">
+        <h4>水力计算</h4>
+        <ul>
+          <li><a href="pipe-hydraulic-calculator.html">管道水力</a></li>
+          <li><a href="open-channel-calculator.html">明渠水力</a></li>
+          <li><a href="weir-flow-calculator.html">堰流计算</a></li>
+          <li><a href="orifice-nozzle-calculator.html">孔口出流</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>工艺与设备</h4>
+        <ul>
+          <li><a href="aeration-calculator.html">曝气量</a></li>
+          <li><a href="sludge-production-calculator.html">污泥产量</a></li>
+          <li><a href="dosing-calculator.html">加药量</a></li>
+          <li><a href="activated-sludge-process-calculator.html">活性污泥工艺</a></li>
+          <li><a href="mbbr-design.html">MBBR 工程设计</a></li>
+          <li><a href="mbr-design.html">MBR 工程设计</a></li>
+          <li><a href="pump-selection-calculator.html">水泵选型</a></li>
+          <li><a href="blower-selection-calculator.html">鼓风机选型</a></li>
+          <li><a href="water-quality-unit-converter.html">水质换算</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="https://dengdengtech.cn" target="_blank" rel="noopener">登登科技官网 ↗</a></li>
+          <li>海南登登科技咨询</li>
+          <li>有限公司</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Open Source</h4>
+        <ul>
+          <li><a href="https://github.com/chengsunmail/waterkit" target="_blank" rel="noopener">GitHub 仓库 ↗</a></li>
+          <li><a href="https://github.com/chengsunmail/waterkit/blob/main/LICENSE" target="_blank" rel="noopener">AGPL-3.0 协议</a></li>
+          <li><a href="https://github.com/chengsunmail/waterkit/issues" target="_blank" rel="noopener">反馈 Issue</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 海南登登科技咨询有限公司 · <a href="https://dengdengtech.cn" target="_blank" rel="noopener">dengdengtech.cn</a></span>
+      <span>WaterKit · V 1.0 · <a href="https://github.com/chengsunmail/waterkit" target="_blank" rel="noopener">开源于 GitHub</a></span>
+    </div>
   </div>
 </footer>
 
 <script>
 const $ = id => document.getElementById(id);
-
-// ============ 水种预设 ============
-const PRESETS = {
-  municipal: {
-    p_Q: 1,  // 1万 m³/d
-    p_T: 15,
-    p_COD0: 400, p_BOD0: 180, p_TN0: 45, p_NH40: 35, p_TP0: 5,
-    p_pH: 7.5, p_Alk: 250,
-    p_SALR20: 7, p_SNR20: 1.0,
-    p_specArea: 500, p_fillRatio: 55, p_biofilmX: 12, p_biofilmL: 200,
-    p_Y: 0.35, p_Kd: 0.04, p_mu_max: 0.75, p_alpha: 0.70, p_beta: 0.95,
-    p_sloughCoef: 0.55, p_settleHRT: 1.5
-  },
-  landfill: {
-    // 渗滤液:典型规模 50-200 m³/d(0.005-0.02 万) · 高NH4 · 高COD · 低BOD/COD
-    p_Q: 0.01,  // 0.01 万 = 100 m³/d 典型
-    p_T: 20,    // 渗滤液发酵热,夏季较热
-    p_COD0: 3000, p_BOD0: 600, p_TN0: 2000, p_NH40: 1800, p_TP0: 15,
-    p_pH: 8.2, p_Alk: 3000,
-    p_SALR20: 3, p_SNR20: 0.4,  // 渗滤液负荷取低
-    p_specArea: 600, p_fillRatio: 60, p_biofilmX: 15, p_biofilmL: 250,
-    p_Y: 0.25, p_Kd: 0.03, p_mu_max: 0.4, p_alpha: 0.55, p_beta: 0.90,
-    p_sloughCoef: 0.45, p_settleHRT: 2.5
-  },
-  aquaculture_out: {
-    // 水产养殖尾水:池塘/工厂化外排尾水 · 中BOD · 中NH4 · 需脱氮除磷
-    p_Q: 0.1,   // 1000 m³/d 典型(池塘面积 300-500 亩)
-    p_T: 20,    // 室外受季节影响
-    p_COD0: 150, p_BOD0: 60, p_TN0: 20, p_NH40: 15, p_TP0: 2.5,
-    p_pH: 7.5, p_Alk: 180,
-    p_SALR20: 4, p_SNR20: 0.9,  // 中等负荷,硝化+去BOD
-    p_specArea: 500, p_fillRatio: 50, p_biofilmX: 10, p_biofilmL: 180,
-    p_Y: 0.32, p_Kd: 0.04, p_mu_max: 0.65, p_alpha: 0.75, p_beta: 0.95,
-    p_sloughCoef: 0.55, p_settleHRT: 1.5
-  },
-  industrial: {
-    p_Q: 0.3,  // 3000 m³/d 典型工业废水规模
-    p_T: 20,
-    p_COD0: 800, p_BOD0: 350, p_TN0: 60, p_NH40: 45, p_TP0: 8,
-    p_pH: 7.0, p_Alk: 200,
-    p_SALR20: 5, p_SNR20: 0.7,
-    p_specArea: 600, p_fillRatio: 55, p_biofilmX: 15, p_biofilmL: 250,
-    p_Y: 0.30, p_Kd: 0.03, p_mu_max: 0.5, p_alpha: 0.60, p_beta: 0.92,
-    p_sloughCoef: 0.45, p_settleHRT: 2.0
-  }
-};
-
-const STANDARDS = {
-  '1A':    { CODe: 50, BODe: 10, NH4e: 5,   TNe: 15, TPe: 0.5, SSe: 10 },
-  '1B':    { CODe: 60, BODe: 20, NH4e: 8,   TNe: 20, TPe: 1.0, SSe: 20 },
-  'grade4':{ CODe: 30, BODe: 6,  NH4e: 1.5, TNe: 10, TPe: 0.3, SSe: 10 }
-};
-
-const CARRIERS = {
-  k1:  { a: 500, X: 10, L: 150, name: 'Kaldnes K1' },
-  k3:  { a: 500, X: 12, L: 200, name: 'Kaldnes K3' },
-  k5:  { a: 800, X: 15, L: 250, name: 'Kaldnes K5' },
-  biofilmchip: { a: 850, X: 18, L: 300, name: 'BiofilmChip M' },  // 修:保护比表面积 850
-  bwt_x:  { a: 650, X: 13, L: 200, name: 'BWT-X' },
-  bwt_15: { a: 828, X: 15, L: 250, name: 'BWT-15' },
-  cn_球形: { a: 450, X: 10, L: 150, name: '国产球形' }
-};
-
-// 全局状态
-let currentPreset = 'municipal';
-
-
 
 // ============ Tab 4 段组合：独立进水参数 ============
 const ST_PRESETS = {
@@ -3684,6 +3807,7 @@ const ST_PRESETS = {
   aqua:       { Q:0.2,  T:25, BOD0:80,   NH40:15,   TN0:25,   TP0:3,  NH4e:1.5, TNe:10, TPe:0.3 },
   industrial: { Q:0.5,  T:25, BOD0:500,  NH40:80,   TN0:100,  TP0:10, NH4e:10,  TNe:20, TPe:1.5 },
 };
+// 准 IV / 准 III 类为地方标准（非 GB 3838 原文限值），限值按项目所在地调整
 const ST_STANDARDS = {
   '1A':    { NH4e:5,   TNe:15, TPe:0.5  },
   'grade4':{ NH4e:1.5, TNe:10, TPe:0.3  },
@@ -3699,6 +3823,7 @@ function setStPreset(key) {
   set('st_TN0', p.TN0); set('st_TP0', p.TP0);
   if ($('st_standard')) $('st_standard').value = p.TNe <= 10 ? 'grade4' : '1A';
   set('st_NH4e', p.NH4e); set('st_TNe', p.TNe); set('st_TPe', p.TPe);
+  set('st_V_total', '');  // 切换预设时清空手填池容，按新水质自动估算
   calcStages();
 }
 
@@ -3714,10 +3839,11 @@ function applyStStandard() {
 function renderStRecommend() {
   const box = $('st_recommend_box'); if (!box) return;
   const g = id => parseFloat($(id)?.value) || 0;
-  const BOD0 = g('st_BOD0'), NH40 = g('st_NH40'), TP0 = g('st_TP0');
+  const BOD0 = g('st_BOD0'), NH40 = g('st_NH40'), TP0 = g('st_TP0'), TN0 = g('st_TN0');
   const NH4e = g('st_NH4e'), TNe = g('st_TNe'), TPe = g('st_TPe');
   const BOD_N = NH40 > 0 ? BOD0 / NH40 : 999;
-  const needDN = TNe < 15, strictDN = TNe <= 10, strictTP = TPe <= 0.5;
+  // 需反硝化：进水 TN 已知且要求去除率 >30%（仅靠同化/硝化无法达到）
+  const needDN = TN0 > 0 && (TN0 - TNe) / TN0 > 0.3, strictDN = TNe <= 10, strictTP = TPe <= 0.5;
   const highNH4 = NH40 > 300;
   const recs = [];
   if (highNH4) {
@@ -3763,69 +3889,6 @@ function renderStRecommend() {
     </div>`).join('');
 }
 
-// 从 Tab 4 同步参数到 Tab 3 曝气
-function syncFromDesign() {
-  const Q_wan = parseFloat($('st_Q')?.value) || 1;
-  const Q = Q_wan * 10000;
-  const T = parseFloat($('st_T')?.value) || 20;
-  const BOD0 = parseFloat($('st_BOD0')?.value) || 180;
-  const NH40 = parseFloat($('st_NH40')?.value) || 35;
-  const NH4e = parseFloat($('st_NH4e')?.value) || 5;
-  const SALR20 = parseFloat($('st_SALR20')?.value) || 7;
-  const fillRatio = (parseFloat($('st_fillRatio')?.value) || 45) / 100;
-  const specArea = parseFloat($('st_specArea')?.value) || 500;
-  const BODe = 10;
-  const theta_s   = parseFloat($('st_theta')?.value)    || 1.09;
-  const theta_o2s = parseFloat($('st_theta_o2')?.value) || 1.024;
-  const alpha_s   = parseFloat($('st_alpha')?.value)    || 0.70;
-  const beta_s    = parseFloat($('st_beta')?.value)     || 0.95;
-  const DO_s      = parseFloat($('st_DO')?.value)       || 2.0;
-  const EE_s      = (parseFloat($('st_EE')?.value)      || 25) / 100;
-  const Y_s       = parseFloat($('st_Y')?.value)        || 0.60;
-  const Kd_s      = parseFloat($('st_Kd')?.value)       || 0.04;
-  const SRT_s     = parseFloat($('st_SRT')?.value)      || 15;
-  const airIntS   = parseFloat($('st_airIntMin')?.value) || 12;
-
-  const SALR_T = SALR20 * Math.pow(theta_s, T - 20);
-  const BOD_rem = (BOD0 - BODe) * Q / 1000;
-  const NH4_rem = (NH40 - NH4e) * Q / 1000;
-  const Yobs = Y_s / (1 + Kd_s * SRT_s);
-  const AOR = (1 - 1.42 * Yobs) * BOD_rem + 4.57 * NH4_rem;
-  const C_sT = 14.652 - 0.41022*T + 0.007991*T*T - 0.000077774*T*T*T;
-  const SOR = AOR * 9.17 / (alpha_s * (beta_s * C_sT - DO_s) * Math.pow(theta_o2s, T - 20));
-  const airFlow = SOR / (EE_s * 0.23 * 1.293 * 24);
-  const A_needed = BOD_rem * 1000 / SALR_T;
-  const V = (A_needed / specArea) / fillRatio;
-  const poolH_sync = parseFloat($('st_poolH')?.value) || 5;
-  const Apool = V / poolH_sync;
-  const airMin = airIntS * Apool;
-  const set = (id, v) => { if ($(id)) $(id).value = isNaN(v) ? 0 : v.toFixed(0); };
-  set('a_V', V); set('a_Apool', Apool);
-  // a_H 已从独立输入改为默认5m（曝气合并后）
-  set('a_SOR', SOR); set('a_airMin', airMin); set('a_airSupply', airFlow);
-  // 同步 α·β·θ·DO·T（如果曝气Tab对应字段有值就不覆盖，否则填入）
-  const syncIfEmpty = (id, v) => { const el = $(id); if (el && (el.value === '' || el.value === '0')) el.value = v; };
-  if ($('a_alpha') && !$('a_alpha').dataset.manual) $('a_alpha').value = alpha_s.toFixed(2);
-  if ($('a_beta')  && !$('a_beta').dataset.manual)  $('a_beta').value  = beta_s.toFixed(2);
-  if ($('a_theta') && !$('a_theta').dataset.manual) $('a_theta').value = theta_o2s.toFixed(3);
-  if ($('a_DO')    && !$('a_DO').dataset.manual)    $('a_DO').value    = DO_s.toFixed(1);
-  if ($('a_T')     && !$('a_T').dataset.manual)     $('a_T').value     = T.toFixed(0);
-}
-
-function syncAndGoAeration() {
-  // 曝气已合并入工艺计算Tab，直接在当前 Tab 触发曝气计算
-  calcAeration();
-  // 滚动到曝气区（第8块）
-  const aerSection = document.querySelector('[data-num="8"], .section-title .num');
-  const sections = document.querySelectorAll('#panel-stages .section-title');
-  for (const s of sections) {
-    if (s.querySelector('.num')?.textContent === '8') {
-      s.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      break;
-    }
-  }
-}
-
 function toggleStAdv() {
   const p = $('stAdvParams'), chev = $('stAdvChev');
   const open = p.classList.toggle('open');
@@ -3863,13 +3926,13 @@ const FEATURE_LABELS = {
 const CARRIER_DB = [
   {
     id: 'k1', name: 'Kaldnes K1', origin: '挪威 (Veolia/Krüger)', shape: '圆柱保护型',
-    specArea: 500, density: 0.95, fillRange: '30-70%', biofilm: 10, airDemand: '10-15', lifespan: 10,
+    specArea: 500, density: 0.95, fillRange: '30-67%', biofilm: 10, airDemand: '10-15', lifespan: 10,
     priceRange: '15-25', features: ['bod', 'nitrification', 'aquaculture'],
     desc: '最经典的 MBBR 填料，保护比表面积 500 m²/m³，内十字结构保护生物膜，流化性好，应用最广泛。'
   },
   {
     id: 'k3', name: 'Kaldnes K3', origin: '挪威 (Veolia/Krüger)', shape: '轮状保护型',
-    specArea: 500, density: 0.95, fillRange: '30-70%', biofilm: 12, airDemand: '12-18', lifespan: 10,
+    specArea: 500, density: 0.95, fillRange: '30-67%', biofilm: 12, airDemand: '12-18', lifespan: 10,
     priceRange: '15-25', features: ['nitrification', 'bod'],
     desc: '升级版 K1，轮状结构更大，比表面积与 K1 相近但挂膜量更大，硝化效果优于 K1。'
   },
@@ -3981,7 +4044,7 @@ function toggleCarrierSelect(id) {
     selectedCarriers.splice(idx, 1);
   } else {
     if (selectedCarriers.length >= 4) {
-      alert('最多对比 4 种填料');
+      wkToast('最多对比 4 种填料');
       return;
     }
     selectedCarriers.push(id);
@@ -3994,16 +4057,6 @@ function clearComparison() {
   selectedCarriers = [];
   renderCarriers();
   renderCompare();
-}
-
-function applyCarrierToDesign(id) {
-  const c = CARRIER_DB.find(x => x.id === id);
-  if (!c) return;
-  // p_specArea/biofilmX/biofilmL 已随 Tab1 删除，改写 st_specArea
-  // 切到主设计 Tab 重算
-  switchTab('design');
-  calc();
-  setTimeout(() => alert(`已应用 ${c.name} 参数到主设计。请在主设计页查看更新后的结果。`), 100);
 }
 
 function renderCompare() {
@@ -4019,8 +4072,7 @@ function renderCompare() {
   const best = {
     specArea: Math.max(...cards.map(c => c.specArea)),
     biofilm: Math.max(...cards.map(c => c.biofilm)),
-    airDemand: Math.min(...cards.map(c => c.airDemand)),  // 低好
-    priceOrigin: Math.min(...cards.map(c => c.priceOrigin)),  // 低好
+    // airDemand / priceRange 为区间字符串（如 '10-15'），仅展示不比较
     lifespan: Math.max(...cards.map(c => c.lifespan)),
     density: null  // 不比较
   };
@@ -4031,12 +4083,11 @@ function renderCompare() {
     { label: '保护比表面积 (m²/m³)', key: 'specArea', suffix: '', best: 'specArea' },
     { label: '密度 (g/cm³)', key: 'density' },
     { label: '典型生物量 (g VSS/m²)', key: 'biofilm', suffix: '', best: 'biofilm' },
-    { label: '流化气量 (Nm³/m²·h)', key: 'airDemand', suffix: '', best: 'airDemand' },
-    { label: '价格 (千元/m³)', key: 'priceRange', best: 'priceOrigin', bestField: 'priceOrigin' },
+    { label: '流化气量 (Nm³/m²·h)', key: 'airDemand', suffix: '' },
+    { label: '价格 (千元/m³)', key: 'priceRange' },
     { label: '典型寿命 (年)', key: 'lifespan', suffix: '', best: 'lifespan' },
-    { label: '推荐应用', key: 'applications', format: v => v.join('、') },
-    { label: '优点', key: 'pros' },
-    { label: '缺点', key: 'cons' }
+    { label: '推荐应用', key: 'features', format: v => (v || []).map(f => FEATURE_LABELS[f] || f).join('、') },
+    { label: '说明', key: 'desc', format: v => v || '' }
   ];
 
   let h = `<thead><tr><th>指标</th>${cards.map(c =>
@@ -4061,12 +4112,15 @@ function renderCompare() {
 
 function getRecommendedCarrier() {
   // 基于 Tab 1 的工况(模式+负荷+规模)推荐填料
-  const NH40 = parseFloat($('st_NH40')?.value) || 35;
-  const BOD0 = parseFloat($('st_BOD0')?.value) || 180;
-  const Q_wan = parseFloat($('st_Q')?.value) || 1;
-  const NH4e = parseFloat($('st_NH4e')?.value) || 5;
-  const T = parseFloat($('st_T')?.value) || 20;
-  const mode = NH40 > 300 ? 'anammox' : NH4e < 3 ? 'nitrification' : 'bod_only';
+  const NH40 = gNum('st_NH40', 35);
+  const BOD0 = gNum('st_BOD0', 180);
+  const Q_wan = gNum('st_Q', 1);
+  const NH4e = gNum('st_NH4e', 5);
+  const T = gNum('st_T', 20);
+  const TN0r = gNum('st_TN0', 45), TNer = gNum('st_TNe', 15);
+  // 出水 NH₄ ≤ 5（一级 A 及更严）即需硝化；同时 TN 去除率 > 30% 归为完整脱氮
+  const needDN_c = TN0r > 0 && (TN0r - TNer) / TN0r > 0.3;
+  const mode = NH40 > 300 ? 'anammox' : NH4e <= 5 ? (needDN_c ? 'bnr' : 'nitrification') : 'bod_only';
 
   // 规则按优先级(越特殊越先):
   // 1. 渗滤液/极高NH4(>500) → BiofilmChip M
@@ -4093,10 +4147,10 @@ function getRecommendedCarrier() {
     based = `基于: 工艺=仅BOD, Q=${Q_wan}万m³/d`;
   } else if (mode === 'bod_only') {
     // 仅BOD + 小规模
-    recId = 'cn_cylinder';
+    recId = 'domestic_cylinder';
     reason = `BOD 去除 + 小规模(${Q_wan}万m³/d),可选 <b>国产圆柱填料</b> 性价比方案。有预算可升级至 K1。`;
     based = `基于: 工艺=仅BOD, 小规模, 性价比优先`;
-  } else if (mode === 'nitrification' && NH4e < 2) {
+  } else if ((mode === 'nitrification' || mode === 'bnr') && NH4e < 2) {
     recId = 'k3';
     reason = `硝化主导且严格出水(NH₄出 <${NH4e} mg/L),可选 <b>Kaldnes K3</b>,国内外大量项目验证,经验丰富。次选 <b>国产圆柱</b> 或 <b>K5</b>(前者经济、后者高效)。`;
     based = `基于: 工艺=硝化型, NH₄出=${NH4e} < 2 mg/L`;
@@ -4104,7 +4158,7 @@ function getRecommendedCarrier() {
     // 完整脱氮 → 需要多段,主段推荐 K3
     recId = 'k3';
     reason = `完整脱氮工艺(BOD+硝化+反硝化),硝化段可选 <b>Kaldnes K3</b>。注意纯 MBBR 反硝化能力有限,建议配合前置缺氧段(见 Tab 4 段组合)。`;
-    based = `基于: 工艺=完整脱氮`;
+    based = `基于: 工艺=完整脱氮(NH₄出=${NH4e} ≤ 5, TN ${TN0r}→${TNer} mg/L)`;
   } else {
     recId = 'k3';
     reason = `综合场景可选 <b>Kaldnes K3</b>,适合多数城镇污水工艺,运行数据丰富。`;
@@ -4187,32 +4241,55 @@ const AERATOR_DB = {
 
 let currentAerator = 'coarse';
 
-function setAeratorType(type) {
-  currentAerator = type;
-  document.querySelectorAll('.aerator-tab').forEach(t => t.classList.remove('active'));
-  document.querySelector(`[data-aer="${type}"]`).classList.add('active');
+// 曝气器有效 EE(%) = OTE(%/m) × 淹没深度(池深 − 曝气器安装高度 0.2 m)，限 5-40%
+const AERATOR_MOUNT_H = 0.2;
+function calcAeratorEE(OTE, H) {
+  const sub = Math.max(0, (H || 5) - AERATOR_MOUNT_H);
+  return Math.min(40, Math.max(5, (OTE || 0) * sub));
+}
+
+// scope: 'a' = 纯 MBBR 工艺Tab（a_* 输入），'ifa' = IFAS Tab（ifa_* 输入）
+function setAeratorType(type, scope = 'a') {
+  const pre = scope === 'ifa' ? 'ifa' : 'a';
+  if (pre === 'a') currentAerator = type;
+  const panel = $(pre + '_OTE')?.closest('.tab-panel') || document;
+  panel.querySelectorAll('.aerator-tab').forEach(t => t.classList.toggle('active', t.dataset.aer === type));
 
   const p = AERATOR_DB[type];
-  $('a_perDevice').value = p.perDevice;
-  $('a_OTE').value = p.OTE;
-  $('a_spacing').value = p.spacing;
-  $('a_price').value = p.price;
-  $('a_dp_aer').value = p.dp;
-  $('a_perDevice_help').textContent = p.helper.perDevice;
-  $('a_OTE_help').textContent = p.helper.OTE;
-  $('a_price_help').textContent = p.helper.price;
-  calcAeration();
+  $(pre + '_perDevice').value = p.perDevice;
+  $(pre + '_OTE').value = p.OTE;
+  $(pre + '_spacing').value = p.spacing;
+  $(pre + '_price').value = p.price;
+  $(pre + '_dp_aer').value = p.dp;
+  $(pre + '_perDevice_help').textContent = p.helper.perDevice;
+  $(pre + '_OTE_help').textContent = p.helper.OTE;
+  $(pre + '_price_help').textContent = p.helper.price;
+  if (pre === 'ifa') calcAndRenderIFAS();
+  else calcStages();  // OTE 变化 → EE → 供氧气量，calcStages 结束后会触发 calcAeration
 }
 
 // 从主设计 Tab 1 同步参数到 Tab 3
 function calcAeration() {
-  // 合并后直接从工艺计算结果读取，不再需要syncFromDesign
 
   // 读取曝气参数
   // 从工艺计算结果读取（合并后不再有独立的气量需求输入区）
-  const V     = parseFloat($('st_V_total')?.value)   || 1678;
-  const H     = parseFloat($('st_poolH')?.value) || 5;  // 好氧池有效水深（从工艺计算Tab读取）
-  const Apool = V / H;
+  // 总池容取 calcStages 实际采用值（输入框为空时即 V_auto）；尚未计算过则先跑 calcStages（其末尾会回调本函数）
+  if (!(stCalcResult.V_total > 0)) { calcStages(); return; }
+  const V     = stCalcResult.V_total;
+  const badA = wkCheckPositive([
+    ['a_perDevice','单个曝气器气量'], ['a_OTE','OTE'], ['a_spacing','曝气器布置间距'], ['a_efficiency','风机效率'],
+    ['a_backupFactor','备用系数'], ['a_alpha','α'], ['a_beta','β'], ['a_theta','θ'], ['a_DO','DO 设计值']
+  ]);
+  const badA2 = wkCheckNonNeg([['a_price','曝气器单价'], ['a_dp_aer','曝气池阻力'], ['a_dp_pipe','管路阻力']]);
+  if (badA.length || badA2.length) {
+    document.querySelectorAll('[id^="ar_"]').forEach(el => { el.textContent = '—'; });
+    $('aerCheckList').innerHTML = `<div class="check-item check-bad"><span class="ic">✗</span><span><b>输入无效</b>：请输入${[...badA.map(x=>'大于 0 的'+x), ...badA2.map(x=>'不小于 0 的'+x)].join('、')}</span></div>`;
+    return;
+  }
+  const H     = gNum('st_poolH', 5);  // 好氧池有效水深（从工艺计算Tab读取）
+  // 曝气器只布置在好氧段：好氧段容积 = V_total × r_aer（与 calcStages 同口径，含容积比归一）
+  const r_aer_a = stCalcResult.r_aer > 0 ? stCalcResult.r_aer : 1;
+  const Apool = V * r_aer_a / H;   // 好氧段池底面积 m²
   const SOR_in  = parseFloat($('st_r_SOR')?.textContent) || 0;   // 工艺计算SOR结果
   const airO2   = parseFloat($('st_r_airFlow')?.textContent) || 0; // 供氧气量
   const airMix  = parseFloat($('st_r_airMin')?.textContent)  || 0; // 搅拌最低气量
@@ -4227,11 +4304,11 @@ function calcAeration() {
   const backupFactor = parseFloat($('a_backupFactor').value);
 
   // α·β·θ 修正参数（Tab3 独立可调）
-  const a_alpha = parseFloat($('a_alpha')?.value) || 0.70;
-  const a_beta  = parseFloat($('a_beta')?.value)  || 0.95;
-  const a_theta = parseFloat($('a_theta')?.value) || 1.024;
-  const a_DO    = parseFloat($('a_DO')?.value)    || 2.0;
-  const a_T     = parseFloat($('a_T')?.value)     || 20;
+  const a_alpha = gNum('a_alpha', 0.70);
+  const a_beta  = gNum('a_beta', 0.95);
+  const a_theta = gNum('a_theta', 1.024);
+  const a_DO    = gNum('a_DO', 2.0);
+  const a_T     = gNum('a_T', 20);   // 由 calcStages 同步为进水温度
 
   // α·β·θ 校核：用Tab3修正系数反推实际供氧气量
   // AOR = SOR × α × (β×CsT - DO_set) × θ^(T-20) / Cs20
@@ -4239,7 +4316,7 @@ function calcAeration() {
   const C_sT_a = 14.652 - 0.41022*a_T + 0.007991*a_T*a_T - 0.000077774*a_T*a_T*a_T;
   const AOR_check = SOR_in * (a_alpha * (a_beta * C_sT_a - a_DO) * Math.pow(a_theta, a_T - 20)) / C_s20_a;
   // 对应供氧气量
-  const EE_a = parseFloat($('st_EE')?.value) || 25;
+  const EE_a = calcAeratorEE(OTE, H);   // % = OTE × 淹没深度
   const airO2_check = AOR_check > 0 ? (AOR_check / (EE_a/100 * 0.23)) / 1.293 / 24 : airO2;
 
   // ========== 气量确定 ==========
@@ -4272,11 +4349,13 @@ function calcAeration() {
   const blowerEff = effByType[blowerType] || 0.65;
   const actEfficiency = Math.min(efficiency, blowerEff);  // 取保守
 
-  // ========== 轴功率 ==========
-  // P (kW) = Q (m³/min) × Δp (kPa) / (60 × η)
-  // 或 P = Q (Nm³/h) × Δp (Pa) / (3600 × 1000 × η) × 单机
-  const Q_per_blower_m3s = blowerQ / 3600;  // Nm³/s
-  const Ns_single = Q_per_blower_m3s * dp_total * 1000 / actEfficiency / 1000;  // kW
+  // ========== 轴功率（绝热压缩，与鼓风机选型工具一致）==========
+  // P (kW) = p₁ · Q₁ / (0.283 · η) · [(p₂/p₁)^0.283 − 1]，p 单位 kPa(abs)，Q₁ 为进口状态 m³/s
+  // 进气按 20 °C、101.325 kPa（海平面）：Nm³(0 °C) → 进口 m³ 乘 293.15/273.15
+  const p1_kPa = 101.325, T_in = 20;
+  const p2_kPa = p1_kPa + dp_total;
+  const Q_per_blower_m3s = blowerQ / 3600 * (273.15 + T_in) / 273.15 * 101.325 / p1_kPa;  // 进口 m³/s
+  const Ns_single = p1_kPa * Q_per_blower_m3s / (0.283 * actEfficiency) * (Math.pow(p2_kPa / p1_kPa, 0.283) - 1);  // kW
   const Ns_total = Ns_single * working;
 
   // 电机配备(按轴功率放大 1.15-1.25 倍)
@@ -4287,7 +4366,7 @@ function calcAeration() {
   const daily_kwh = Ns_total * 24;
 
   // 吨水电耗
-  const Q_daily = (parseFloat($('st_Q')?.value) || 1) * 10000;
+  const Q_daily = gNum('st_Q', 1) * 10000;
   const kwh_per_m3 = daily_kwh / Q_daily;
 
   // 年电费(按 0.8 元/度)
@@ -4309,6 +4388,7 @@ function calcAeration() {
   $('ar_airO2').textContent = airO2.toFixed(0);
   $('ar_airMix').textContent = airMix.toFixed(0);
   $('ar_airDesign').textContent = airDesign.toFixed(0);
+  if ($('ar_airInstalled')) $('ar_airInstalled').textContent = airTotalDesign.toFixed(0);
   $('ar_control').textContent = control;
 
   $('ar_count').textContent = count;
@@ -4353,13 +4433,14 @@ function calcAeration() {
     checks.push({type:'ok', ic:'✓', text:`<b>曝气器密度合理</b>: ${density.toFixed(2)} 个/m²`});
   }
 
-  // 3. 间距
+  // 3. 间距（输入的"曝气器布置间距"作为最大间距约束）
   if (actSpacing < 0.4) {
     checks.push({type:'warn', ic:'⚠', text:`<b>间距过小</b>: ${actSpacing.toFixed(2)} m(安装困难,气流干扰)`});
-  } else if (actSpacing > 1.5 && currentAerator !== 'jet') {
-    checks.push({type:'warn', ic:'⚠', text:`<b>间距过大</b>: ${actSpacing.toFixed(2)} m(搅拌不均,死角)`});
+  } else if (actSpacing > spacing) {
+    const countBySpacing = Math.ceil(Apool / (spacing * spacing));
+    checks.push({type:'warn', ic:'⚠', text:`<b>间距超过最大布置间距</b>: 均布间距 ${actSpacing.toFixed(2)} m &gt; ${spacing} m（输入值），搅拌不均易出死角；按间距需 ≥ ${countBySpacing} 个曝气器（单个气量相应减小）`});
   } else {
-    checks.push({type:'ok', ic:'✓', text:`<b>布置间距合理</b>: ${actSpacing.toFixed(2)} m`});
+    checks.push({type:'ok', ic:'✓', text:`<b>布置间距合理</b>: ${actSpacing.toFixed(2)} m ≤ 最大间距 ${spacing} m`});
   }
 
   // 4. 风机效率
@@ -4456,6 +4537,7 @@ function copyAeration() {
   const txt = `纯 MBBR 曝气系统设计
 曝气器类型: ${AERATOR_DB[currentAerator].name}
 设计气量: ${$('ar_airDesign').textContent} Nm³/h(${$('ar_control').textContent})
+装机气量(含备用): ${$('ar_airInstalled').textContent} Nm³/h
 曝气器数量: ${$('ar_count').textContent} 个 · 间距 ${$('ar_actSpacing').textContent} m · 投资 ${$('ar_cost').textContent} 元
 风机: ${$('ar_blowerModel').textContent} × ${$('ar_blowerCount').textContent}
 风机总压: ${$('ar_dp').textContent} kPa
@@ -4463,7 +4545,15 @@ function copyAeration() {
 日耗电: ${$('ar_daily_kwh').textContent} kWh/d(吨水 ${$('ar_kwh_per_m3').textContent} kWh/m³)
 年电费: ${$('ar_yearly_cost').textContent} 万元
 —— 由 WaterKit MBBR 工程设计平台生成`;
-  navigator.clipboard.writeText(txt).then(() => alert('已复制到剪贴板'));
+  wkCopy(txt);
+}
+
+// 复制到剪贴板（非阻塞提示）
+function wkCopy(txt) {
+  const done = () => wkToast('✓ 已复制到剪贴板');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(txt).then(done, () => wkToast('复制失败，请手动选择文本复制'));
+  } else { wkToast('当前浏览器不支持自动复制'); }
 }
 
 // ================================================
@@ -4708,7 +4798,7 @@ function applyCase(id) {
   set('st_SALR20',  c.design.SALR20);
   set('st_specArea',c.design.specArea);
   set('st_fillRatio',c.design.fillRatio);
-  set('st_V_total', 0);  // 重置，让系统自动估算
+  set('st_V_total', '');  // 清空，让系统自动估算
 
   switchTab('stages');
 
@@ -4716,14 +4806,12 @@ function applyCase(id) {
     // 如果案例有推荐工艺，自动切换工艺构型
     if (c.design.stageConfig) {
       setStageConfig(c.design.stageConfig);
-      const msg = `已载入案例：${c.title}\n\n`
-        + `✓ 进水/出水参数已同步\n`
-        + `✓ 工艺构型已切换为：${c.design.stageLabel}\n\n`
-        + `你可以在工艺计算 Tab 查看结果，或根据实际情况调整容积分配比。`;
-      alert(msg);
+      const msg = `已载入案例：${c.title}\n`
+        + `✓ 进水/出水参数已同步；工艺构型已切换为：${c.design.stageLabel}`;
+      wkToast(msg, 4000);
     } else {
       calcStages();
-      alert(`已载入案例：${c.title}\n\n进水参数已同步，请在工艺推荐区选择合适的工艺构型。`);
+      wkToast(`已载入案例：${c.title}\n进水参数已同步，请在工艺推荐区选择合适的工艺构型。`, 4000);
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, 200);
@@ -4784,65 +4872,181 @@ function setStageConfig(n) {
 
 // 从主设计同步参数
 
+// calcStages 最近一次结果（供 calcAeration 读取采用的总池容 / 好氧占比）
+const stCalcResult = { V_total: 0, V_auto: 0, r_aer: 1 };
+
+// 读数值输入：仅在空/非数字时取默认（不吞掉合法的 0）
+const gNum = (id, d) => { const v = parseFloat($(id)?.value); return isNaN(v) ? d : v; };
+// 输入 > 0 校验：不合格的输入框加 .invalid，返回不合格项名称列表
+function wkCheckPositive(list) {
+  const bad = [];
+  list.forEach(([id, label]) => {
+    const el = $(id); if (!el) return;
+    const v = parseFloat(el.value);
+    const ok = !isNaN(v) && v > 0;
+    el.classList.toggle('invalid', !ok);
+    if (!ok) bad.push(label);
+  });
+  return bad;
+}
+// 输入 ≥ 0 校验（允许 0，拦截负值）
+function wkCheckNonNeg(list) {
+  const bad = [];
+  list.forEach(([id, label]) => {
+    const el = $(id); if (!el) return;
+    const raw = el.value.trim();
+    const v = parseFloat(raw);
+    const ok = raw === '' || (!isNaN(v) && v >= 0);
+    el.classList.toggle('invalid', !ok);
+    if (!ok) bad.push(label);
+  });
+  return bad;
+}
+// 校验失败：结果区数值置"—"，在校核框给出提示
+function wkShowInvalid(panelId, checkIds, msg) {
+  document.querySelectorAll('#' + panelId + ' .results .result-value').forEach(el => { el.textContent = '—'; });
+  checkIds.forEach(cid => { const el = $(cid); if (el) el.innerHTML = `<div class="check-item check-bad"><span class="ic">✗</span><span>${msg}</span></div>`; });
+}
+// 非阻塞提示（替代 alert）
+function wkToast(msg, ms = 2600) {
+  let t = document.getElementById('wkToast');
+  if (!t) { t = document.createElement('div'); t.id = 'wkToast'; t.className = 'wk-toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(wkToast._tm);
+  wkToast._tm = setTimeout(() => t.classList.remove('show'), ms);
+}
 
 function calcStages() {
   renderStRecommend();
 
-  const Q_wan = parseFloat($('st_Q')?.value) || 1;
+  // ── 输入校验：作为除数/幂底的参数须 > 0 ──
+  const badPos = wkCheckPositive([
+    ['st_Q','进水流量 Q'], ['st_BOD0','进水 BOD₀'], ['st_SALR20','SALR₂₀'], ['st_SNR20','SNR₂₀'],
+    ['st_fillRatio','填充率'], ['st_specArea','比表面积'], ['st_poolH','好氧池有效水深 H'],
+    ['st_theta','θ_BOD'], ['st_theta_N','θ_N'], ['st_theta_o2','θ_O₂'], ['st_alpha','α'], ['st_beta','β'],
+    ['st_DO','DO 设计值'], ['st_airIntMin','搅拌气量强度'], ['st_Y','产率系数 Y'], ['st_SRT','参考 SRT'],
+    ['st_VSS_SS','VSS/SS 比'], ['st_biofilmX','生物膜量 X'], ['a_OTE','曝气器 OTE'], ['st_acetatePurity','乙酸钠有效含量']
+  ]);
+  const badNN = wkCheckNonNeg([
+    ['st_T','水温 T'], ['st_NH40','进水 NH₄-N'], ['st_TN0','进水 TN'], ['st_TP0','进水 TP'],
+    ['st_NH4e','出水 NH₄-N'], ['st_TNe','出水 TN'], ['st_TPe','出水 TP'], ['st_V_total','总池容 V'],
+    ['st_settleHRT','后置沉淀 HRT'], ['st_KO','K_O'], ['st_Kd','Kd'], ['st_SDNR20','SDNR₂₀'],
+    ['st_r_preAnox','预缺氧 %'], ['st_r_nitrif_hi','高负荷 %'], ['st_r_nitrif','硝化 %'], ['st_r_nitrif_lo','低负荷 %'],
+    ['st_r_partNitrif','短程硝化 %'], ['st_r_anammox','Anammox %'], ['st_r_postAnox','后缺氧 %'], ['st_r_chemP','化除磷 %'],
+    ['st_MLR','内回流比 MLR'], ['st_c_n_ratio','BOD/NO₃ 比'], ['st_PAC','PAC 投加量'], ['st_PAC_price','PAC 单价'],
+    ['st_carbon_price','碳源单价'], ['st_sludge_price','污泥处置费用']
+  ]);
+  const mcEl = $('st_sludge_mc'), mcV = parseFloat(mcEl?.value);
+  const mcBad = mcEl && (isNaN(mcV) || mcV < 0 || mcV >= 100);
+  if (mcEl) mcEl.classList.toggle('invalid', !!mcBad);
+  const peEl = $('st_pumpEff'), peV = parseFloat(peEl?.value);
+  const peBad = peEl && (isNaN(peV) || peV <= 0);
+  if (peEl) peEl.classList.toggle('invalid', !!peBad);
+  const badAll = [...badPos.map(x => '大于 0 的' + x), ...badNN.map(x => '不小于 0 的' + x)];
+  if (mcBad) badAll.push('0-100 之间的泥饼含水率');
+  if (peBad) badAll.push('大于 0 的回流泵效率');
+  if (badAll.length) {
+    stCalcResult.V_total = 0;
+    wkShowInvalid('panel-stages', ['stagesCheckList', 'aerCheckList'], `<b>输入无效</b>：请输入${badAll.join('、')}`);
+    return;
+  }
+
+  const Q_wan = gNum('st_Q', 1);
   const Q = Q_wan * 10000;
-  const T = parseFloat($('st_T')?.value) || 20;
-  const BOD0 = parseFloat($('st_BOD0')?.value) || 180;
-  const TN0 = parseFloat($('st_TN0')?.value) || 45;
-  const NH40 = parseFloat($('st_NH40')?.value) || 35;
-  const TP0 = parseFloat($('st_TP0')?.value) || 5;
-  const TNe = parseFloat($('st_TNe')?.value) || 15;
-  const TPe = parseFloat($('st_TPe')?.value) || 0.5;
-  const NH4e = parseFloat($('st_NH4e')?.value) || 5;
+  const T = gNum('st_T', 20);
+  const BOD0 = gNum('st_BOD0', 180);
+  const TN0 = gNum('st_TN0', 45);
+  const NH40 = gNum('st_NH40', 35);
+  const TP0 = gNum('st_TP0', 5);
+  const TNe = gNum('st_TNe', 15);
+  const TPe = gNum('st_TPe', 0.5);
+  const NH4e = gNum('st_NH4e', 5);
   const BODe = 10;
-  const SALR20   = parseFloat($('st_SALR20')?.value)    || 7;
-  const SNR20    = parseFloat($('st_SNR20')?.value)     || 1.0;
-  const fillRatio = (parseFloat($('st_fillRatio')?.value) || 45) / 100;
-  const specArea  = parseFloat($('st_specArea')?.value)  || 500;
-  const settleHRT = parseFloat($('st_settleHRT')?.value) || 1.5;
+  const SALR20   = gNum('st_SALR20', 7);
+  const SNR20    = gNum('st_SNR20', 1.0);
+  const fillRatio = gNum('st_fillRatio', 45) / 100;
+  const specArea  = gNum('st_specArea', 500);
+  const settleHRT = gNum('st_settleHRT', 1.5);
   // 高级参数（带默认值）
-  const theta     = parseFloat($('st_theta')?.value)     || 1.09;
-  const theta_o2  = parseFloat($('st_theta_o2')?.value)  || 1.024;
-  const alpha_p   = parseFloat($('st_alpha')?.value)     || 0.70;
-  const beta_p    = parseFloat($('st_beta')?.value)      || 0.95;
-  const DO_set_p  = parseFloat($('st_DO')?.value)        || 2.0;
-  const EE_p      = (parseFloat($('st_EE')?.value)       || 25) / 100;
-  const airIntMin = parseFloat($('st_airIntMin')?.value)  || 12;
-  const Y_p       = parseFloat($('st_Y')?.value)         || 0.60;
-  const Kd_p      = parseFloat($('st_Kd')?.value)        || 0.04;
-  const SRT_p     = parseFloat($('st_SRT')?.value)       || 15;
-  const SDNR20_p  = parseFloat($('st_SDNR20')?.value)    || 0.08;
-  const VSS_SS_p  = parseFloat($('st_VSS_SS')?.value)    || 0.75;
-  const biofilmL  = parseFloat($('st_biofilmL')?.value)  || 200;
-  const biofilmX  = parseFloat($('st_biofilmX')?.value)  || 20;
-  const sloughCoef= parseFloat($('st_sloughCoef')?.value) || 0.55;
+  const theta     = gNum('st_theta', 1.07);       // BOD 去除（SALR）温度系数
+  const theta_N   = gNum('st_theta_N', 1.09);     // 硝化（SNR）温度系数
+  const theta_o2  = gNum('st_theta_o2', 1.024);
+  const alpha_p   = gNum('st_alpha', 0.70);
+  const beta_p    = gNum('st_beta', 0.95);
+  const DO_set_p  = gNum('st_DO', 2.0);
+  const KO_p      = gNum('st_KO', 1.0);           // 生物膜硝化氧半饱和常数 mg/L
+  // EE 不再手填：= 曝气器 OTE(%/m) × 淹没深度(池深 − 0.2 m)，限 5-40%
+  const poolH_EE  = gNum('st_poolH', 5);
+  const EE_pct    = calcAeratorEE(gNum('a_OTE', 3), poolH_EE);
+  if ($('st_EE')) $('st_EE').value = EE_pct.toFixed(1);
+  const EE_p      = EE_pct / 100;
+  const airIntMin = gNum('st_airIntMin', 12);
+  const Y_p       = gNum('st_Y', 0.60);
+  const Kd_p      = gNum('st_Kd', 0.04);
+  const SRT_p     = gNum('st_SRT', 15);
+  const SDNR20_p  = gNum('st_SDNR20', 0.08);
+  const VSS_SS_p  = gNum('st_VSS_SS', 0.75);
+  const biofilmX  = gNum('st_biofilmX', 20);
+  // 曝气校核区水温自动跟随进水温度
+  if ($('a_T')) $('a_T').value = T;
 
   const SALR_T = SALR20 * Math.pow(theta, T - 20);
-  const SNR_T  = SNR20  * Math.pow(theta, T - 20);
+  const SNR_T  = SNR20  * Math.pow(theta_N, T - 20);
+  // 硝化速率 DO 修正（Monod 半饱和）：SNR_T,DO = SNR_T × DO/(K_O+DO)，只作用于硝化面积 A_nit
+  const DO_factor = DO_set_p / (KO_p + DO_set_p);
+  const SNR_T_DO  = SNR_T * DO_factor;
   const BOD_rem = (BOD0 - BODe) * Q / 1000;
-  const A_needed = BOD_rem * 1000 / SALR_T;
-  const V_auto = (A_needed / specArea) / fillRatio;
-  const V_input = parseFloat($('st_V_total')?.value) || 0;
-  const V_total = V_input > 0 ? V_input : V_auto;
-  if ($('st_V_total') && V_input === 0) $('st_V_total').value = Math.round(V_auto);
+  const A_BOD = BOD_rem * 1000 / SALR_T;                 // BOD 去除所需填料面积 m²
+  const NH4_rem_auto = Math.max(NH40 - NH4e, 0) * Q / 1000; // NH₄-N 去除量 kg/d（估算池容用）
+  const A_nit = SNR_T_DO > 0 ? NH4_rem_auto * 1000 / SNR_T_DO : 0; // 硝化所需填料面积 m²
+  const A_needed = Math.max(A_BOD, A_nit);               // 取 BOD / 硝化两者较大者
+  const V_input = gNum('st_V_total', 0);
 
-  const r_preAnox   = parseFloat($('st_r_preAnox').value)   || 0;
-  const r_nitrif_hi = parseFloat($('st_r_nitrif_hi').value) || 0;
-  const r_nitrif    = parseFloat($('st_r_nitrif').value)    || 0;
-  const r_nitrif_lo = parseFloat($('st_r_nitrif_lo').value) || 0;
-  const r_partNitrif= parseFloat($('st_r_partNitrif').value)|| 0;
-  const r_anammox   = parseFloat($('st_r_anammox').value)   || 0;
-  const r_postAnox  = parseFloat($('st_r_postAnox').value)  || 0;
-  const r_chemP     = parseFloat($('st_r_chemP').value)     || 0;
-  const sumR = r_preAnox + r_nitrif_hi + r_nitrif + r_nitrif_lo + r_partNitrif + r_anammox + r_postAnox + r_chemP;
+  // 容积比：之和 ≠ 100 时按比例归一后计算
+  const rawR = {};
+  ['preAnox','nitrif_hi','nitrif','nitrif_lo','partNitrif','anammox','postAnox','chemP']
+    .forEach(k => { rawR[k] = gNum('st_r_' + k, 0); });
+  const sumR = Object.values(rawR).reduce((a, b) => a + b, 0);
+  if (!(sumR > 0)) {
+    stCalcResult.V_total = 0;
+    $('volSumWarn').innerHTML = `<div class="vol-sum-err">✗ 容积比之和为 0，无法计算。请填写各段容积比或点击上方方案按钮恢复默认</div>`;
+    wkShowInvalid('panel-stages', ['stagesCheckList', 'aerCheckList'], '<b>容积比无效</b>：各段容积比之和须大于 0');
+    return;
+  }
+  const volNormalized = Math.abs(sumR - 100) > 0.5;
+  const kNorm = volNormalized ? 100 / sumR : 1;
+  const r_preAnox   = rawR.preAnox * kNorm;
+  const r_nitrif_hi = rawR.nitrif_hi * kNorm;
+  const r_nitrif    = rawR.nitrif * kNorm;
+  const r_nitrif_lo = rawR.nitrif_lo * kNorm;
+  const r_partNitrif= rawR.partNitrif * kNorm;
+  const r_anammox   = rawR.anammox * kNorm;
+  const r_postAnox  = rawR.postAnox * kNorm;
+  const r_chemP     = rawR.chemP * kNorm;
+
+  // 自动池容：所需填料面积按好氧段（硝化高/中/低负荷 + 短程硝化）容积占比 r_aer 放大到总池容；
+  // 缺氧/Anammox/化除磷段不贡献硝化面积。r_aer 为 0（无好氧段）时按 1 处理。
+  const r_aer_sum = r_nitrif_hi + r_nitrif + r_nitrif_lo + r_partNitrif;
+  const r_aer = r_aer_sum > 0 ? r_aer_sum / 100 : 1;
+  const V_auto = (A_needed / specArea) / fillRatio / r_aer;
+  // 输入框为空 → 采用 V_auto；用户手填 → 采用用户值。V_auto 只写 placeholder，不回写 value
+  const V_total = V_input > 0 ? V_input : V_auto;
+  if ($('st_V_total')) $('st_V_total').placeholder = `自动：${Math.round(V_auto)} m³`;
+  if ($('st_r_Vtotal')) $('st_r_Vtotal').textContent = Math.round(V_total);
+  if ($('st_r_Vsrc')) $('st_r_Vsrc').textContent = V_input > 0 ? '（用户输入）' : '（自动估算）';
+  if ($('st_r_A_BOD')) $('st_r_A_BOD').textContent = Math.round(A_BOD).toLocaleString('zh-CN');
+  if ($('st_r_A_nit')) $('st_r_A_nit').textContent = Math.round(A_nit).toLocaleString('zh-CN');
+  if ($('st_r_DOfactor')) $('st_r_DOfactor').textContent = `${DO_factor.toFixed(3)}（SNR_T ${SNR_T.toFixed(2)} → ${SNR_T_DO.toFixed(2)} g/m²·d）`;
+  const V_settle = Q * settleHRT / 24;
+  if ($('st_r_Vsettle')) $('st_r_Vsettle').textContent = Math.round(V_settle);
+  stCalcResult.V_total = V_total;
+  stCalcResult.V_auto  = V_auto;
+  stCalcResult.r_aer   = r_aer;
 
   // 容积比校核
-  if (Math.abs(sumR - 100) > 0.5) {
-    $('volSumWarn').innerHTML = `<div class="vol-sum-warn">⚠️ 容积比之和 = ${sumR.toFixed(0)}% ≠ 100%,请调整(点击方案 ${currentStageCount} 可恢复默认)</div>`;
+  if (volNormalized) {
+    $('volSumWarn').innerHTML = `<div class="vol-sum-err">✗ 容积比之和 = ${sumR.toFixed(1)}% ≠ 100%：已按比例归一后计算（各段 = 输入值 × 100/${sumR.toFixed(1)}）。请修正输入，或点击方案 ${currentStageCount} 恢复默认配比</div>`;
   } else {
     $('volSumWarn').innerHTML = `<div class="vol-sum-ok">✓ 容积比之和 = 100% (匹配)</div>`;
   }
@@ -4872,14 +5076,14 @@ function calcStages() {
   // =========== 去除率预测(基于段组合) ============
   // BOD 去除:基本在硝化/高负荷段就做完了
   const has_aerobic = V_aerobic_total > 0 || V_partN > 0;
-  const BOD_rm = has_aerobic ? 92 : 30;
+  const BOD_rm = has_aerobic ? 92 : 30;   // 经验值
 
   // NH4 去除分情况:
   // - 常规硝化段(含 nitrif_hi / nitrif / nitrif_lo):~95%
   // - 前高+后低双池:高池 60% + 低池精处理到 95%
   // - 短程硝化:~60-70% (被 Anammox 段再消耗)
   // - Anammox 段:配合短程硝化后再 90%+
-  let NH4_rm = 30;
+  let NH4_rm = 30;   // 各路径 NH₄ 去除率 30/93/95/97% 均为经验值，无规范出处
   if (V_nit_hi > 0 && V_nit_lo > 0) {
     NH4_rm = 97;  // 双池串联,精度更高
   } else if (V_aerobic_total > 0) {
@@ -4889,7 +5093,7 @@ function calcStages() {
   }
 
   // MLR 参数(仅在含预缺氧的方案 4/5/6 有效)
-  const MLR = parseFloat($('st_MLR')?.value) || 200;   // %
+  const MLR = gNum('st_MLR', 200);   // %
   const MLR_ratio = MLR / 100;                          // 倍数
 
   // TN 去除
@@ -4897,62 +5101,73 @@ function calcStages() {
   let TNout_est = TN0;
   if (V_anx > 0 && V_partN > 0) {
     // Anammox 路径:自养脱氮,总 TN 去除 80-85%
-    total_TN_rm = Math.min(85, 70 + r_anammox * 0.3);
+    total_TN_rm = Math.min(85, 70 + r_anammox * 0.3);   // 经验值（70 + 0.3×容积比，上限 85%）
   } else if (V_pre > 0) {
     // 含预缺氧方案: 基于 MLR 计算(经典 MLE/A2O 理论)
     // 理论极限: η_N = MLR / (1 + MLR)
     //   MLR=100% → 50%, MLR=200% → 67%, MLR=300% → 75%, MLR=400% → 80%
     // 实际效率约 85% 理论值(受 BOD 不足/DO 扰动影响)
     const MLR_theoretic = MLR_ratio / (1 + MLR_ratio) * 100;  // %
-    const preAnox_eff = 0.85;  // 实际/理论比
+    const preAnox_eff = 0.85;  // 实际/理论比（经验值）
     const preAnox_TN_rm = MLR_theoretic * preAnox_eff;
     // BOD/N 比不足校核: 前端反硝化需 BOD/N ≥ 4
     const BOD_N_ratio = BOD0 / Math.max(NH40, 1);
     const BOD_factor = BOD_N_ratio >= 4 ? 1 : BOD_N_ratio / 4;  // 不足则打折
     const preAnox_TN_rm_actual = preAnox_TN_rm * BOD_factor;
     // 后缺氧段额外贡献(若有)
-    const postAnox_TN_rm = V_post > 0 ? Math.min(20, r_postAnox * 1.2) : 0;
+    const postAnox_TN_rm = V_post > 0 ? Math.min(20, r_postAnox * 1.2) : 0;   // 经验值
     total_TN_rm = Math.min(92, preAnox_TN_rm_actual + postAnox_TN_rm);
   } else {
     // 无预缺氧,仅后缺氧(方案3)
-    const postAnox_TN_rm = V_post > 0 ? Math.min(60, r_postAnox * 2) : 0;
-    total_TN_rm = Math.min(88, postAnox_TN_rm * 0.85);
+    const postAnox_TN_rm = V_post > 0 ? Math.min(60, r_postAnox * 2) : 0;   // 经验值
+    total_TN_rm = Math.min(88, postAnox_TN_rm * 0.85);                      // 经验值（0.85 折减，上限 88%）
   }
   TNout_est = TN0 * (1 - total_TN_rm / 100);
 
   // TP 去除(仅化除磷段)
-  const PAC_dose = parseFloat($('st_PAC').value) || 30;  // mg/L
-  const PAC_eff = 0.25;  // 保守取值
-  const TP_removed_chem = V_chm > 0 ? PAC_dose * PAC_eff : 0;
-  // 生物合成去除约 15-20%
+  // 化学除磷按化学计量：PAC(mg/L) = ΔTP_chem × (Al/P 摩尔比) × 27/31 ÷ Al 质量分数
+  //   PAC 含 Al₂O₃ 10% → Al 质量分数 = 0.10 × 54/102 = 0.0529
+  // 生物合成去除约 15-20%（经验值）
   const TP_bio_rm = 15;
+  const AlP_molar = gNum('st_AlP', 2) > 0 ? gNum('st_AlP', 2) : 2;
+  const PAC_Al_frac = 0.0529;
+  const PAC_per_TP = AlP_molar * 27 / 31 / PAC_Al_frac;   // mg PAC / mg P（Al/P=2 时 ≈ 32.9）
+  const dTP_chem_need = Math.max(0, TP0 * (1 - TP_bio_rm / 100) - TPe);   // mg/L 需化学去除的 TP
+  const PAC_need = dTP_chem_need * PAC_per_TP;                            // mg/L 化学计量投加量
+  const PAC_input = gNum('st_PAC', NaN);
+  const PAC_auto = !(PAC_input >= 0);
+  const PAC_dose = PAC_auto ? PAC_need : PAC_input;  // mg/L
+  if ($('st_PAC')) $('st_PAC').placeholder = `自动：${PAC_need.toFixed(0)} mg/L`;
+  const TP_removed_chem = V_chm > 0 ? PAC_dose / PAC_per_TP : 0;          // mg/L
   const TP_chem_rm = Math.min(95 - TP_bio_rm, TP_removed_chem / TP0 * 100);
   const total_TP_rm = TP_bio_rm + TP_chem_rm;
   const TPout_est = TP0 * (1 - total_TP_rm / 100);
 
   // =========== 碳源消耗(后缺氧)=============
   const carbonType = $('st_carbonSrc').value;
-  const carbonPrice = parseFloat($('st_carbon_price').value) || 5;
-  const c_n = parseFloat($('st_c_n_ratio').value) || 4;  // BOD:N
+  const carbonPrice = gNum('st_carbon_price', 5);
+  const c_n = gNum('st_c_n_ratio', 4);  // BOD:N
   // Anammox 路径不需要外加碳源(自养菌)
   const isAnammoxPath = V_anx > 0 && V_partN > 0;
   let carbonNeed_kgCOD = 0;
   if (!isAnammoxPath && V_post > 0) {
     // 常规后缺氧需外加碳源
-    const preAnox_TN_rm_for_carbon = V_pre > 0 ? Math.min(40, r_preAnox * 1.5) : 0;
+    const preAnox_TN_rm_for_carbon = V_pre > 0 ? Math.min(40, r_preAnox * 1.5) : 0;   // 经验值（min(40, r×1.5)）
     const NO3_to_postAnox = (NH40 - preAnox_TN_rm_for_carbon * TN0 / 100) * NH4_rm / 100 * Q / 1000;
-    const NO3_rm_postAnox = NO3_to_postAnox * 0.7;
+    const NO3_rm_postAnox = NO3_to_postAnox * 0.7;   // 后缺氧去除比例 0.7，经验值
     carbonNeed_kgCOD = NO3_rm_postAnox * c_n;
   }
   // 不同碳源COD当量
-  const carbonFactor = { methanol: 1.5, acetate: 0.67, glucose: 1.07 };
+  // 乙酸钠按无水计 0.78 g COD/g，商品药剂再乘有效含量（三水固体默认 58% → 0.45 g COD/g 商品）
+  const acetatePurity = Math.min(100, Math.max(0, gNum('st_acetatePurity', 58))) / 100;
+  const carbonFactor = { methanol: 1.5, acetate: 0.78 * acetatePurity, glucose: 1.07 };
   const carbonFactorT = { methanol: '甲醇', acetate: '乙酸钠', glucose: '葡萄糖' };
   const factor = carbonFactor[carbonType];
   const carbonDose_kg = carbonNeed_kgCOD / factor;  // kg/d 实际药剂
   const carbonCost_year = carbonDose_kg * 365 * carbonPrice / 10000;  // 万元/年
 
   // =========== PAC 消耗 ==========
-  const PAC_price = parseFloat($('st_PAC_price').value) || 3;
+  const PAC_price = gNum('st_PAC_price', 3);
   const PAC_kg_d = V_chm > 0 ? PAC_dose * Q / 1000 : 0;  // kg/d
   const PAC_cost_year = PAC_kg_d * 365 * PAC_price / 10000;
 
@@ -4974,6 +5189,17 @@ function calcStages() {
     ]
   });
 
+  // 供复制使用：各段（含归一后的容积比）
+  stCalcResult.stages = [
+    ['preAnox', r_preAnox, V_pre, HRT_pre], ['nitrif_hi', r_nitrif_hi, V_nit_hi, HRT_nit_hi],
+    ['nitrif', r_nitrif, V_nit, HRT_nit], ['nitrif_lo', r_nitrif_lo, V_nit_lo, HRT_nit_lo],
+    ['partNitrif', r_partNitrif, V_partN, HRT_partN], ['anammox', r_anammox, V_anx, HRT_anx],
+    ['postAnox', r_postAnox, V_post, HRT_post], ['chemP', r_chemP, V_chm, HRT_chm]
+  ].map(([key, r, V, HRT]) => ({ key, r, V, HRT, isMin: key === 'chemP' }));
+  stCalcResult.volNormalized = volNormalized;
+  stCalcResult.sumR = sumR;
+  stCalcResult.MLR = V_pre > 0 ? MLR : null;
+
   $('st_r_BODrm').textContent = BOD_rm.toFixed(0);
   $('st_r_NH4rm').textContent = NH4_rm.toFixed(0);
   $('st_r_TNrm').textContent = total_TN_rm.toFixed(0);
@@ -4981,21 +5207,46 @@ function calcStages() {
   $('st_r_TNout').textContent = TNout_est.toFixed(1);
   $('st_r_TPout').textContent = TPout_est.toFixed(2);
 
+  // =========== 污泥产量计算（纯 MBBR：唯一来源是生物膜剥落）===========
+  // 纯 MBBR 没有悬浮污泥，产泥完全来自生物膜剥落，不应使用活性污泥的 Yobs×BOD_rem 公式
+  // 好氧段总填料面积（缺氧/厌氧段不考虑，无好氧生长）
+  const V_aerobic_total_sludge = V_nit_hi + V_nit + V_nit_lo;
+  const A_total_st = V_aerobic_total_sludge * fillRatio * specArea; // m²
+  const X_bio_kg_st = A_total_st * biofilmX / 1000;                 // kg VSS（生物膜总量）
+
+  // ① 生物膜净产泥量（质量守恒）：与活性污泥法同框架
+  //   净产泥 = Y × BOD去除量 - Kd × X_bio_total（内源衰减消耗）
+  //   MBBR 与活性污泥的区别仅在于 X_bio_total 由填料量决定而非悬浮污泥量
+  const dX_bio_vss = Math.max(0, Y_p * BOD_rem - Kd_p * X_bio_kg_st);  // kg VSS/d
+
+  // ② 缺氧/厌氧段剥落（比例与非好氧段容积占比有关）
+  const V_nonaerobic_st = V_total - V_aerobic_total_sludge;
+  const anox_ratio = V_aerobic_total_sludge > 0 ? V_nonaerobic_st / V_aerobic_total_sludge : 0;
+  const dX_anox_vss = dX_bio_vss * anox_ratio * 0.6;  // 缺氧段底物利用率约60%（经验值）
+  const dX_total_vss = dX_bio_vss + dX_anox_vss;                   // kg VSS/d
+
+  // ③ VSS → DS（除以 VSS/SS 比）
+  const dX_st = dX_total_vss / VSS_SS_p;                           // kg DS/d
+
+  // 同时计算等效 SRT（供参考，验证生物膜参数自洽性）
+  const eff_SRT_st = dX_bio_vss > 0 ? X_bio_kg_st / dX_bio_vss : Infinity;
+
   // =========== AOR / SOR / 空气量 ===========
   // 好氧段有效容积（不含缺氧/厌氧/除磷段）
   const V_aero_for_aor = V_nit_hi + V_nit + V_nit_lo + V_partN;
 
   // AOR = 碳化需氧 + 硝化需氧 - 反硝化节省
   const BOD_rem_kg = (BOD0 - 10) * Q / 1000;        // kg BOD/d (BODe≈10)
-  const NH4_rem_kg = (NH40 - parseFloat($('st_NH4e')?.value || 5)) * Q / 1000;
-  const Yobs_st = Y_p / (1 + Kd_p * SRT_p);
-  const O_BOD = Math.max(0, (1 - 1.42 * Yobs_st) * BOD_rem_kg);  // kg O₂/d
+  const NH4_rem_kg = (NH40 - NH4e) * Q / 1000;
+  // 碳化需氧（GB 50014）：O_BOD = 1.47·ΔBOD − 1.42·ΔX_VSS，ΔX_VSS 取上方生物膜产泥量 dX_total_vss
+  const O_BOD = Math.max(0, 1.47 * BOD_rem_kg - 1.42 * dX_total_vss);  // kg O₂/d
   const O_N   = NH4_rem_kg * 4.57;                  // kg O₂/d
+  // 反硝化回收：2.86 为化学计量值；×0.5 为回收折减系数，经验值（无规范出处）
   const O_DN  = total_TN_rm > 10 ? (total_TN_rm/100 * TN0 * Q / 1000) * 2.86 * 0.5 : 0;
   const AOR   = Math.max(0, O_BOD + O_N - O_DN);    // kg O₂/d
 
   // SOR (标准转移量): AOR × Cs20 / [α × (β×CsT - DO_set) × θ^(T-20)]
-  const T_st = parseFloat($('st_T')?.value) || 20;
+  const T_st = T;
   const C_s20_st = 9.17;
   const C_sT_st  = 14.652 - 0.41022*T_st + 0.007991*T_st*T_st - 0.000077774*T_st*T_st*T_st;
   const SOR   = AOR * C_s20_st / (alpha_p * (beta_p * C_sT_st - DO_set_p) * Math.pow(theta_o2, T_st - 20));
@@ -5005,7 +5256,7 @@ function calcStages() {
   const airFlow_st = airMass_st / 1.293 / 24;        // Nm³/h（供氧所需）
 
   // 搅拌最低气量（可调气量强度 × 好氧段池底面积）
-  const poolH_st = parseFloat($('st_poolH')?.value) || 5;
+  const poolH_st = gNum('st_poolH', 5);
   const A_aerobic = V_aero_for_aor / poolH_st;
   const airMin_st = airIntMin * A_aerobic;            // Nm³/h
 
@@ -5014,7 +5265,7 @@ function calcStages() {
   const airRatio_st  = airDesign_st * 24 / Q;        // Nm³/m³ 气水比
   const airIntens_st = A_aerobic > 0 ? airDesign_st / A_aerobic : 0; // Nm³/m²·h
   // 曝气电耗：P(kW) = airDesign(Nm³/h)/3600 × ρ × Δh / η，简化为 kWh/m³
-  const airPower_kwhm3 = SOR > 0 ? SOR * 0.3 / Q : 0;  // 0.3 kWh/kg O₂ 鼓风机
+  const airPower_kwhm3 = SOR > 0 ? SOR * 0.3 / Q : 0;  // 0.3 kWh/kg O₂ 鼓风机（经验值）
 
   const setR = (id, val) => { if ($(id)) $(id).textContent = val; };
   setR('st_r_AOR', AOR.toFixed(0));
@@ -5039,37 +5290,14 @@ function calcStages() {
   $('st_r_totalChemCost').textContent = totalChemCost.toFixed(1);
   $('st_r_chemPerTon').textContent = chemPerTon.toFixed(3);
 
-  // =========== 污泥产量计算（纯 MBBR：唯一来源是生物膜剥落）===========
-  // 纯 MBBR 没有悬浮污泥，产泥完全来自生物膜剥落，不应使用活性污泥的 Yobs×BOD_rem 公式
-  // 好氧段总填料面积（缺氧/厌氧段不考虑，无好氧生长）
-  const V_aerobic_total_sludge = V_nit_hi + V_nit + V_nit_lo;
-  const A_total_st = V_aerobic_total_sludge * fillRatio * specArea; // m²
-  const X_bio_kg_st = A_total_st * biofilmX / 1000;                 // kg VSS（生物膜总量）
-
-  // ① 生物膜净产泥量（质量守恒）：与活性污泥法同框架
-  //   净产泥 = Y × BOD去除量 - Kd × X_bio_total（内源衰减消耗）
-  //   MBBR 与活性污泥的区别仅在于 X_bio_total 由填料量决定而非悬浮污泥量
-  const dX_bio_vss = Math.max(0, Y_p * BOD_rem - Kd_p * X_bio_kg_st);  // kg VSS/d
-
-  // ② 缺氧/厌氧段剥落（比例与非好氧段容积占比有关）
-  const V_nonaerobic_st = V_total - V_aerobic_total_sludge;
-  const anox_ratio = V_aerobic_total_sludge > 0 ? V_nonaerobic_st / V_aerobic_total_sludge : 0;
-  const dX_anox_vss = dX_bio_vss * anox_ratio * 0.6;  // 缺氧段底物利用率约60%
-  const dX_total_vss = dX_bio_vss + dX_anox_vss;                   // kg VSS/d
-
-  // ③ VSS → DS（除以 VSS/SS 比）
-  const dX_st = dX_total_vss / VSS_SS_p;                           // kg DS/d
-
-  // 同时计算等效 SRT（供参考，验证生物膜参数自洽性）
-  const eff_SRT_st = dX_bio_vss > 0 ? X_bio_kg_st / dX_bio_vss : Infinity;
 
   // ④ 湿污泥量：DS / (1 - 含水率)
-  const sludge_mc = (parseFloat($('st_sludge_mc')?.value) || 80) / 100;
+  const sludge_mc = gNum('st_sludge_mc', 80) / 100;
   const sludge_wet_td = dX_st / (1 - sludge_mc) / 1000;            // t/d
   const sludge_yield = dX_st / Q;                                   // kg DS/m³
 
   // ⑤ 处置费用
-  const sludge_price = parseFloat($('st_sludge_price')?.value) || 300;
+  const sludge_price = gNum('st_sludge_price', 300);
   const sludge_cost_year = sludge_wet_td * 365 * sludge_price / 10000;  // 万元/年
 
   // 渲染污泥结果（st_r_dX_assim 改为显示缺氧段剥落）
@@ -5103,8 +5331,31 @@ function calcStages() {
   const checks = [];
 
   // 容积比校核
-  if (Math.abs(sumR - 100) > 0.5) {
-    checks.push({type:'bad', ic:'✗', text:`<b>容积比错误</b>: 总和 ${sumR.toFixed(0)}% ≠ 100%,请调整输入`});
+  if (volNormalized) {
+    checks.push({type:'bad', ic:'✗', text:`<b>容积比之和 ${sumR.toFixed(1)}% ≠ 100%</b>: 已按比例归一后计算，请修正输入`});
+  }
+
+  // 填充率上限（MBBR ≤ 67%）
+  if (fillRatio > 0.67) {
+    checks.push({type:'bad', ic:'✗', text:`<b>填充率超限</b>: ${(fillRatio*100).toFixed(0)}% &gt; 67%（MBBR 上限），填料流化困难、易堆积，应降低填充率或增大池容`});
+  }
+
+  // 硝化 DO 修正提示
+  if (NH4_rem_auto > 0) {
+    checks.push({type: DO_factor < 0.6 ? 'warn' : 'info', ic: DO_factor < 0.6 ? '⚠' : 'ℹ', text:`<b>硝化速率 DO 修正</b>: DO=${DO_set_p} mg/L、K_O=${KO_p} mg/L → 系数 ${DO_factor.toFixed(2)}，SNR_T ${SNR_T.toFixed(2)} → ${SNR_T_DO.toFixed(2)} g/m²·d；${A_nit >= A_BOD ? '池容由硝化控制' : '池容由 BOD 控制'}${DO_factor < 0.6 ? '。DO 偏低，生物膜硝化受氧扩散限制明显，建议好氧段 DO ≥ 3 mg/L' : ''}`});
+  }
+
+  // 缺氧段生物膜反硝化能力校核（SDNR₂₀，θ=1.08，依据 GB 50014 Kde(T)=Kde(20)·1.08^(T−20)）
+  if (!isAnammoxPath && (V_pre + V_post) > 0 && total_TN_rm > 0) {
+    const SDNR_T_st = SDNR20_p * Math.pow(1.08, T - 20);
+    const X_anox_kg = (V_pre + V_post) * fillRatio * specArea * biofilmX / 1000;   // 缺氧段填料生物膜 kg VSS
+    const DN_cap = SDNR_T_st * X_anox_kg;                                          // kg N/d
+    const DN_need = total_TN_rm / 100 * TN0 * Q / 1000;                             // kg N/d（按预测 TN 去除量）
+    if (DN_cap >= DN_need) {
+      checks.push({type:'ok', ic:'✓', text:`<b>缺氧段反硝化能力</b>: SDNR_T ${SDNR_T_st.toFixed(3)} × 生物膜 ${X_anox_kg.toFixed(0)} kg VSS = ${DN_cap.toFixed(0)} kg N/d ≥ 预测脱氮量 ${DN_need.toFixed(0)} kg N/d`});
+    } else {
+      checks.push({type:'warn', ic:'⚠', text:`<b>缺氧段反硝化能力不足</b>: SDNR_T ${SDNR_T_st.toFixed(3)} × 生物膜 ${X_anox_kg.toFixed(0)} kg VSS = ${DN_cap.toFixed(0)} kg N/d &lt; 预测脱氮量 ${DN_need.toFixed(0)} kg N/d，建议增大缺氧段容积比/填充率，或下调 TN 去除预期`});
+    }
   }
 
   // TN 去除
@@ -5116,14 +5367,15 @@ function calcStages() {
 
   // MLR 回流校核(仅含预缺氧方案)
   if (V_pre > 0) {
-    MLR_theoretic = MLR_ratio / (1 + MLR_ratio) * 100;
+    const MLR_theoretic = MLR_ratio / (1 + MLR_ratio) * 100;
     const Q_recircle = Q * MLR_ratio;  // m³/d
     // 回流泵功率估算
-    const pumpEff = parseFloat($('st_pumpEff')?.value) || 65;
-    const pumpH = parseFloat($('st_pumpH')?.value) || 2;
-    const pumpPower_kW = Q_recircle / 3600 * 9.81 * pumpH / (pumpEff / 100) / 1000;
+    const pumpEff = gNum('st_pumpEff', 65);
+    const pumpH = gNum('st_pumpH', 2);
+    // P(kW) = ρ·g·Q·H/η = 1000 kg/m³ × 9.81 × (Q m³/d ÷ 86400) × H / η / 1000
+    const pumpPower_kW = Q_recircle / 86400 * 9.81 * pumpH / (pumpEff / 100);
     const pumpEnergy_kWh_d = pumpPower_kW * 24;
-    const pumpEnergy_year = pumpEnergy_kWh_d * 365 * 0.7 / 10000;  // 万元/年(0.7元/kWh)
+    const pumpEnergy_year = pumpEnergy_kWh_d * 365 * 0.8 / 10000;  // 万元/年(0.8元/kWh，与风机电价一致)
 
     checks.push({type:'info', ic:'🔄', text:`<b>内回流 MLR=${MLR}%</b> · 理论 TN 去除极限 ${MLR_theoretic.toFixed(0)}% · 实际约 ${(MLR_theoretic * 0.85).toFixed(0)}%`});
     checks.push({type:'info', ic:'💡', text:`<b>回流泵功率</b>: Q回流=${(Q_recircle/24).toFixed(0)} m³/h · 功率 ${pumpPower_kW.toFixed(1)} kW · 电费约 ${pumpEnergy_year.toFixed(1)} 万元/年`});
@@ -5150,7 +5402,7 @@ function calcStages() {
   } else if (V_chm === 0 && TPe < 1.5 && !isAnammoxPath) {
     checks.push({type:'bad', ic:'✗', text:`<b>无化除磷段</b>: 出水 TP ≥ ${(TP0*0.85).toFixed(1)} mg/L,必须配除磷工艺或改选方案 ⑥`});
   } else if (V_chm > 0 && total_TP_rm < (TP0 - TPe) / TP0 * 100) {
-    checks.push({type:'warn', ic:'⚠', text:`<b>TP 可能不达标</b>: 当前 PAC ${PAC_dose} mg/L 只能除 ${total_TP_rm.toFixed(0)}%,建议增加到 ${(PAC_dose * (TP0-TPe)/TP0 / (total_TP_rm/100 - TP_bio_rm/100) / PAC_dose).toFixed(0)}+ mg/L`});
+    checks.push({type:'warn', ic:'⚠', text:`<b>TP 可能不达标</b>: 当前 PAC ${PAC_dose.toFixed(0)} mg/L 只能除 ${total_TP_rm.toFixed(0)}%,建议按化学计量（Al/P=${AlP_molar}）增加到 ${PAC_need.toFixed(0)}+ mg/L`});
   }
 
   // 碳源成本
@@ -5201,7 +5453,7 @@ function calcStages() {
       checks.push({type:'ok', ic:'✓', text:`<b>高氨氮适配 Anammox</b>: NH₄=${NH40} mg/L 适合自养脱氮`});
     }
     // 温度要求
-    const T_current = parseFloat($('st_T')?.value) || 20;
+    const T_current = T;
     if (T_current < 20) {
       checks.push({type:'warn', ic:'⚠', text:`<b>Anammox 温度要求</b>: 当前 T=${T_current}°C &lt; 20°C,菌群活性下降明显,建议保温 25-35°C`});
     }
@@ -5432,30 +5684,67 @@ function drawStageFlow(r) {
 }
 
 function copyStages() {
-  const txt = `纯 MBBR 段组合方案(${currentStageCount} 段)
-总池容: ${$('st_V_total').value} m³
+  const t = id => ($(id)?.textContent || '—').trim();
+  const n = currentStageCount;
+  const scName = document.querySelector(`.stage-config[data-stages="${n}"] .sc-title`)?.textContent.trim() || '';
+  const segs = (stCalcResult.stages || []).filter(x => x.r > 0)
+    .map(x => `${STAGE_DEFS[x.key].name}: ${x.r.toFixed(1)}% · V=${x.V.toFixed(0)} m³ · HRT ${x.isMin ? x.HRT.toFixed(0) + ' min' : x.HRT.toFixed(1) + ' h'}`)
+    .join('\n');
+  const txt = `纯 MBBR 方案 ${'①②③④⑤⑥⑦'[n-1] || n} ${scName}
+进水 Q=${$('st_Q').value} 万m³/d · T=${$('st_T').value}°C · BOD₀=${$('st_BOD0').value} · NH₄₀=${$('st_NH40').value} · TN₀=${$('st_TN0').value} · TP₀=${$('st_TP0').value} mg/L
+出水 NH₄≤${$('st_NH4e').value} · TN≤${$('st_TNe').value} · TP≤${$('st_TPe').value} mg/L
+总池容: ${t('st_r_Vtotal')} m³${t('st_r_Vsrc')} · 填充率 ${$('st_fillRatio').value}% · 比表面积 ${$('st_specArea').value} m²/m³
+A_BOD=${t('st_r_A_BOD')} m² · A_nit=${t('st_r_A_nit')} m² · 硝化 DO 修正 ${t('st_r_DOfactor')}
+后置沉淀池容积: ${t('st_r_Vsettle')} m³
 
-─── 各段配置 ───
-预缺氧: ${$('st_r_preAnox').value}%
-硝化:   ${$('st_r_nitrif').value}%
-后缺氧: ${$('st_r_postAnox').value}%
-化除磷: ${$('st_r_chemP').value}%
+─── 池容分配${stCalcResult.volNormalized ? `（输入之和 ${stCalcResult.sumR.toFixed(1)}%，已按比例归一）` : ''} ───
+${segs}${stCalcResult.MLR != null ? `\n内回流 MLR = ${stCalcResult.MLR}%` : ''}
 
 ─── 去除效果 ───
-BOD 去除率: ${$('st_r_BODrm').textContent}%
-NH₄ 去除率: ${$('st_r_NH4rm').textContent}%
-好氧池水深: ${$('st_poolH')?.value || 5} m
-TN 去除率:  ${$('st_r_TNrm').textContent}%(出水 ${$('st_r_TNout').textContent} mg/L)
-TP 去除率:  ${$('st_r_TPrm').textContent}%(出水 ${$('st_r_TPout').textContent} mg/L)
+BOD 去除率: ${t('st_r_BODrm')}% · NH₄ 去除率: ${t('st_r_NH4rm')}%
+TN 去除率:  ${t('st_r_TNrm')}%(出水 ${t('st_r_TNout')} mg/L)
+TP 去除率:  ${t('st_r_TPrm')}%(出水 ${t('st_r_TPout')} mg/L)
+
+─── 需氧量与曝气 ───
+AOR: ${t('st_r_AOR')} kg O₂/d(碳化 ${t('st_r_O_BOD')} + 硝化 ${t('st_r_O_N')} − 反硝化回收 ${t('st_r_O_DN')})
+SOR: ${t('st_r_SOR')} kg O₂/d
+供氧气量 ${t('st_r_airFlow')} · 搅拌气量 ${t('st_r_airMin')} → 设计供气量 ${t('st_r_airDesign')} Nm³/h(${t('st_r_airControl')})
+装机气量(含备用): ${t('ar_airInstalled')} Nm³/h · 风机轴功率 ${t('ar_Ns')} kW
+好氧池水深: ${$('st_poolH')?.value || 5} m · 气水比 ${t('st_r_airRatio')} · 气量强度 ${t('st_r_airIntensity')} Nm³/m²·h
 
 ─── 药剂消耗 ───
-碳源(${$('st_r_carbonType').textContent}): ${$('st_r_carbonDose').textContent} kg/d · ${$('st_r_carbonCost').textContent} 万元/年
-PAC: ${$('st_r_PACDose').textContent} kg/d · ${$('st_r_PACCost').textContent} 万元/年
-药剂总年费: ${$('st_r_totalChemCost').textContent} 万元/年
-药剂吨水成本: ${$('st_r_chemPerTon').textContent} 元/m³
+碳源(${t('st_r_carbonType')}): ${t('st_r_carbonDose')} kg/d · ${t('st_r_carbonCost')} 万元/年
+PAC: ${t('st_r_PACDose')} kg/d · ${t('st_r_PACCost')} 万元/年
+药剂总年费: ${t('st_r_totalChemCost')} 万元/年 · 吨水 ${t('st_r_chemPerTon')} 元/m³
+
+─── 产泥 ───
+剩余污泥干量: ${t('st_r_dX')} kg DS/d · 泥饼 ${t('st_r_sludge_wet')} t/d · 等效 SRT ${t('st_r_eff_SRT')} d · 处置 ${t('st_r_sludge_cost')} 万元/年
 
 —— 由 WaterKit MBBR 工程设计平台生成`;
-  navigator.clipboard.writeText(txt).then(() => alert('已复制到剪贴板'));
+  wkCopy(txt);
+}
+
+// ---- 恢复默认（纯 MBBR Tab）：页面加载时快照所有 input/select 初值 ----
+const ST_INIT_VALUES = {};
+function snapshotStDefaults() {
+  document.querySelectorAll('#panel-stages input, #panel-stages select').forEach(el => {
+    if (!el.id) return;
+    ST_INIT_VALUES[el.id] = (el.type === 'checkbox' || el.type === 'radio') ? el.checked : el.value;
+  });
+}
+function resetStDefaults() {
+  Object.entries(ST_INIT_VALUES).forEach(([id, v]) => {
+    const el = $(id); if (!el) return;
+    if (el.type === 'checkbox' || el.type === 'radio') el.checked = v; else el.value = v;
+    el.classList.remove('invalid');
+  });
+  document.querySelectorAll('[data-st-preset]').forEach(b => b.classList.toggle('active', b.dataset.stPreset === 'municipal'));
+  // 曝气器类型恢复为粗孔（仅切换按钮状态，数值已由快照恢复）
+  currentAerator = 'coarse';
+  document.querySelectorAll('#panel-stages .aerator-tab').forEach(t => t.classList.toggle('active', t.dataset.aer === 'coarse'));
+  if ($('a_perDevice_help')) { const h = AERATOR_DB.coarse.helper; $('a_perDevice_help').textContent = h.perDevice; $('a_OTE_help').textContent = h.OTE; $('a_price_help').textContent = h.price; }
+  setStageConfig(1);   // 恢复方案①并重算
+  wkToast('已恢复纯 MBBR Tab 全部输入为默认值');
 }
 
 // ============ IFAS 混合工艺 ============
@@ -5468,6 +5757,7 @@ const PRESETS_IFAS = {
     CODe:50, BODe:10, NH4e:5, TNe:15, TPe:0.5 },
 };
 
+// 准 IV / 准 III 类为地方标准，限值按项目所在地调整
 const STANDARDS_IFAS = {
   '1A':    { CODe:50, BODe:10, NH4e:5,   TNe:15, TPe:0.5  },
   'grade4':{ CODe:30, BODe:6,  NH4e:1.5, TNe:10, TPe:0.3  },
@@ -5560,10 +5850,14 @@ function calcIFAS() {
   const BOD0 = get('BOD0'), BODe = get('BODe'), COD0 = get('COD0');
   const TN0 = get('TN0'), NH40 = get('NH40'), NH4e = get('NH4e'), TNe = get('TNe');
   const TP0 = get('TP0'), TPe = get('TPe'), Alk0 = get('Alk');
-  const fillRatio = get('fillRatio') / 100;
-  const specArea = get('specArea'), biofilm = get('biofilm');
-  const SALR_20 = get('SALR'), SNR_20 = get('SALR_N');
-  const settleHRT = get('settleHRT') || 2.0;
+  // 新建读 ifas_xxx，改造读 ifas_xxx_r（同一计算链路）
+  const sfx = ifasMode === 'retrofit' ? '_r' : '';
+  const getP = id => get(id + sfx);
+  const fillRatio = getP('fillRatio') / 100;
+  const specArea = getP('specArea'), biofilm = getP('biofilm');
+  const SALR_20 = getP('SALR'), SNR_20 = getP('SALR_N');
+  const settleHRT = getP('settleHRT') || 2.0;     // 最小沉淀 HRT h
+  const settleQ   = getP('settleQ')   || 1.0;     // 二沉池设计表面负荷 m³/m²·h
 
   // 高级参数
   const theta    = get('theta')    || 1.09;
@@ -5588,7 +5882,7 @@ function calcIFAS() {
   const SALR_T_factor = Math.pow(theta, T - 20);
   const SALR = SALR_20 * SALR_T_factor;
   const SNR  = SNR_20  * SALR_T_factor;
-  const SDNR = SDNR20  * Math.pow(1.08, T - 20);
+  const SDNR = SDNR20  * Math.pow(1.08, T - 20);   // 反硝化 θ=1.08，依据 GB 50014 Kde(T)=Kde(20)·1.08^(T−20)
 
   const BOD_rem = (BOD0 - BODe) * Q / 1000;  // kg/d
   const NH4_rem = (NH40 - NH4e) * Q / 1000;
@@ -5614,7 +5908,8 @@ function calcIFAS() {
     V = V_input > 0 ? V_input : Math.max(V_by_SRT, V_by_SALR);
   } else { // retrofit
     V       = get('Vexisting') || 15000;
-    MLSS    = get('MLSSexisting') || 3000;
+    // 改造后悬浮相按目标 MLSS（ifas_MLSS_new）计算；改造前能力（cap_before）按原有 MLSS
+    MLSS    = get('MLSS_new') || get('MLSSexisting') || 3000;
     VSS_SS  = get('VSS_SS2') || 0.72;
     MLVSS   = MLSS * VSS_SS;
   }
@@ -5667,8 +5962,8 @@ function calcIFAS() {
     ? MLR_r / (1 + MLR_r) * 0.85 * 100 : 0;
   // 后缺氧去除能力（以进水 NO₃ 负荷估算）
   const V_postAnox_eff = V_postAnox;
-  const X_postAnox = MLVSS * (V_postAnox_eff / V);
-  const NO3_post_rm = SDNR * X_postAnox * V_postAnox_eff / 1000; // kg N/d
+  // 反硝化量 = SDNR (g N/g VSS·d) × MLVSS (mg/L=g/m³) × V_post (m³) / 1000 → kg N/d
+  const NO3_post_rm = SDNR * MLVSS * V_postAnox_eff / 1000; // kg N/d
   const post_TN_rm = NO3_post_rm / (TN0 * Q / 1000) * 100;
 
   // 总 TN 去除率
@@ -5687,18 +5982,25 @@ function calcIFAS() {
   const BOD_rm_pct = (BOD0 - BODe) / BOD0 * 100;
 
   // 碱度校核
-  const alkUse = (NH40 - NH4e) * 7.14;
-  const alkRem = Alk0 - alkUse;
+  const alkUse = (NH40 - NH4e) * 7.14;   // 硝化消耗 mg CaCO₃/L
+  // alkRem 在下方 NOx_DN 算出后再计算（含反硝化回收 3.57 mg CaCO₃/mg N）
 
   // ===== 沉淀池 =====
-  const poolH_ifas = parseFloat($('ifas_poolH')?.value) || parseFloat($('ifas_poolH_r')?.value) || 5;
-  const Vsettle = Q * settleHRT / 24;
-  const A_settle = Vsettle / 3.5;
-  const surfLoad = Q / 24 / Math.max(A_settle, 1);
+  const poolH_ifas = getP('poolH') || 5;
+  // 面积由设计表面负荷决定：A = Q_h / q；V = max(A × 有效水深 3.5 m, Q_h × 最小 HRT)
+  const Q_h_settle = Q / 24;
+  const settleDepth = 3.5;
+  const A_settle = Q_h_settle / settleQ;
+  const Vsettle = Math.max(A_settle * settleDepth, Q_h_settle * settleHRT);
+  const surfLoad = Q_h_settle / Math.max(A_settle, 1);
+  const HRT_settle = Q_h_settle > 0 ? Vsettle / Q_h_settle : 0;
 
   // ===== 需氧量 =====
   const NOx_prod = Math.max(0, NH40 - NH4e - N_assim);
   const NOx_DN = TN0 * Q / 1000 * TN_rm_ratio * 0.8; // 80% 效率折减
+  // 碱度平衡：剩余 = 进水 - 硝化消耗 + 反硝化回收（3.57 mg CaCO₃/mg NO₃-N 去除）
+  const alkRecover = Q > 0 ? 3.57 * NOx_DN * 1000 / Q : 0;  // mg/L
+  const alkRem = Alk0 - alkUse + alkRecover;
   const O_BOD = (1 - 1.42 * Yobs) * BOD_rem;
   const O_N   = 4.57 * NOx_prod * Q / 1000;
   const O_DN  = 2.86 * NOx_DN;
@@ -5738,18 +6040,20 @@ function calcIFAS() {
 
   // ===== 改造容量 =====
   if (ifasMode === 'retrofit') {
-    const MLSS_new = get('MLSS_new') || (MLSS * 1.1);
-    cap_before = (V * MLVSS / 1000 * 0.15) / ((BOD0 - BODe) / 1000) / 10000;
+    const MLVSS_before = (get('MLSSexisting') || 3000) * VSS_SS;
+    cap_before = (V * MLVSS_before / 1000 * 0.15) / ((BOD0 - BODe) / 1000) / 10000;   // 0.15 kgBOD/kgMLVSS·d 污泥负荷，经验值
     cap_after  = Q_wan; // 改造目标就是当前 Q
   }
 
   // ===== 药剂 =====
   // 后缺氧碳源
-  const carbonFactor = { methanol:1.5, acetate:0.67, glucose:1.07 };
+  // 乙酸钠按无水计 0.78 g COD/g，商品药剂再乘有效含量（三水固体默认 58% → 0.45 g COD/g 商品）
+  const acetatePurity = Math.min(100, get('acetatePurity') || 58) / 100;
+  const carbonFactor = { methanol:1.5, acetate:0.78 * acetatePurity, glucose:1.07 };
   const cSrc = $('ifas_carbonSrc')?.value || 'methanol';
   const c_n = 4; // BOD/N 比
   const carbonNeed_kgCOD = (ifasConfig === 'post_anox' || ifasConfig === 'full_bnr')
-    ? NOx_DN * c_n * 0.5 : 0;  // 简化：后缺氧需求的一半靠外加
+    ? NOx_DN * c_n * 0.5 : 0;  // 简化：后缺氧需求的一半靠外加（0.5 为经验值）
   const carbonDose = carbonNeed_kgCOD / (carbonFactor[cSrc] || 1.5);
   const carbonPrice = get('carbonPrice') || 5;
   const carbonCost = carbonDose * 365 * carbonPrice / 1e4;
@@ -5760,17 +6064,40 @@ function calcIFAS() {
   const PACprice = get('PACprice') || 3;
   const PACcost = PAC_kg_d * 365 * PACprice / 1e4;
 
-  // 碱度补充（NaHCO₃，MW=84，提升碱度 1 mg/L 需 1.19 mg/L NaHCO₃）
+  // 碱度补充（NaHCO₃，MW=84，当量 84/50=1.68：提升碱度 1 mg CaCO₃/L 需 1.68 mg/L NaHCO₃）
   const alkDeficit = Math.max(0, 50 - alkRem);  // 目标剩余碱度 50 mg/L
-  const alkDose_need = alkDeficit > 0 ? alkDeficit * 1.19 * Q / 1e6 * 1e3 : 0; // kg/d
+  const alkDose_need = alkDeficit > 0 ? alkDeficit * 1.68 * Q / 1e6 * 1e3 : 0; // kg/d
   const alkInput = get('alkDose');
   const alkDoseOut = alkInput > 0 ? alkInput * Q / 1e6 * 1e3 : alkDose_need;
   const alkCost = alkDoseOut * 365 * 2.5 / 1e4;  // 碱 2.5 元/kg
 
   const totalChemCost = carbonCost + PACcost + alkCost;
 
+  // ===== 曝气器与风机（§8-11 ifa_* 输入）=====
+  // SOR 按 §11 α·β·θ·DO·T 由 AOR 换算；EE = OTE × 淹没深度(H − 0.2 m)
+  const ga = id => parseFloat($('ifa_' + id)?.value) || 0;
+  if ($('ifa_T')) $('ifa_T').value = T;   // 校核区水温自动跟随 IFAS 进水温度
+  // α 统一读高级参数 ifas_alpha（默认 0.65），§11 不再单独设 α
+  const ifa_alpha = alpha, ifa_beta = ga('beta') || 0.95, ifa_theta = ga('theta') || 1.024;
+  const ifa_DO = ga('DO') || 2.0, ifa_T = ga('T') || T || 20;
+  const C_sT_ifa = 14.652 - 0.41022*ifa_T + 0.007991*ifa_T*ifa_T - 0.000077774*ifa_T*ifa_T*ifa_T;
+  const ifa_SOR = AOR * C_s20 / (ifa_alpha * (ifa_beta * C_sT_ifa - ifa_DO) * Math.pow(ifa_theta, ifa_T - 20));
+  const ifa_EE = calcAeratorEE(ga('OTE') || 3, poolH_ifas);                 // %
+  const ifa_air = ifa_SOR / (ifa_EE / 100 * 0.23 * 1.293 * 24);              // Nm³/h
+  const ifa_count = Math.ceil(ifa_air / (ga('perDevice') || 8));
+  const ifa_cost = ifa_count * (ga('price') || 0) / 1e4;                    // 万元
+  const A_aer_ifas = V_aer / poolH_ifas;                                     // 好氧段池底面积 m²
+  const ifa_spacing = ifa_count > 0 ? Math.sqrt(A_aer_ifas / ifa_count) : 0;
+  const ifa_dp = poolH_ifas * 9.8 + ga('dp_aer') + ga('dp_pipe');           // kPa
+  const effByTypeIfa = { roots: 0.62, multistage: 0.70, magnetic: 0.80 };
+  const ifa_eff = Math.min((ga('efficiency') || 65) / 100, effByTypeIfa[$('ifa_blowerType')?.value] || 0.65);
+  const ifa_Ns = ifa_air / 3600 * ifa_dp / ifa_eff;                          // 主用轴功率 kW
+  const ifa_airInstalled = ifa_air * (ga('backupFactor') || 1.2);            // 含备用装机气量
+
   return {
-    Q, Q_wan, T, V, HRT, V_fill, A_total, MLSS_eq, HRT,
+    TNe, HRT_settle, A_settle, settleQ,
+    ifa_SOR, ifa_EE, ifa_air, ifa_count, ifa_cost, ifa_spacing, ifa_spacing_set: ga('spacing'), ifa_Ns, ifa_airInstalled,
+    Q, Q_wan, T, V, HRT, V_fill, A_total, MLSS_eq, fillRatio,
     V_preAnox, V_aer, V_postAnox,
     X_bio_kg, X_susp_kg, bio_contrib_BOD, susp_contrib_BOD, bio_contrib_N,
     dX_SS, dX_susp: Math.max(0, dX_susp), dX_bio: Math.max(0, dX_bio),
@@ -5797,24 +6124,43 @@ function checkIFAS(r) {
     checks.push({type:'ok', ic:'✓', text:`<b>SALR 合理</b>: ${r.SALR_actual.toFixed(1)} g/m²·d（限值 ${r.SALR.toFixed(1)}）`});
   }
 
-  // 沉淀池表面负荷
+  // 二沉池表面负荷（GB 50014 活性污泥二沉池 0.6-1.5 m³/m²·h）
   if (r.surfLoad > 1.5) {
-    checks.push({type:'bad', ic:'✗', text:`<b>沉淀池表面负荷过高</b>: ${r.surfLoad.toFixed(2)} m/h（IFAS含活性污泥，建议 ≤1.0 m/h）`});
+    checks.push({type:'bad', ic:'✗', text:`<b>沉淀池表面负荷过高</b>: ${r.surfLoad.toFixed(2)} m³/m²·h > 1.5（GB 50014 活性污泥二沉池 0.6-1.5）`});
     score -= 12;
-  } else if (r.surfLoad > 1.0) {
-    checks.push({type:'warn', ic:'⚠', text:`<b>沉淀池表面负荷偏高</b>: ${r.surfLoad.toFixed(2)} m/h，建议延长沉淀 HRT`});
-    score -= 6;
+  } else if (r.surfLoad < 0.6) {
+    checks.push({type:'info', ic:'ℹ', text:`<b>沉淀池表面负荷偏低</b>: ${r.surfLoad.toFixed(2)} m³/m²·h < 0.6，面积偏保守`});
   } else {
-    checks.push({type:'ok', ic:'✓', text:`<b>沉淀池表面负荷合理</b>: ${r.surfLoad.toFixed(2)} m/h`});
+    checks.push({type:'ok', ic:'✓', text:`<b>沉淀池表面负荷合理</b>: ${r.surfLoad.toFixed(2)} m³/m²·h（0.6-1.5）`});
+  }
+  // 二沉池 HRT（1.5-4 h）
+  if (r.HRT_settle < 1.5) {
+    checks.push({type:'warn', ic:'⚠', text:`<b>沉淀池 HRT 偏短</b>: ${r.HRT_settle.toFixed(1)} h < 1.5 h`});
+    score -= 6;
+  } else if (r.HRT_settle > 4) {
+    checks.push({type:'warn', ic:'⚠', text:`<b>沉淀池 HRT 偏长</b>: ${r.HRT_settle.toFixed(1)} h > 4 h，易反硝化浮泥`});
+    score -= 4;
+  } else {
+    checks.push({type:'ok', ic:'✓', text:`<b>沉淀池 HRT 合理</b>: ${r.HRT_settle.toFixed(1)} h（1.5-4 h）`});
   }
 
-  // TN 去除
-  const TN_need = (r.TN0 - r.TN_out) / r.TN0 * 100;
-  if (r.total_TN_rm < TN_need - 5) {
-    checks.push({type:'warn', ic:'⚠', text:`<b>TN 去除不足</b>: 当前工艺去除 ${r.total_TN_rm.toFixed(0)}%，目标需 ${TN_need.toFixed(0)}%，建议用 A/O 或完整 BNR`});
+  // TN 去除：预测出水 TN 与用户出水目标 TNe 比较
+  const TN_need = r.TN0 > 0 ? (r.TN0 - r.TNe) / r.TN0 * 100 : 0;
+  if (r.TNe > 0 && r.TN_out > r.TNe) {
+    checks.push({type:'warn', ic:'⚠', text:`<b>TN 去除不足</b>: 预计出水 TN ${r.TN_out.toFixed(1)} mg/L > 目标 ${r.TNe} mg/L（当前去除 ${r.total_TN_rm.toFixed(0)}%，需 ${TN_need.toFixed(0)}%），建议用 A/O 或完整 BNR / 提高 MLR`});
     score -= 10;
   } else if (r.total_TN_rm > 0) {
     checks.push({type:'ok', ic:'✓', text:`<b>TN 去除可达标</b>: 预计去除 ${r.total_TN_rm.toFixed(0)}%，出水 TN ≈ ${r.TN_out.toFixed(1)} mg/L`});
+  }
+
+  // 曝气器布置间距（好氧段均布）
+  if (r.ifa_count > 0) {
+    if (r.ifa_spacing > Math.max(1.5, r.ifa_spacing_set * 1.5)) {
+      checks.push({type:'warn', ic:'⚠', text:`<b>曝气器间距偏大</b>: 实际 ${r.ifa_spacing.toFixed(2)} m（设定 ${r.ifa_spacing_set} m），搅拌不均`});
+      score -= 4;
+    } else {
+      checks.push({type:'ok', ic:'✓', text:`<b>曝气器布置</b>: ${r.ifa_count} 个，实际间距 ${r.ifa_spacing.toFixed(2)} m（设定 ${r.ifa_spacing_set} m），装机气量 ${r.ifa_airInstalled.toFixed(0)} Nm³/h`});
+    }
   }
 
   // 碱度
@@ -5835,8 +6181,8 @@ function checkIFAS(r) {
   }
 
   // 填充率
-  if (r.V_fill / r.V > 0.5) {
-    checks.push({type:'warn', ic:'⚠', text:`<b>IFAS 填充率偏高</b>: ${(r.V_fill/r.V*100).toFixed(0)}%，IFAS 建议 ≤ 40% 以维持悬浮污泥流态`});
+  if (r.fillRatio > 0.5) {
+    checks.push({type:'warn', ic:'⚠', text:`<b>IFAS 填充率超限</b>: 好氧段填充率 ${(r.fillRatio*100).toFixed(0)}% &gt; 50%（IFAS 上限），常用 20-40% 以维持悬浮污泥流态`});
     score -= 8;
   }
 
@@ -5932,6 +6278,17 @@ function renderIFASRecommend() {
 }
 function calcAndRenderIFAS() {
   renderIFASRecommend();
+  const sfxV = ifasMode === 'retrofit' ? '_r' : '';
+  const badI = wkCheckPositive([
+    ['ifas_Q','进水流量 Q'], ['ifas_BOD0','进水 BOD₀'], ['ifas_fillRatio' + sfxV,'填充率'], ['ifas_specArea' + sfxV,'比表面积'],
+    ['ifas_SALR' + sfxV,'SALR'], ['ifas_SALR_N' + sfxV,'SNR'], ['ifas_MLSS' + sfxV,'MLSS'], ['ifas_SRT','SRT'],
+    ['ifas_poolH','有效水深'], ['ifas_alpha','α'], ['ifas_beta','β'], ['ifas_acetatePurity','乙酸钠有效含量']
+  ]);
+  const badI2 = wkCheckNonNeg([['ifas_T','水温'], ['ifas_NH40','进水 NH₄'], ['ifas_TN0','进水 TN'], ['ifas_TP0','进水 TP'], ['ifas_V_input','总池容']]);
+  if (badI.length || badI2.length) {
+    wkShowInvalid('panel-ifas', ['ifasCheckList'], `<b>输入无效</b>：请输入${[...badI.map(x=>'大于 0 的'+x), ...badI2.map(x=>'不小于 0 的'+x)].join('、')}`);
+    return;
+  }
   const r = calcIFAS();
   const set = (id, v) => { const el = $(id); if (el) el.textContent = typeof v === 'number' ? v.toFixed(v < 10 ? 1 : 0) : v; };
   const setF = (id, v, dec=1) => { const el = $(id); if (el) el.textContent = (v == null || isNaN(v)) ? '—' : v.toFixed(dec); };
@@ -5945,6 +6302,7 @@ function calcAndRenderIFAS() {
   set('ifas_r_Atotal', r.A_total);
   set('ifas_r_Vsettle', r.Vsettle);
   setF('ifas_r_surfLoad', r.surfLoad, 2);
+  if ($('ifas_r_settleAH')) $('ifas_r_settleAH').textContent = `${r.A_settle.toFixed(0)} / ${r.HRT_settle.toFixed(1)}`;
 
   set('ifas_r_Xbio', r.X_bio_kg);
   set('ifas_r_Xsusp', r.X_susp_kg);
@@ -5967,6 +6325,9 @@ function calcAndRenderIFAS() {
 
   set('ifas_r_AOR', r.AOR);
   set('ifas_r_SOR', r.SOR);
+  if ($('ifas_r_ifaSOR'))   $('ifas_r_ifaSOR').textContent   = `${r.ifa_SOR.toFixed(0)} / ${r.ifa_EE.toFixed(1)}`;
+  setF('ifas_r_ifaAir', r.ifa_air, 0);
+  if ($('ifas_r_ifaCount')) $('ifas_r_ifaCount').textContent = `${r.ifa_count} / ${r.ifa_cost.toFixed(1)} / ${r.ifa_Ns.toFixed(1)}`;
   setF('ifas_r_SALRcheck', r.SALR_actual, 2);
   setF('ifas_r_SALRfactor', r.SALR_T_factor, 3);
 
@@ -6033,18 +6394,35 @@ function toggleRasAdv() {
 }
 
 function calcRas() {
+  const badR = wkCheckPositive([
+    ['ras_protein','饲料蛋白含量'], ['ras_tan_coef','TAN 产生系数'], ['ras_peak','峰值系数'], ['ras_tan_target','TAN 目标'],
+    ['ras_pH','pH'], ['ras_V_tank','鱼池水体'], ['ras_SNR20','SNR₂₀'], ['ras_theta','θ'], ['ras_specArea','比表面积'],
+    ['ras_fillRatio','填充率'], ['ras_circ_target','循环倍率'], ['ras_alpha','α'], ['ras_beta','β'], ['ras_EE','曝气效率 EE'],
+    ['ras_poolH','有效水深'], ['ras_nh3_limit','NH₃ 安全上限'], ['ras_theta_o2','θ_O₂'], ['ras_acetatePurity','乙酸钠有效含量']
+  ]);
+  const badR2 = wkCheckNonNeg([
+    ['ras_feed','日投饲量'], ['ras_T','水温'], ['ras_exchange_rate','换水率'], ['ras_DO','DO 设计值'], ['ras_pipe_pct','管道系数'],
+    ['ras_airIntMin','搅拌气量强度'], ['ras_alk0','补水碱度'], ['ras_alk_target','目标碱度'], ['ras_alk_dose_override','手动补碱量'],
+    ['ras_alkPrice','碱剂单价'], ['ras_carbon_price','碳源单价']
+  ]);
+  if (badR.length || badR2.length) {
+    document.querySelectorAll('[id^="ras_r_"]').forEach(el => { if (!/_rows$|_note$/.test(el.id)) el.textContent = '—'; });
+    wkShowInvalid('panel-ras', ['rasCheckList'], `<b>输入无效</b>：请输入${[...badR.map(x=>'大于 0 的'+x), ...badR2.map(x=>'不小于 0 的'+x)].join('、')}`);
+    return;
+  }
   const g = id => parseFloat($('ras_'+id)?.value) || 0;
+  const gd = (id, d) => { const v = parseFloat($('ras_'+id)?.value); return isNaN(v) ? d : v; };  // 不吞掉合法的 0
   const feed    = g('feed');
   const protein = g('protein') / 100;
   const tan_coef= g('tan_coef') || 0.092;
   const peak    = g('peak')    || 1.5;
-  const T       = g('T')       || 15;
+  const T       = gd('T', 15);
   const tan_tgt = g('tan_target') || 1.0;
   const pH      = g('pH')      || 7.2;
   const V_tank  = g('V_tank')  || 200;     // 鱼池水体（用户输入）
-  const pipe_pct= (g('pipe_pct') || 5) / 100;  // 管道系数
+  const pipe_pct= gd('pipe_pct', 5) / 100;  // 管道系数
   const exch_pct= g('exchange_rate') / 100;     // 换水率 /d（相对 V_sys）
-  const DO_set  = g('DO')      || 7;
+  const DO_set  = gd('DO', 7);
   const SNR20   = g('SNR20')   || 1.0;
   const theta   = g('theta')   || 1.09;
   const specArea= g('specArea')|| 500;
@@ -6053,11 +6431,11 @@ function calcRas() {
   const alpha   = g('alpha')   || 0.85;
   const beta    = g('beta')    || 0.98;
   const EE      = g('EE') / 100 || 0.25;
-  const airIntMin = g('airIntMin') || 12;
+  const airIntMin = gd('airIntMin', 12);
   const poolH   = g('poolH')   || 3;
   const theta_o2= g('theta_o2')|| 1.024;
   const nh3_limit = g('nh3_limit') || 0.02;
-  const alk0    = g('alk0')    || 150;
+  const alk0    = gd('alk0', 150);
 
   // ── TAN 物料平衡 ──────────────────────────────────────────────
   const tan_gen  = feed * protein * tan_coef * 1000;  // g/d
@@ -6125,7 +6503,7 @@ function calcRas() {
     const split_pct = (g('denif_split')      || 20) / 100;
     const SDNR20    = g('SDNR20')            || 1.5;
     const fillR_d   = (g('denif_fillRatio')  || 50) / 100;
-    const SDNR_T    = SDNR20 * Math.pow(1.08, T - 20);
+    const SDNR_T    = SDNR20 * Math.pow(1.08, T - 20);   // 反硝化 θ=1.08，依据 GB 50014
 
     // 分流量
     denif_Q_split = circ_Q * split_pct;  // m³/h
@@ -6152,7 +6530,7 @@ function calcRas() {
 
     // 内源碳估算：RAS 中来自鱼粪、残饵的溶解性 BOD
     // 经验：约 0.1-0.3 g BOD/g 饲料（投饲量的 15-20% 进入水体，其中 30-50% 为溶解性）
-    // 保守取 feed × 0.15（可溶 BOD 进水）× 1.4（BOD→COD 换算）
+    // 保守取 0.12 g COD/g 饲料（≈ 可溶 BOD 0.085 g/g × 1.4 BOD→COD 换算）
     internal_carbon_g = feed * 1000 * 0.12;  // g COD/d（保守估算）
 
     // 外加碳源需求
@@ -6161,7 +6539,9 @@ function calcRas() {
     // 药剂换算系数（g 药剂 / g COD 需求）
     const carbonType = $('ras_carbon_type')?.value || 'internal';
     const carbonPrice = g('carbon_price') || 3.5;  // 元/kg
-    const agentFactor = { internal:0, methanol:1/1.50, acetate:1/0.78, glucose:1/1.07 };
+    // 乙酸钠按无水计 0.78 g COD/g，商品药剂再乘有效含量（三水固体默认 58% → 0.45 g COD/g 商品）
+    const acetatePurity = Math.min(100, g('acetatePurity') || 58) / 100;
+    const agentFactor = { internal:0, methanol:1/1.50, acetate:1/(0.78 * acetatePurity), glucose:1/1.07 };
     const agentName   = { internal:'无需外加', methanol:'甲醇', acetate:'乙酸钠', glucose:'葡萄糖' };
     const factor = agentFactor[carbonType] ?? 0;
 
@@ -6190,12 +6570,15 @@ function calcRas() {
   const alk_replenish = Q_exchange * alk0;                      // g CaCO₃/d
   // 净碱度缺口（正数=需要补碱）
   const alk_net_deficit_g = Math.max(0, alk_consume - alk_replenish); // g CaCO₃/d
-  const alk_target = g('alk_target') || 100;                    // 目标最低碱度 mg/L
-  // 稳态碱度（不补碱时）：alk0 - 净消耗/V_sys
-  const alk_steady_no_dose = alk0 - (alk_consume - alk_replenish) / V_sys; // mg/L
+  const alk_target = gd('alk_target', 100);                    // 目标最低碱度 mg/L
+  // 稳态碱度（不补碱时）：稳态下换水带出 = 换水带入 − 硝化消耗 + 补碱，
+  // 即 alk_steady = (alk_replenish − alk_consume + dose) / Q_exchange，与 V_sys 无关
+  const alk_steady_no_dose = Q_exchange > 0
+    ? (alk_replenish - alk_consume) / Q_exchange
+    : alk0 - alk_consume / Math.max(V_sys, 1e-9);              // mg/L（无换水时退化为日降幅）
   // 需要额外补入的碱度（使稳态 ≥ alk_target）
-  const alk_need_mg_L = Math.max(0, alk_target - alk_steady_no_dose);  // mg/L·d 等效
-  const alk_dose_caco3 = alk_need_mg_L * V_sys;                // g CaCO₃/d 需补入量
+  const alk_need_mg_L = Math.max(0, alk_target - alk_steady_no_dose);  // mg/L
+  const alk_dose_caco3 = alk_need_mg_L * Q_exchange;           // g CaCO₃/d 需补入量（按换水量）
 
   // 药剂换算（g CaCO₃ → g 药剂）
   // NaHCO₃：MW=84，CaCO₃当量=50，换算系数=84/50=1.68；实际1g NaHCO₃提升碱度0.595 g CaCO₃等效
@@ -6212,12 +6595,12 @@ function calcRas() {
   // 用户手动覆盖投加量
   const dose_override = g('alk_dose_override');
   const alk_dose_agent = dose_override > 0
-    ? dose_override * V_sys * agentData.factor  // 手动：mg/L × V_sys × 换算 g/d
+    ? dose_override * Q_exchange * agentData.factor  // 手动：mg/L × Q_exchange × 换算 g/d
     : alk_dose_caco3 * agentData.factor;        // 自动：g CaCO₃/d × 换算系数
 
   // 补碱后稳态碱度
   const alk_dose_caco3_actual = alk_dose_agent / agentData.factor; // 实际补入 g CaCO₃/d
-  const alk_steady = alk_steady_no_dose + alk_dose_caco3_actual / V_sys; // mg/L
+  const alk_steady = alk_steady_no_dose + (Q_exchange > 0 ? alk_dose_caco3_actual / Q_exchange : 0); // mg/L
 
   // 年费用
   const alkPrice = g('alkPrice') || 3.5;
@@ -6232,15 +6615,18 @@ function calcRas() {
   const AOR = tan_to_nitrif * 4.57 / 1000;            // kg O₂/d
   const C_s20 = 9.17;
   const C_sT  = 14.652 - 0.41022*T + 0.007991*T*T - 0.000077774*T*T*T;
-  const SOR   = AOR > 0 ? AOR * C_s20 / (alpha * (beta * C_sT - DO_set) * Math.pow(theta_o2, T-20)) : 0;
+  // 氧传递推动力 β·Cs − DO：≤ 0 时空气曝气无法供氧（SOR 无意义，显示"—"）
+  const o2_drive = beta * C_sT - DO_set;           // mg/L
+  const o2_ok    = o2_drive > 0;
+  const SOR   = AOR > 0 ? (o2_ok ? AOR * C_s20 / (alpha * o2_drive * Math.pow(theta_o2, T-20)) : NaN) : 0;
   // 空气量（供氧）
-  const airMass = SOR / (EE * 0.23);               // kg/d
+  const airMass = o2_ok ? SOR / (EE * 0.23) : 0;   // kg/d
   const airFlow = airMass / 1.293 / 24;            // Nm³/h
   // 最小搅拌气量
   const A_pool  = V_mbbr > 0 ? V_mbbr / poolH : 0;  // m² 池底面积
   const airMix  = airIntMin * A_pool;               // Nm³/h
   const airDesign = Math.max(airFlow, airMix);
-  const control = airMix > airFlow ? '搅拌控制（池容大/负荷低时常见）' : '供氧控制（硝化耗氧驱动）';
+  const control = !o2_ok && AOR > 0 ? '空气曝气无法满足（DO ≥ β·Cs）' : airMix > airFlow ? '搅拌控制（池容大/负荷低时常见）' : '供氧控制（硝化耗氧驱动）';
   // 鼓风机静压
   const dp_water = poolH * 9.8;
   const dp_sys   = 10;
@@ -6320,7 +6706,7 @@ function calcRas() {
   // 注：η值本身不需要校核"达到30%"——只要填料面积满足日去除量就合理
   const denNoteEl = $('ras_r_den_eta_note');
   if (denif_on && denif_Q_split > 0 && no3_steady > 0) {
-    const SDNR_T_display = (g('SDNR20') || 1.5) * Math.pow(1.08, T - 20);
+    const SDNR_T_display = (g('SDNR20') || 1.5) * Math.pow(1.08, T - 20);   // θ=1.08，依据 GB 50014
     const den_remove_per_h = SDNR_T_display * denif_A / 24;     // g/h
     const den_delta_conc = den_remove_per_h / denif_Q_split;    // mg/L 单次降幅
     const no3_out_denif = Math.max(0, no3_steady - den_delta_conc); // mg/L 旁支路出水
@@ -6344,14 +6730,15 @@ function calcRas() {
   set('ras_r_alk_consume',    alk_consume.toFixed(0));
   set('ras_r_alk_replenish',  alk_replenish.toFixed(0));
   set('ras_r_alk_deficit',    Math.max(0, alk_consume - alk_replenish).toFixed(0));
-  set('ras_r_alkAgent_dose',  alk_dose_agent.toFixed(1));
+  set('ras_r_alkAgent_dose',  (alk_dose_agent / 1000).toFixed(2));   // kg/d
+  if ($('ras_r_alkAgent_unit')) $('ras_r_alkAgent_unit').textContent = 'kg/d';
   if ($('ras_r_alkAgent_name')) $('ras_r_alkAgent_name').textContent = agentData.name;
   set('ras_r_alk_steady',     alk_steady.toFixed(1));
   set('ras_r_alk_cost',       alk_cost_year.toFixed(2));
 
   set('ras_r_AOR',          AOR.toFixed(1));
-  set('ras_r_SOR',          SOR.toFixed(1));
-  set('ras_r_airDesign',    airDesign.toFixed(0));
+  set('ras_r_SOR',          isFinite(SOR) ? SOR.toFixed(1) : '—');
+  set('ras_r_airDesign',    !o2_ok && AOR > 0 ? '—' : airDesign.toFixed(0));
   if ($('ras_r_airControl')) $('ras_r_airControl').textContent = control;
   set('ras_r_dp',           dp_total.toFixed(1));
 
@@ -6412,7 +6799,7 @@ function calcRas() {
     score -= 8;
   } else {
     const dose_display = alk_dose_agent > 0
-      ? `，每日投加 ${agentData.name} ${alk_dose_agent.toFixed(0)} g，年费 ${alk_cost_year.toFixed(2)} 万元`
+      ? `，每日投加 ${agentData.name} ${(alk_dose_agent/1000).toFixed(2)} kg，年费 ${alk_cost_year.toFixed(2)} 万元`
       : '，换水自然补充碱度充足';
     checks.push({type:'ok', ic:'✓', text:`<b>碱度充足</b>: 稳态 ${alk_remain.toFixed(0)} mg/L ≥ 目标 ${alk_target} mg/L${dose_display}`});
   }
@@ -6437,6 +6824,21 @@ function calcRas() {
     } else {
       checks.push({type:'ok', ic:'✓', text:`<b>碳源充足</b>: 内源碳 ${internal_carbon_g.toFixed(0)} g COD/d，满足反硝化需求 ${denif_COD_need.toFixed(0)} g COD/d`});
     }
+  }
+
+  // 氧传递推动力校核（高温 + 高 DO 时 β·Cs − DO 很小，空气曝气效率极低）
+  if (AOR > 0 && !o2_ok) {
+    checks.push({type:'bad', ic:'✗', text:`<b>空气曝气无法达到设定 DO</b>: DO 设定 ${DO_set} mg/L ≥ β·Cs = ${(beta*C_sT).toFixed(2)} mg/L（${T}°C），推动力不足，需纯氧/增氧锥供氧，或降低 DO 设定`});
+    score -= 15;
+  } else if (AOR > 0 && o2_drive < 1) {
+    checks.push({type:'warn', ic:'⚠', text:`<b>推动力不足，建议纯氧/增氧锥</b>: β·Cs − DO = ${o2_drive.toFixed(2)} mg/L &lt; 1 mg/L（${T}°C，DO 设定 ${DO_set}），SOR/AOR = ${(SOR/AOR).toFixed(1)}，空气曝气气量与能耗急剧增大`});
+    score -= 8;
+  }
+
+  // 填充率上限（MBBR ≤ 67%）
+  if (fillRatio > 0.67) {
+    checks.push({type:'bad', ic:'✗', text:`<b>填充率超限</b>: ${(fillRatio*100).toFixed(0)}% &gt; 67%（MBBR 上限），填料流化困难`});
+    score -= 10;
   }
 
   // DO 校核
@@ -6531,6 +6933,7 @@ function drawRasFlow({ V_mbbr, V_tank, V_sys, Q_exchange, circ_Q, denif_on, deni
 }
 
 // ============ 初始化(所有数据库声明之后) ============
+snapshotStDefaults();   // 记录纯 MBBR Tab 初始输入（供"恢复默认"）
 renderCases();
 setStageConfig(1);
 calcStages();
