@@ -34,7 +34,7 @@
 | [污泥产量](sludge-production-calculator.html) | 生物+化学+原生污泥 · 脱水前后体积 · 处置成本 |
 | [加药量](dosing-calculator.html) | PAC/PAM/次氯酸钠/碳源/除磷/pH 调节 六大类药剂 |
 | [活性污泥工艺](activated-sludge-process-calculator.html) | AAO / A/O / SBR / 氧化沟 池容 · 回流 · 需氧 · 剩余污泥(Beta) |
-| [MBBR / IFAS / RAS](mbbr-design.html) | 纯 MBBR 段组合 · IFAS · 循环水养殖 · 填料选型(Beta) |
+| [MBBR / IFAS](mbbr-design.html) | 纯 MBBR 段组合 · IFAS · 填料选型(Beta)；循环水养殖 RAS 见 [iRAS](https://iras.cn) |
 | [MBR](mbr-design.html) | 池容 · 膜面积 · 清洗 · 能耗(Beta) |
 
 ### 设备选型 · Equipment
