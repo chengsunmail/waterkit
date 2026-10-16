@@ -577,8 +577,8 @@
       </div>
       <div class="field scene-draining" id="f_H2" style="display:none;">
         <label for="H2">终了水头 H₂ <span class="unit">m</span></label>
-        <input type="number" id="H2" value="0.1" step="0.1">
-        <div class="helper">完全排空取 0 或孔口中心处</div>
+        <input type="number" id="H2" value="1.0" step="0.1">
+        <div class="helper">默认 1.0 m: 使 H₂/d (矩形孔 H₂/e) ≥ 10, 小孔口公式全程适用; 完全排空取 0 或孔口中心处 (末段结果偏乐观, 工具会提示)</div>
       </div>
 
       <!-- 流量系数 -->
@@ -705,7 +705,7 @@
         <tr><td>薄壁小孔（圆形）</td><td>0.64</td><td>0.97</td><td>0.62</td><td>锐边薄壁,H ≥ 10d（矩形孔按孔高 e）</td></tr>
         <tr><td>圆柱外管嘴</td><td>1.00</td><td>0.82</td><td>0.82</td><td>L = (3~4)d,H &lt; 9m 避免气蚀</td></tr>
         <tr><td>锥形收缩管嘴（θ=13°）</td><td>0.98</td><td>0.96</td><td>0.94</td><td>收敛角约 13°24′</td></tr>
-        <tr><td>大孔口（矩形）</td><td>0.70</td><td>0.97</td><td>0.60-0.65</td><td>e &gt; H/10（即 H/e &lt; 10）,按积分式</td></tr>
+        <tr><td>大孔口（矩形）</td><td>0.64</td><td>0.97</td><td>0.62（常见 0.60-0.65）</td><td>e &gt; H/10（即 H/e &lt; 10）,按积分式</td></tr>
       </table>
       <p>注：管嘴（圆柱外）μ 比同尺寸薄壁孔大约 32%,因为出口断面恢复为整个孔面积,同时内部形成真空增强吸入。</p>
 
@@ -717,12 +717,14 @@
       <p>当孔口高度相对水头较大（e &gt; H/10,即 H/d 或 H/e &lt; 10）时,不能按孔心水头简化,需积分：</p>
       <code>Q = (2/3)·μ·b·√(2g)·(H_底^1.5 − H_顶^1.5)</code>
       <p>其中 b 为孔宽（= a）,H_顶 为孔顶水头,H_底 = H_顶 + e 为孔底水头。大孔口模式下"作用水头 H"自动取孔心水头 H_顶 + e/2（只读）,仅用于计算流速 v。</p>
+      <p>若 H/e ≥ 10（H 为孔心水头）,积分式与小孔口式结果接近,可直接按小孔口计算,工具给出提示。</p>
       <p>变水头泄流工况下,大孔口按孔心水头简化为 Q = μ·A·√(2gH),未采用积分式。</p>
 
       <h3>⑤ 变水头泄流时间（容器排空）</h3>
       <p>假设容器截面面积 A_池 不随水深变化：</p>
       <code>t = 2·A_池·(√H₁ − √H₂) / (μ·A·√(2g))</code>
       <p>若容器形状复杂（锥形/球形）,须单独积分。</p>
+      <p>式中按孔心水头的小孔口公式积分;当终了水头 H₂/d（矩形孔按孔高 e）&lt; 10 时,末段已非小孔口出流,工具给出提示,泄流时间结果偏乐观。</p>
 
       <h3>⑥ 圆柱管嘴气蚀校核</h3>
       <p>圆柱外管嘴工作时内部形成真空,但水头过大或管嘴过长时会发生气蚀导致断流。经验限值：</p>
@@ -828,7 +830,7 @@
     thin:  {mu: 0.62, eps: 0.64, phi: 0.97, name: '薄壁小孔'},
     cylin: {mu: 0.82, eps: 1.00, phi: 0.82, name: '圆柱外管嘴'},
     conic: {mu: 0.94, eps: 0.98, phi: 0.96, name: '锥形收缩管嘴'},
-    large: {mu: 0.62, eps: 0.70, phi: 0.97, name: '大孔口'},
+    large: {mu: 0.62, eps: 0.64, phi: 0.97, name: '大孔口'},
   };
 
   function setType(t) {
@@ -1103,6 +1105,10 @@
       } else if (type === 'large') {
         ck.className = 'check-box check-info';
         ck.innerHTML = `ℹ <b>大孔口</b> · 按积分式计算,H_顶 = ${num('H_top')} m,H_底 = ${(num('H_top') + num('e')).toFixed(3)} m;流速按孔心水头 H = ${H} m 计算。μ = ${mu}。`;
+        const He = H / num('e');
+        if (He >= 10) {
+          ck.innerHTML += `<br>ℹ H/e = ${He.toFixed(1)} ≥ 10,孔高相对水头已很小,可按小孔口（Q = μ·A·√(2gH)）计算,两者结果接近。`;
+        }
       } else {
         ck.className = 'check-box check-info';
         ck.innerHTML = `ℹ <b>${coef.name}</b> · 流量系数 μ = ${mu},理论流速 ${v_t.toFixed(2)} m/s,实际流速 ${v_r.toFixed(2)} m/s。`;
@@ -1158,8 +1164,16 @@
         $('r_t2').textContent = `${(t_sec/3600).toFixed(1)} h`;
       }
 
-      ck.className = 'check-box check-ok';
-      ck.innerHTML = `✓ <b>池面积 ${A_tank} m² 的水池,由 ${H1} m 泄放到 ${H2} m</b>,共排水 ${V.toFixed(1)} m³,初始流量 ${Q1.toFixed(3)} m³/s,终了流量 ${Q2.toFixed(3)} m³/s,泄流时间见上。假设池面积恒定。${type === 'large' ? ' 大孔口在变水头工况按孔心水头简化（Q = μ·A·√(2gH),未用积分式）。' : ''}` + subNote;
+      // 末段适用性:H₂/d（矩形孔按孔高 e）< 10 时已非小孔口出流
+      const isRd = (type === 'large' || $('shape').value === 'rect');
+      const dimD = isRd ? num('e') : num('d');
+      const lblD = isRd ? 'H₂/e' : 'H₂/d';
+      const r2 = H2 / dimD;
+      const endWarn = r2 < 10
+        ? `<br>⚠ <b>末段已非小孔口出流</b> · ${lblD} = ${r2.toFixed(1)} &lt; 10,孔口尺寸相对水头不可忽略（并可能出现漩涡、掺气）,按孔心水头计算的末段流量偏大,泄流时间结果偏乐观（偏短）。`
+        : '';
+      ck.className = 'check-box ' + (endWarn ? 'check-warn' : 'check-ok');
+      ck.innerHTML = `${endWarn ? '⚠' : '✓'} <b>池面积 ${A_tank} m² 的水池,由 ${H1} m 泄放到 ${H2} m</b>,共排水 ${V.toFixed(1)} m³,初始流量 ${Q1.toFixed(3)} m³/s,终了流量 ${Q2.toFixed(3)} m³/s,泄流时间见上。假设池面积恒定。${type === 'large' ? ' 大孔口在变水头工况按孔心水头简化（Q = μ·A·√(2gH),未用积分式）。' : ''}` + endWarn + subNote;
     }
 
     drawViz();

@@ -231,6 +231,8 @@
     color: #059669;
     margin-top: 4px;
   }
+  .field .hint.unused-note { color: #9ca3af; }
+  .field.coef-unused label { color: #9ca3af; }
 
   .results {
     margin-top: 24px;
@@ -517,14 +519,17 @@
       <div class="field">
         <label for="n">曼宁系数 n <span class="unit">—</span></label>
         <input type="number" id="n" value="0.009" step="0.001">
+        <div class="hint unused-note" id="note_n"></div>
       </div>
       <div class="field">
         <label for="C">Hazen-Williams C <span class="unit">—</span></label>
         <input type="number" id="C" value="150" step="5">
+        <div class="hint unused-note" id="note_C"></div>
       </div>
       <div class="field">
         <label for="eps">绝对粗糙度 ε <span class="unit">mm</span></label>
         <input type="number" id="eps" value="0.0015" step="0.001">
+        <div class="hint unused-note" id="note_eps"></div>
       </div>
       <div class="field">
         <label for="T">水温 T <span class="unit">℃</span></label>
@@ -751,6 +756,19 @@
     calc();
   }
 
+  // 按所选沿程损失公式启用对应粗糙度输入（D-W 用 ε，H-W 用 C，Manning 用 n），其余禁用灰显
+  // 禁用框仍由 updateMaterial() 写入管材值，便于切换公式后直接使用
+  const COEF_FOR = {dw: 'eps', hw: 'C', manning: 'n'};
+  function updateCoefState() {
+    const use = COEF_FOR[$('hfMethod').value] || 'eps';
+    ['n','C','eps'].forEach(id => {
+      const off = id !== use;
+      $(id).disabled = off;
+      $(id).closest('.field').classList.toggle('coef-unused', off);
+      $('note_' + id).textContent = off ? '当前公式不使用' : '';
+    });
+  }
+
   function setMode(m) {
     mode = m;
     document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
@@ -815,18 +833,18 @@
     return lambda;
   }
 
-  // 推荐公称直径
+  // 推荐公称直径（超出 DN 系列上限时返回 null）
   function recommendDN(D_mm) {
     for (let dn of dnList) {
       if (dn >= D_mm) return dn;
     }
-    return dnList[dnList.length-1];
+    return null;
   }
 
   // 流速校核
   function velocityCheck(v) {
     if (v < 0.3) return {cls: 'check-warn', msg: `⚠ 流速 ${v.toFixed(2)} m/s 偏低（&lt;0.3），易沉积，建议放大流速或减小管径`};
-    if (v < 0.6) return {cls: 'check-warn', msg: `⚠ 流速 ${v.toFixed(2)} m/s 偏低，污水管道需 ≥ 0.6 m/s 防沉积`};
+    if (v < 0.6) return {cls: 'check-warn', msg: `⚠ 流速 ${v.toFixed(2)} m/s 对给水管偏低（支管宜 ≥ 0.6 m/s）；若为污水压力管需 ≥ 0.7 m/s、污水重力流需 ≥ 0.6 m/s 防沉积`};
     if (v <= 1.5) return {cls: 'check-ok', msg: `✓ 流速 ${v.toFixed(2)} m/s 处于常规给水管道推荐范围（0.6-1.5 m/s）`};
     if (v <= 2.5) return {cls: 'check-warn', msg: `⚠ 流速 ${v.toFixed(2)} m/s 偏高，注意经济流速（给水干管一般 ≤ 1.5–2.0 m/s；压力管/加药管可取至 2.5 m/s）`};
     if (v <= 5.0) return {cls: 'check-warn', msg: `⚠ 流速 ${v.toFixed(2)} m/s 偏高，注意水锤和管道冲刷`};
@@ -866,6 +884,7 @@
     const nu = nu_T(T);
     const C_hw = num('C'), n_m = num('n');
     $('u_Q').textContent = unitMap[unit];
+    updateCoefState();
 
     // 输入校验
     document.querySelectorAll('.invalid').forEach(el => el.classList.remove('invalid'));
@@ -875,11 +894,13 @@
       showInvalid(bad.map(b => b[0]), `请输入大于 0 的${bad.map(b => b[1]).join('、')}`);
       return;
     }
-    const neg = [['L','管长 L'],['eps','粗糙度 ε'],['zeta','局部阻力系数 Σζ']].filter(([id]) => num(id) < 0);
+    const neg = [['L','管长 L'],['eps','粗糙度 ε'],['zeta','局部阻力系数 Σζ']]
+      .filter(([id]) => num(id) < 0 && !(id === 'eps' && method !== 'dw'));
     if (neg.length) {
       showInvalid(neg.map(b => b[0]), `${neg.map(b => b[1]).join('、')}不能为负`);
       return;
     }
+    if (!isFinite(parseFloat($('T').value))) { showInvalid(['T'], '请输入水温 T（℃）'); return; }
     if (method === 'hw' && !(C_hw > 0)) { showInvalid(['C'], '请输入大于 0 的 Hazen-Williams 系数 C'); return; }
     if (method === 'manning' && !(n_m > 0)) { showInvalid(['n'], '请输入大于 0 的曼宁系数 n'); return; }
 
@@ -932,7 +953,7 @@
     $('r_Q_u').textContent = unitMap[unit];
     $('r_v').textContent = v.toFixed(3);
     $('r_D').textContent = (D_m * 1000).toFixed(1);
-    $('r_DN').textContent = 'DN ' + DN;
+    $('r_DN').textContent = DN === null ? '—' : 'DN ' + DN;
     $('r_Re').textContent = Re.toExponential(2);
     $('r_Re_t').textContent = Re < 2300 ? '层流' : (Re < 4000 ? '过渡' : '紊流');
     $('r_lambda').textContent = (method !== 'dw' && !(L > 0)) ? '—' : lambda.toFixed(4);
@@ -945,7 +966,9 @@
 
     // 管径提示
     if (mode === 'D') {
-      $('D_hint').textContent = `推荐取 DN ${DN}（实际内径按管材壁厚确定）`;
+      $('D_hint').textContent = DN === null
+        ? `所需内径超出 DN 系列上限 DN ${dnList[dnList.length-1]}，请按实际内径选管或多管并联`
+        : `推荐取 DN ${DN}（实际内径按管材壁厚确定）`;
     } else {
       $('D_hint').textContent = '';
     }
@@ -953,8 +976,13 @@
     // 流速校核
     const check = velocityCheck(v);
     const cbox = $('checkBox');
-    cbox.className = 'check-box ' + check.cls;
-    cbox.innerHTML = check.msg + (Re >= 2300 && Re < 4000 ? '<br>⚠ Re 处于 2300–4000 过渡区，λ 不确定性较大' : '')
+    const dnOver = DN === null && mode === 'D';
+    const dnMsg = dnOver
+      ? `✗ 所需内径 ${(D_m * 1000).toFixed(0)} mm 超出 DN 系列上限（DN ${dnList[dnList.length-1]}），请按实际内径选管或多管并联<br>`
+      : '';
+    cbox.className = 'check-box ' + (dnOver ? 'check-bad' : check.cls);
+    cbox.innerHTML = dnMsg + check.msg
+      + (Re >= 2300 && Re < 4000 ? '<br>⚠ Re 处于 2300–4000 过渡区，λ 不确定性较大' : '')
       + (T < 0 || T > 100 ? `<br>⚠ 水温 ${T} ℃ 超出黏度表范围 0–100 ℃，ν 已按 ${T < 0 ? 0 : 100} ℃ 取值` : '');
   }
 

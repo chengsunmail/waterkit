@@ -454,6 +454,11 @@
     }
     .tab { font-size: 11.5px; min-width: 72px; padding: 8px 4px; }
   }
+  /* 手机端 6 个 Tab 改为 3×2 网格，避免横向溢出且无滚动提示 */
+  @media (max-width: 640px) {
+    .tabs { display: grid; grid-template-columns: repeat(3, 1fr); overflow-x: visible; }
+    .tab { min-width: 0; }
+  }
 </style>
 </head>
 <body>
@@ -963,7 +968,7 @@
                 <option value="F">F⁻（19, 1价）</option>
                 <option value="OH">OH⁻（17, 1价）</option>
                 <option value="S">S²⁻（32, 2价）</option>
-                <option value="SiO2">SiO₂（60, 按2价当量）</option>
+                <option value="SiO2">SiO₂（60，按 HSiO₃⁻ 1 价当量）</option>
               </optgroup>
             </select>
           </div>
@@ -1413,16 +1418,18 @@
   }
 
   // ======== 盐度/电导 ========
+  let salLastSource = 'EC_uS';   // 最后一次由用户输入的行；改水温 / K 时以它为基准重算
   function convertSalinity(fromUnit, val) {
     const K = parseFloat($('tds_K').value);
     // 电导温补：EC25 = EC_T / (1 + 0.02·(T − 25))，线性 2%/℃
     let T = parseFloat($('temp').value);
     if (!isFinite(T)) T = 25;
     const tf = Math.max(0.1, 1 + 0.02 * (T - 25));
-    if (fromUnit !== undefined) markSource('sal', fromUnit);
+    if (fromUnit !== undefined) { markSource('sal', fromUnit); salLastSource = fromUnit; }
     if (val === undefined) {
-      val = document.querySelector('[data-group="sal"][data-unit="EC_uS"] input').value;
-      fromUnit = 'EC_uS';
+      // 只改了水温或 K：保持用户最后输入的那一行不变，其余行重算
+      fromUnit = salLastSource;
+      val = srcInput('sal', fromUnit).value;
     }
     const v = parseFloat(val);
     if (!isFinite(v)) return;
@@ -1464,7 +1471,7 @@
     NH4:  {M:18, v:1}, Mn:{M:54.9, v:2},
     Cl:   {M:35.5, v:1}, SO4:{M:96, v:2}, HCO3:{M:61, v:1}, CO3:{M:60, v:2},
     NO3:  {M:62, v:1}, NO2:{M:46, v:1}, PO4:{M:95, v:3}, F:{M:19, v:1},
-    OH:   {M:17, v:1}, S:{M:32, v:2}, SiO2:{M:60, v:2}
+    OH:   {M:17, v:1}, S:{M:32, v:2}, SiO2:{M:60, v:1}   // SiO₂ 按 HSiO₃⁻ 1 价当量（当量 60，折 CaCO₃ 系数 50/60 = 0.833）
   };
 
   function updateIonParams() {

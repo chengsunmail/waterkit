@@ -198,10 +198,12 @@
     padding: 4px;
     background: #f1f5f9;
     border-radius: 10px;
-    overflow-x: auto;
-    scrollbar-width: none;
+    flex-wrap: wrap;
   }
-  .weir-tabs::-webkit-scrollbar { display: none; }
+  @media (max-width: 560px) {
+    .weir-tabs { display: grid; grid-template-columns: 1fr 1fr; }
+    .weir-tabs .weir-tab { min-width: 0; white-space: normal; }
+  }
   .weir-tab {
     flex: 1;
     min-width: 100px;
@@ -566,7 +568,7 @@
           <option value="square" selected>直角进口</option>
           <option value="round">圆角进口</option>
         </select>
-        <div class="helper">直角按 δ/H 分档取 m；圆角简化取 m = 0.36</div>
+        <div class="helper">m 按别列津斯基公式随 P/H 连续取值（直角 0.32–0.385，圆角 0.36–0.385）</div>
       </div>
 
       <!-- 共用:水头H -->
@@ -651,7 +653,7 @@
           <span><span class="result-value" id="r_sigma">—</span><span class="result-unit">—</span></span>
         </div>
         <div class="result-row">
-          <span class="result-label">名义流速 Q/(bH)</span>
+          <span class="result-label" id="r_v_l">堰口平均流速 Q/(b·H)</span>
           <span><span class="result-value" id="r_v">—</span><span class="result-unit">m/s</span></span>
         </div>
         <div class="result-row">
@@ -703,14 +705,10 @@
       <h3>④ 宽顶堰</h3>
       <code>Q = m · ε · b · √(2g) · H₀^(3/2)</code>
       <p>其中 H₀ = H + v₀²/(2g) 为包含行近流速头的全水头（v₀ = Q/[B·(P+H)],迭代中 Q 同样计入 m·ε,迭代 10 次求解,使 H₀ 与最终 Q 自洽）,ε 为侧收缩系数（ε = 1 − 0.2·H/b,下限 0.7,仅 B &gt; b 时计入;经验值,以规范 / 手册原文为准）,m 为流量系数,按"堰顶进口形式"取值:</p>
-      <table>
-        <tr><th>进口形式</th><th>δ/H</th><th>工具取 m</th><th>手册常用范围</th></tr>
-        <tr><td>直角进口</td><td>&lt; 4</td><td>0.36</td><td rowspan="3">0.32-0.35</td></tr>
-        <tr><td>直角进口</td><td>4-10</td><td>0.34</td></tr>
-        <tr><td>直角进口</td><td>≥ 10</td><td>0.32</td></tr>
-        <tr><td>圆角进口</td><td>2.5-10</td><td>0.36（简化为常数）</td><td>0.36-0.385（随 r/H 增大）</td></tr>
-      </table>
-      <p>默认按直角进口计算。圆角进口的 m 实际随圆角半径 r/H 变化,工具简化取 0.36,偏于保守。表中工具取值为参考值,以规范 / 手册原文为准。</p>
+      <p><strong>别列津斯基（Березинский）经验公式</strong>（P 为上游堰高,m 随 P/H 连续变化）:</p>
+      <code>直角进口:m = 0.32 + 0.01 · (3 − P/H) / (0.46 + 0.75 · P/H)   （P/H ≥ 3 时 m = 0.32）</code>
+      <code>圆角进口（r/H ≥ 0.2）:m = 0.36 + 0.01 · (3 − P/H) / (1.2 + 1.5 · P/H)   （P/H ≥ 3 时 m = 0.36）</code>
+      <p>P/H → 0 时两式均趋于理论上限 0.385;直角进口 m 在 0.32–0.385 之间,圆角进口在 0.36–0.385 之间。m 随 H 连续变化,"已知 H 求 Q"与"已知 Q 求 H"两条路径结果互逆一致。默认按直角进口计算。来源:水力学教材（如吴持恭《水力学》）宽顶堰流量系数经验公式,以规范 / 手册原文为准。</p>
       <p>宽顶堰适用范围 2.5 ≤ δ/H ≤ 10:δ/H &lt; 2.5 不属宽顶堰,宜按实用堰/薄壁堰计算;δ/H &gt; 10 属长堰,需计入堰顶沿程水头损失,本式会高估流量。</p>
 
       <h3>⑤ 淹没出流修正</h3>
@@ -823,10 +821,11 @@
     document.querySelector(`[data-type="${w}"]`).classList.add('active');
 
     // 控制字段显示
-    document.querySelectorAll('.weir-rect').forEach(el => el.style.display = (w==='rect') ? '' : 'none');
-    document.querySelectorAll('.weir-tri').forEach(el => el.style.display = (w==='tri') ? '' : 'none');
-    document.querySelectorAll('.weir-trap').forEach(el => el.style.display = (w==='trap') ? '' : 'none');
-    document.querySelectorAll('.weir-broad').forEach(el => el.style.display = (w==='broad') ? '' : 'none');
+    // 一次遍历所有带 weir-* 类的字段:任一类匹配当前堰型即显示
+    // （b、B 同属 rect/trap/broad;三角堰仅需顶角 θ 与堰高 P）
+    document.querySelectorAll('.field.weir-rect, .field.weir-tri, .field.weir-trap, .field.weir-broad')
+      .forEach(el => el.style.display = el.classList.contains('weir-' + w) ? '' : 'none');
+    $('r_v_l').textContent = V_LABEL[w];
 
     drawWeir();
     calc();
@@ -850,6 +849,21 @@
     $('submerged_params').style.display = en ? 'grid' : 'none';
     calc();
   }
+
+  // 宽顶堰流量系数（别列津斯基公式）:直角进口 0.32–0.385,圆角进口 0.36–0.385
+  function broadM(PH, round) {
+    const r = Math.max(0, Math.min(3, PH));
+    return round ? 0.36 + 0.01 * (3 - r) / (1.2 + 1.5 * r)
+                 : 0.32 + 0.01 * (3 - r) / (0.46 + 0.75 * r);
+  }
+
+  // 堰口平均流速所用过水面积（随堰型而异）
+  const V_LABEL = {
+    rect:  '堰口平均流速 Q/(b·H)',
+    tri:   '堰口平均流速 Q/[H²·tan(θ/2)]',
+    trap:  '堰口平均流速 Q/[(b + H/4)·H]',
+    broad: '堰口平均流速 Q/(b·H)'
+  };
 
   // ============ 流量计算（自由出流） ============
   function Q_free(H) {
@@ -897,14 +911,8 @@
 
     if (weir === 'broad') {
       const b = num('b'), delta = num('delta'), B = num('B'), P = num('P');
-      // 流量系数按 δ/H 判断
-      // 直角进口按 δ/H 分档;圆角进口简化取常数 0.36（实际随 r/H 变化）
-      let m0;
-      const ratio = delta / Math.max(H, 0.001);
-      if ($('broad_inlet').value === 'round') m0 = 0.36;
-      else if (ratio < 4) m0 = 0.36;
-      else if (ratio < 10) m0 = 0.34;
-      else m0 = 0.32;
+      // 流量系数:别列津斯基公式,随 P/H 连续变化（P/H ≥ 3 取下限）
+      const m0 = broadM(P / H, $('broad_inlet').value === 'round');
 
       // 侧收缩（经验式,先算出供行近流速迭代使用）
       let eps = 1;
@@ -1204,7 +1212,7 @@
         ckd.innerHTML = `⚠ <b>δ/H = ${dr.toFixed(2)} &gt; 10</b> · 属长堰,需计入堰顶沿程水头损失,本公式会高估流量。`;
       } else {
         ckd.className = 'check-box check-ok';
-        ckd.innerHTML = `✓ <b>δ/H = ${dr.toFixed(2)}</b> · 在宽顶堰范围 2.5-10 内,${$('broad_inlet').value === 'round' ? '圆角进口 m = 0.36（按常数简化）' : '直角进口 m 按 δ/H 分档取值'}。`;
+        ckd.innerHTML = `✓ <b>δ/H = ${dr.toFixed(2)}</b> · 在宽顶堰范围 2.5-10 内,${$('broad_inlet').value === 'round' ? '圆角进口' : '直角进口'} m 按别列津斯基公式取值（P/H = ${(num('P') / H_val).toFixed(2)}）。`;
       }
     } else {
       ckd.style.display = 'none';
@@ -1272,7 +1280,7 @@ ${params}
 流量系数 = ${$('r_m0').textContent}${triNote}
 侧收缩系数 ε = ${$('r_eps').textContent}
 淹没系数 σ = ${$('r_sigma').textContent}
-名义流速 Q/(bH) = ${$('r_v').textContent} m/s
+${V_LABEL[weir]} = ${$('r_v').textContent} m/s
 上游行近流速 v₀ = ${$('r_v0').textContent} m/s
 
 适用性校核:${$('check_H').innerText}`;

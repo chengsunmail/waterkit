@@ -315,6 +315,7 @@
   .match-good { background: #dcfce7; color: #166534; }
   .match-ok   { background: #fef9c3; color: #854d0e; }
   .match-poor { background: #fee2e2; color: #991b1b; }
+  .match-info { background: #dbeafe; color: #1e40af; }
 
   /* 校核警告 */
   .check-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
@@ -329,6 +330,7 @@
   .check-ok   { background: #f0fdf4; color: #166534; }
   .check-warn { background: #fffbeb; color: #92400e; }
   .check-bad  { background: #fef2f2; color: #991b1b; }
+  .check-info { background: #eff6ff; color: #1e40af; }
   .check-item .ic { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
 
   /* 按钮 */
@@ -500,7 +502,7 @@
   </header>
 
   <div class="info-box">
-    💡 可直接输入供气量，或从曝气量计算器的结果（标准供气量 Gs）导入。风压由曝气池水深、管道阻力和曝气器背压共同决定。
+    💡 可直接输入供气量，或从曝气量计算器的结果（标准供气量 Gs）导入。风压由扩散器淹没深度、管道阻力和曝气器背压共同决定。
   </div>
 
   <!-- 第一部分：风量 -->
@@ -527,9 +529,9 @@
   <div class="section-title">② 风压计算</div>
   <div class="grid">
     <div class="field">
-      <label for="H_pool">曝气池有效水深 H <span class="unit">m</span></label>
+      <label for="H_pool">扩散器淹没深度 H（池深 − 扩散器安装高度） <span class="unit">m</span></label>
       <input type="number" id="H_pool" value="5.0" step="0.5" oninput="calc()">
-      <div class="helper">曝气器安装位置到水面距离</div>
+      <div class="helper">扩散器出气口到最高水面的距离，不是池深；如池深 5.2 m、扩散器离池底 0.2 m，则 H = 5.0 m</div>
     </div>
     <div class="field">
       <label for="dP_diff">曝气器背压 ΔP<sub>diff</sub> <span class="unit">kPa</span></label>
@@ -681,7 +683,7 @@
       <div class="blower-cards" id="blowerCards">
         <!-- JS 动态生成 -->
       </div>
-      <div class="helper" style="margin-top:10px;">注：各机型的风量/风压适用区间、效率、噪音及磁悬浮单台功率上限等均为参考值（经验范围），以厂家样本为准。</div>
+      <div class="helper" style="margin-top:10px;">注：各机型的风量/压比适用区间、效率、噪音及磁悬浮单台功率上限等均为参考值（经验范围），以厂家样本为准。</div>
     </div>
 
     <!-- 校核 -->
@@ -708,15 +710,15 @@
     <p>标准状态定义为 20°C、101.325 kPa；实际进气温度和海拔（P₁）均影响密度，需修正流量。</p>
 
     <h4>③ 风压计算</h4>
-    <code>ΔP_water = ρ_水 × g × H = 9.8 × H  [kPa]</code>
+    <code>ΔP_water = ρ_水 × g × H = 9.8 × H  [kPa]（H 为扩散器淹没深度 = 池深 − 扩散器安装高度）</code>
     <code>ΔP_total = (ΔP_water + ΔP_diff + ΔP_pipe) × f_s  [kPa]</code>
-    <p>海拔修正：P₁ = 101.325 × exp(-alt/8435) kPa(abs)</p>
+    <p>海拔修正（标准大气式，与曝气量/水泵选型页一致）：P₁ = 101.325 × (1 − 2.25577×10⁻⁵ × alt)^5.25588 kPa(abs)</p>
     <code>P₂ = P₁ + ΔP_total  [kPa(abs)]</code>
 
     <h4>④ 绝热压缩功率（等熵压缩）</h4>
     <code>N_ad = (κ/(κ-1)) × P₁ × Q_actual × [(P₂/P₁)^((κ-1)/κ) - 1]  [kW]</code>
     <p>κ = 1.4（空气绝热指数）；P 单位 kPa，Q 单位 m³/s。<br>
-    此公式为等熵压缩理论功率，是计算风机功率的标准方法（GB 50014 附录）。</p>
+    此为等熵压缩理论功率的常用工程公式（热力学通用式，非规范条文）。</p>
 
     <h4>⑤ 轴功率与电机功率</h4>
     <code>N_shaft = N_ad / η_bl  [kW]</code>
@@ -732,7 +734,7 @@
 
   <div class="note">
     ℹ️ <b>选型要点：</b>①风量按最大时工况（K_h）选型；②风压应有 5-15% 余量；③离心风机应避免在喘振区运行，核查风机特性曲线；④磁悬浮风机调速性能好，适合变负荷场景；⑤建议至少备用一台，总台数宜为 3-5 台。<br>
-    📌 <b>参考值说明：</b>机型推荐区间（风量、风压）、罗茨鼓风机压比上限（约 1.5）、离心单级压比上限（约 1.8）、磁悬浮单台风量/功率上限（约 200 m³/min（标）/ 300 kW）、离心单台风量上限（约 500 m³/min（标））均为经验参考值，非规范条文，以厂家样本为准。<br>
+    📌 <b>参考值说明：</b>机型推荐区间（单台风量、压比：罗茨 ≤1.5 常用、1.5–2.0 慎用；单级离心 1.3–1.8；磁悬浮 1.3–1.9）、磁悬浮单台风量/功率上限（约 200 m³/min（标）/ 300 kW）、离心单台风量上限（约 500 m³/min（标））均为经验参考值，非规范条文，以厂家样本为准。<br>
     📐 <b>依据：</b>GB 50014-2021《室外排水设计标准》、HJ 576《厌氧-缺氧-好氧活性污泥法》
   </div>
 
@@ -811,16 +813,16 @@
   // 电机档位显示：< 1 kW 保留原值，非整数保留 1 位小数（18.5 不再被显示成 19）
   const fmtMotor = m => m < 1 ? String(m) : (Number.isInteger(m) ? String(m) : m.toFixed(1));
 
-  // 读取输入：空/非数字时取默认值 def（仅 isNaN 时），否则原样返回（0、负值交由校验拦截）
-  const gv = (id, def) => { const v = parseFloat($(id).value); return isNaN(v) ? def : v; };
+  // 读取输入：空/非数字返回 NaN 由校验拦截（不静默取默认值）；0、负值也交由校验判断
+  const gv = id => { const s = $(id).value.trim(); return s === '' ? NaN : Number(s); };
 
   // 输入校验：返回错误信息列表，并给不合格输入框加 .invalid
   function validateInputs(vals) {
     const rules = [
       ['Q_avg',   v => v > 0,             '请输入大于 0 的平均供气量'],
       ['Kh',      v => v > 0,             '请输入大于 0 的最大时系数 K_h'],
-      ['n_run',   v => v >= 1,            '运行台数应不少于 1 台'],
-      ['H_pool',  v => v >= 0,            '曝气池水深不能为负值'],
+      ['n_run',   v => Number.isInteger(v) && v >= 1, '运行台数应为不少于 1 的整数'],
+      ['H_pool',  v => v >= 0,            '扩散器淹没深度不能为负值'],
       ['dP_diff', v => v >= 0,            '曝气器背压不能为负值'],
       ['dP_pipe', v => v >= 0,            '管道阻力不能为负值'],
       ['fs',      v => v > 0,             '请输入大于 0 的安全余量系数 f_s'],
@@ -849,14 +851,10 @@
   }
 
   function calc() {
-    // Q_avg、温度、海拔、水深等无默认值：为空时记为 NaN 由校验拦截
-    const vals = {
-      Q_avg: gv('Q_avg', NaN), Kh: gv('Kh', 1.5), n_run: gv('n_run', 2),
-      H_pool: gv('H_pool', NaN), dP_diff: gv('dP_diff', 0), dP_pipe: gv('dP_pipe', 0),
-      fs: gv('fs', 1.1), alt: gv('alt', 0), T_inlet: gv('T_inlet', 20),
-      eta_bl: gv('eta_bl', 75), eta_t: gv('eta_t', 95), eta_m: gv('eta_m', 93),
-      motor_margin: gv('motor_margin', 1.1), price: gv('price', 0.8),
-    };
+    // 所有输入为空/非数字时均记为 NaN，由校验标红并提示
+    const ids = ['Q_avg','Kh','n_run','H_pool','dP_diff','dP_pipe','fs','alt','T_inlet','eta_bl','eta_t','eta_m','motor_margin','price'];
+    const vals = {};
+    ids.forEach(id => { vals[id] = gv(id); });
     const errs = validateInputs(vals);
     if (errs.length) { showInvalid(errs); return; }
 
@@ -884,7 +882,7 @@
     const dP_total = dP_raw * fs;                         // kPa 含余量
 
     // 海拔修正大气压
-    const P1 = 101.325 * Math.exp(-alt / 8435);          // kPa(abs)
+    const P1 = 101.325 * Math.pow(1 - 2.25577e-5 * alt, 5.25588);  // kPa(abs)，标准大气式
     const P2 = P1 + dP_total;                             // kPa(abs)
     const pr = P2 / P1;                                   // 压力比
 
@@ -928,78 +926,71 @@
     set('r_annual_cost', annual_cost, 1);
 
     // ── 机型推荐 ─────────────────────────────────────────────────
-    const Q_u_nm3h = Q_unit * 60;   // m³/h（标），便于判断
-    const dP_kpa   = dP_total;
-
-    // 判断各机型匹配度
-    // 罗茨鼓风机：风量 1-200 m³/min（标），风压 20-100 kPa，噪音大
-    const roots_q_ok = Q_unit >= 1 && Q_unit <= 200;
-    const roots_p_ok = dP_kpa >= 15 && dP_kpa <= 100;
-    const roots_score = (roots_q_ok ? 1 : 0) + (roots_p_ok ? 1 : 0);
-
-    // 单级高速离心：风量 20-500 m³/min（标），风压 40-120 kPa
-    const cent_q_ok = Q_unit >= 15 && Q_unit <= 500;
-    const cent_p_ok = dP_kpa >= 40 && dP_kpa <= 120;
-    const cent_score = (cent_q_ok ? 1 : 0) + (cent_p_ok ? 1 : 0);
-
-    // 磁悬浮/空气悬浮：风量 5-200 m³/min（标），风压 40-100 kPa，高效调速
-    const mag_q_ok = Q_unit >= 5 && Q_unit <= 200;
-    const mag_p_ok = dP_kpa >= 35 && dP_kpa <= 100;
-    const mag_score = (mag_q_ok ? 1 : 0) + (mag_p_ok ? 1 : 0);
-
-    const scores = [roots_score, cent_score, mag_score];
-    const maxScore = Math.max(...scores);
-
-    const cards = [
-      {
-        type: '罗茨鼓风机',
-        range: `风量：1-200 m³/min（标）<br>风压：15-100 kPa<br>单台：${Q_unit.toFixed(1)} m³/min（标） / ${dP_kpa.toFixed(0)} kPa`,
+    // 判断各机型匹配度：压力以压比 P₂/P₁ 为口径（与下方压比校核一致），风量按单台风量区间；均为参考值
+    // 等级：2 = ✓，1 = ⚠，0 = ✗；卡片等级取压比与风量两者中较差者
+    const prLevel = (lo_ok, hi_ok, hi_warn) =>
+      (pr >= lo_ok && pr <= hi_ok) ? 2 : (pr < lo_ok || (hi_warn && pr <= hi_warn)) ? 1 : 0;
+    const blowers = [
+      { key: 'roots', type: '罗茨鼓风机', q: [1, 200], prTxt: '≤ 1.5 ✓；1.5–2.0 慎用',
+        prL: prLevel(0, 1.5, 2.0),
+        prNote: { 1: '压比 1.5–2.0，罗茨已超常用区，温升、噪音和泄漏增大', 0: '压比 > 2.0，超出罗茨适用范围' },
         pros: '✓ 结构简单，维护方便<br>✓ 价格低，国产化程度高<br>✓ 适合中小型污水处理厂',
-        cons: '✗ 噪音大（85-95 dB），需隔音<br>✗ 效率偏低（60-75%）<br>✗ 风量调节范围有限',
-        score: roots_score,
-        max: maxScore,
-      },
-      {
-        type: '单级高速离心鼓风机',
-        range: `风量：15-500 m³/min（标）<br>风压：40-120 kPa<br>单台：${Q_unit.toFixed(1)} m³/min（标） / ${dP_kpa.toFixed(0)} kPa`,
+        cons: '✗ 噪音大（85-95 dB），需隔音<br>✗ 效率偏低（60-75%）<br>✗ 风量调节范围有限' },
+      { key: 'cent', type: '单级高速离心鼓风机', q: [15, 500], prTxt: '1.3–1.8 ✓',
+        prL: prLevel(1.3, 1.8, 0),
+        prNote: { 1: '压比 < 1.3，低于离心鼓风机常用区，效率偏低', 0: '压比 > 1.8，超出单级离心常用范围' },
         pros: '✓ 效率高（75-85%），可变频<br>✓ 噪音相对较低<br>✓ 适合大中型污水处理厂',
-        cons: '✗ 注意喘振区，需配防喘振阀<br>✗ 造价高于罗茨<br>✗ 调速范围受限（一般 70-100%）',
-        score: cent_score,
-        max: maxScore,
-      },
-      {
-        type: '磁悬浮/空气悬浮鼓风机',
-        range: `风量：5-200 m³/min（标）<br>风压：35-100 kPa<br>单台：${Q_unit.toFixed(1)} m³/min（标） / ${dP_kpa.toFixed(0)} kPa`,
+        cons: '✗ 注意喘振区，需配防喘振阀<br>✗ 造价高于罗茨<br>✗ 调速范围受限（一般 70-100%）' },
+      { key: 'mag', type: '磁悬浮/空气悬浮鼓风机', q: [5, 200], prTxt: '1.3–1.9 ✓',
+        prL: prLevel(1.3, 1.9, 0),
+        prNote: { 1: '压比 < 1.3，低于磁悬浮常用区，效率偏低', 0: '压比 > 1.9，超出磁悬浮常用范围' },
         pros: '✓ 效率最高（80-88%）<br>✓ 调速范围广（30-100%）<br>✓ 免润滑，维护成本极低<br>✓ 噪音低（<80 dB）',
-        cons: '✗ 造价高（约为罗茨的 3-5 倍）<br>✗ 单台功率上限约 300 kW（参考值，以厂家样本为准）<br>✗ 对电网质量要求较高',
-        score: mag_score,
-        max: maxScore,
-      },
+        cons: '✗ 造价高（约为罗茨的 3-5 倍）<br>✗ 单台功率上限约 300 kW（参考值，以厂家样本为准）<br>✗ 对电网质量要求较高' },
     ];
+    blowers.forEach(c => {
+      c.qL = (Q_unit >= c.q[0] && Q_unit <= c.q[1]) ? 2 : 1;
+      c.level = Math.min(c.prL, c.qL);
+      const notes = [];
+      if (c.prL < 2) notes.push(c.prNote[c.prL]);
+      if (c.qL < 2) notes.push(`单台风量 ${Q_unit.toFixed(1)} m³/min（标）不在 ${c.q[0]}–${c.q[1]} 区间`);
+      c.note = notes.join('；');
+    });
+    const maxLevel = Math.max(...blowers.map(c => c.level));
+    const cards = blowers.map(c => ({
+      type: c.type,
+      range: `风量：${c.q[0]}-${c.q[1]} m³/min（标）<br>压比 P₂/P₁：${c.prTxt}（参考值）<br>单台：${Q_unit.toFixed(1)} m³/min（标） / 压比 ${pr.toFixed(2)}`,
+      pros: c.pros, cons: c.cons, score: c.level, max: maxLevel, note: c.note,
+    }));
 
     $('blowerCards').innerHTML = cards.map(c => {
       const isRec = c.score === c.max && c.score > 0;
-      const matchClass = c.score === 2 ? 'match-good' : c.score === 1 ? 'match-ok' : 'match-poor';
-      const matchText  = c.score === 2 ? '✓ 参数匹配' : c.score === 1 ? '⚠ 部分匹配' : '✗ 超出范围';
+      const matchClass = c.score === 2 ? 'match-good' : c.score === 1 ? (c.max === 2 ? 'match-info' : 'match-ok') : 'match-poor';
+      // 已有机型 ✓ 时，其余机型的“部分匹配”属选型比较信息 → ℹ；无机型 ✓ 时才用 ⚠
+      const matchText  = (c.score === 2 ? '✓ 参数匹配' : c.score === 1 ? (c.max === 2 ? 'ℹ 部分匹配' : '⚠ 部分匹配') : '✗ 超出范围') + '（参考值）';
       return `<div class="blower-card${isRec ? ' recommended' : ''}">
         <div class="blower-type">${c.type}</div>
         <div class="blower-range">${c.range}</div>
         <div class="blower-pros">${c.pros}</div>
         <div class="blower-cons">${c.cons}</div>
-        <span class="match-badge ${matchClass}">${matchText}</span>
+        <span class="match-badge ${matchClass}">${matchText}</span>${c.note ? `<div class="helper" style="margin-top:4px;">${c.note}</div>` : ''}
       </div>`;
     }).join('');
 
     // ── 校核 ─────────────────────────────────────────────────────
     const checks = [];
 
-    // 压力比校核（罗茨一般 < 1.5，离心 < 1.8；均为经验参考值，以厂家样本为准）
-    if (pr > 1.8) {
-      checks.push({type:'bad', ic:'✗', text:`压力比 ${pr.toFixed(3)} > 1.8，已超离心鼓风机常用范围，单级离心鼓风机可能无法满足，建议考虑两级压缩或提高充氧效率以降低水深（压比上限为参考值，以厂家样本为准）`});
-    } else if (pr > 1.5) {
-      checks.push({type:'warn', ic:'⚠', text:`压力比 ${pr.toFixed(3)} 在 1.5-1.8，罗茨鼓风机已接近上限，建议优先选离心或磁悬浮鼓风机（罗茨压比上限约 1.5 为参考值，以厂家样本为准）`});
-    } else {
-      checks.push({type:'ok', ic:'✓', text:`压力比 ${pr.toFixed(3)}，三种机型均可满足`});
+    // 压力比校核：由机型卡片结果生成，口径一致（罗茨 ≤1.5 ✓、1.5–2.0 ⚠；离心 1.3–1.8 ✓；磁悬浮 1.3–1.9 ✓；均为参考值）
+    {
+      const sym = l => l === 2 ? '✓' : l === 1 ? '⚠' : '✗';
+      const symTxt = l => l === 2 ? '✓' : l === 1 ? '慎用' : '不适用';   // 行内机型评价用文字, 行首图标表示本行级别
+      const summary = blowers.map(c => `${c.type.replace('鼓风机','')} ${symTxt(c.prL)}`).join('，');
+      const nGood = blowers.filter(c => c.prL === 2).length;
+      // 至少一种机型压比 ✓ 时，设计压比本身可行，此行属选型建议 → ℹ 信息样式；三种机型均无 ✓ 时才 ⚠（有慎用机型）/✗（均超范围）
+      const type = nGood === blowers.length ? 'ok' : nGood > 0 ? 'info' : blowers.some(c => c.prL === 1) ? 'warn' : 'bad';
+      const tail = nGood === 0 ? '；三种单级机型均不在常用压比区间，建议考虑多级压缩或降低扩散器淹没深度/系统阻力' :
+                   nGood < blowers.length ? `；结合单台风量，建议优先选 ${(blowers.some(c => c.level === 2) ? blowers.filter(c => c.level === 2) : blowers.filter(c => c.prL === 2)).map(c => c.type).join('、')}（同机型卡片“推荐”）` : '';
+      checks.push({type, ic: type === 'info' ? 'ℹ' : sym(type === 'ok' ? 2 : type === 'warn' ? 1 : 0),
+        text:`压力比 ${pr.toFixed(3)}：${summary}${tail}（压比区间为参考值，以厂家样本为准）`});
     }
 
     // 台数校核
@@ -1022,15 +1013,15 @@
 
     // 风压校核
     if (dP_total < 30) {
-      checks.push({type:'warn', ic:'⚠', text:`设计风压 ${dP_total.toFixed(1)} kPa 偏低，请核查曝气池水深和曝气器背压`});
+      checks.push({type:'warn', ic:'⚠', text:`设计风压 ${dP_total.toFixed(1)} kPa 偏低，请核查扩散器淹没深度和曝气器背压`});
     } else if (dP_total > 120) {
-      checks.push({type:'warn', ic:'⚠', text:`设计风压 ${dP_total.toFixed(1)} kPa > 120 kPa，超出单级鼓风机常用范围，考虑减小水深或采用两级压缩`});
+      checks.push({type:'warn', ic:'⚠', text:`设计风压 ${dP_total.toFixed(1)} kPa > 120 kPa，超出单级鼓风机常用范围，考虑减小扩散器淹没深度或采用两级压缩`});
     } else {
       checks.push({type:'ok', ic:'✓', text:`设计风压 ${dP_total.toFixed(1)} kPa，在单级鼓风机常用范围内`});
     }
-    // 风压安全余量系数校核（合理区间 1.05–1.25）
+    // 风压安全余量系数校核（常用经验区间 1.05–1.25，非规范条文）
     if (fs >= 1.05 && fs <= 1.25) {
-      checks.push({type:'ok', ic:'✓', text:`风压安全余量系数 f_s = ${fs}（含 ${((fs-1)*100).toFixed(0)}% 余量），符合设计规范`});
+      checks.push({type:'ok', ic:'✓', text:`风压安全余量系数 f_s = ${fs}（含 ${((fs-1)*100).toFixed(0)}% 余量），在常用经验范围 1.05–1.25 内`});
     } else if (fs < 1.05) {
       checks.push({type:'warn', ic:'⚠', text:`风压安全余量系数 f_s = ${fs} 小于 1.05，余量不足，建议取 1.05-1.15`});
     } else {

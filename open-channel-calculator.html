@@ -794,6 +794,10 @@
     document.querySelectorAll('.shape-circ').forEach(el => {
       el.style.display = (s === 'circular') ? '' : 'none';
     });
+    // 切到圆形断面时若沿用的水深 h ≥ D（一切换即满管）,改取半管 h = 0.5·D
+    if (s === 'circular' && num('D') > 0 && num('h') >= num('D')) {
+      $('h').value = +(0.5 * num('D')).toFixed(3);
+    }
 
     drawSection();
     calc();
@@ -1222,6 +1226,13 @@ ${$('bestHint').innerText}`;
     const box = $('formulaBox');
     box.style.display = box.style.display === 'none' ? 'block' : 'none';
   }
+
+  // 手动改 n 时,下拉同步为匹配的预设,否则切到"自定义"
+  $('n').addEventListener('input', () => {
+    const v = parseFloat($('n').value);
+    const opt = Array.from($('n_preset').options).find(o => o.value !== 'custom' && Math.abs(parseFloat(o.value) - v) < 1e-9);
+    $('n_preset').value = opt ? opt.value : 'custom';
+  });
 
   document.querySelectorAll('input, select').forEach(el => {
     el.addEventListener('input', calc);

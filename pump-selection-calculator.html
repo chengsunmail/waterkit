@@ -608,6 +608,11 @@
         <label for="speed_ratio">变频调速比 <span class="unit">%（相对额定转速）</span></label>
         <input type="number" id="speed_ratio" value="100" step="5">
       </div>
+      <div class="field">
+        <label for="H0_ratio">关死扬程系数 H₀/H（高级） <span class="unit">倍</span></label>
+        <input type="number" id="H0_ratio" value="1.25" step="0.05">
+        <div class="helper">变频估算用假定泵曲线 H = H₀ − k·Q²，H₀ = 系数 × 设计扬程；离心泵常见 1.1–1.4</div>
+      </div>
     </div>
 
     <div class="results">
@@ -634,7 +639,7 @@
       </div>
 
       <div class="result-group">
-        <div class="result-group-title">功率计算（单泵）</div>
+        <div class="result-group-title" id="pw_title">功率计算（单泵）</div>
         <div class="result-row">
           <span class="result-label">有效功率 Pe（水功率）</span>
           <span><span class="result-value" id="r_Pe">—</span><span class="result-unit">kW</span></span>
@@ -644,11 +649,11 @@
           <span><span class="result-value" id="r_Psh">—</span><span class="result-unit">kW</span></span>
         </div>
         <div class="result-row highlight-row">
-          <span class="result-label"><b>电机配套功率 Pm（含 K 系数）</b></span>
+          <span class="result-label"><b id="lbl_Pm">电机配套功率 Pm（含 K 系数）</b></span>
           <span><span class="result-value big" id="r_Pm">—</span><span class="result-unit">kW</span></span>
         </div>
         <div class="result-row">
-          <span class="result-label">推荐电机功率（标准规格）</span>
+          <span class="result-label" id="lbl_Pm_std">推荐电机功率（标准规格）</span>
           <span><span class="result-value" id="r_Pm_std">—</span><span class="result-unit">kW</span></span>
         </div>
       </div>
@@ -712,7 +717,7 @@
       </div>
 
       <div class="result-group" id="vfd_group" style="display:none;">
-        <div class="result-group-title">变频运行（相似律预估）</div>
+        <div class="result-group-title">变频运行（假定二次泵曲线 × 系统曲线交点估算）</div>
         <div class="result-row">
           <span class="result-label">变频后流量 Q'</span>
           <span><span class="result-value" id="r_Q_vfd">—</span><span class="result-unit">m³/h</span></span>
@@ -730,6 +735,7 @@
           <span><span class="result-value" id="r_save">—</span><span class="result-unit">%</span></span>
         </div>
         <div class="check-box" id="checkVFD" style="display:none;"></div>
+        <div class="helper" id="vfd_note" style="margin-top:8px;color:#64748b;">按假定二次泵曲线估算（功率按设计效率近似），以厂家曲线为准。</div>
       </div>
 
       <div class="model-card">
@@ -768,12 +774,13 @@
       <p><strong>最大允许吸水高度</strong>：</p>
       <code>Hs_max = (Pa + P₁ − Pv)/(ρ·g)·1000 − NPSHr − hf_s − 安全余量</code>
 
-      <h3>④ 泵相似律（变频调速预估）</h3>
-      <p>对同一台泵在不同转速 n 下：</p>
-      <code>Q' / Q = n' / n</code>
-      <code>H' / H = (n' / n)²</code>
-      <code>P' / P = (n' / n)³</code>
-      <p>⚠️ 降频后扬程快速降低，如系统有较大静扬程，过度降频会导致流量为零。</p>
+      <h3>④ 变频调速工作点（假定泵曲线 × 系统曲线）</h3>
+      <p>相似律 Q∝n、H∝n² 只描述泵曲线本身的平移，实际工作点由泵曲线与系统曲线的交点决定；有静扬程时不能直接取 Q'=rQ、H'=r²H。本工具按以下近似求交点（r = n'/n）：</p>
+      <code>泵曲线（假定二次式）：H = r²·H₀ − k·Q²，H₀ = 关死扬程系数 × H_design，k = (H₀ − H_design)/Q_design²</code>
+      <code>系统曲线：H = Hst + (H_design − Hst)·(Q/Q_design)²，Hst = Hg + Hp（静扬程，富余扬程计入动扬程部分，曲线过设计点）</code>
+      <code>Q' = Q_design·√[(r²·H₀ − Hst)/(H₀ − Hst)]，H' 代入系统曲线；r²·H₀ ≤ Hst 时泵无法出流</code>
+      <code>P' = ρ·g·Q'·H' / (η_pump·η_trans) / 1000  [kW]（η 取设计效率，近似；实际降速后效率点会偏移）</code>
+      <p>节能率 = 1 − P'/Psh。多台同速并联时按总流量计算，结果相同。⚠️ 泵曲线为假定的二次式，仅作估算，以厂家特性曲线为准。</p>
 
       <h3>⑤ 海拔-大气压-水汽压关系</h3>
       <table>
@@ -889,7 +896,7 @@
   // 标准电机功率档位（GB/T 系列，与鼓风机选型计算器共用同一列表）
   const STD_MOTORS = [0.37,0.55,0.75,1.1,1.5,2.2,3,4,5.5,7.5,11,15,18.5,22,30,37,45,55,75,90,110,132,160,185,200,220,250,280,315,355,400,450,500,560,630,710,800,900,1000];
   // 读取原始数值（空/非数字返回 NaN，用于校验）
-  const raw = id => parseFloat($(id).value);
+  const raw = id => { const s = $(id).value.trim(); return s === '' ? NaN : Number(s); };
 
   const FLUID_NAMES = {clean_water:'清水', sewage:'污水', sludge:'污泥', seawater:'海水', chemical:'化学药液'};
   const PUMP_NAMES = {centrifugal:'离心泵', submerged:'潜水泵', axial:'轴流泵', screw:'螺杆泵', dosing:'计量泵'};
@@ -904,7 +911,7 @@
   function updateFluid() {
     const t = $('fluid').value;
     const defaults = {
-      clean_water: {rho: 1000, eta_pump: 78},
+      clean_water: {rho: 1000, eta_pump: 75},
       sewage:      {rho: 1010, eta_pump: 65},
       sludge:      {rho: 1020, eta_pump: 55},
       seawater:    {rho: 1025, eta_pump: 72},
@@ -922,7 +929,7 @@
   function updatePumpType() {
     const t = $('pump_type').value;
     const defaults = {
-      centrifugal: {eta_pump: 78, NPSHr: 3.5},
+      centrifugal: {eta_pump: 75, NPSHr: 3.5},
       submerged:   {eta_pump: 65, NPSHr: 2.0},
       axial:       {eta_pump: 78, NPSHr: 5.0},
       screw:       {eta_pump: 55, NPSHr: 2.5},
@@ -969,9 +976,10 @@
       ['price',     v => v >= 0,             '电费单价不能为负值'],
       ['NPSHr',     v => v >= 0,             '必需汽蚀余量 NPSHr 不能为负值'],
       ['NPSH_safe', v => v >= 0,             '汽蚀安全余量不能为负值'],
-      ['n_parallel',v => v >= 1,             '并联台数应不少于 1 台'],
-      ['n_backup',  v => v >= 0,             '备用台数不能为负值'],
+      ['n_parallel',v => Number.isInteger(v) && v >= 1, '并联台数应为不少于 1 的整数'],
+      ['n_backup',  v => Number.isInteger(v) && v >= 0, '备用台数应为不小于 0 的整数'],
       ['speed_ratio', v => v > 0,            '请输入大于 0 的变频调速比'],
+      ['H0_ratio',  v => v > 1 && v <= 3,    '关死扬程系数 H₀/H 应在 1–3 之间（大于 1）'],
     ];
     const errs = [];
     rules.forEach(([id, ok, msg]) => {
@@ -1032,8 +1040,8 @@
     const Pm_std = pickStdMotor(Pm);
 
     // 并联
-    const n_parallel = Math.max(1, parseInt($('n_parallel').value) || 1);
-    const n_backup = Math.max(0, parseInt($('n_backup').value) || 0);
+    const n_parallel = raw('n_parallel');  // 已校验为正整数
+    const n_backup = raw('n_backup');      // 已校验为非负整数
     const n_work = Math.max(1, n_parallel - n_backup);
     const Q_each = Q / n_work;
 
@@ -1067,11 +1075,19 @@
     const NPSH_margin = NPSHa - NPSHr;
 
     // 变频分析
+    // 假定泵曲线 H = r²·H0 − k·Q²（H0 = 关死扬程系数 × H，k 由设计点求出），
+    // 系统曲线 H = Hst + (H − Hst)·(Q/Q)²（Hst = Hg + Hp 静扬程，富余扬程计入动扬程，曲线过设计点），联立求交点
     const speed_ratio = num('speed_ratio') / 100;
-    const Q_vfd = Q * speed_ratio;
-    const H_vfd = H * speed_ratio * speed_ratio;
-    const vfd_below_static = H_vfd < Hg;  // 变频后扬程低于静扬程，无出流
-    const P_vfd = Psh * speed_ratio * speed_ratio * speed_ratio;  // 基数为轴功率
+    const H0 = num('H0_ratio') * H;
+    const Hst = Hg + Hp;
+    // (r²H0 − Hst) = (H0 − Hst)·(Q'/Q)²
+    const vfd_curve_ok = H > 0 && H0 - Hst > 0;    // 设计点、关死点需高于静扬程，否则假定曲线无意义
+    const vfd_num = speed_ratio * speed_ratio * H0 - Hst;
+    const vfd_below_static = vfd_curve_ok && vfd_num <= 0;  // r²·H0 ≤ Hst：泵无法出流
+    const x_vfd = vfd_curve_ok && vfd_num > 0 ? Math.sqrt(vfd_num / (H0 - Hst)) : NaN;  // Q'/Q
+    const Q_vfd = Q * x_vfd;
+    const H_vfd = Hst + (H - Hst) * x_vfd * x_vfd;
+    const P_vfd = rho * g * (Q_vfd/3600) * H_vfd / 1000 / eta_pump / eta_trans;  // 轴功率，η 取设计效率（近似）
     const save = Psh > 0 ? (1 - P_vfd/Psh) * 100 : 0;
 
     // 渲染结果
@@ -1107,6 +1123,12 @@
       cbox.innerHTML = `✗ 汽蚀风险 NPSHa (${NPSHa.toFixed(2)} m) &lt; NPSHr (${NPSHr.toFixed(2)} m)，必然发生汽蚀！必须将泵位置降低 ≥ ${(NPSHr - NPSHa + NPSH_safe).toFixed(2)} m 或倒灌安装`;
     }
 
+    // 多台工作泵时，顶部功率按总流量计算，仅为单泵等效参考；实际单泵电机见并联分析
+    const multiWork = n_work > 1;
+    $('pw_title').textContent = multiWork ? `功率计算（按总流量单泵等效，仅参考；实际单泵见下方并联分析）` : '功率计算（单泵）';
+    $('lbl_Pm').textContent = multiWork ? '总流量单泵等效 Pm（仅参考）' : '电机配套功率 Pm（含 K 系数）';
+    $('lbl_Pm_std').textContent = multiWork ? '总流量单泵等效标准规格（仅参考）' : '推荐电机功率（标准规格）';
+
     // 并联显示
     const backup_overflow = n_backup > 0 && n_backup >= n_parallel;
     if (n_parallel > 1 || backup_overflow) {
@@ -1130,14 +1152,19 @@
     if (Math.abs(speed_ratio - 1) > 0.001) {
       $('vfd_group').style.display = 'block';
       const vbox = $('checkVFD');
-      if (vfd_below_static) {
-        $('r_Q_vfd').textContent = '— 已低于静扬程，无出流';
-        $('r_H_vfd').textContent = `${H_vfd.toFixed(2)} < Hg ${Hg.toFixed(2)}`;
+      if (!vfd_curve_ok || vfd_below_static) {
+        $('r_Q_vfd').textContent = vfd_below_static ? '— 无出流' : '—';
+        $('r_H_vfd').textContent = '—';
         $('r_P_vfd').textContent = '—';
         $('r_save').textContent = '—';
         vbox.style.display = 'block';
-        vbox.className = 'check-box check-bad';
-        vbox.innerHTML = `✗ 变频后扬程 H' (${H_vfd.toFixed(2)} m) 已低于静扬程 Hg (${Hg.toFixed(2)} m)，泵无法出流，相似律预估无效，请提高调速比`;
+        if (!vfd_curve_ok) {
+          vbox.className = 'check-box check-warn';
+          vbox.textContent = `⚠ 设计扬程或关死扬程 H₀ (${H0.toFixed(2)} m) 不高于静扬程 Hst (${Hst.toFixed(2)} m)，假定泵曲线无法与系统曲线求交点，未做变频估算`;
+        } else {
+          vbox.className = 'check-box check-bad';
+          vbox.textContent = `✗ 调速比 ${(speed_ratio*100).toFixed(0)}% 下关死扬程 r²·H₀ = ${(speed_ratio*speed_ratio*H0).toFixed(2)} m ≤ 静扬程 Hst = ${Hst.toFixed(2)} m，泵曲线与系统曲线无正交点，泵无法出流；最低调速比约 ${(Math.sqrt(Math.max(Hst,0)/H0)*100).toFixed(0)}%（按假定泵曲线）`;
+        }
       } else {
         $('r_Q_vfd').textContent = Q_vfd.toFixed(1);
         $('r_H_vfd').textContent = H_vfd.toFixed(2);
@@ -1171,10 +1198,10 @@
 压力扬程 Hp = ${$('r_Hp').textContent} m
 水头损失 hw = ${$('r_hw').textContent} m
 
-【功率】
+【功率${$('pw_title').textContent.replace('功率计算', '')}】
 有效功率 Pe = ${$('r_Pe').textContent} kW
 泵轴功率 Psh = ${$('r_Psh').textContent} kW
-电机配套 Pm = ${$('r_Pm').textContent} kW → 标准 ${$('r_Pm_std').textContent} kW
+${$('lbl_Pm').textContent} = ${$('r_Pm').textContent} kW → 标准 ${$('r_Pm_std').textContent} kW
 
 【能耗】
 吨水能耗 = ${$('r_ekwh').textContent} kWh/m³
@@ -1193,7 +1220,7 @@ ${$('parallel_group').style.display !== 'none' ? `
 单泵流量 = ${$('r_Q_each').textContent} m³/h
 单泵电机功率 = ${$('r_Pm_each').textContent} kW${$('checkParallel').style.display !== 'none' ? '\n' + $('checkParallel').textContent : ''}
 ` : ''}${$('vfd_group').style.display !== 'none' ? `
-【变频运行（调速比 ${num('speed_ratio')}%）】
+【变频运行（调速比 ${num('speed_ratio')}%，关死扬程系数 ${num('H0_ratio')}，按假定二次泵曲线估算，以厂家曲线为准）】
 Q' = ${$('r_Q_vfd').textContent} m³/h
 H' = ${$('r_H_vfd').textContent} m
 P' = ${$('r_P_vfd').textContent} kW
@@ -1215,7 +1242,13 @@ ${$('r_suggest').textContent}`;
   }
 
   function resetDefaults() {
-    location.reload();
+    // 显式恢复 HTML 默认值（部分浏览器 reload 会保留表单输入）
+    document.querySelectorAll('input').forEach(el => { el.value = el.defaultValue; el.classList.remove('invalid'); });
+    document.querySelectorAll('select').forEach(el => {
+      [...el.options].forEach(o => { o.selected = o.defaultSelected; });
+    });
+    setEtaHint('');
+    calc();
   }
 
   function toggleFormula() {

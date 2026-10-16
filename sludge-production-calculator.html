@@ -460,10 +460,6 @@
         <input type="number" id="SRT" value="15" step="1">
       </div>
       <div class="field">
-        <label for="f_vss">VSS/SS 比 <span class="unit">—</span></label>
-        <input type="number" id="f_vss" value="0.75" step="0.05">
-      </div>
-      <div class="field">
         <label for="f_inert">进水 SS 不可降解系数 f <span class="unit">—</span></label>
         <input type="number" id="f_inert" value="0.5" step="0.05">
       </div>
@@ -507,6 +503,10 @@
       <div class="field">
         <label for="TPe">出水 TP <span class="unit">mg/L</span></label>
         <input type="number" id="TPe" value="0.3" step="0.1">
+      </div>
+      <div class="field">
+        <label for="bioP">生物除磷/同化量 <span class="unit">mg/L</span></label>
+        <input type="number" id="bioP" value="1.5" step="0.5">
       </div>
       <div class="field">
         <label for="chem_type">药剂类型</label>
@@ -628,22 +628,23 @@
       <h3>② 生物污泥（剩余活性污泥）</h3>
       <p><strong>方法一：产率系数法（Lawrence-McCarty 模型）</strong></p>
       <code>ΔX_bio_VSS = Y · Q · ΔBOD / (1 + Kd · SRT) / 1000</code>
-      <code>ΔX_bio_SS = ΔX_bio_VSS / f_vss + f · Q · (SS₀ − SSₑ) / 1000</code>
-      <p>后一项为进水中不可降解（惰性）固体在系统内的积累（GB 50014 剩余污泥量公式中的 f·Q·(SS₀−SSₑ) 项）：f 为进水 SS 中不可生物降解及惰性部分的比例，一般取 0.5-0.7，默认 0.5；SS₀ 为进入生物段的 SS（启用初沉时取初沉出水 SS = SS_o·(1−η_SS)，否则取进水 SS），SSₑ 为出水 SS。</p>
-      <p>其中 ΔBOD 为进入生物段后的 BOD 去除量（若有初沉，需扣除初沉去除部分）。Y 典型值 0.4-0.8 kgVSS/kgBOD；Kd 典型值 0.04-0.08 d⁻¹；f_vss（VSS/SS）典型值 0.7-0.8。</p>
+      <code>ΔX_bio = ΔX_bio_VSS + f · Q · (SS₀ − SSₑ) / 1000</code>
+      <p>后一项为进水中不可降解（惰性）固体在系统内的积累（GB 50014 剩余污泥量公式中的 f·Q·(SS₀−SSₑ) 项）：f 为进水 SS 中不可生物降解及惰性部分的比例，一般取 0.5-0.7，默认 0.5；SS₀ 为进入生物段的 SS（启用初沉时取初沉出水 SS = SS_o·(1−η_SS)，否则取进水 SS），SSₑ 为出水 SS。生物量项不再除以 VSS/SS：进水惰性及无机固体已由 f 项计入，再除以 VSS/SS 会重复计算（与 GB 50014 剩余污泥量公式口径一致）。</p>
+      <p>其中 ΔBOD 为进入生物段后的 BOD 去除量（若有初沉，需扣除初沉去除部分）。Y 典型值 0.4-0.8 kgVSS/kgBOD；Kd 典型值 0.04-0.08 d⁻¹。</p>
 
       <p><strong>方法二：污泥负荷法（经验系数）</strong></p>
       <code>ΔX_bio = Fr · Q · ΔBOD / 1000</code>
       <p>Fr 为总污泥产率（包含衰减），典型值 0.6-1.0 kgSS/kgBOD。此法简单，适合工程估算。Fr 为按 SS 计的总产率经验值，已隐含进水惰性固体，不再另加 f·Q·(SS₀−SSₑ) 项。</p>
 
       <h3>③ 化学除磷污泥</h3>
-      <code>ΔP = Q · (TP_o − TP_e) / 1000  [kgP/d]</code>
+      <code>ΔP = Q · max(0, TP_o − TP_e − P_bio) / 1000  [kgP/d]</code>
+      <p>P_bio 为生物除磷及污泥同化去除的磷（默认 1.5 mg/L，与加药量计算器“生物除磷贡献”默认值一致），只有剩余部分需化学沉淀。</p>
       <p>根据药剂类型，化学污泥包括两部分：反应生成的金属磷酸盐 + 过量投药生成的金属氢氧化物。</p>
-      <p>按化学计量：每 1 mol P 生成 1 mol 金属磷酸盐，过量的 (Me/P − 1) mol 金属生成氢氧化物。摩尔质量：P=31，AlPO₄=122，Al(OH)₃=78，FePO₄=150.8，Fe(OH)₃=106.9。</p>
+      <p>按化学计量：每 1 mol P 生成 1 mol 金属磷酸盐，过量的 (Me/P − 1) mol 金属生成氢氧化物。摩尔质量：P=31，AlPO₄=122，Al(OH)₃=78，FePO₄=150.8，Fe(OH)₃=106.87（55.845 + 3×17.007）。</p>
       <p><strong>PAC/铝系</strong>：</p>
       <code>ΔX_chem = ΔP · [122/31 + (Al/P − 1) · 78/31]</code>
       <p><strong>FeCl₃/PFS 铁系</strong>：</p>
-      <code>ΔX_chem = ΔP · [150.8/31 + (Fe/P − 1) · 106.9/31]</code>
+      <code>ΔX_chem = ΔP · [150.8/31 + (Fe/P − 1) · 106.87/31]</code>
       <p><strong>石灰</strong>（经验值，不随摩尔比线性；石灰除磷主要受 pH 控制）：</p>
       <code>ΔX_chem ≈ ΔP · (5.0 + 2.0 · Ca/P)</code>
       <p>Me/P 摩尔比一般取 1.2-2.0。摩尔比 1.5 时：PAC ≈ 5.19 kgDS/kgP，铁盐 ≈ 6.59 kgDS/kgP。石灰除磷同时生成 CaCO₃ 等副产物，与水的碱度强相关，此处仅为经验估算。</p>
@@ -784,10 +785,10 @@
       ['w_thick', '浓缩后含水率', 'w'], ['w_dewater', '脱水后含水率', 'w'],
       ['rho', '浓缩污泥密度', 'pos'], ['rho_cake', '泥饼密度', 'pos'], ['price', '处置单价', 'nn']
     ];
-    if (methodSel === 'Y') rules.push(['Y', '污泥产率 Y', 'nn'], ['Kd', '内源呼吸率 Kd', 'nn'], ['SRT', '污泥龄 SRT', 'pos'], ['f_vss', 'VSS/SS 比', 'pos'], ['f_inert', '不可降解系数 f', 'nn']);
+    if (methodSel === 'Y') rules.push(['Y', '污泥产率 Y', 'nn'], ['Kd', '内源呼吸率 Kd', 'nn'], ['SRT', '污泥龄 SRT', 'pos'], ['f_inert', '不可降解系数 f', 'nn']);
     else rules.push(['Fr', '污泥产率系数 Fr', 'nn']);
     if (usePS) rules.push(['eta_SS', '初沉 SS 去除率', 'nn'], ['eta_BOD', '初沉 BOD 去除率', 'nn'], ['w_ps', '初沉污泥含水率', 'w']);
-    if (useChem) rules.push(['TPo', '进水 TP', 'nn'], ['TPe', '出水 TP', 'nn'], ['mole_ratio', '投药比', 'nn']);
+    if (useChem) rules.push(['TPo', '进水 TP', 'nn'], ['TPe', '出水 TP', 'nn'], ['bioP', '生物除磷/同化量', 'nn'], ['mole_ratio', '投药比', 'nn']);
     document.querySelectorAll('.invalid').forEach(el => el.classList.remove('invalid'));
     const errs = [];
     rules.forEach(([id, name, rule]) => {
@@ -833,11 +834,12 @@
     const method = document.querySelector('input[name="method"]:checked').value;
     let X_bio = 0, X_inert = 0;
     if (method === 'Y') {
-      const Y = num('Y'), Kd = num('Kd'), SRT = num('SRT'), fvss = num('f_vss');
+      const Y = num('Y'), Kd = num('Kd'), SRT = num('SRT');
       const X_VSS = Y * Q * dBOD_bio / (1 + Kd * SRT) / 1000;
       // 惰性固体：GB 50014 f·Q·(SS₀−SSₑ)/1000，SS₀ 为进入生物段的 SS
       X_inert = num('f_inert') * Q * Math.max(SS_bio_in - num('SSe'), 0) / 1000;
-      X_bio = (fvss > 0 ? X_VSS / fvss : X_VSS) + X_inert;
+      // ΔX = ΔX_VSS + f·Q·(SS₀−SSₑ)/1000（不再除以 VSS/SS，避免与 f 项重复计入惰性固体）
+      X_bio = X_VSS + X_inert;
     } else {
       const Fr = num('Fr');
       X_bio = Fr * Q * dBOD_bio / 1000;
@@ -846,19 +848,20 @@
     // ③ 化学污泥
     let X_chem = 0;
     if (useChem) {
-      const TPo = num('TPo'), TPe = num('TPe');
-      const dP = Q * Math.max(TPo - TPe, 0) / 1000;  // kgP/d
+      const TPo = num('TPo'), TPe = num('TPe'), bioP = num('bioP');
+      // 化学除磷量须扣除生物除磷/污泥同化量（与加药量计算器“生物除磷贡献”口径一致）
+      const dP = Q * Math.max(TPo - TPe - bioP, 0) / 1000;  // kgP/d
       const mole = num('mole_ratio');
       const chemType = $('chem_type').value;
       // 化学计量系数：每kg磷产生的化学污泥量 = 金属磷酸盐 + 过量金属生成的氢氧化物
-      // M_P=31；AlPO4=122，Al(OH)3=78；FePO4=150.8，Fe(OH)3=106.85
+      // M_P=31；AlPO4=122，Al(OH)3=78；FePO4=150.8，Fe(OH)3=106.87（55.845 + 3×17.007）
       let factor;
       if (chemType === 'PAC') {
         // Al基：1 mol P → 1 mol AlPO4 + (mole−1) mol Al(OH)3
         factor = 122/31 + (mole - 1) * 78/31;      // mole=1.5 时 ≈ 5.19 kg/kgP
       } else if (chemType === 'FeCl3' || chemType === 'PFS') {
         // Fe基：1 mol P → 1 mol FePO4 + (mole−1) mol Fe(OH)3
-        factor = 150.8/31 + (mole - 1) * 106.85/31; // mole=1.5 时 ≈ 6.59 kg/kgP
+        factor = 150.8/31 + (mole - 1) * 106.87/31; // mole=1.5 时 ≈ 6.59 kg/kgP
       } else {
         factor = 5.0 + 2.0 * mole;   // 石灰系：经验值（含 CaCO3 等副产物，与碱度相关）
       }
@@ -912,7 +915,7 @@
 【干污泥产量】
 初沉污泥 = ${$('r_ps').textContent} kgDS/d
 剩余生物污泥 = ${$('r_bio').textContent} kgDS/d${document.querySelector('input[name="method"]:checked').value === 'Y' ? '（含惰性固体 f=' + num('f_inert') + '）' : ''}
-化学除磷污泥 = ${$('r_chem').textContent} kgDS/d
+化学除磷污泥 = ${$('r_chem').textContent} kgDS/d${$('useChem').checked ? '（TP ' + num('TPo') + '→' + num('TPe') + ' mg/L，扣生物除磷/同化 ' + num('bioP') + ' mg/L）' : ''}
 干污泥总量 ΔX = ${$('r_total_dry').textContent} kgDS/d
 
 【湿污泥】
@@ -939,9 +942,9 @@
 
   function resetDefaults() {
     const d = {Q:10000, SSo:200, SSe:10, BODo:200, BODe:10,
-      Y:0.6, Kd:0.05, SRT:15, f_vss:0.75, f_inert:0.5, Fr:0.8,
+      Y:0.6, Kd:0.05, SRT:15, f_inert:0.5, Fr:0.8,
       eta_SS:55, eta_BOD:30, w_ps:97,
-      TPo:4, TPe:0.3, mole_ratio:1.5,
+      TPo:4, TPe:0.3, bioP:1.5, mole_ratio:1.5,
       w_thick:97, w_dewater:80, rho:1.02, rho_cake:1.05, price:300};
     Object.keys(d).forEach(k => $(k).value = d[k]);
     $('usePS').checked = true;

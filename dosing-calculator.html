@@ -780,7 +780,8 @@
         </div>
         <div class="field">
           <label for="p_price">采购单价 <span class="unit">元/t</span></label>
-          <input type="number" id="p_price" value="1800" step="100">
+          <input type="number" id="p_price" value="700" step="50">
+          <span id="p_price_note" style="font-size:11.5px;color:#9ca3af;margin-top:4px;">液体 PAC（10% Al₂O₃）参考价，按厂家报价调整</span>
         </div>
       </div>
 
@@ -1091,7 +1092,7 @@
   function updateP() {
     const t = $('p_type').value;
     const defaults = {
-      PAC:   {metal: 10, price: 1800},  // 按 Al2O3 标示含量，calc() 内乘 0.529 换算为 Al
+      PAC:   {metal: 10, price: 700},   // 10% Al2O3 液体 PAC 参考价（固体 30% 约 1800 元/t），按厂家报价调整；按 Al2O3 标示含量，calc() 内乘 0.529 换算为 Al
       PFS:   {metal: 11, price: 1200},
       FeCl3: {metal: 13, price: 1500},
       FeSO4: {metal: 20, price: 800}
@@ -1179,6 +1180,7 @@
     const Q = num('Q');           // m³/h
     const hours = num('hours');
     syncCarbonForm();
+    $('p_price_note').textContent = $('p_type').value === 'PAC' ? '液体 PAC（10% Al₂O₃）参考价，按厂家报价调整' : '参考价，按厂家报价调整';
     $('ph_vol_row').style.display = SOLID_PH.includes($('ph_chem').value) ? 'none' : 'flex';
     showMsg('hintBox', '');
     const errs = validate(currentDrug);

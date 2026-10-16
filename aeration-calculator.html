@@ -424,7 +424,7 @@
         <input type="number" id="alt" value="0" step="50">
       </div>
       <div class="field">
-        <label for="H">曝气池水深 H <span class="unit">m</span></label>
+        <label for="H">曝气池水深 H（仅用于校核 Hd ≤ H） <span class="unit">m</span></label>
         <input type="number" id="H" value="5.0" step="0.1">
       </div>
       <div class="field">
@@ -518,7 +518,7 @@
       <p><strong>④ 标准需氧量（SOR）—— 修正到 20℃、清水、DO=0 条件</strong></p>
       <code>SOR = AOR · Cs20 / [α · (β · Csm(T) − Cw) · 1.024^(T−20)]</code>
       <code>Csm(T) = Cs(T) · [ρ + Hd · 9.81 / 101.325 + Ot / 21] / 2</code>
-      <p>其中 Cs20 = Cs(20) ≈ 9.02 mg/L（与 Cs(T) 同一拟合式）；ρ 为海拔大气压比 P/P₀；Hd·9.81/101.325 为扩散器深度处的静水压（atm）；Ot = 21·(1 − EA) / [79 + 21·(1 − EA)] × 100 为出气含氧 %（Metcalf &amp; Eddy 式 5-67）。海拔与水深按压力叠加，不再重复相乘。Cs(T) 为三次多项式拟合，适用约 0–40 ℃，超出范围误差增大。若 Cw ≥ β·Csm，则无传质推动力，SOR 无解。</p>
+      <p>其中 Cs20 = Cs(20) = 9.09 mg/L（与 Cs(T) 同一张表）；ρ 为海拔大气压比 P/P₀；Hd·9.81/101.325 为扩散器深度处的静水压（atm）；Ot = 21·(1 − EA) / [79 + 21·(1 − EA)] × 100 为出气含氧 %（Metcalf &amp; Eddy 式 5-67）。海拔与水深按压力叠加，不再重复相乘。Cs(T) 取 101.325 kPa、淡水的饱和溶解氧表（APHA Standard Methods 4500-O，Benson &amp; Krause 式；0–40 ℃ 每 1 ℃，如 20 ℃ 9.09、25 ℃ 8.26、30 ℃ 7.56、35 ℃ 6.95、40 ℃ 6.41 mg/L），表间线性插值，水温限 0–40 ℃、海拔限 −500–6000 m。池深 H 仅用于校核 Hd ≤ H，不参与计算。若 Cw ≥ β·Csm，则无传质推动力，SOR 无解。</p>
 
       <p><strong>⑤ 标准供气量</strong></p>
       <code>Gs = SOR / (0.28 · EA · 1440)  [m³/min，标准状态 20 ℃、101.325 kPa]</code>
@@ -603,10 +603,17 @@
   const $ = id => document.getElementById(id);
   const num = id => parseFloat($(id).value) || 0;
 
-  // 不同温度下清水饱和溶解氧 (mg/L)，标准大气压
+  // 清水饱和溶解氧 (mg/L)：0–40 ℃ 每 1 ℃，101.325 kPa，淡水（盐度 0），与水饱和空气接触
+  // 来源：APHA Standard Methods 4500-O 溶解度表（Benson & Krause 1984 式），数值同 YSI《Oxygen Solubility Table》
+  const CS_TABLE = [14.62,14.22,13.83,13.46,13.11,12.77,12.45,12.14,11.84,11.56,
+    11.29,11.03,10.78,10.54,10.31,10.08,9.87,9.67,9.47,9.28,
+    9.09,8.92,8.74,8.58,8.42,8.26,8.11,7.97,7.83,7.69,
+    7.56,7.43,7.31,7.18,7.07,6.95,6.84,6.73,6.62,6.52,6.41];
   function Cs_T(T) {
-    // 三次多项式拟合（约 0–40℃ 适用，>40℃ 失真，calc() 中给出提示）
-    return 14.652 - 0.41022*T + 0.0079910*T*T - 0.000077774*T*T*T;
+    // 表内线性插值；T 已在 calc() 中限定为 0–40 ℃
+    const t = Math.min(Math.max(T, 0), 40);
+    const i = Math.min(Math.floor(t), 39);
+    return CS_TABLE[i] + (CS_TABLE[i + 1] - CS_TABLE[i]) * (t - i);
   }
 
   // 大气压修正因子（按海拔，标准大气压为1）
@@ -641,6 +648,14 @@
       if (bad) errs.push(rule === 'pos' ? `请输入大于 0 的${name}` : `${name}不能为负值`);
     });
     if (num('EA') > 100) { $('EA').classList.add('invalid'); errs.push('氧转移效率 EA 不应超过 100%'); }
+    // 水温、海拔：空/非数字或超出适用范围均按无效处理
+    const vT = parseFloat($('T').value), vAlt = parseFloat($('alt').value);
+    const badT = isNaN(vT) || vT < 0 || vT > 40;
+    const badAlt = isNaN(vAlt) || vAlt < -500 || vAlt > 6000;
+    $('T').classList.toggle('invalid', badT);
+    $('alt').classList.toggle('invalid', badAlt);
+    if (badT) errs.push(isNaN(vT) ? '请输入水温 T' : '水温 T 应在 0–40 ℃ 之间（饱和溶解氧表适用范围）');
+    if (badAlt) errs.push(isNaN(vAlt) ? '请输入海拔高度' : '海拔高度应在 −500–6000 m 之间');
     if (errs.length) {
       OUT_IDS.forEach(id => $(id).textContent = '—');
       showMsg('warnBox', '⚠️ ' + errs.join('；'));
@@ -658,8 +673,6 @@
 
     const hints = [];
     if (Hd > H) hints.push(`扩散器安装深度 Hd（${Hd} m）大于曝气池水深 H（${H} m），请核对`);
-    if (T > 40) hints.push('水温超过 40 ℃，饱和溶解氧拟合多项式已超出适用范围，结果可能失真');
-    else if (T < 0) hints.push('水温低于 0 ℃，饱和溶解氧拟合多项式已超出适用范围');
 
     // ① 去除BOD需氧量（污泥龄法）：净剩余污泥 Px，1.47 = BOD_u/BOD5，1.42 = VSS 氧当量
     const Px = Y * Q * (So - Se) / (1 + Kd * SRT) / 1000;  // kgVSS/d
@@ -673,7 +686,7 @@
     const AOR = Math.max(O1 + O2 - O3, 0) * sf;
 
     // ④ SOR：修正因子
-    const Cs20 = Cs_T(20);  // mg/L, 20℃清水饱和DO，与 Cs_T 同一口径
+    const Cs20 = Cs_T(20);  // mg/L, 20℃清水饱和DO = 9.09，与 Cs_T 同一张表
     const CsT = Cs_T(T);
     const rho = rho_alt(alt);
     // 出气氧浓度%（Metcalf & Eddy 5-67）：Ot = 21(1−EA)/[79+21(1−EA)]×100
