@@ -1,0 +1,2492 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>池塘养殖尾水处理设计计算 | 水处理工具箱 · WaterKit</title>
+<meta name="description" content="池塘养殖尾水处理设计计算: 按各省水产养殖尾水排放标准自动判定执行级别, 用氮磷质量平衡估算尾水浓度, 计算三池两坝处理设施规模。">
+<link rel="canonical" href="https://waterkit.cn/tailwater.html">
+<meta name="author" content="海南登登科技咨询有限公司">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:site_name" content="水处理工具箱 WaterKit">
+<meta property="og:url" content="https://waterkit.cn/tailwater.html">
+<meta property="og:title" content="池塘养殖尾水处理设计计算">
+<meta property="og:description" content="按各省水产养殖尾水排放标准自动判定执行级别，用氮磷质量平衡估算尾水浓度，计算三池两坝处理设施规模。">
+<!--
+  池塘养殖尾水处理设计计算 v0.7 (; 独立单文件工具; 依据《三池两坝处理效果与设计参数审计》2026-10-12)
+  单文件版: 计算核心内嵌于 id 为 tailwater-core 的 script 块 (纯函数, 单元测试内嵌于 id 为 tailwater-tests 的 script 块)
+  页面自检: tailwater.html?selftest=1 (运行全部单元测试)
+  表单本地保存: localStorage['tailwaterForm_v06']
+-->
+<style>
+  :root {
+    --brand: #0891b2; --brand-dark: #0e7490; --brand-light: #e0f2fe;
+    --text: #0f172a; --text-muted: #64748b; --text-faint: #94a3b8;
+    --border: #e2e8f0; --bg: #f8fafc; --white: #ffffff;
+    --ok: #16a34a; --warn: #d97706; --bad: #dc2626; --info: #2563eb;
+    --radius: 8px;
+    --ink: #0f172a; --bg-section: #f1f5f9;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', "Microsoft YaHei", sans-serif;
+    background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.55;
+    display: flex; flex-direction: column; min-height: 100vh;
+  }
+  a { color: var(--brand); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ===== 统一顶部导航 ===== */
+  .topbar { background: rgba(255,255,255,0.92); border-bottom: 1px solid var(--border); position: relative; z-index: 101; }
+  .topbar-inner { max-width: 1280px; margin: 0 auto; padding: 14px 32px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
+  .brand:hover { text-decoration: none; }
+  .brand-mark { width: 34px; height: 34px; background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%); border-radius: 8px; display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 16px; letter-spacing: -1px; box-shadow: 0 2px 6px rgba(8,145,178,0.25); }
+  .brand-name { font-weight: 600; font-size: 16.5px; color: var(--ink); letter-spacing: -0.2px; }
+  .brand-sub { font-size: 11px; color: var(--text-faint); margin-top: 1px; }
+  .nav-links { display: flex; gap: 24px; font-size: 14px; align-items: center; }
+  .nav-links a { color: var(--text); text-decoration: none; transition: color 0.15s; font-weight: 500; }
+  .nav-links a:hover { color: var(--brand); }
+  .nav-links a.back::before { content: "←"; margin-right: 4px; color: var(--brand); }
+  @media (max-width: 640px) {
+    .nav-links { gap: 16px; font-size: 13px; }
+    .nav-links a:not(.back) { display: none; }
+    .topbar-inner { padding: 12px 20px; }
+    .brand-name { font-size: 15px; }
+    .brand-sub { display: none; }
+  }
+
+  /* ===== Hero ===== */
+  .hero { background: linear-gradient(135deg, #0c4a6e 0%, #0e7490 60%, #0891b2 100%); color: white; padding: 28px 24px 24px; }
+  .hero-inner { max-width: 1280px; margin: 0 auto; }
+  .breadcrumb { font-size: 12px; opacity: 0.7; margin-bottom: 10px; }
+  .breadcrumb a { color: white; opacity: 0.8; }
+  .hero-row { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 14px; }
+  .hero-title { font-size: clamp(22px,4vw,32px); font-weight: 700; margin: 0 0 8px; color: white; }
+  .hero-sub { font-size: 13px; opacity: 0.85; line-height: 1.6; max-width: 760px; }
+  .hero-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .hero-actions .btn { background: rgba(255,255,255,0.15); color: white; border-color: rgba(255,255,255,0.4); }
+  .hero-actions .btn:hover { background: white; color: var(--brand-dark); border-color: white; }
+  @media (max-width: 640px) { .hero { padding: 20px 16px 18px; } }
+
+  /* ===== Tab Nav ===== */
+  .tab-nav-wrap { background: white; border-bottom: 2px solid var(--border); position: sticky; top: 0; z-index: 100; }
+  .tabs { max-width: 1280px; margin: 0 auto; display: flex; overflow-x: auto; padding: 0 12px; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { flex-shrink: 0; padding: 14px 18px 12px; border: none; border-bottom: 3px solid transparent; margin-bottom: -2px; background: none; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--text-muted); white-space: nowrap; font-family: inherit; transition: color 0.15s; }
+  .tab:hover { color: var(--brand); }
+  .tab[aria-selected="true"] { color: var(--brand); border-bottom-color: var(--brand); }
+  .tab-panel[hidden] { display: none; }
+
+  /* ===== 主体 ===== */
+  .container { max-width: 1280px; width: 100%; margin: 0 auto; padding: 20px 16px 40px; flex: 1 0 auto; }
+  h1 { color: var(--text); font-size: 20px; font-weight: 700; margin: 0; }
+  h2 { color: var(--brand-dark); font-size: 17px; font-weight: 700; margin: 24px 0 10px 0; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+  h3 { color: var(--text); font-size: 15px; font-weight: 700; margin: 16px 0 6px 0; }
+  .meta { color: var(--text-muted); font-size: 12px; }
+  .hero .meta { color: white; }
+  .btn { display: inline-block; background: white; color: var(--text-muted); border: 1.5px solid var(--border); padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; font-family: inherit; text-decoration: none; transition: all 0.15s; }
+  .btn:hover { border-color: var(--brand); color: var(--brand); text-decoration: none; }
+  .std-card .btn { background: var(--brand); color: white; border-color: var(--brand); }
+  .std-card .btn:hover { background: var(--brand-dark); border-color: var(--brand-dark); color: white; }
+  .layout { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 20px; align-items: start; }
+  @media (max-width: 1000px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+  .input-section { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 16px; min-width: 0; box-shadow: 0 1px 3px rgba(15,23,42,0.04); }
+  #results { min-width: 0; }
+  .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr)); gap: 10px 14px; }
+  .field select { min-width: 0; }
+  .field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .field label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+  .field label .hint { color: var(--text-faint); font-size: 11px; font-weight: 400; margin-left: 3px; }
+  .field input, .field select {
+    background: white; color: var(--text); border: 1.5px solid var(--border); border-radius: 6px;
+    padding: 7px 10px; font-size: 14px; width: 100%; font-family: inherit; font-variant-numeric: tabular-nums; transition: border-color 0.15s;
+  }
+  .field input:focus, .field select:focus { outline: none; border-color: var(--brand); }
+  .field.wide { grid-column: span 2; }
+  .check { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text); grid-column: 1 / -1; }
+  .check input { accent-color: var(--brand); }
+  .check[hidden], .field[hidden] { display: none; }
+  .group-title { grid-column: 1 / -1; color: var(--brand-dark); font-size: 14px; font-weight: 700; border-top: 1px dashed var(--border); padding-top: 12px; margin-top: 8px; }
+  .group-title:first-child { border-top: none; padding-top: 0; margin-top: 0; }
+  .group-title small { color: var(--text-muted); font-weight: 400; font-size: 12px; margin-left: 6px; }
+  .stdbox { grid-column: 1 / -1; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px; padding: 8px 12px; font-size: 12px; color: var(--text); line-height: 1.65; }
+  .stdbox b { color: var(--brand-dark); }
+  .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .kpi { background: white; border: 1px solid var(--border); border-top: 3px solid var(--brand); border-radius: 10px; padding: 10px 12px; min-width: 0; }
+  .kpi .label { color: var(--text-muted); font-size: 12px; margin-bottom: 4px; }
+  .kpi .value { font-size: 19px; font-weight: 700; color: var(--brand-dark); font-family: ui-monospace, "SF Mono", Consolas, monospace; overflow-wrap: anywhere; }
+  .kpi .value.txt { font-size: 15px; font-family: inherit; }
+  .kpi .sub { color: var(--text-muted); font-size: 11px; margin-top: 2px; }
+  .kpi.good { border-top-color: var(--ok); background: #f0fdf4; } .kpi.good .value { color: #15803d; }
+  .kpi.warn { border-top-color: var(--warn); background: #fffbeb; } .kpi.warn .value { color: #b45309; }
+  .kpi.bad { border-top-color: var(--bad); background: #fef2f2; } .kpi.bad .value { color: #b91c1c; }
+  .table-wrapper { overflow-x: auto; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 10px; background: white; }
+  .table-wrapper table.tw { border: none; }
+  table.tw { width: 100%; border-collapse: collapse; font-size: 12.5px; background: white; }
+  table.tw th, table.tw td { border-bottom: 1px solid #f1f5f9; padding: 6px 8px; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; font-family: ui-monospace, "SF Mono", Consolas, monospace; color: var(--text); }
+  table.tw th { background: #f1f5f9; color: var(--text); text-align: center; font-weight: 700; font-family: inherit; border-bottom: 2px solid var(--border); }
+  table.tw tr:last-child td { border-bottom: none; }
+  table.tw td:first-child { text-align: left; color: var(--text); font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; }
+  table.tw td.l { text-align: left; font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; white-space: normal; }
+  table.tw tr.total td { background: var(--brand-light); color: var(--brand-dark); font-weight: 700; }
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; font-family: -apple-system, "PingFang SC", sans-serif; }
+  .pill.ok { background: #dcfce7; color: #166534; }
+  .pill.no { background: #fee2e2; color: #991b1b; }
+  .pill.na { background: #f1f5f9; color: #475569; }
+  .pill.edge { background: #fef9c3; color: #713f12; }
+  .pill.gov { background: var(--brand-light); color: var(--brand-dark); }
+  .note { background: #f0f9ff; border-left: 3px solid var(--brand); padding: 10px 14px; border-radius: 0 6px 6px 0; margin: 10px 0; font-size: 12.5px; line-height: 1.7; color: var(--text); }
+  .note.warn { background: #fffbeb; border-left-color: #f59e0b; }
+  .note.bad { background: #fef2f2; border-left-color: #ef4444; color: #991b1b; }
+  .note .label { color: var(--brand-dark); font-weight: 700; }
+  .note.warn .label { color: #b45309; } .note.bad .label { color: #b91c1c; }
+  .src { font-size: 12px; color: var(--text-muted); }
+  .src li { margin: 3px 0; }
+  .muted { color: var(--text-muted); }
+  #selftest { display: none; position: fixed; right: 16px; bottom: 16px; z-index: 150; max-width: min(420px, calc(100vw - 32px)); background: white; color: var(--text); border: 1px solid var(--border); border-top: 3px solid var(--brand); border-radius: 10px; padding: 12px 14px; font-size: 12px; box-shadow: 0 8px 24px rgba(15,23,42,0.15); }
+  /* 文档排版 */
+  .doc { max-width: 980px; }
+  .doc p, .doc li, .doc dd { color: var(--text); line-height: 1.8; }
+  .doc .lead { font-size: 14px; color: var(--text); }
+  .doc h3 { margin-top: 28px; scroll-margin-top: 64px; color: var(--brand-dark); }
+  .doc h4 { color: var(--text); font-size: 13.5px; margin: 16px 0 6px; }
+  .doc ul, .doc ol { padding-left: 20px; }
+  .toc { display: flex; flex-wrap: wrap; gap: 6px 14px; background: white; border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin: 12px 0; }
+  .toc a { text-decoration: none; font-size: 12.5px; font-weight: 500; }
+  .steps li { margin-bottom: 6px; }
+  .tip { background: #f0f9ff; border-left: 3px solid var(--brand); padding: 10px 14px; border-radius: 0 6px 6px 0; }
+  .formula { background: white; border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; color: var(--text); line-height: 1.9; overflow-x: auto; }
+  table.gtable td:first-child { width: 22%; min-width: 96px; color: var(--brand-dark); font-weight: 600; vertical-align: top; }
+  table.gtable td, table.gtable th { text-align: left; vertical-align: top; white-space: normal; font-family: inherit; line-height: 1.65; }
+  .doc table.gtable { border: 1px solid var(--border); border-radius: 10px; border-collapse: separate; border-spacing: 0; overflow: hidden; margin: 8px 0 12px; }
+  .doc .std-card .rule, .doc table.gtable { word-break: break-word; }
+  .faq dt { color: var(--text); font-weight: 700; margin-top: 12px; }
+  .faq dd { margin: 4px 0 0 0; }
+  code { background: var(--bg-section); padding: 1px 5px; border-radius: 4px; font-size: 12px; color: var(--brand-dark); }
+  .std-filter { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin: 12px 0; }
+  .std-filter label { display: flex; gap: 6px; align-items: center; color: var(--text-muted); font-size: 12px; font-weight: 500; }
+  .std-filter select, .std-filter input { background: white; color: var(--text); border: 1.5px solid var(--border); border-radius: 6px; padding: 6px 10px; font-size: 13px; font-family: inherit; max-width: 100%; }
+  .std-filter select:focus, .std-filter input:focus { outline: none; border-color: var(--brand); }
+  .std-card { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; }
+  .std-card .hd { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: baseline; }
+  .std-card .hd b { color: var(--brand-dark); font-size: 14.5px; }
+  .std-card .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 4px 16px; margin: 8px 0; font-size: 12.5px; color: var(--text); }
+  .std-card .facts span { color: var(--text-muted); }
+  .std-card .rule { font-size: 12.5px; color: var(--text); margin: 6px 0; line-height: 1.7; }
+  .std-card .flag { color: #b45309; font-size: 12px; }
+  @media (max-width: 600px) {
+    .container { padding: 14px 12px 32px; }
+    .field.wide { grid-column: 1 / -1; }
+  }
+
+  /* ===== 免责声明 ===== */
+  .disclaimer-wrap { max-width: 1280px; width: 100%; margin: 0 auto 24px; padding: 0 16px; }
+  .disclaimer { padding: 12px 16px; background: #fef9c3; border-left: 3px solid #ca8a04; border-radius: 4px; font-size: 12px; color: #713f12; line-height: 1.6; }
+
+  /* 页脚基础重置（本页未使用全局 margin/padding 重置） */
+  .site-footer h4, .site-footer p, .site-footer ul { margin: 0; padding: 0; }
+  .site-footer h4 { margin-bottom: 14px; }
+  .site-footer .brand-mark { flex-shrink: 0; }
+
+/* ===== 统一页脚 ===== */
+  .site-footer {
+    background: var(--bg-section);
+    border-top: 1px solid var(--border);
+    padding: 56px 32px 32px;
+    margin-top: auto;
+  }
+  .footer-inner { max-width: 1280px; margin: 0 auto; }
+  .footer-main {
+    display: grid;
+    grid-template-columns: 1.5fr repeat(5, minmax(0, 1fr));
+    gap: 32px;
+    gap: 40px;
+    padding-bottom: 32px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  @media (max-width: 1100px) {
+    .footer-main { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
+    .footer-about-col { grid-column: 1 / -1; }
+    .footer-about { max-width: 640px; }
+  }
+  @media (max-width: 720px) {
+    .site-footer { padding: 40px 16px 28px; }
+    .footer-main { grid-template-columns: 1fr 1fr; gap: 24px 20px; }
+  }
+  .footer-about-col .brand { margin-bottom: 14px; }
+  .footer-col h4 {
+    font-size: 11.5px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+  .footer-col ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .footer-col li { font-size: 13px; color: var(--text); }
+  .footer-col a {
+    font-size: 13px;
+    color: var(--text);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .footer-col a:hover { color: var(--brand); }
+  .footer-about {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    max-width: 340px;
+  }
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--text-muted);
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .footer-bottom a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--border);
+    text-underline-offset: 2px;
+  }
+  .footer-bottom a:hover { color: var(--brand); }
+
+  @media print {
+    /* v0.6: 打印输入表单以便复核; 不依赖背景色, 用边框和加粗区分 */
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body { background: white; color: #111; font-size: 10px; }
+    .no-print { display: none !important; }
+    .layout { grid-template-columns: 1fr; }
+    .input-section { display: block !important; page-break-after: always; }
+    .input-section .grid { grid-template-columns: repeat(4, 1fr); }
+    .field input, .field select { border: 1px solid #999 !important; background: white !important; color: #111 !important; }
+    .field label, .hint, .group-title, .check { color: #111 !important; }
+    .kpi, table.tw, .note, .input-section, .stdbox { background: white !important; color: #111 !important; border-color: #999 !important; }
+    .kpi .label, .kpi .sub, .muted, .src, .note .label, .stdbox { color: #333 !important; }
+    table.tw th { background: #eee !important; color: #111 !important; }
+    table.tw td, table.tw th { border: 1px solid #bbb !important; color: #111 !important; }
+    table.tw tr.total td { background: #e6f4f1 !important; color: #111 !important; font-weight: 700; border-top: 2px solid #0f766e !important; }
+    .pill { border: 1px solid #333 !important; color: #111 !important; background: white !important; }
+    .pill.ok::before { content: '✓ '; } .pill.no::before { content: '✗ '; } .pill.edge::before { content: '! '; }
+    .kpi.bad { border: 2px solid #b91c1c !important; } .kpi.warn { border: 2px solid #b45309 !important; } .kpi.good { border: 2px solid #15803d !important; }
+    h1, h2, h3, .kpi .value { color: #0f766e !important; }
+    a { color: #111; text-decoration: none; }
+    .doc p, .doc li, .doc dd, .std-card .rule, .std-card .facts, .formula, .lead { color: #111 !important; }
+    .std-card, .toc, .formula, .tip { background: white !important; border: 1px solid #999 !important; }
+    .std-card { page-break-inside: avoid; }
+    .doc h4, .std-card .hd b, table.gtable td:first-child { color: #0f766e !important; }
+    .std-filter, .toc, .std-card .btn { display: none !important; }
+    .site-footer { color: #333 !important; border-top: 1px solid #999; }
+    .site-footer a { color: #333 !important; }
+    /* WaterKit 外壳: 打印时隐藏顶栏/Tab/页脚, 标题区改白底 */
+    .topbar, .tab-nav-wrap, .site-footer { display: none !important; }
+    .hero { background: white !important; color: #111 !important; padding: 0 0 8px !important; border-bottom: 2px solid #0f766e; }
+    .hero .breadcrumb { display: none !important; }
+    .hero .meta, .hero-sub { color: #333 !important; opacity: 1 !important; }
+    .container { max-width: none; padding: 8px 0; }
+    .disclaimer-wrap { max-width: none; padding: 0; margin: 12px 0 0; }
+    .disclaimer { background: white !important; color: #111 !important; border: 1px solid #999 !important; }
+    #results, .doc { color: #111; }
+  }
+
+</style>
+</head>
+<body>
+
+<!-- 统一顶部导航 -->
+<header class="topbar no-print">
+  <div class="topbar-inner">
+    <a href="index.html" class="brand">
+      <div class="brand-mark">W</div>
+      <div>
+        <div class="brand-name">水处理工具箱</div>
+        <div class="brand-sub">WaterKit · by 登登科技</div>
+      </div>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html" class="back">返回首页</a>
+      <a href="index.html#cat-aquaculture">水产养殖</a>
+      <a href="https://dengdengtech.cn" target="_blank" rel="noopener">登登科技</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ===== Hero ===== -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="breadcrumb no-print">
+      <a href="index.html">WaterKit</a> / <a href="index.html#cat-aquaculture">水产养殖</a> / 池塘养殖尾水处理
+    </div>
+    <div class="hero-row">
+      <div>
+        <h1 class="hero-title">🌿 池塘养殖尾水处理设计计算</h1>
+        <div class="meta hero-sub" id="metaLine">排放标准判定 · 尾水水质估算 · 三池两坝规模 · 达标核算 · v0.7</div>
+      </div>
+      <div class="hero-actions no-print">
+        <button class="btn" id="btnReset" type="button">↺ 恢复默认</button>
+        <button class="btn" id="btnPrint" type="button">🖨️ 打印</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Tab Nav ===== -->
+<div class="tab-nav-wrap no-print">
+  <nav class="tabs" role="tablist">
+    <button type="button" class="tab" role="tab" data-tab="calc">设计计算</button>
+    <button type="button" class="tab" role="tab" data-tab="standards">排放标准汇总</button>
+    <button type="button" class="tab" role="tab" data-tab="guide">使用说明</button>
+  </nav>
+</div>
+
+<div class="container">
+
+  <section id="tab-calc" class="tab-panel">
+  <div class="layout">
+    <!-- ============ 输入 ============ -->
+    <form class="input-section no-print" id="form" autocomplete="off" onsubmit="return false">
+      <div class="input-grid">
+        <div class="group-title">① 所在地与排放标准</div>
+        <div class="field"><label for="water">水体</label>
+          <select id="water"><option value="fw">淡水养殖</option><option value="sw">海水养殖</option></select></div>
+        <div class="field"><label for="standardId">省份 / 标准</label><select id="standardId"></select></div>
+        <div class="field"><label for="receiving">受纳水体类别</label><select id="receiving"></select></div>
+        <div class="field"><label for="gradeOverride">执行级别</label>
+          <select id="gradeOverride"><option value="auto">按受纳水体自动判定</option><option value="1">指定一级（只能比自动判定更严）</option></select></div>
+        <label class="check" id="wrapExisting"><input type="checkbox" id="existingOutlet"> 现有排放口（标准实施前已有；标准不给限值，按一级参照）</label>
+        <label class="check" id="wrapKeyArea"><input type="checkbox" id="keyArea"> <span id="lblKeyArea"></span></label>
+        <label class="check" id="wrapSpecial"><input type="checkbox" id="useSpecial"> <span id="lblSpecial"></span></label>
+        <label class="check" id="wrapVariant"><input type="checkbox" id="useVariant"> <span id="lblVariant"></span></label>
+        <label class="check" id="wrapPhase2"><input type="checkbox" id="usePhase2"> <span id="lblPhase2"></span></label>
+        <div class="stdbox" id="stdBox"></div>
+
+        <div class="group-title">② 养殖规模与品种</div>
+        <div class="field"><label for="speciesId">品种</label><select id="speciesId"></select></div>
+        <div class="field"><label for="areaMu">养殖水面 <span class="hint">亩</span></label><input id="areaMu" type="number" min="0" step="1"></div>
+        <div class="field"><label for="pondDepth">平均水深 <span class="hint">m</span></label><input id="pondDepth" type="number" min="0.3" step="0.1"></div>
+        <div class="field"><label for="yieldKgMu">单产 <span class="hint">kg/亩·周期</span></label><input id="yieldKgMu" type="number" min="0" step="50"></div>
+        <div class="field"><label for="days">养殖周期 <span class="hint">d</span></label><input id="days" type="number" min="1" step="10"></div>
+
+        <div class="group-title">③ 饲料与产品成分 <small>决定氮磷投入与留存</small></div>
+        <div class="field"><label for="fcr">饲料系数 FCR</label><input id="fcr" type="number" min="0" step="0.05"></div>
+        <div class="field"><label for="cp">饲料粗蛋白 <span class="hint">%</span></label><input id="cp" type="number" min="0" step="1"></div>
+        <div class="field"><label for="pFeed">饲料总磷 <span class="hint">%</span></label><input id="pFeed" type="number" min="0" step="0.1"></div>
+        <div class="field"><label for="bodyN">产品含氮 <span class="hint">% 鲜重</span></label><input id="bodyN" type="number" min="0" step="0.1"></div>
+        <div class="field"><label for="bodyP">产品含磷 <span class="hint">% 鲜重</span></label><input id="bodyP" type="number" min="0" step="0.05"></div>
+
+        <div class="group-title">④ 排水方式</div>
+        <div class="field wide"><label for="exchange">排水模式 <span class="hint">决定氮磷流失比例的默认值</span></label><select id="exchange"></select></div>
+        <div class="field"><label for="fN">饲料氮随排水流失 <span class="hint">%</span></label><input id="fN" type="number" min="0" max="100" step="1"></div>
+        <div class="field"><label for="fP">饲料磷随排水流失 <span class="hint">%</span></label><input id="fP" type="number" min="0" max="100" step="0.5"></div>
+        <div class="field"><label for="dailyPct">日换水率 <span class="hint">% 池容/d</span></label><input id="dailyPct" type="number" min="0" step="0.5"></div>
+        <div class="field"><label for="drainLoadPct">排干时排出的份额 <span class="hint">% 流失氮磷</span></label><input id="drainLoadPct" type="number" min="0" max="100" step="5"></div>
+        <div class="field"><label for="drainsPerCycle">每周期排干 <span class="hint">次</span></label><input id="drainsPerCycle" type="number" min="0" step="1"></div>
+        <div class="field"><label for="simultaneousPct">同时排干面积 <span class="hint">%</span></label><input id="simultaneousPct" type="number" min="0" max="100" step="5"></div>
+        <div class="field"><label for="drainDays">排干历时 <span class="hint">d</span></label><input id="drainDays" type="number" min="0.5" step="0.5"></div>
+        <div class="field wide"><label for="designFlowMode">设计流量口径</label><select id="designFlowMode"><option value="draft">广东草案：周期平均日排水量 × 变化系数</option><option value="peak">排干峰值流量（偏保守）</option></select></div>
+        <div class="field wide"><label for="exchDuringDrain">排干期间其余池塘 <span class="hint">峰值口径下决定设计流量</span></label><select id="exchDuringDrain"><option value="1">照常换水（两股水叠加，偏保守）</option><option value="0">停止换水（两者取大）</option></select></div>
+        <div class="field"><label for="bgTN">水源本底 TN <span class="hint">mg/L</span></label><input id="bgTN" type="number" min="0" step="0.1"></div>
+        <div class="field"><label for="bgTP">水源本底 TP <span class="hint">mg/L</span></label><input id="bgTP" type="number" min="0" step="0.01"></div>
+
+        <div class="group-title">⑤ 尾水原水水质 <small>有实测时优先用实测</small></div>
+        <div class="field wide"><label for="rawMode">TN、TP 来源</label><select id="rawMode"><option value="estimate">按③④质量平衡估算</option><option value="measured">本场实测（并反推流失比例）</option></select></div>
+        <div class="field" id="wrapMeasTN"><label for="measTN">实测尾水 TN <span class="hint">mg/L</span></label><input id="measTN" type="number" min="0" step="0.1"></div>
+        <div class="field" id="wrapMeasTP"><label for="measTP">实测尾水 TP <span class="hint">mg/L</span></label><input id="measTP" type="number" min="0" step="0.01"></div>
+        <div class="field"><label for="SS">日常尾水 SS <span class="hint">mg/L</span></label><input id="SS" type="number" min="0" step="5"></div>
+        <div class="field"><label for="drainSS">排干末 20% 水 SS <span class="hint">mg/L, 选填</span></label><input id="drainSS" type="number" min="0" step="10" placeholder="空 = 1000 (Boyd 2000)"></div>
+        <label class="check wide" id="wrapHeld"><input type="checkbox" id="lastPortionHeld"> 最后 20% 排水单独收集、静置 ≥8 h 后再处理（按前 80% 水评价，SS = 日常 × 1.5）</label>
+        <div class="field"><label for="drainTN">排干末段 TN <span class="hint">mg/L, 选填</span></label><input id="drainTN" type="number" min="0" step="0.1" placeholder="空 = 沿用日常"></div>
+        <div class="field"><label for="drainTP">排干末段 TP <span class="hint">mg/L, 选填</span></label><input id="drainTP" type="number" min="0" step="0.01" placeholder="空 = 沿用日常"></div>
+        <div class="field"><label for="COD"><span id="lblCOD">尾水 COD<sub>Mn</sub></span> <span class="hint">mg/L</span></label><input id="COD" type="number" min="0" step="1"></div>
+        <div class="field"><label for="NH3N">尾水氨氮 <span class="hint">mg/L</span></label><input id="NH3N" type="number" min="0" step="0.1"></div>
+
+        <div class="group-title">⑥ 三池两坝设计参数</div>
+        <div class="field"><label for="areaRatioPct">处理面积比 <span class="hint">% 养殖面积</span></label><input id="areaRatioPct" type="number" min="0" step="0.5"></div>
+        <div class="stdbox" id="ratioBox"></div>
+        <div class="field"><label for="splitSed">沉淀池 <span class="hint">%</span></label><input id="splitSed" type="number" min="0" step="5"></div>
+        <div class="field"><label for="splitAer">曝气池 <span class="hint">%</span></label><input id="splitAer" type="number" min="0" step="5"></div>
+        <div class="field"><label for="splitEco">生态净化池 <span class="hint">%</span></label><input id="splitEco" type="number" min="0" step="5"></div>
+        <div class="field"><label for="depthSed">沉淀池水深 <span class="hint">m</span></label><input id="depthSed" type="number" min="0.5" step="0.1"></div>
+        <div class="field"><label for="depthAer">曝气池水深 <span class="hint">m</span></label><input id="depthAer" type="number" min="0.5" step="0.1"></div>
+        <div class="field"><label for="depthEco">净化池水深 <span class="hint">m</span></label><input id="depthEco" type="number" min="0.5" step="0.1"></div>
+        <div class="field"><label for="slopeA">边坡系数 a</label><input id="slopeA" type="number" min="0.5" max="1" step="0.01"></div>
+        <div class="field"><label for="flowFactor">日流量变化系数 b</label><input id="flowFactor" type="number" min="1" step="0.05"></div>
+        <div class="field"><label for="minHRT">最短停留时间 <span class="hint">d</span></label><input id="minHRT" type="number" min="0" step="0.5"></div>
+        <div class="field"><label for="maxHL">最大水力负荷 <span class="hint">m³/(m²·d)</span></label><input id="maxHL" type="number" min="0.05" step="0.05"></div>
+        <div class="field"><label for="minSettleH">排干沉淀停留 <span class="hint">h</span></label><input id="minSettleH" type="number" min="0" step="1"></div>
+        <div class="field"><label for="recircPct">内循环 <span class="hint">% 设计日流量</span></label><input id="recircPct" type="number" min="0" step="10"></div>
+        <div class="field"><label for="floatBedPct">净化池浮床 <span class="hint">%</span></label><input id="floatBedPct" type="number" min="0" step="5"></div>
+        <div class="field"><label for="sedFloatPct">沉淀池浮床 <span class="hint">% (应布设 10–30)</span></label><input id="sedFloatPct" type="number" min="0" step="5"></div>
+
+        <div class="group-title">⑦ 去除效果 <small>C<sub>out</sub> = C* + (C<sub>in</sub> − C*)(1 − R·f)</small></div>
+        <div class="field wide"><label for="season">评价季节 <span class="hint">季节系数 f</span></label><select id="season"></select></div>
+        <div class="field"><label for="rSS">SS 去除率中值 R <span class="hint">%</span></label><input id="rSS" type="number" min="0" max="100" step="1"></div>
+        <div class="field"><label for="rCOD">COD 去除率中值 R <span class="hint">%</span></label><input id="rCOD" type="number" min="0" max="100" step="1"></div>
+        <div class="field"><label for="rTN">TN 去除率中值 R <span class="hint">%</span></label><input id="rTN" type="number" min="0" max="100" step="1"></div>
+        <div class="field"><label for="rTP">TP 去除率中值 R <span class="hint">%</span></label><input id="rTP" type="number" min="0" max="100" step="1"></div>
+        <div class="field"><label for="rNH3N">氨氮去除率中值 R <span class="hint">%</span></label><input id="rNH3N" type="number" min="0" max="100" step="1"></div>
+        <div class="stdbox" id="removalBox"></div>
+      </div>
+    </form>
+
+    <!-- ============ 结果 ============ -->
+    <main id="results"></main>
+  </div>
+
+  <h2>依据与来源</h2>
+  <div id="sources"></div>
+  <div class="note warn"><span class="label">免责声明</span>：本工具用于方案阶段估算。尾水 TN、TP 若由质量平衡推算，受排水方式与水量影响很大，应尽量改用本场实测；设计参数主要来自尚未正式发布的广东征求意见稿；去除效果基于少量公开实测，海水与排干期数据尤其不足；限值以各省标准原文和当地生态环境部门的认定为准。页面中的“达标”是模型在当前输入和去除率区间下的预测，不代表实际排放、验收或排污许可合规；曝气、过滤坝等设备参数为经验估算。不替代环境影响评价和排污许可。</div>
+  </section>
+
+  <section id="tab-standards" class="tab-panel" hidden>
+    <div class="doc">
+      <h2>排放标准汇总</h2>
+      <p class="lead">国内各省水产养殖尾水排放标准中与池塘养殖相关的限值、执行级别规则与适用范围。限值单位 mg/L（pH 无量纲），均为“≤”，按单项判定，任一项超标即不达标。本页与设计计算使用同一份数据。</p>
+      <div class="std-filter">
+        <label>水体 <select id="stdWater"><option value="all">全部</option><option value="fw">淡水</option><option value="sw">海水</option></select></label>
+        <label>搜索 <input id="stdQuery" type="search" placeholder="省份或标准编号"></label>
+        <span class="muted" id="stdCount"></span>
+      </div>
+      <div id="stdList"></div>
+      <div id="stdExtra"></div>
+    </div>
+  </section>
+
+  <section id="tab-guide" class="tab-panel" hidden>
+    <div class="doc">
+      <h2>使用说明</h2>
+      <p class="lead">本工具用于<b>池塘养殖</b>尾水处理的方案阶段计算：按所在省份的水产养殖尾水排放标准判定执行级别，估算尾水原水水质，计算“三池两坝”处理设施规模，并预测日常换水和收获排干两种工况下能否达标。全部计算在浏览器本地完成，不上传任何数据，断网也能使用。</p>
+
+      <nav class="toc">
+        <a href="#g1">1. 适用范围</a><a href="#g2">2. 五分钟上手</a><a href="#g3">3. 输入参数逐项说明</a><a href="#g4">4. 怎样读结果</a>
+        <a href="#g5">5. 计算方法</a><a href="#g6">6. 常见场景怎么填</a><a href="#g7">7. 局限与注意</a><a href="#g8">8. 常见问题</a><a href="#g9">9. 其他功能</a>
+      </nav>
+
+      <h3 id="g1">1. 适用范围</h3>
+      <ul>
+        <li><b>适用</b>：淡水或海水<b>池塘</b>养殖，投饵型品种，采用“沉淀池 → 过滤坝 → 曝气池 → 过滤坝 → 生态净化池”（三池两坝）或类似的生态处理工艺。</li>
+        <li><b>不适用</b>：工厂化循环水养殖（RAS）、网箱、筏式、底播等；以化学处理、膜处理为主的工艺；只投肥不投饵的养殖。</li>
+        <li><b>阶段</b>：可行性研究、方案比选、初步设计的规模估算。施工图设计、环评和排污许可仍需现场监测数据和专业判断。</li>
+      </ul>
+
+      <h3 id="g2">2. 五分钟上手</h3>
+      <ol class="steps">
+        <li><b>选标准</b>：在①选“淡水 / 海水”、所在省份和受纳水体类别。工具自动判定执行一级、二级或“不得新建排放口”。</li>
+        <li><b>选品种</b>：在②选品种、填养殖面积。单产、饲料系数、蛋白含量、换水方式等会自动带入典型值。</li>
+        <li><b>核对排水方式</b>：在④确认日换水率、每周期排干次数、同时排干的池塘比例。这几个数对处理设施规模影响最大。</li>
+        <li><b>有实测就用实测</b>：在⑤把“TN、TP 来源”改为“本场实测”，填入日常尾水的 TN、TP、SS、COD、氨氮。没有实测时，工具用质量平衡估算。</li>
+        <li><b>看结果</b>：右侧顶部五张卡片给出执行标准、适用性、三池两坝总面积，以及日常、排干两种工况的达标结论；下方表格逐项列出进水、出水与限值。</li>
+      </ol>
+      <p class="tip">默认算例：广东淡水、100 亩草鱼、排入Ⅳ–Ⅴ类水体。打开页面后改几个数字，就能看到结果如何变化。点右上角“恢复默认”可回到默认算例。</p>
+
+      <h3 id="g3">3. 输入参数逐项说明</h3>
+      <h4>① 所在地与排放标准</h4>
+      <table class="tw gtable"><tbody>
+        <tr><td>水体</td><td>淡水养殖使用 GB 3838 类别，海水养殖使用 GB 3097 类别。</td></tr>
+        <tr><td>省份 / 标准</td><td>收录 16 个省市的地方标准共 20 套限值；没有地方标准的地区可选“其他地区”，按推荐性行业标准 SC/T 9101 / 9103 参照。各标准的详细内容见“排放标准汇总”页。</td></tr>
+        <tr><td>受纳水体类别</td><td>尾水最终排入的水体。“特殊保护水域”指饮用水水源保护区、自然保护区核心区等法律法规禁止设置排污口的水域。不清楚类别时，请查当地水功能区划或向生态环境部门确认。</td></tr>
+        <tr><td>执行级别</td><td>一般选“自动判定”。当地政府或环评、排污许可要求执行一级时，可指定一级；工具<b>不允许放宽</b>为二级，也不能解除禁排。</td></tr>
+        <tr><td>现有排放口</td><td>仅在受纳水体属于“不得新建排放口”时出现。标准实施前已有的排放口，标准本身不给限值，工具按一级作参照。</td></tr>
+        <tr><td>重点控制区域</td><td>仅四川出现。位于附录 A 所列 10 市 62 县的，不论水体类别一律执行一级。</td></tr>
+        <tr><td>特别限值 / 变体 / 第二阶段</td><td>江苏太湖保护区、福建特别排放限值区、福建提水式池塘、浙江 2027-10-01 起的第二阶段 TN 限值。勾选第二阶段时，结果会标为“未来情景”。</td></tr>
+      </tbody></table>
+
+      <h4>② 养殖规模与品种 · ③ 饲料与产品成分</h4>
+      <table class="tw gtable"><tbody>
+        <tr><td>品种</td><td>决定默认的单产、饲料参数、换水方式和处理面积比。没有对应品种时选“自定义”。</td></tr>
+        <tr><td>养殖水面、平均水深</td><td>按实际可养殖水面填写（不含沟渠、道路）。水深用于计算池塘水体体积。</td></tr>
+        <tr><td>单产、养殖周期</td><td>每亩每个养殖周期的产量和天数。一年多茬的，按单茬填写。</td></tr>
+        <tr><td>饲料系数、粗蛋白、总磷</td><td>按实际使用的饲料标签填写。饲料氮 = 投饵量 × 粗蛋白 ÷ 6.25。</td></tr>
+        <tr><td>产品含氮、含磷</td><td>按鲜重计，用于扣除随产品带走的氮磷。缺少数据时保留默认值即可。</td></tr>
+      </tbody></table>
+
+      <h4>④ 排水方式</h4>
+      <table class="tw gtable"><tbody>
+        <tr><td>排水模式</td><td>“养殖期日常换水”或“少换水、收获时排干”。切换时会带入对应的流失比例和换水率默认值。</td></tr>
+        <tr><td>饲料氮、磷随排水流失</td><td>投入的饲料氮磷中最终随排水离开池塘的比例。文献值：日常换水约 35% / 10%（Briggs 1994），少换水约 16% / 11.4%（Boyd 2004）。<b>这是估算中最不确定的参数</b>，有实测时请用⑤反推校准。</td></tr>
+        <tr><td>日换水率</td><td>每天换掉池塘水体的百分比。为 0 表示养殖期不排水，只在收获时排干。</td></tr>
+        <tr><td>排干时排出的份额</td><td>随排水流失的氮磷中，在收获排干时排出的份额。默认 35%（其余 65% 随日常换水排出）。</td></tr>
+        <tr><td>每周期排干次数、同时排干面积、排干历时</td><td>决定排干峰值流量。<b>错开各池塘的排干时间</b>（降低同时排干面积、延长排干历时）可以显著减小处理设施。</td></tr>
+        <tr><td>设计流量口径</td><td>“广东草案”口径按周期平均日排水量 × 变化系数；“排干峰值”口径更保守，按排干峰值叠加其余池塘换水。排干沉淀池的停留时间校核始终按排干峰值。</td></tr>
+        <tr><td>水源本底 TN、TP</td><td>进水水源本身的浓度，会叠加到尾水浓度上。</td></tr>
+      </tbody></table>
+
+      <h4>⑤ 尾水原水水质</h4>
+      <table class="tw gtable"><tbody>
+        <tr><td>TN、TP 来源</td><td>“质量平衡估算”或“本场实测”。选实测时，工具同时反推本场的流失比例，可点“填入④”保存下来，用于推算其他方案。</td></tr>
+        <tr><td>日常尾水 SS、COD、氨氮</td><td>质量平衡算不出这三项，<b>必须填实测值</b>；默认值只是示例。</td></tr>
+        <tr><td>排干末 20% 水 SS</td><td>选填。留空时按 1000 mg/L（Boyd 2000 实测）。排干最后阶段底泥被搅起，SS 会比日常高一个数量级。</td></tr>
+        <tr><td>末 20% 单独收集静置</td><td>勾选表示最后 20% 排水先单独收集、静置 ≥8 h 再进入处理系统，此时按前 80% 水（日常 × 1.5）评价。这是降低排干期 SS 最有效的措施。</td></tr>
+        <tr><td>排干末段 TN、TP</td><td>选填。留空时按负荷拆分模型推算。</td></tr>
+      </tbody></table>
+
+      <h4>⑥ 三池两坝设计参数</h4>
+      <table class="tw gtable"><tbody>
+        <tr><td>处理面积比</td><td>处理设施占养殖面积的最低比例，按品种默认：龟鳖鳗 10%、鳜鲈鳢 8%、罗非与家鱼 6%、虾 5%（广东）或 8%（其他地区）、蟹 6%。海水池塘不设面积比。</td></tr>
+        <tr><td>三池比例</td><td>沉淀、曝气、生态净化三池的面积分配，广东草案推荐 30–45% / 5–30% / 35–50%。任何一池为 0 都会报错。</td></tr>
+        <tr><td>各池水深、边坡系数</td><td>有效容积 = 边坡系数 × 面积 × 水深。边坡系数推荐 0.85–0.95。</td></tr>
+        <tr><td>变化系数、停留时间、水力负荷</td><td>水力负荷上限 0.5 m³/(m²·d) 借自潜流湿地规范，对面积影响最大，可按当地经验调整。</td></tr>
+        <tr><td>内循环、浮床</td><td>内循环 70–150%，净化池浮床 ≥20%，沉淀池浮床 10–30%。超出范围会给出黄色提示。</td></tr>
+      </tbody></table>
+
+      <h4>⑦ 去除效果</h4>
+      <table class="tw gtable"><tbody>
+        <tr><td>评价季节</td><td>夏季（≥20 °C）、春秋（10–20 °C）、冬季（&lt;10 °C）。冬季脱氮、硝化效率大幅下降。建议按最不利季节校核。</td></tr>
+        <tr><td>去除率中值</td><td>默认值取自国内实测文献。有本地运行数据时可修改；超出文献区间会给出提示。</td></tr>
+      </tbody></table>
+
+      <h3 id="g4">4. 怎样读结果</h3>
+      <h4>顶部卡片</h4>
+      <ul>
+        <li><b>执行标准</b>：一级、二级、单一限值、参照一级，或“不得新建排放口”。</li>
+        <li><b>适用性</b>：“强制适用”指达到标准的规模门槛；“参照执行”指未达门槛，但<b>不等于可以不处理</b>；“待核对”指门槛尚未核实。</li>
+        <li><b>三池两坝总面积</b>：处理设施总面积及其占养殖面积的比例。</li>
+        <li><b>日常换水排水、收获排干期</b>：两种工况的达标结论，分三档——
+          <span class="pill ok">达标</span> 去除率取区间不利端仍达标；
+          <span class="pill edge">临界</span> 按中值达标，去除率偏低时会超标；
+          <span class="pill no">超标</span> 按中值就超标。“无此工况”表示该工况不排水。</li>
+      </ul>
+      <h4>达标对照表</h4>
+      <ul>
+        <li><b>进水</b>：后面括号注明来源，如“实测”“估算·负荷拆分”“末 20% 按 Boyd 2000”。</li>
+        <li><b>需要去除率</b>：进水降到限值所需的去除率。若远高于“去除率 R×f”，靠生态处理很难达标。</li>
+        <li><b>出水区间</b>：按去除率区间两端计算的出水范围，反映模型的不确定性。</li>
+      </ul>
+      <h4>提示条颜色</h4>
+      <p>绿色边为一般说明，黄色为需要注意的假设或偏离推荐值，红色为禁排、超标或输入错误。输入有误时工具不出结果，并列出需要修改的参数。</p>
+
+      <h3 id="g5">5. 计算方法</h3>
+      <h4>5.1 尾水氮磷（质量平衡）</h4>
+      <div class="formula">饲料氮 = 投饵量 × 粗蛋白% ÷ 6.25　　饲料磷 = 投饵量 × 总磷%<br>
+        随排水流失 = 饲料氮（磷）× 流失比例<br>
+        日常换水浓度 = 本底 + 流失量 × (1 − 排干份额) ÷ 周期换水量<br>
+        排干期浓度 = 本底 + 流失量 × 排干份额 ÷ 排干水量</div>
+      <p>工具把流失负荷分到日常和排干两种工况，不再按全周期平均，否则会低估排干期浓度。估算值会与国内实测范围（TN 2.0–10.1、TP 0.18–1.63 mg/L）对照，超出时给出提示。</p>
+      <h4>5.2 处理设施规模</h4>
+      <div class="formula">总面积 = max(面积比要求, 设计流量 ÷ 水力负荷上限, 设计流量 × 停留时间 ÷ (边坡系数 × 加权水深), 排干沉淀 ≥8 h 所需)</div>
+      <p>四项中最大的一项为“控制项”，在规模表中以“控制”标出。由水力负荷或停留时间控制时，说明排水量决定了规模，此时错开排干、延长排干历时最有效。</p>
+      <h4>5.3 去除效果</h4>
+      <div class="formula">出水 = C* + (进水 − C*) × (1 − R × f)</div>
+      <p>C* 为实测出水下限（生态处理难以低于此值），R 为去除率，f 为季节系数。排干期不计生态净化池对 TN 的贡献（扣 16.3 个百分点），因为短时大流量下生态池来不及发挥作用。</p>
+
+      <h3 id="g6">6. 常见场景怎么填</h3>
+      <table class="tw gtable"><thead><tr><th>场景</th><th>做法</th></tr></thead><tbody>
+        <tr><td>已有实测尾水数据</td><td>⑤选“本场实测”，填日常 TN、TP、SS、COD、氨氮；有排干期数据再填排干末段 SS、TN、TP。点“填入④”保存反推的流失比例。</td></tr>
+        <tr><td>新建项目、无实测</td><td>用估算值，但务必把 SS、COD、氨氮改为同类养殖场的典型值；参考国内实测范围判断估算是否合理。</td></tr>
+        <tr><td>比较不同品种或单产</td><td>先用一个有实测的方案校准流失比例（填入④），再切回“估算”，修改品种或单产。</td></tr>
+        <tr><td>处理面积太大</td><td>依次尝试：降低同时排干面积、延长排干历时、末 20% 排水单独静置、排干期间暂停其余池塘换水、改用“广东草案”流量口径。</td></tr>
+        <tr><td>排干期 SS 超标</td><td>勾选“末 20% 单独收集静置”，或在排水口设置临时沉淀区；藻类形成的 SS 无法靠沉淀去除。</td></tr>
+        <tr><td>TP 超标</td><td>扩大生态净化池、增设人工湿地，或在沉淀池化学除磷；从源头上选用低磷饲料、提高饲料利用率。</td></tr>
+        <tr><td>冬季 TN 超标</td><td>生态处理冬季脱氮能力只有夏季的一半左右；延长停留时间，或在冬季减少排水、尽量安排在暖季排干。</td></tr>
+        <tr><td>排口在特殊保护水域</td><td>新建项目不得设排放口，应考虑循环利用或改排其他水体；已有排放口勾选“现有排放口”，按一级参照并与当地确认。</td></tr>
+      </tbody></table>
+
+      <h3 id="g7">7. 局限与注意</h3>
+      <ul>
+        <li>流失比例和排干份额来自国外池塘研究，国内高产池塘可能不同，<b>实测校准比任何默认值都可靠</b>。</li>
+        <li>国内尚无公开的排干期 TN、TP 实测数据，排干期结论属工程估算。</li>
+        <li>三池两坝设计参数主要来自广东《三池两坝技术规范》征求意见稿（尚未发布），水力负荷上限借自潜流湿地规范。</li>
+        <li>去除率来自少量公开实测，海水数据尤其少；短流、死区、底泥释放、植物收割、运行管理等因素均未建模。</li>
+        <li>曝气功率、过滤坝尺寸为经验估算，未按需氧量、氧转移效率或过流能力计算。</li>
+        <li>pH 和本工具未建模的指标（如 BOD₅、重金属、总余氯）需另行实测核对。</li>
+        <li>“达标”是模型预测，不代表实际排放、验收或排污许可合规。限值以标准原文和当地生态环境部门认定为准。</li>
+      </ul>
+
+      <h3 id="g8">8. 常见问题</h3>
+      <dl class="faq">
+        <dt>为什么日换水率越高，算出的尾水浓度越低？</dt>
+        <dd>流失比例固定时，同样的氮磷被更多的水稀释。但实际换水越多，流失比例通常也越高。换水率超过 5%/d 时工具会提示，建议同时提高流失比例或改用实测。</dd>
+        <dt>为什么所有品种算出的面积都差不多？</dt>
+        <dd>此时面积由水力负荷或停留时间控制，而不是面积比。看规模表中的“控制”标记；减小设计流量后，品种面积比才会起作用。</dd>
+        <dt>为什么广东Ⅰ–Ⅱ类水体执行一级，其他省份却“不得新建”？</dt>
+        <dd>各省标准原文不同。广东 5.2.1.1 把Ⅰ–Ⅲ类都列为重点保护水域、执行一级；福建、海南、重庆、四川、河南、湖北、湖南规定Ⅰ–Ⅱ类为特殊保护水域、不得新建排放口。详见“排放标准汇总”页。</dd>
+        <dt>为什么“适用性”显示“参照执行”还要算？</dt>
+        <dd>未达到强制适用的规模门槛，不等于可以不处理尾水，仍须遵守其他排放管理要求。</dd>
+        <dt>我的数据会上传吗？</dt>
+        <dd>不会。所有计算在浏览器本地完成；表单内容只保存在本机浏览器中，下次打开自动恢复。清除浏览器数据或点“恢复默认”即可清空。</dd>
+      </dl>
+
+      <h3 id="g9">9. 其他功能</h3>
+      <ul>
+        <li><b>打印</b>：打印当前页面。设计计算页会连同输入参数一起打印，便于复核；建议在打印对话框中选择“A4 纵向”。</li>
+        <li><b>自检</b>：在网址后加 <code>?selftest=1</code>，页面会运行内置的全部单元测试并显示结果，用于确认计算核心没有被改坏。</li>
+        <li><b>离线使用</b>：本工具是单个 HTML 文件，可保存到本地后直接用浏览器打开。</li>
+      </ul>
+    </div>
+  </section>
+</div>
+
+<div class="disclaimer-wrap">
+  <div class="disclaimer">
+    ⚠️ <b>免责声明：</b>计算结果仅供工程概算参考，实际工程需结合现场水质监测、试验数据与专业判断。
+  </div>
+</div>
+
+<!-- ===== 页脚 ===== -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-main">
+      <div class="footer-col footer-about-col">
+        <a href="index.html" class="brand">
+          <div class="brand-mark">W</div>
+          <div>
+            <div class="brand-name">水处理工具箱</div>
+            <div class="brand-sub">WaterKit · by 登登科技</div>
+          </div>
+        </a>
+        <p class="footer-about">水处理工具箱(WaterKit)是海南登登科技咨询有限公司推出的水处理在线计算工具集合,由一线水处理工艺工程师开发维护。免费、持续更新。</p>
+      </div>
+      <div class="footer-col">
+        <h4>水力计算</h4>
+        <ul>
+          <li><a href="pipe-hydraulic-calculator.html">管道水力</a></li>
+          <li><a href="pipe-hydraulic-pro.html">管道水力（加强版）</a></li>
+          <li><a href="open-channel-calculator.html">明渠水力</a></li>
+          <li><a href="weir-flow-calculator.html">堰流计算</a></li>
+          <li><a href="orifice-nozzle-calculator.html">孔口出流</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>工艺与设备</h4>
+        <ul>
+          <li><a href="aeration-calculator.html">曝气量</a></li>
+          <li><a href="sludge-production-calculator.html">污泥产量</a></li>
+          <li><a href="dosing-calculator.html">加药量</a></li>
+          <li><a href="activated-sludge-process-calculator.html">活性污泥工艺</a></li>
+          <li><a href="mbbr-design.html">MBBR 工程设计</a></li>
+          <li><a href="mbr-design.html">MBR 工程设计</a></li>
+          <li><a href="pump-selection-calculator.html">水泵选型</a></li>
+          <li><a href="blower-selection-calculator.html">鼓风机选型</a></li>
+          <li><a href="water-quality-unit-converter.html">水质换算</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>水产养殖</h4>
+        <ul>
+          <li><a href="tailwater.html">池塘养殖尾水处理</a></li>
+          <li><a href="aquanor-2027-guide-cn.html">Aqua Nor 2027 观展指南</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="https://dengdengtech.cn" target="_blank" rel="noopener">登登科技官网 ↗</a></li>
+          <li>海南登登科技咨询</li>
+          <li>有限公司</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Open Source</h4>
+        <ul>
+          <li><a href="https://github.com/chengsunmail/waterkit" target="_blank" rel="noopener">GitHub 仓库 ↗</a></li>
+          <li><a href="https://github.com/chengsunmail/waterkit/blob/main/LICENSE" target="_blank" rel="noopener">AGPL-3.0 协议</a></li>
+          <li><a href="https://github.com/chengsunmail/waterkit/issues" target="_blank" rel="noopener">反馈 Issue</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 海南登登科技咨询有限公司 · <a href="https://dengdengtech.cn" target="_blank" rel="noopener">dengdengtech.cn</a></span>
+      <span>WaterKit · V 1.0 · <a href="https://github.com/chengsunmail/waterkit" target="_blank" rel="noopener">开源于 GitHub</a></span>
+    </div>
+  </div>
+</footer>
+<div id="selftest" role="dialog" aria-label="自检结果"></div>
+
+<script id="tailwater-core">
+/*
+ * 池塘养殖尾水处理设计计算 · 计算核心 v0.7
+ *
+ * 范围 (第一版): 池塘养殖。
+ *   1) 地方水产养殖尾水排放标准库 (仅收录已对照原文核实的限值)
+ *   2) 适用性 (规模门槛) 与执行级别判定
+ *   3) 氮磷质量平衡 → 尾水原水 TN / TP 浓度估算
+ *   4) "三池两坝" 处理设施规模与校核 (分池水深、边坡系数、排干沉淀 8 h)
+ *   5) 去除模型 C* + R × f_季节 (淡/海水分设), 日常与排干两种工况的达标对照
+ *
+ * v0.2 依据: 《三池两坝处理效果与设计参数审计》(2026-10-12)
+ * v0.3: TN/TP 原水可改用本场实测 (并反推流失比例); 估算值与国内实测范围对照;
+ *       草鱼、罗非默认改为日常换水 (按广东实测进水校准, 见 FIELD_REF)
+ * v0.4: 按第三方测评修订: 禁止排放不可覆盖、指定级别只能更严; 统一输入校验;
+ *       汇总判定区分 达标/有风险/超标; 排干末段 TN、TP 可选实测, 未填时明确标为沿用
+ * v0.5: 按第二轮测评修订: 排干 0 次不计排干流量; 设计流量按 "排干期间是否继续换水" 取值;
+ *       实测反推分日常与排干两部分; 三池缺一报错并校核推荐区间; 适用性分三态; 未来阶段限值标为情景
+ * v0.6: 按第三轮审计修订 (对照各省原文): 广东/江西 Ⅰ–Ⅱ 类执行一级; 其余省份 "不得新建, 现有按法规" →
+ *       现有排放口按一级参照; 四川附录 A 重点区域; 天津第一类未规定; 河南 Ⅲ 类说明; 福建海水特别限值;
+ *       新增特殊保护水域选项与 SC/T 9101/9103 兜底。氮磷负荷按 Briggs 拆分到日常与排干 (不再周期平均);
+ *       排干 SS 按 Boyd 2000 末 20% 约 1000 mg/L; 排干 0 次不评价排干工况; 设计流量默认改为广东草案口径。
+ *
+ * 纯函数, 无 DOM 依赖; 浏览器挂 window.TailwaterCore, Node 下 module.exports。
+ * 所有默认参数在 DEFAULTS / SPECIES / EXCHANGE_PRESETS 中集中定义, 并标注来源。
+ */
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) module.exports = factory();
+  else root.TailwaterCore = factory();
+})(typeof self !== 'undefined' ? self : this, function () {
+  'use strict';
+
+  var VERSION = '0.7';
+  var MU_M2 = 10000 / 15;          // 1 亩 = 666.67 m²
+
+  /* ------------------------------------------------------------------
+   * 1. 标准库
+   *    限值单位 mg/L (pH 无量纲), 均为 "≤"; 单项判定。
+   *    COD: 淡水为高锰酸盐指数 COD_Mn; 海水为化学需氧量 (碱性高锰酸钾法)。
+   *    thresholdMu: 强制适用的最小养殖面积 (亩), null = 无规模门槛。
+   *    数据核对日期 2026-10-12; 原文链接见 sources。
+   * ------------------------------------------------------------------ */
+  function lim(SS, COD, TN, TP, pH, extra) {
+    var o = { SS: SS, COD: COD, TN: TN, TP: TP, pH: pH };
+    if (extra) for (var k in extra) o[k] = extra[k];
+    return o;
+  }
+  var PH_FW = [6, 9];
+  var PH_SW1 = [7.0, 8.5];          // 且不超出背景值 ±0.5 (各标准表注)
+  var PH_SW2 = [6.5, 9.0];
+
+  var STANDARDS = [
+    /* ---------- 淡水 ---------- */
+    { id: 'JX', region: '江西', code: 'DB36/1993-2024', water: 'fw', nature: '强制',
+      effective: '2025-02-01', existing: '2026-02-01',
+      thresholdMu: 30, thresholdNote: '规模化池塘: 连片 ≥50 亩或单塘 ≥30 亩; 设施渔业全部适用',
+      gradeRule: 'JX', grades: { 1: lim(45, 15, 3.0, 0.4, PH_FW), 2: lim(90, 25, 5.0, 0.8, PH_FW) },
+      source: 'https://dbba.sacinfo.org.cn/portal/download/6a86e5ad6a7052293bc3f028877994ac8902913607806fc4e00d8f06edeef534' },
+    { id: 'GD_FW', region: '广东', code: 'DB44/2462-2024', water: 'fw', nature: '强制',
+      effective: '2024-05-01', existing: '2026-05-01',
+      thresholdMu: 30, thresholdNote: '池塘 ≥30 亩; 工厂化等封闭系统; <30 亩参照执行',
+      belowThreshold: '参照执行',
+      gradeRule: 'GD', grades: { 1: lim(45, 15, 3.0, 0.4, PH_FW), 2: lim(90, 25, 5.0, 1.0, PH_FW) },
+      source: 'https://gdee.gd.gov.cn/gkmlpt/content/4/4382/post_4382815.html' },
+    { id: 'SH', region: '上海', code: 'DB31/1405-2023', water: 'fw', nature: '强制',
+      effective: '2023-10-01', existing: '2024-06-01',
+      thresholdMu: null, thresholdNote: '池塘、工厂化, 无规模门槛',
+      gradeRule: 'SINGLE', grades: { 0: lim(85, 25, 5.0, 0.8, PH_FW, { NH3N: 2.0 }) },
+      source: 'https://sthj.sh.gov.cn/cmsres/1e/1e100688b08b4714a9e7e8fe284a33cf/10c673d2f3e9a7eb4b13a02948de3948.pdf' },
+    { id: 'JS_FW', region: '江苏', code: 'DB32/4043-2021', water: 'fw', nature: '强制',
+      effective: '2021-08-01', existing: '2023-06-01',
+      thresholdMu: 50, thresholdNote: '连片 >100 亩; 单一主体 >50 亩; 工厂化等封闭系统',
+      gradeRule: 'JS', grades: { 1: lim(40, 15, 3.0, 0.4, PH_FW), 2: lim(85, 25, 6.0, 0.8, PH_FW) },
+      special: { label: '太湖一、二级保护区 (特别限值)',
+        grades: { 1: lim(40, 8, 2.0, 0.3, PH_FW), 2: lim(80, 12, 3.0, 0.4, PH_FW) } },
+      source: 'https://hbj.nantong.gov.cn/ntshbj/upload/d31a39fa-c45b-412d-96c8-d961031e0951.doc' },
+    { id: 'FJ_FW', region: '福建', code: 'DB35/2160-2023', water: 'fw', nature: '强制',
+      effective: '2024-01-01', existing: '2024-12-31',
+      thresholdMu: 100, thresholdNote: '集中连片池塘 ≥100 亩; 工厂化',
+      gradeRule: 'FW_CLASS1_BAN', grades: { 1: lim(45, 10, 3.0, 0.5, PH_FW), 2: lim(90, 20, 5.0, 1.0, PH_FW) },
+      special: { label: '政府划定的特别排放限值区域/时段',
+        grades: { 1: lim(40, 10, 3.0, 0.3, PH_FW), 2: lim(40, 10, 3.0, 0.3, PH_FW) } },
+      source: 'https://sthjt.fujian.gov.cn/zwgk/flfg/202312/P020231218570686062672.pdf' },
+    { id: 'HI_FW', region: '海南', code: 'DB46/475-2023', water: 'fw', nature: '强制',
+      effective: '2023-03-01', existing: '2025-01-01',
+      thresholdMu: null, thresholdNote: '工厂化、池塘, 无规模门槛',
+      gradeRule: 'FW', grades: { 1: lim(45, 10, 3.0, 0.4, PH_FW), 2: lim(90, 20, 5.0, 0.8, PH_FW) },
+      source: 'https://amr.hainan.gov.cn/zw/gsgg/qtgsgg/202301/P020230117567354170133.pdf' },
+    { id: 'CQ', region: '重庆', code: 'DB50/1544-2023', water: 'fw', nature: '强制',
+      effective: '2024-01-01', existing: '2025-01-01',
+      thresholdMu: 30, thresholdNote: '池塘/工厂化面积 >2 hm² (30 亩), 或连片 >3.33 hm² (50 亩)',
+      gradeRule: 'FW', grades: { 1: lim(45, 15, 3.0, 0.4, PH_FW), 2: lim(90, 25, 5.0, 0.8, PH_FW) },
+      source: 'https://sthjj.cq.gov.cn/zwgk_249/zfxxgkml/kjbz/gjjdfhj/dfhjbz/202312/W020231215378144404479.pdf' },
+    { id: 'SC', region: '四川', code: 'DB51/3061-2023', water: 'fw', nature: '强制',
+      effective: '2023-10-01', existing: '2025-01-01',
+      thresholdMu: null, thresholdNote: '向公共水体排放的封闭式池塘、工厂化, 无规模门槛',
+      gradeRule: 'SC', keyArea: '附录 A 重点控制区域 (成都 20 区县、眉山 6、乐山 11、宜宾 3、德阳 4、资阳 3、内江 5、自贡 6、泸州 3、雅安名山, 共 10 市 62 县) 不论水体类别一律执行一级',
+      grades: { 1: lim(45, 15, 3.0, 0.4, PH_FW), 2: lim(90, 25, 5.0, 0.8, PH_FW) },
+      source: 'https://dbba.sacinfo.org.cn/portal/download/76541c8e17ece48789a3f0cf90e5c7d6038fd61839e0c0c8f067c35b6c8b15ea' },
+    { id: 'HA', region: '河南', code: 'DB41/2575-2024', water: 'fw', nature: '强制',
+      effective: '2024-06-01', existing: '2026-06-01',
+      thresholdMu: 100, thresholdNote: '集中连片池塘 ≥100 亩; 漏斗形池塘; 工厂化',
+      gradeRule: 'HA', grades: { 1: lim(45, 15, 8, 0.5, PH_FW), 2: lim(90, 25, 15, 1.0, PH_FW) },
+      source: 'https://dbba.sacinfo.org.cn/portal/download/d40e53f654a52729b50edcbac3e28ceea04b498d7cdf88c2b7d1184964f0a1fa' },
+    { id: 'HB', region: '湖北', code: 'DB42/2330-2024', water: 'fw', nature: '强制',
+      effective: '2025-01-01', existing: '2026-01-01 (洪湖、梁子湖、斧头湖流域) / 2027-01-01 (其他地区)',
+      thresholdMu: 200, thresholdNote: '养殖水面 ≥200 亩的连片池塘和单个池塘; 工厂化等封闭式养殖',
+      gradeRule: 'HB', grades: { 1: lim(45, 15, 3.0, 0.4, PH_FW), 2: lim(90, 25, 5.0, 1.0, PH_FW) },
+      source: 'http://sthjt.hubei.gov.cn/hjsj/hbbz/shjbh/swrbz/swrdb/202503/P020250301734539887915.pdf' },
+    { id: 'HN', region: '湖南', code: 'DB43/1752-2020', water: 'fw', nature: '强制',
+      effective: '2021-02-27', existing: null,
+      thresholdMu: null,
+      thresholdNote: '池塘养殖、工厂化养殖等非天然水域投饵投肥养殖 (淡水), 无规模门槛; 现有养殖场过渡期未核对 (见标准"实施与监督"章)',
+      gradeRule: 'HN', grades: { 1: lim(45, 15, 2.5, 0.4, PH_FW), 2: lim(90, 25, 5.0, 0.8, PH_FW) },
+      source: 'https://hbj.yueyang.gov.cn/6824/6829/content_1667688.html' },
+
+    /* ---------- 海水 ---------- */
+    { id: 'GD_SW', region: '广东', code: 'DB44/2462-2024', water: 'sw', nature: '强制',
+      effective: '2024-05-01', existing: '2026-05-01',
+      thresholdMu: 30, thresholdNote: '池塘 ≥30 亩; 工厂化等封闭系统; <30 亩参照执行',
+      belowThreshold: '参照执行',
+      gradeRule: 'SW', grades: { 1: lim(40, 10, 3.5, 0.5, PH_SW2), 2: lim(90, 20, 7.0, 1.5, PH_SW2) },
+      source: 'https://gdee.gd.gov.cn/gkmlpt/content/4/4382/post_4382815.html' },
+    { id: 'JS_SW', region: '江苏', code: 'DB32/4043-2021', water: 'sw', nature: '强制',
+      effective: '2021-08-01', existing: '2023-06-01',
+      thresholdMu: 50, thresholdNote: '连片 >100 亩; 单一主体 >50 亩',
+      gradeRule: 'SW', grades: { 1: lim(40, 10, 3.0, 0.5, PH_SW1), 2: lim(100, 20, 5.0, 1.0, PH_SW2) },
+      source: 'https://hbj.nantong.gov.cn/ntshbj/upload/d31a39fa-c45b-412d-96c8-d961031e0951.doc' },
+    { id: 'ZJ', region: '浙江', code: 'DB33/1384-2024', water: 'sw', nature: '强制',
+      effective: '2024-10-15', existing: '2025-10-15',
+      thresholdMu: 50, thresholdNote: '连片海水池塘 ≥50 亩; 工厂化; 育苗',
+      gradeRule: 'SW', grades: { 1: lim(100, 10.0, 5.0, 0.5, [7.0, 9.0]), 2: lim(120, 20.0, 7.0, 1.0, PH_SW2) },
+      phase2: { from: '2027-10-01', TN: { 1: 4.0, 2: 6.0 } },
+      source: 'https://zjjcmspublic.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/jcms_files/jcms1/web1756/site/attach/-1/2405201754074968811.pdf' },
+    { id: 'FJ_SW', region: '福建', code: 'DB35/2160-2023', water: 'sw', nature: '强制',
+      effective: '2024-01-01', existing: '2024-12-31',
+      thresholdMu: 100, thresholdNote: '提水式海水池塘全部适用; 其他集中连片池塘 ≥100 亩',
+      gradeRule: 'SW_CLASS1_BAN', grades: { 1: lim(50, 10, 3.0, 0.5, PH_SW1), 2: lim(90, 20, 5.0, 1.0, PH_SW2) },
+      special: { label: '政府划定的特别排放限值区域/时段 (表 3, 淡水海水同一表)',
+        grades: { 1: lim(40, 10, 3.0, 0.3, PH_SW2), 2: lim(40, 10, 3.0, 0.3, PH_SW2) } },
+      variant: { label: '提水式池塘 (TN 放宽)', TN: { 1: 5.0, 2: 7.0 } },
+      source: 'https://sthjt.fujian.gov.cn/zwgk/flfg/202312/P020231218570686062672.pdf' },
+    { id: 'HI_SW', region: '海南', code: 'DB46/475-2023', water: 'sw', nature: '强制',
+      effective: '2023-03-01', existing: '2025-01-01',
+      thresholdMu: null, thresholdNote: '工厂化、池塘, 无规模门槛',
+      gradeRule: 'SW_CLASS1_BAN', grades: { 1: lim(50, 10, 3.5, 0.5, PH_SW1), 2: lim(90, 20, 7.0, 1.0, PH_SW2) },
+      source: 'https://amr.hainan.gov.cn/zw/gsgg/qtgsgg/202301/P020230117567354170133.pdf' },
+    { id: 'SD', region: '山东', code: 'DB37/4676-2023', water: 'sw', nature: '强制',
+      effective: '2024-05-24', existing: '2026-05-24',
+      thresholdMu: null, thresholdNote: '海水池塘、工厂化, 无规模门槛',
+      gradeRule: 'SW', grades: { 1: lim(40, 10, 4.0, 0.7, PH_SW1), 2: lim(100, 20, 6.0, 1.0, PH_SW2) },
+      source: 'https://dbba.sacinfo.org.cn/portal/download/80f454b25749f7c5c2bd41b5e0a16ee2c3a46a03ba989ca1f01f799185d78307' },
+    { id: 'LN', region: '辽宁', code: 'DB21/3907-2023', water: 'sw', nature: '强制',
+      effective: '2025-07-01', existing: '2025-07-01',
+      thresholdMu: null, thresholdNote: '海水池塘、工厂化, 无规模门槛',
+      gradeRule: 'SW', grades: { 1: lim(40, 10, 5, 0.5, PH_SW1), 2: lim(100, 20, 8, 1.0, PH_SW2) },
+      source: 'https://dbba.sacinfo.org.cn/portal/download/d56b8874c7504dee9fd90192461739ddf556d3bbdde635ad76a30af7078cab90' },
+    { id: 'TJ', region: '天津', code: 'DB12/1288-2023', water: 'sw', nature: '强制',
+      effective: '2024-09-01', existing: null,
+      thresholdMu: null, thresholdNote: '池塘 (表 1); 无规模门槛',
+      gradeRule: 'TJ', grades: { 1: lim(40, 10, 5.0, 0.5, PH_SW2, { NH3N: 1.5 }), 2: lim(80, 20, 8.0, 0.8, PH_SW2, { NH3N: 2.0 }) },
+      source: 'https://dbba.sacinfo.org.cn/portal/download/74363e672a45718b91d5d8b25e7c075838a6ddd7be6e416383d3ca6183c09213' },
+    { id: 'HE', region: '河北', code: 'DB13/5879-2023', water: 'sw', nature: '强制',
+      effective: '2024-01-01', existing: '2024-09-01',
+      thresholdMu: null, thresholdNote: '池塘、工厂化海水养殖及尾水处理设施, 无规模门槛; 不含网箱、筏式、吊笼、滩涂底播',
+      gradeRule: 'SW', grades: { 1: lim(40, 10, 5.0, 0.5, PH_SW2), 2: lim(100, 20, 8.0, 1.0, PH_SW2) },
+      sourceNote: 'SS、COD、TN、TP 与分级取自河北省生态环境厅官方解读 (未取得标准原文); pH 6.5–9.0 取自苏洁等 2025《海洋环境科学》44(3) 对照表, 未核实',
+      source: 'https://hbepb.hebei.gov.cn/hbhjt/zwgk/zc/101699834119841.html' },
+    /* ---------- 无省标地区兜底: 推荐性行业标准 ---------- */
+    { id: 'SCT9101', region: '其他地区 (无省标)', code: 'SC/T 9101-2007', water: 'fw', nature: '推荐性行业标准',
+      effective: '2007-09-01', existing: null,
+      thresholdMu: null, thresholdNote: '淡水池塘养殖水排放要求; 无规模门槛, 非强制',
+      gradeRule: 'SCT', grades: { 1: lim(50, 15, 3.0, 0.5, [6.0, 9.0]), 2: lim(100, 25, 5.0, 1.0, [6.0, 9.0]) },
+      sourceNote: '限值取自项目标准笔记; 另有 BOD₅ 10/15 及铜、锌、硫化物、总余氯等本工具未建模; 分级规则 (Ⅲ 类执行一级、Ⅳ–Ⅴ 类执行二级) 据常见引用, 原文未能打开核对',
+      source: 'https://www.doc88.com/' },
+    { id: 'SCT9103', region: '其他地区 (无省标)', code: 'SC/T 9103-2007', water: 'sw', nature: '推荐性行业标准',
+      effective: '2007-09-01', existing: null,
+      thresholdMu: null, thresholdNote: '海水养殖水排放要求; 无规模门槛, 非强制',
+      gradeRule: 'SCT', grades: { 1: lim(40, 10, null, null, PH_SW1), 2: lim(100, 20, null, null, PH_SW2) },
+      sourceNote: '该标准不考核 TN、TP, 而考核无机氮 0.50/1.00、活性磷酸盐 0.05/0.10 及 BOD₅ 6/10 等, 本工具未建模, TN、TP 列为不考核; 限值取自项目标准笔记, 原文未能打开核对',
+      source: 'https://www.doc88.com/' }
+  ];
+
+  /* 已发布但限值未能对照原文核实: 只展示, 不参与计算 */
+  var UNVERIFIED = [
+    { region: '安徽', code: 'DB34/4722-2024', water: 'fw', note: '原文未取得; 官方解读确认适用于单个养殖水面 ≥10 亩, 现有养殖场 2025-01-01 起执行; 论文转录值 SS 40/85、COD_Mn 15/25、TN 3/6、TP 0.4/0.8 未核实' },
+    { region: '广西', code: 'DB45/T 2841-2024', water: 'sw', note: '推荐性标准, 原文未取得; 论文转录值 SS 40/100、COD 10/20、TN 5.0/8.0、TP 0.7/1.5 未核实' }
+  ];
+
+  function findStandard(id) {
+    for (var i = 0; i < STANDARDS.length; i++) if (STANDARDS[i].id === id) return STANDARDS[i];
+    return null;
+  }
+
+  /* ------------------------------------------------------------------
+   * 2. 适用性与执行级别
+   *    receiving: 淡水 'SPECIAL' (法律法规禁止设排污口的特殊保护水域: 饮用水源保护区等) | 'I-II' | 'III' | 'IV-V'
+   *               海水 'SPECIAL' | '1' | '2' | '3' | '4' (GB 3097 类别)
+   *    override:  'auto' | '1'
+   *    opts: { useSpecial, existingOutlet (标准实施前已有的排放口), keyArea (四川附录 A) }
+   *  v0.6: 各省 Ⅰ–Ⅱ 类规定不同, 按原文逐省处理:
+   *    广东 5.2.1.1、江西 4.2: Ⅰ–Ⅲ 类均执行一级, 无禁排条款 (特殊保护水域除外)
+   *    福建、海南、重庆、四川、河南、湖北、湖南: 特殊保护水域 "不得新建排放口, 现有排放口按国家和地方法规执行"
+   *      → 新建: 禁止; 现有排放口: 标准不给限值, 本工具按一级作参照 (reference = true)
+   *    天津 4.1 只规定第二、三、四类海域, 第一类未规定 → 按禁止设排污口处理并提示
+   * ------------------------------------------------------------------ */
+  /* v0.4: 先按受纳水体自动判定; 禁止排放不可被覆盖; 用户指定级别只能比自动判定更严 (二级 → 一级) */
+  function resolveGrade(std, receiving, override, opts) {
+    if (typeof opts === 'boolean') opts = { useSpecial: opts };
+    var r = autoGrade(std, receiving, opts || {});
+    r.autoGrade = r.grade; r.override = null; r.overrideRejected = null;
+    if (override !== '1' && override !== '2') return r;
+    var want = +override;
+    if (r.single) { r.overrideRejected = '本标准只有一套限值, 指定级别无效'; return r; }
+    if (r.prohibited) { r.overrideRejected = '禁止排放的水域不能通过指定级别解除'; return r; }
+    if (r.reference && want === 1) return r;   // 已按一级参照
+    if (want > r.grade) {
+      r.overrideRejected = '自动判定为一级, 不能放宽为二级; 如环评或排污许可另有规定, 以批复文件为准';
+      return r;
+    }
+    if (want < r.grade) {
+      r.grade = want; r.override = want;
+      r.note = '按用户指定执行一级 (严于自动判定的二级; 如地方要求、环评或排污许可另有规定)。自动判定依据: ' + r.note;
+    }
+    return r;
+  }
+  function autoGrade(std, receiving, o) {
+    var r = { grade: null, prohibited: false, reference: false, single: false, special: false, note: '', existingNote: null };
+    if (std.gradeRule === 'SINGLE') {
+      r.single = true; r.grade = 0;
+      r.note = '本标准只有一套限值, 不分级';
+      return r;
+    }
+    if (o.useSpecial && std.special) r.special = true;
+    var rule = std.gradeRule;
+    var ban = function (note) {
+      // 不得新建排放口; 标准实施前已有的排放口按国家和地方法规执行, 标准本身不给限值
+      if (o.existingOutlet) {
+        r.grade = 1; r.reference = true;
+        r.note = note + '。现有排放口: 标准未给限值, "按国家和地方相关法律法规执行"; 本工具按一级限值作参照, 以当地生态环境部门认定为准';
+      } else {
+        r.prohibited = true; r.note = note + '; 如为标准实施前已有的排放口, 请勾选"现有排放口"';
+      }
+    };
+    if (std.water === 'fw') {
+      if (receiving === 'SPECIAL') {
+        ban('法律法规禁止设置排污口的特殊保护水域 (饮用水水源保护区、自然保护区核心区等) 不得设置养殖尾水排放口');
+      } else if (receiving === 'I-II') {
+        if (rule === 'JX') { r.grade = 1; r.note = '江西 4.2: GB 3838 Ⅰ–Ⅲ 类水体 (划定的特殊保护水域除外) 执行一级'; }
+        else if (rule === 'GD') { r.grade = 1; r.note = '广东 5.2.1.1: GB 3838 Ⅰ、Ⅱ、Ⅲ 类水域为重点保护水域, 执行一级 (本标准无禁排条款; 法律法规禁止设排污口的水域请选"特殊保护水域")'; }
+        else if (rule === 'SCT') { r.grade = 1; r.note = 'SC/T 9101 未对 Ⅰ–Ⅱ 类水体作规定, 按一级参照; 此类水域通常禁止设排污口'; r.reference = true; }
+        else if (rule === 'HN') ban('湖南: 法律法规禁止设置排污口的特殊保护水域不得设置养殖尾水排放口');
+        else if (rule === 'HB') ban('湖北: GB 3838 Ⅰ、Ⅱ 类水域及Ⅲ类水域中划定的保护区为特殊保护水域, 不得新建排放口');
+        else if (rule === 'HA') ban('河南 6.2 a): Ⅰ、Ⅱ 类功能水域为特殊保护水域, 不应新建水产养殖尾水排放口');
+        else if (rule === 'SC') ban('四川 5.1 c): 法律法规禁止设置排污口的水域 (含 Ⅰ、Ⅱ 类) 为特殊保护水域, 不得新建排放口');
+        else ban('GB 3838 Ⅰ–Ⅱ 类水域为特殊保护水域, 不得新建养殖尾水排放口');
+      } else if (receiving === 'III') {
+        r.grade = 1; r.note = '排入 GB 3838 Ⅲ 类水体执行一级';
+        if (rule === 'HA') r.note = '河南 5 b): 一级仅针对 Ⅲ 类功能水域内的渔业水域及游泳区; 其他 Ⅲ 类水域标准未明确归类, 本工具按一级偏严处理, 请与当地确认';
+        if (rule === 'SC') r.note += ' (划定的饮用水水源保护区除外; 5.2: 有环境容量且水质稳定达Ⅲ类的重点控制区域经论证可执行二级)';
+      } else {
+        r.grade = 2; r.note = '排入 GB 3838 Ⅳ–Ⅴ 类及未划类水体执行二级';
+      }
+      if (rule === 'SC' && o.keyArea && !r.prohibited && r.grade === 2) {
+        r.grade = 1; r.note = '四川附录 A 重点控制区域: 不论受纳水体类别一律执行一级 (5.1 b)';
+      }
+      if (rule === 'SC' && !o.keyArea && !r.prohibited) r.note += '; 四川另规定: 附录 A 重点控制区域 (10 市 62 县) 一律执行一级, 位于其中请勾选';
+      if (rule === 'JS' && !r.prohibited) r.note += '; 江苏按水体功能划分, 渔业水域等执行一级, 请以当地生态环境部门认定为准';
+      if (rule === 'HN' && !r.prohibited) r.note += (receiving === 'III' ? ' (划定的饮用水水源保护区除外)' : '') + '; 湖南另规定: 通过未明确环境功能的水域排入湖库的尾水, 县级以上人民政府可要求执行一级 (可在"执行级别"中指定)';
+      if (rule === 'HB' && !r.prohibited) r.note += '; 湖北另规定: Ⅱ、Ⅲ类水质目标湖泊 (水库) 保护区外围 500 m 内的养殖池塘, 不论排向何处一律执行一级 (可在"执行级别"中指定)';
+      if (rule === 'GD' && !r.prohibited && r.grade === 2) r.note += '; 广东 5.2.2.3: 水功能重要、容量小或未达标地区, 地级以上市政府可要求执行一级 (可在"执行级别"中指定)';
+    } else {
+      if (receiving === 'SPECIAL') {
+        ban('法律法规禁止设置排污口的海域不得设置养殖尾水排放口');
+      } else if (receiving === '1') {
+        if (rule === 'SW_CLASS1_BAN') ban('GB 3097 第一类海域为特殊保护水域, 不得新建养殖尾水排放口');
+        else if (rule === 'TJ') ban('天津 4.1 只规定了第二、三、四类海域, 未规定第一类海域; 第一类海域一般属法律法规禁止设排污口的海域');
+        else { r.grade = 1; r.note = '排入 GB 3097 第一类海域执行一级'; }
+      } else if (receiving === '2') {
+        r.grade = 1; r.note = '排入 GB 3097 第二类海域执行一级';
+      } else {
+        r.grade = 2; r.note = '排入 GB 3097 第三、四类海域执行二级';
+      }
+    }
+    return r;
+  }
+
+  function limitsFor(std, gradeInfo, opts) {
+    if (!gradeInfo || gradeInfo.prohibited || gradeInfo.grade === null) return null;
+    opts = opts || {};
+    var src = (gradeInfo.special && std.special) ? std.special.grades : std.grades;
+    var base = src[gradeInfo.grade];
+    var out = {};
+    for (var k in base) out[k] = base[k];
+    if (opts.variant && std.variant && std.variant.TN) out.TN = std.variant.TN[gradeInfo.grade];
+    if (opts.phase2 && std.phase2 && std.phase2.TN) out.TN = std.phase2.TN[gradeInfo.grade];
+    return out;
+  }
+
+  /* v0.5 status: 'mandatory' 强制适用 | 'reference' 未达门槛 (参照执行, 不等于免于处理) | 'pending' 门槛待核对 */
+  function applicability(std, areaMu) {
+    if (std.thresholdUnknown) return { applies: true, status: 'pending', text: '规模门槛未核对: ' + std.thresholdNote };
+    if (std.thresholdMu == null) return { applies: true, status: 'mandatory', text: '无规模门槛, 适用' };
+    if (areaMu >= std.thresholdMu) return { applies: true, status: 'mandatory', text: '达到规模门槛 (' + std.thresholdNote + ')' };
+    return { applies: false, status: 'reference',
+      text: (std.belowThreshold ? std.belowThreshold + ': ' : '未达到强制适用规模: ') + std.thresholdNote +
+        '。未达门槛不等于可以不处理, 仍须遵守其他排放管理要求' };
+  }
+
+  /* ------------------------------------------------------------------
+   * 3. 品种参数与排水方式
+   *    group 决定三池两坝面积比 (见 AREA_RATIO)。
+   *    饲料与产量为常见典型取值, 仅作起点; 鱼体成分: 对虾 N 2.9% / P 0.34%
+   *    (Boyd 2004, Global Aquaculture Advocate), 鱼类为一般范围取值。
+   * ------------------------------------------------------------------ */
+  var SPECIES = [
+    { id: 'grasscarp', name: '草鱼 / 四大家鱼', water: 'fw', group: 'general', yieldKgMu: 1500, fcr: 1.6, cp: 28, pFeed: 1.0, bodyN: 2.7, bodyP: 0.6, days: 240, exchange: 'routine' },
+    { id: 'tilapia',   name: '罗非鱼',          water: 'fw', group: 'general', yieldKgMu: 2000, fcr: 1.4, cp: 30, pFeed: 1.0, bodyN: 2.7, bodyP: 0.6, days: 200, exchange: 'routine' },
+    { id: 'bass',      name: '加州鲈',          water: 'fw', group: 'carnivore', yieldKgMu: 2000, fcr: 1.2, cp: 45, pFeed: 1.3, bodyN: 2.8, bodyP: 0.6, days: 210, exchange: 'routine' },
+    { id: 'snakehead', name: '乌鳢 / 鳜鱼 (配合饲料)', water: 'fw', group: 'carnivore', yieldKgMu: 2500, fcr: 1.3, cp: 42, pFeed: 1.2, bodyN: 2.8, bodyP: 0.6, days: 210, exchange: 'routine' },
+    { id: 'eel',       name: '鳗鲡',            water: 'fw', group: 'eel_turtle', yieldKgMu: 1500, fcr: 1.6, cp: 45, pFeed: 1.4, bodyN: 2.6, bodyP: 0.5, days: 300, exchange: 'routine' },
+    { id: 'turtle',    name: '中华鳖',          water: 'fw', group: 'eel_turtle', yieldKgMu: 800,  fcr: 1.4, cp: 45, pFeed: 1.4, bodyN: 2.6, bodyP: 0.9, days: 300, exchange: 'routine' },
+    { id: 'shrimp_fw', name: '南美白对虾 (淡水/低盐)', water: 'fw', group: 'shrimp', yieldKgMu: 800, fcr: 1.2, cp: 40, pFeed: 1.2, bodyN: 2.9, bodyP: 0.34, days: 100, exchange: 'routine' },
+    { id: 'crab',      name: '河蟹',            water: 'fw', group: 'crab', yieldKgMu: 150, fcr: 2.0, cp: 35, pFeed: 1.0, bodyN: 2.5, bodyP: 0.5, days: 240, exchange: 'low' },
+    { id: 'shrimp_sw', name: '南美白对虾 (海水池塘)', water: 'sw', group: 'shrimp', yieldKgMu: 800, fcr: 1.2, cp: 40, pFeed: 1.2, bodyN: 2.9, bodyP: 0.34, days: 100, exchange: 'routine' },
+    { id: 'custom',    name: '自定义',           water: 'any', group: 'general', yieldKgMu: 1000, fcr: 1.5, cp: 32, pFeed: 1.0, bodyN: 2.7, bodyP: 0.6, days: 200, exchange: 'low' }
+  ];
+
+  var GROUP_LABEL = {
+    eel_turtle: '龟鳖、鳗鲡', carnivore: '鳜鱼、鲈鱼、乌鳢', general: '罗非鱼、四大家鱼及其他', shrimp: '虾类', crab: '蟹类'
+  };
+
+  /* 饲料氮磷随排水流失比例 (占饲料投入的 %)
+   *  low:     Boyd 2004 斑点叉尾鮰池塘收支: 排水 N 16.0%, P 11.4%
+   *  routine: Briggs & Funge-Smith 1994 泰国集约化对虾池塘: 排水 N 35%, P 10%
+   *           (其中 63–67% 随日常换水排出, 其余在收获排干时)
+   *  v0.3: 草鱼、罗非默认由 low 改为 routine。low 把 16% 的饲料氮全部集中到一次排干水量中,
+   *        对 1500–2000 kg/亩 的高产池塘算得 TN 14–18 mg/L, 是广东实测进水 (3.1–5.4) 的 3–5 倍;
+   *        routine 算得 3.8 / 5.6 mg/L, 与实测吻合 (见 FIELD_REF)。 */
+  var EXCHANGE_PRESETS = {
+    low:     { label: '少换水, 主要在收获时排干 (高产池塘会高估)', fN: 16.0, fP: 11.4, dailyPct: 0, drainLoadPct: 100,
+               source: 'Boyd 2004, Global Aquaculture Advocate (斑点叉尾鮰池塘)' },
+    routine: { label: '养殖期日常换水', fN: 35.0, fP: 10.0, dailyPct: 3, drainLoadPct: 35,
+               source: 'Briggs & Funge-Smith 1994, Aquaculture Research 25:789–811 (集约化对虾池塘)' }
+  };
+  /* drainLoadPct (v0.6): 随排水流失的氮磷中在收获排干时排出的份额 (%);
+   *  Briggs & Funge-Smith: 63–67% 随日常换水排出, 其余 33–37% 在排干时 → 取 35。
+   *  日常换水浓度 = 本底 + 流失量 × (1 − d) ÷ 周期换水量;  排干浓度 = 本底 + 流失量 × d ÷ 排干水量。
+   *  不再把全周期负荷平均到总排水量上 (v0.5 及以前的做法低估了排干期浓度)。 */
+
+  /* 国内淡水池塘尾水 (处理前) 实测范围, mg/L — 用于校核质量平衡估算值
+   *  邹 2024 广东 8 市 25 点: 均值 TN 3.13、TP 0.37; 各模式进水 TN 3.05–5.44、TP 0.18–0.68
+   *  徐嘉波 2022 上海 n=44: TN 2.03、TP 0.63;  蒋文俊 2026 四川加州鲈: TN 10.14、TP 1.57 (池塘水, 非同步)
+   *  罗开练 2023 珠海黄鳍鲷 (半咸水): TN 7.41、TP 1.63
+   *  均为日常换水期单次或少量采样, 不含排干末段。 */
+  var FIELD_REF = {
+    TN: { lo: 2.0, hi: 10.1, typ: 3.13 },
+    TP: { lo: 0.18, hi: 1.63, typ: 0.37 },
+    note: '邹 2024 (广东 25 点)、徐嘉波 2022 (上海)、蒋文俊 2026 (四川)、罗开练 2023 (珠海)'
+  };
+  function fieldCheck(k, c) {
+    var r = FIELD_REF[k];
+    if (!r || !isFinite(c)) return null;
+    return c > r.hi ? 'above' : (c < r.lo ? 'below' : 'within');
+  }
+
+  /* ------------------------------------------------------------------
+   * 处理面积比 (% 养殖面积), v0.2 按审计报告改为区间:
+   *  def: 默认值; defOther: 非广东辖区默认 (仅虾类); lo–hi: 各文件给出的区间
+   *  龟鳖鳗 10 (广东草案, 海盐, T/SNLT); 鳜鲈鳢 8 (广东) – 10 (T/SNLT 乌鳢);
+   *  罗非/家鱼 6 (广东, T/JSYX 7) – 8 (T/SNLT); 淡水虾 5 (广东) – 8 (T/SNLT, T/GDNB);
+   *  蟹 6 (T/SNLT), 3 仅见广东编制说明 (引自粤农农办〔2021〕40号, 原文未核)。
+   *  海水: 无官方面积比, 只作下限提示, 规模由流量与水力负荷决定。
+   * ------------------------------------------------------------------ */
+  var AREA_RATIO = {
+    eel_turtle: { def: 10, lo: 10, hi: 10, note: '广东草案 10%; 海盐 ≥10% 另设湿地 ≥5%; T/SNLT ≥10%' },
+    carnivore:  { def: 8,  lo: 8,  hi: 10, note: '广东草案 8%; T/SNLT 乌鳢 ≥10%' },
+    general:    { def: 6,  lo: 6,  hi: 8,  note: '广东草案 6%; T/JSYX 7—2025 ≥6%; 湖北 2022 6–10%; T/SNLT 大宗淡水鱼 ≥8%' },
+    shrimp:     { def: 5,  defOther: 8, lo: 5, hi: 8, note: '广东草案 5% (广东辖区默认); T/SNLT 白对虾、T/GDNB 罗氏沼虾 ≥8% (其他地区默认)' },
+    crab:       { def: 6,  lo: 3,  hi: 6,  note: 'T/SNLT ≥6% (默认); 3% 仅见广东编制说明, 引自粤农农办〔2021〕40号, 原文未核' }
+  };
+  function defaultAreaRatio(group, standardId) {
+    var g = AREA_RATIO[group] || AREA_RATIO.general;
+    if (g.defOther != null && !/^GD/.test(standardId || '')) return g.defOther;
+    return g.def;
+  }
+
+  /* ------------------------------------------------------------------
+   * 去除模型 (v0.2):  C_out = C* + (C_in − C*) × (1 − R × f_季节);  C_in ≤ C* 时 C_out = C_in
+   *  R 中值与区间、C* 锚定实测出水下限; 中值选取与季节系数属工程判断 (见审计报告)。
+   *  淡水: 刘梅 2021 (浙江 3 点), 邹 2024 (广州南沙), 徐嘉波 2022 (上海, n=44)
+   *  海水: 王磊 2023 (烟台对虾全茬次质量衡算); NH3-N 海水以 DIN 计
+   *  C* 取淡水实测出水下限, 海水暂用同值 (SS 21–26 两类水体一致)
+   * ------------------------------------------------------------------ */
+  var REMOVAL = {
+    fw: { SS:   { R: 50, lo: 40, hi: 60, Cstar: 20 },
+          COD:  { R: 45, lo: 40, hi: 60, Cstar: 4 },
+          TN:   { R: 50, lo: 35, hi: 60, Cstar: 1.0 },
+          TP:   { R: 40, lo: 30, hi: 65, Cstar: 0.1 },
+          NH3N: { R: 70, lo: 60, hi: 80, Cstar: 0.2 } },
+    sw: { SS:   { R: 50, lo: 45, hi: 75, Cstar: 20 },
+          COD:  { R: 40, lo: 20, hi: 58, Cstar: 4 },
+          TN:   { R: 40, lo: 27, hi: 60, Cstar: 1.0 },
+          TP:   { R: 40, lo: 40, hi: 60, Cstar: 0.1 },
+          NH3N: { R: 60, lo: 25, hi: 95, Cstar: 0.2 } }
+  };
+  /* 季节系数 f: ≥20 °C 1.0; 10–20 °C 0.85; <10 °C TN、NH3-N 0.5, 其余 0.8
+   * (θ = 1.08 时 8 °C 速率约为 20 °C 的 40%; TP 的 θ 接近 1.0) */
+  var SEASONS = {
+    warm: { label: '夏季 (水温 ≥20 °C)', f: { SS: 1, COD: 1, TN: 1, TP: 1, NH3N: 1 } },
+    mild: { label: '春秋 (10–20 °C)',    f: { SS: 0.85, COD: 0.85, TN: 0.85, TP: 0.85, NH3N: 0.85 } },
+    cold: { label: '冬季 (<10 °C)',      f: { SS: 0.8, COD: 0.8, TN: 0.5, TP: 0.8, NH3N: 0.5 } }
+  };
+  /* 排干期: 生态净化池对 TN 的贡献 16.3 个百分点 (刘梅 2021 单元贡献) 不计入 */
+  var DRAIN_ECO_TN_CREDIT = 16.3;
+
+  var DEFAULTS = {
+    pondDepth: 1.8,               // m 养殖池平均水深 (典型取值)
+    drainsPerCycle: 1,            // 每个周期排干次数
+    drainDays: 5,                 // 排干一批池塘所需天数
+    simultaneousPct: 10,          // 同时排水的池塘面积占比 % (错开排水可显著减小处理设施)
+    bgTN: 0, bgTP: 0,             // 水源本底 mg/L
+    rawMode: 'estimate',          // TN/TP 原水: 'estimate' 质量平衡 | 'measured' 本场实测
+    measTN: 3.13, measTP: 0.37,   // 实测示例 = 广东 25 点进水均值 (邹 2024)
+    SS: 120, COD: 20, NH3N: 1.5,  // 示例值, 需按实测替换 (质量平衡不覆盖 SS、COD、NH3-N)
+    drainSSFactor: 1.5,           // 排干前 80% 水 SS / 日常 SS (Boyd 2000 对虾池: 池水 100 → 前 80% 约 150 mg/L)
+    drainSSLast: 1000,            // 排干最后 20% 水 SS, mg/L (Boyd 2000: 约 1000 mg/L; SRAC: 末 10% 比首 10% 高 40–70% 仅为相对值)
+    lastPortionHeld: false,       // 最后 20% 排水单独收集静置 ≥8 h 后再处理 → 按前 80% 值评价
+    drainLoadPct: 35,             // 见 EXCHANGE_PRESETS
+    designFlowMode: 'draft',      // 'draft' 广东草案口径: 周期平均日排水量 × b; 'peak' 排干峰值 (+ 其余池塘换水)
+    // 三池两坝 (广东《淡水池塘养殖尾水处理技术规范 三池两坝技术》征求意见稿, 编制说明 2025-10)
+    splitSed: 40, splitAer: 20, splitEco: 40,   // % (草案区间: 沉淀 30–45, 曝气 5–30, 净化 35–50)
+    depthSed: 2.5,                // m 沉淀池 (T/SNLT、T/NNAS、T/GDNB ≥2.5)
+    depthAer: 2.0,                // m 曝气池 (广东草案 ≥2.0; 编制说明 ≥3.0, 矛盾待核)
+    depthEco: 2.0,                // m 生态净化池 (广东草案 ≥2.0)
+    slopeA: 0.9,                  // 边坡系数 (广东编制说明 0.85–0.95, 示例 0.84 / 0.89)
+    flowFactor: 1.2,              // 日常流量变化系数 b (广东草案 1.1–1.3)
+    minHRT: 1.0,                  // d, ≥1 (广东草案)
+    maxHL: 0.5,                   // m³/(m²·d), 借自 HJ 2005-2010 水平潜流湿地
+    minSettleH: 8,                // h 排干峰值下沉淀池停留时间 (SRAC 建议最后 20% 排水 8 h)
+    exchDuringDrain: true,        // v0.5: 排干期间其余池塘照常换水 (保守); false = 排干期间停止换水
+    recircPct: 100,               // % 设计日流量 (广东草案 70–150)
+    floatBedPct: 20,              // % 生态净化池 (广东草案 ≥20)
+    sedFloatPct: 20,              // % 沉淀池浮床 (广东草案: 应布设 10–30%)
+    m2PerHead: 3, kWPer100Heads: 3   // 曝气: 每 3 m² 1 个头, 每 100 头 ≥3 kW (广东草案, 湖北 2022)
+  };
+
+  /* ------------------------------------------------------------------
+   * 4. 氮磷质量平衡
+   * ------------------------------------------------------------------ */
+  function massBalance(p) {
+    var areaM2 = p.areaMu * MU_M2;
+    var pondVol = areaM2 * p.pondDepth;                       // m³
+    var prod = p.areaMu * p.yieldKgMu;                         // kg/周期
+    var feed = prod * p.fcr;                                   // kg/周期
+    var Nfeed = feed * p.cp / 100 / 6.25;                      // kg N
+    var Pfeed = feed * p.pFeed / 100;                          // kg P
+    var Nharv = prod * p.bodyN / 100;
+    var Pharv = prod * p.bodyP / 100;
+    var Nwater = Nfeed * p.fN / 100;
+    var Pwater = Pfeed * p.fP / 100;
+    var Nrest = Nfeed - Nharv - Nwater;                        // 底泥 + 气态逸失
+    var Prest = Pfeed - Pharv - Pwater;                        // 底泥
+    var Vexch = pondVol * p.dailyPct / 100 * p.days;
+    var Vdrain = pondVol * p.drainsPerCycle;
+    var Vtot = Vexch + Vdrain;
+    var cTN = Vtot > 0 ? p.bgTN + Nwater * 1000 / Vtot : NaN;  // 周期平均 (仅作对照)
+    var cTP = Vtot > 0 ? p.bgTP + Pwater * 1000 / Vtot : NaN;
+    // v0.6 分工况: 排干份额 d; 无换水 → 全部在排干; 无排干 → 全部在换水
+    var d = isFinite(p.drainLoadPct) ? Math.max(0, Math.min(100, p.drainLoadPct)) / 100 : 0.35;
+    if (Vexch <= 0) d = 1; else if (Vdrain <= 0) d = 0;
+    var cTNr = Vexch > 0 ? p.bgTN + Nwater * (1 - d) * 1000 / Vexch : NaN;
+    var cTPr = Vexch > 0 ? p.bgTP + Pwater * (1 - d) * 1000 / Vexch : NaN;
+    var cTNd = Vdrain > 0 ? p.bgTN + Nwater * d * 1000 / Vdrain : NaN;
+    var cTPd = Vdrain > 0 ? p.bgTP + Pwater * d * 1000 / Vdrain : NaN;
+    var warnings = [];
+    if (Nrest < 0) warnings.push('氮收支不闭合: 鱼体留存 + 排水流失超过饲料投入, 请检查饲料系数、蛋白含量或鱼体含氮量');
+    if (Prest < 0) warnings.push('磷收支不闭合: 鱼体留存 + 排水流失超过饲料投入, 请检查饲料含磷量或鱼体含磷量');
+    if (Vtot <= 0) warnings.push('排水总量为 0: 请设置换水率或排干次数');
+    return {
+      areaM2: areaM2, pondVol: pondVol, prod: prod, feed: feed,
+      N: { feed: Nfeed, harv: Nharv, water: Nwater, rest: Nrest,
+           retPct: Nfeed > 0 ? Nharv / Nfeed * 100 : NaN },
+      P: { feed: Pfeed, harv: Pharv, water: Pwater, rest: Prest,
+           retPct: Pfeed > 0 ? Pharv / Pfeed * 100 : NaN },
+      Vexch: Vexch, Vdrain: Vdrain, Vtot: Vtot,
+      dischargePerKg: prod > 0 ? Vtot / prod : NaN,           // m³/kg 产品
+      cTN: cTN, cTP: cTP, drainShareUsed: d,
+      routine: { TN: cTNr, TP: cTPr }, drain: { TN: cTNd, TP: cTPd }, warnings: warnings
+    };
+  }
+
+  /* ------------------------------------------------------------------
+   * 5. 三池两坝规模 (v0.2)
+   *  设计流量 (v0.5): 排干期间日常换水持续 → Q = Q排干 + Q换水 × (1 − 同时排干比例)
+   *                   排干期间停止换水     → Q = max(Q排干, Q换水)
+   *  每周期排干 0 次时 Q排干 = 0, 不做排干沉淀校核
+   *  (v0.2 原文) Q = max(排干峰值, 日常换水 × b)
+   *  有效容积 V = a × Σ(A_i × h_i);  加权水深 h_w = Σ(split_i × h_i)
+   *  总面积 A = max(面积比 [淡水], Q / e, Q × HRT / (a × h_w), 排干沉淀 8 h 所需)
+   *  海水: 面积比不参与控制, 只作下限提示
+   * ------------------------------------------------------------------ */
+  function sizeTreatment(p, mb) {
+    var sw = p.water === 'sw';
+    var a = p.slopeA > 0 ? p.slopeA : 1;
+    var splitSum = p.splitSed + p.splitAer + p.splitEco;
+    var fSed = splitSum > 0 ? p.splitSed / splitSum : 0;
+    var fAer = splitSum > 0 ? p.splitAer / splitSum : 0;
+    var fEco = splitSum > 0 ? p.splitEco / splitSum : 0;
+    var hW = fSed * p.depthSed + fAer * p.depthAer + fEco * p.depthEco;
+
+    var hasDrain = p.drainsPerCycle > 0 && p.drainDays > 0;
+    var qDrain = hasDrain ? mb.pondVol * p.simultaneousPct / 100 / p.drainDays : 0;
+    var qExchRaw = mb.pondVol * p.dailyPct / 100;
+    var qExch = qExchRaw * (p.flowFactor > 0 ? p.flowFactor : 1);
+    var concurrent = p.exchDuringDrain == null ? DEFAULTS.exchDuringDrain : !!p.exchDuringDrain;
+    var qExchOthers = qDrain > 0 ? qExch * (1 - p.simultaneousPct / 100) : qExch;   // 正在排干的池塘不再换水
+    var qPeak = concurrent ? Math.max(qExch, qDrain + qExchOthers) : Math.max(qDrain, qExch);
+    var qAvg = p.days > 0 ? mb.Vtot / p.days * (p.flowFactor > 0 ? p.flowFactor : 1) : 0;   // 广东草案: 周期平均日排水量 × b
+    var mode = p.designFlowMode === 'peak' ? 'peak' : 'draft';
+    var qDesign = mode === 'peak' ? qPeak : qAvg;                                     // m³/d
+    var peakGov = (concurrent && qDrain > 0 && qDrain + qExchOthers >= qExch) ? 'both' : (qDrain >= qExch ? 'drain' : 'exch');
+
+    var aRatio = mb.areaM2 * p.areaRatioPct / 100;
+    var aHL = p.maxHL > 0 ? qDesign / p.maxHL : 0;
+    var aHRT = (a * hW) > 0 ? qDesign * p.minHRT / (a * hW) : 0;
+    // 排干峰值下沉淀池停留 ≥ minSettleH:  a × fSed × A × hSed ≥ qDrain × h/24
+    var aSettle = (qDrain > 0 && fSed > 0 && p.depthSed > 0) ? qDrain * p.minSettleH / 24 / (a * fSed * p.depthSed) : 0;
+
+    var cands = { hl: aHL, hrt: aHRT, settle: aSettle };
+    if (!sw) cands.ratio = aRatio;
+    var aReq = 0, governing = 'hl';
+    ['ratio', 'hl', 'hrt', 'settle'].forEach(function (k) {
+      if (cands[k] != null && cands[k] > aReq) { aReq = cands[k]; governing = k; }
+    });
+
+    var aSed = aReq * fSed, aAer = aReq * fAer, aEco = aReq * fEco;
+    var volSed = a * aSed * p.depthSed, volAer = a * aAer * p.depthAer, volEco = a * aEco * p.depthEco;
+    var vol = volSed + volAer + volEco;
+    var heads = p.m2PerHead > 0 ? Math.ceil(aAer / p.m2PerHead) : 0;
+    var bigFarm = p.areaMu > 300;
+    return {
+      qDrain: qDrain, qExchRaw: qExchRaw, qExch: qExch, qDesign: qDesign,
+      qGoverning: mode === 'peak' ? peakGov : 'avg', designFlowMode: mode, qPeak: qPeak, qAvg: qAvg,
+      concurrent: concurrent, qExchOthers: qExchOthers,
+      aRatio: aRatio, ratioControls: !sw, aHL: aHL, aHRT: aHRT, aSettle: aSettle,
+      aReq: aReq, governing: governing,
+      aReqMu: aReq / MU_M2, pctOfFarm: mb.areaM2 > 0 ? aReq / mb.areaM2 * 100 : NaN,
+      hW: hW, slopeA: a,
+      aSed: aSed, aAer: aAer, aEco: aEco, volSed: volSed, volAer: volAer, volEco: volEco, vol: vol,
+      hrt: qDesign > 0 ? vol / qDesign : Infinity,
+      hl: aReq > 0 ? qDesign / aReq : 0,
+      settleH: qDrain > 0 ? volSed / qDrain * 24 : Infinity,
+      splitOk: Math.abs(splitSum - 100) < 1e-6,
+      floatBed: aEco * p.floatBedPct / 100,
+      sedFloat: aSed * (p.sedFloatPct || 0) / 100,
+      recirc: qDesign * p.recircPct / 100,
+      // 广东草案: "每 3 kW 宜配不少于 100 个曝气头" → 功率上限 = 曝气头数 × 3 / 100 (经验估算, 非需氧量计算)
+      aeration: { heads: heads, kW: heads * p.kWPer100Heads / 100,
+                  kWPerMuAer: aAer > 0 ? heads * p.kWPer100Heads / 100 / (aAer / MU_M2) : 0 },
+      dam: bigFarm ? { n: 2, L: 6, W: 2, section: 4.8 } : { n: 2, L: 4, W: 1, section: 3.2 },
+      bigFarm: bigFarm
+    };
+  }
+
+  /* ------------------------------------------------------------------
+   * 6. 去除与达标对照
+   *    rMid: 用户可调的去除率中值 (缺省取 REMOVAL 表); 区间取表中 lo–hi 并包含中值
+   * ------------------------------------------------------------------ */
+  var POLLUTANTS = ['SS', 'COD', 'TN', 'TP', 'NH3N'];
+  function effluent(cin, R, f, Cstar) {
+    if (!isFinite(cin)) return NaN;
+    if (cin <= Cstar) return cin;
+    var r = Math.max(0, Math.min(100, R * f)) / 100;
+    return Cstar + (cin - Cstar) * (1 - r);
+  }
+  function compliance(raw, opts) {
+    var tab = REMOVAL[opts.water === 'sw' ? 'sw' : 'fw'];
+    var f = (SEASONS[opts.season] || SEASONS.mild).f;
+    var limits = opts.limits;
+    var rows = [];
+    POLLUTANTS.forEach(function (k) {
+      var t = tab[k];
+      var cin = raw[k];
+      var Rmid = (opts.rMid && isFinite(opts.rMid[k])) ? opts.rMid[k] : t.R;
+      var lo = Math.min(t.lo, Rmid), hi = Math.max(t.hi, Rmid);
+      var credit = (opts.drain && k === 'TN') ? DRAIN_ECO_TN_CREDIT : 0;
+      var adj = function (R) { return Math.max(0, R - credit); };
+      var fk = f[k];
+      var cMid = effluent(cin, adj(Rmid), fk, t.Cstar);
+      var cBest = effluent(cin, adj(hi), fk, t.Cstar);
+      var cWorst = effluent(cin, adj(lo), fk, t.Cstar);
+      var L = limits && limits[k] != null ? limits[k] : null;
+      var status = null;
+      if (L != null && isFinite(cMid)) {
+        if (cWorst <= L) status = 'pass';
+        else if (cMid <= L) status = 'edge';
+        else status = 'fail';
+      }
+      var needEta = (L != null && isFinite(cin) && cin > 0) ? Math.max(0, (1 - L / cin) * 100) : null;
+      rows.push({ key: k, cin: cin, Cstar: t.Cstar, R: adj(Rmid), f: fk, Reff: Math.min(100, adj(Rmid) * fk),
+        cout: cMid, coutBest: cBest, coutWorst: cWorst, limit: L, needEta: needEta,
+        floorExceeds: L != null && t.Cstar > L, status: status,
+        outOk: status == null ? null : status !== 'fail' });
+    });
+    return rows;
+  }
+
+  /* ------------------------------------------------------------------
+   * 输入校验 (v0.4): 错误 → 不出计算结果; 警告 → 计算但提示
+   *   空白或无法解析的数值以 NaN 传入, 一律报错 (不再静默按 0 计算)
+   * ------------------------------------------------------------------ */
+  var CHECKS = [
+    // [字段, 名称, 下限, 上限, 下限是否可取等号]
+    ['areaMu', '养殖水面', 0, Infinity, false], ['pondDepth', '平均水深', 0, 10, false],
+    ['yieldKgMu', '单产', 0, Infinity, true], ['days', '养殖周期', 0, 3650, false],
+    ['fcr', '饲料系数', 0, 10, true], ['cp', '饲料粗蛋白', 0, 100, true], ['pFeed', '饲料总磷', 0, 100, true],
+    ['bodyN', '产品含氮', 0, 100, true], ['bodyP', '产品含磷', 0, 100, true],
+    ['fN', '饲料氮流失比例', 0, 100, true], ['fP', '饲料磷流失比例', 0, 100, true],
+    ['dailyPct', '日换水率', 0, 100, true], ['drainsPerCycle', '每周期排干次数', 0, 50, true],
+    ['simultaneousPct', '同时排干面积', 0, 100, true], ['drainDays', '排干历时', 0, 365, false],
+    ['bgTN', '水源本底 TN', 0, 100, true], ['bgTP', '水源本底 TP', 0, 20, true],
+    ['SS', '日常尾水 SS', 0, 10000, true], ['COD', '尾水 COD', 0, 1000, true], ['NH3N', '尾水氨氮', 0, 200, true],
+    ['areaRatioPct', '处理面积比', 0, 100, true],
+    ['splitSed', '沉淀池比例', 0, 100, true], ['splitAer', '曝气池比例', 0, 100, true], ['splitEco', '生态净化池比例', 0, 100, true],
+    ['depthSed', '沉淀池水深', 0, 10, false], ['depthAer', '曝气池水深', 0, 10, false], ['depthEco', '净化池水深', 0, 10, false],
+    ['slopeA', '边坡系数', 0, 1, false], ['flowFactor', '日流量变化系数', 1, 5, true],
+    ['minHRT', '最短停留时间', 0, 100, true], ['maxHL', '最大水力负荷', 0, 10, false], ['minSettleH', '排干沉淀停留', 0, 240, true],
+    ['recircPct', '内循环比例', 0, 1000, true], ['floatBedPct', '净化池浮床', 0, 100, true], ['sedFloatPct', '沉淀池浮床', 0, 100, true],
+    ['drainLoadPct', '排干时排出的氮磷份额', 0, 100, true], ['drainSSLast', '排干末段 SS', 0, 100000, false]
+  ];
+  var OPTIONAL_POS = [['drainSS', '排干末段 SS'], ['drainTN', '排干末段 TN'], ['drainTP', '排干末段 TP']];
+  function validate(p) {
+    var errors = [], warnings = [];
+    var bad = function (v) { return typeof v !== 'number' || !isFinite(v); };
+    CHECKS.forEach(function (c) {
+      var v = p[c[0]];
+      if (bad(v)) { errors.push(c[1] + ': 未填写或不是数字'); return; }
+      var lowOk = c[4] ? v >= c[2] : v > c[2];
+      if (!lowOk || v > c[3]) errors.push(c[1] + ' = ' + v + ': 应' + (c[4] ? '≥ ' : '> ') + c[2] + (c[3] < Infinity ? ' 且 ≤ ' + c[3] : ''));
+    });
+    if (p.rawMode === 'measured') {
+      [['measTN', '实测尾水 TN'], ['measTP', '实测尾水 TP']].forEach(function (c) {
+        var v = p[c[0]];
+        if (bad(v) || v <= 0) errors.push(c[1] + ': 选择"本场实测"时必须填写大于 0 的数值');
+      });
+    }
+    OPTIONAL_POS.forEach(function (c) {      // 选填: 空白 (NaN/undefined/null) 表示未提供
+      var v = p[c[0]];
+      if (v != null && !(typeof v === 'number' && isNaN(v)) && (bad(v) || v <= 0)) errors.push(c[1] + ': 选填, 填写时应大于 0');
+    });
+    if (p.rMid) POLLUTANTS.forEach(function (k) {
+      var v = p.rMid[k];
+      if (v == null) return;
+      if (bad(v) || v < 0 || v > 100) errors.push(k.replace('NH3N', '氨氮') + ' 去除率中值: 应在 0–100% 之间');
+    });
+    if (errors.length) return { errors: errors, warnings: warnings };
+    [['splitSed', '沉淀池'], ['splitAer', '曝气池'], ['splitEco', '生态净化池']].forEach(function (c) {
+      if (!(p[c[0]] > 0)) errors.push(c[1] + '比例为 0: 三池两坝必须同时有沉淀、曝气、生态净化三个单元');
+    });
+    if (p.dailyPct === 0 && p.drainsPerCycle === 0) errors.push('日换水率与排干次数都为 0: 没有排水, 无法计算尾水浓度与处理规模');
+    var sum = p.splitSed + p.splitAer + p.splitEco;
+    if (sum > 0) [['splitSed', '沉淀池', 30, 45], ['splitAer', '曝气池', 5, 30], ['splitEco', '生态净化池', 35, 50]].forEach(function (c) {
+      var v = p[c[0]] / sum * 100;
+      if (v < c[2] - 1e-9 || v > c[3] + 1e-9) warnings.push(c[1] + '占 ' + (Math.round(v * 10) / 10) + '%, 超出广东草案 ' + c[2] + '–' + c[3] + '%');
+    });
+    if (p.floatBedPct < 20) warnings.push('净化池浮床 ' + p.floatBedPct + '% 低于广东草案 ≥20%');
+    if (p.sedFloatPct < 10 || p.sedFloatPct > 30) warnings.push('沉淀池浮床 ' + p.sedFloatPct + '% 超出广东草案应布设的 10–30%');
+    if (p.rawMode !== 'measured' && p.dailyPct > 5) warnings.push('日换水率 ' + p.dailyPct + '%/d 较高: 流失比例固定时换水越多算出的浓度越低, 只是稀释; 文献 35% 对应约 3%/d, 高换水率下应相应提高流失比例或改用实测');
+    if (p.recircPct < 70 || p.recircPct > 150) warnings.push('内循环 ' + p.recircPct + '% 超出广东草案 70–150%');
+    if (p.cp > 0 && p.cp < 10) warnings.push('饲料粗蛋白 ' + p.cp + '% 偏低, 请确认单位为 %');
+    if (p.slopeA < 0.85 || p.slopeA > 0.95) warnings.push('边坡系数 ' + p.slopeA + ' 超出广东草案 0.85–0.95');
+    if (p.flowFactor > 1.3) warnings.push('日流量变化系数 ' + p.flowFactor + ' 超出广东草案 1.1–1.3');
+    if (p.simultaneousPct === 0 && p.drainsPerCycle > 0) warnings.push('同时排干面积为 0: 排干峰值流量不计入设计');
+    var tab = REMOVAL[p.water === 'sw' ? 'sw' : 'fw'];
+    if (p.rMid) POLLUTANTS.forEach(function (k) {
+      var v = p.rMid[k];
+      if (v != null && (v < tab[k].lo || v > tab[k].hi)) warnings.push(k.replace('NH3N', '氨氮') + ' 去除率中值 ' + v + '% 超出实测区间 ' + tab[k].lo + '–' + tab[k].hi + '%');
+    });
+    return { errors: errors, warnings: warnings };
+  }
+
+  /* ------------------------------------------------------------------
+   * 汇总入口
+   * ------------------------------------------------------------------ */
+  function run(input) {
+    var std = findStandard(input.standardId);
+    var gi = std ? resolveGrade(std, input.receiving, input.gradeOverride,
+      { useSpecial: input.useSpecial, existingOutlet: input.existingOutlet, keyArea: input.keyArea }) : null;
+    var limits = std ? limitsFor(std, gi, { variant: input.useVariant, phase2: input.usePhase2 }) : null;
+    var water = std ? std.water : (input.water || 'fw');
+    var p = {};
+    for (var d in DEFAULTS) p[d] = DEFAULTS[d];            // 未提供的参数取默认值 (如曝气规格)
+    for (var k in input) if (input[k] !== undefined) p[k] = input[k];
+    p.water = water;
+    var validation = validate(p);
+    if (validation.errors.length) {
+      return { standard: std, grade: gi, limits: limits, water: water, validation: validation, invalid: true };
+    }
+    var mb = massBalance(p);
+    var tr = sizeTreatment(p, mb);
+    var measured = p.rawMode === 'measured';
+    var given = function (v) { return typeof v === 'number' && isFinite(v) && v > 0; };
+    var hasRoutine = mb.Vexch > 0, hasDrain = mb.Vdrain > 0 && p.drainsPerCycle > 0;
+    var rawTN = measured ? p.measTN : mb.routine.TN;
+    var rawTP = measured ? p.measTP : mb.routine.TP;
+    // 排干期 TN/TP: 实测 > 估算模型 (负荷拆分) > 实测模式下按模型比例放大日常实测
+    var scale = function (k) { var r = mb.routine[k], d = mb.drain[k]; return (isFinite(r) && r > 0 && isFinite(d)) ? d / r : 1; };
+    var drainEst = { TN: measured ? (hasRoutine ? p.measTN * scale('TN') : p.measTN) : mb.drain.TN,
+                     TP: measured ? (hasRoutine ? p.measTP * scale('TP') : p.measTP) : mb.drain.TP };
+    /* 由实测浓度反推随排水流失比例 (% 饲料投入), v0.5 分两部分:
+     *   日常换水部分 = (实测日常 − 本底) × 周期换水量          — 由日常实测唯一确定
+     *   排干部分     = (排干末段 − 本底) × 周期排干水量       — 有排干实测才确定; 否则假设与日常相同
+     *   全周期比例 = 两部分之和; drainBasis 标明排干部分的依据 */
+    var part = function (c, bg, V, feed) { return Math.max(0, c - bg) * V / 1000 / feed * 100; };
+    var implied = function (cR, cD, cEst, bg, feed) {
+      if (!(measured && isFinite(cR) && feed > 0 && mb.Vtot > 0)) return { routine: NaN, drain: NaN, total: NaN };
+      var r = part(cR, bg, mb.Vexch, feed), d = part(given(cD) ? cD : cEst, bg, mb.Vdrain, feed);
+      return { routine: r, drain: d, total: r + d };
+    };
+    var iN = implied(p.measTN, p.drainTN, drainEst.TN, p.bgTN, mb.N.feed);
+    var iP = implied(p.measTP, p.drainTP, drainEst.TP, p.bgTP, mb.P.feed);
+    var raw = {
+      mode: measured ? 'measured' : 'estimate', TN: rawTN, TP: rawTP,
+      estTN: mb.cTN, estTP: mb.cTP,
+      impliedFN: iN.total, impliedFP: iP.total, impliedN: iN, impliedP: iP,
+      drainBasis: { TN: given(p.drainTN) ? 'measured' : (measured ? 'scaled' : 'model'), TP: given(p.drainTP) ? 'measured' : (measured ? 'scaled' : 'model') },
+      drainEst: drainEst, hasRoutine: hasRoutine, hasDrain: hasDrain,
+      drainShare: mb.Vtot > 0 ? mb.Vdrain / mb.Vtot : NaN,
+      check: { TN: fieldCheck('TN', rawTN), TP: fieldCheck('TP', rawTP) }
+    };
+    var routineRaw = hasRoutine ? { SS: p.SS, COD: p.COD, TN: rawTN, TP: rawTP, NH3N: p.NH3N }
+                                : { SS: NaN, COD: NaN, TN: NaN, TP: NaN, NH3N: NaN };
+    // 排干 SS (v0.6): 前 80% 水 = 日常 × 1.5; 最后 20% 水 = drainSSLast (Boyd 2000 约 1000 mg/L); 评价取最后 20%,
+    // 除非末段单独收集静置 (lastPortionHeld)。用户填了"排干末段 SS"则以实测为准。
+    var drainSSFirst = p.SS * (p.drainSSFactor || DEFAULTS.drainSSFactor);
+    var drainSSLast = given(p.drainSS) ? p.drainSS : p.drainSSLast;
+    var drainSS = p.lastPortionHeld ? drainSSFirst : drainSSLast;
+    var drainSSBasis = p.lastPortionHeld ? 'first80' : (given(p.drainSS) ? 'measured' : 'boyd');
+    // 排干末段 TN/TP: 有实测用实测; 否则沿用日常 (周期平均) 值, 并标记为"未单独预测"
+    var drainAssumed = { TN: !given(p.drainTN), TP: !given(p.drainTP) };
+    var drainRaw = hasDrain ? { SS: drainSS, COD: p.COD, TN: drainAssumed.TN ? drainEst.TN : p.drainTN,
+                                TP: drainAssumed.TP ? drainEst.TP : p.drainTP, NH3N: p.NH3N }
+                            : { SS: NaN, COD: NaN, TN: NaN, TP: NaN, NH3N: NaN };
+    var common = { water: water, season: p.season, limits: limits, rMid: p.rMid };
+    var comp = compliance(routineRaw, common);
+    var compDrain = compliance(drainRaw, { water: water, season: p.season, limits: limits, rMid: p.rMid, drain: true });
+    var judged = function (rows) { return rows.filter(function (r) { return r.status != null; }); };
+    /* verdict: 'pass' 去除率区间不利端全部达标; 'risk' 中值达标但有临界项; 'fail' 中值即超标 */
+    var summary = function (rows, exists) {
+      var j = judged(rows);
+      if (!limits || !exists) return null;
+      var fail = j.filter(function (r) { return r.status === 'fail'; }).length;
+      var edge = j.filter(function (r) { return r.status === 'edge'; }).length;
+      return { fail: fail, edge: edge, n: j.length, verdict: fail ? 'fail' : (edge ? 'risk' : 'pass') };
+    };
+    return {
+      standard: std, grade: gi, limits: limits, water: water,
+      applicability: std ? applicability(std, p.areaMu) : null,
+      massBalance: mb, treatment: tr, raw: raw,
+      compliance: comp, complianceDrain: compDrain, drainSS: drainSS, drainAssumed: drainAssumed,
+      summary: summary(comp, hasRoutine), summaryDrain: summary(compDrain, hasDrain),
+      hasRoutine: hasRoutine, hasDrain: hasDrain, drainSSBasis: drainSSBasis, drainSSFirst: drainSSFirst, drainSSLast: drainSSLast,
+      settleOk: !(tr.qDrain > 0) || tr.settleH >= p.minSettleH - 1e-9,
+      validation: validation, invalid: false,
+      scenario: { phase2: !!(input.usePhase2 && std && std.phase2), phase2From: std && std.phase2 ? std.phase2.from : null }
+    };
+  }
+
+  return {
+    VERSION: VERSION, MU_M2: MU_M2,
+    STANDARDS: STANDARDS, UNVERIFIED: UNVERIFIED, SPECIES: SPECIES, GROUP_LABEL: GROUP_LABEL,
+    EXCHANGE_PRESETS: EXCHANGE_PRESETS, FIELD_REF: FIELD_REF, fieldCheck: fieldCheck, AREA_RATIO: AREA_RATIO, REMOVAL: REMOVAL, SEASONS: SEASONS,
+    DRAIN_ECO_TN_CREDIT: DRAIN_ECO_TN_CREDIT, DEFAULTS: DEFAULTS, POLLUTANTS: POLLUTANTS,
+    defaultAreaRatio: defaultAreaRatio,
+    findStandard: findStandard, resolveGrade: resolveGrade, limitsFor: limitsFor,
+    applicability: applicability, massBalance: massBalance, sizeTreatment: sizeTreatment,
+    effluent: effluent, compliance: compliance, validate: validate, run: run
+  };
+});
+</script>
+<script id="tailwater-tests">
+/* 单元测试 (44 项), 算例全部手算; 在页面地址后加 ?selftest=1 运行。
+ * 与计算核心放在同一文件中, 保证测试的就是页面实际使用的代码。 */
+function TailwaterTests(T, test, assert) {
+  'use strict';
+  const near = (a, b, tol = 1e-6) => assert.ok(Math.abs(a - b) <= tol * Math.max(1, Math.abs(b)), `${a} ≉ ${b}`);
+
+function baseInput(over) {
+  return Object.assign({
+    standardId: 'JX', receiving: 'III', gradeOverride: 'auto', useSpecial: false, season: 'mild',
+    areaMu: 100, pondDepth: 1.8, yieldKgMu: 1500, fcr: 1.6, cp: 28, pFeed: 1.0,
+    bodyN: 2.7, bodyP: 0.6, fN: 16, fP: 11.4, days: 240, dailyPct: 0, drainsPerCycle: 1,
+    bgTN: 0, bgTP: 0, SS: 120, COD: 20, NH3N: 1.5, drainSS: NaN,
+    areaRatioPct: 6, simultaneousPct: 10, drainDays: 5,
+    splitSed: 40, splitAer: 20, splitEco: 40, depthSed: 2.5, depthAer: 2.0, depthEco: 2.0,
+    slopeA: 0.9, flowFactor: 1.2, minHRT: 1.0, maxHL: 0.5, minSettleH: 8,
+    recircPct: 100, floatBedPct: 20, sedFloatPct: 20, m2PerHead: 3, kWPer100Heads: 3,
+    drainLoadPct: 35, drainSSLast: 1000, lastPortionHeld: false, designFlowMode: 'peak',
+    existingOutlet: false, keyArea: false, rMid: null
+  }, over || {});
+}
+/* 有日常换水的实测算例: 日常 TN/TP 取 v0.2 的周期平均估算值, 使去除模型的手算结果保持不变 */
+const ROUTINE = { dailyPct: 1, rawMode: 'measured', measTN: 14.336, measTP: 2.2848 };
+
+test('氮磷质量平衡 (草鱼 100 亩算例)', () => {
+  const mb = T.massBalance(baseInput());
+  near(mb.areaM2, 66666.6667, 1e-6);
+  near(mb.pondVol, 120000);              // 66666.67 × 1.8
+  near(mb.prod, 150000);                 // 100 × 1500
+  near(mb.feed, 240000);                 // × 1.6
+  near(mb.N.feed, 10752);                // 240000 × 0.28 / 6.25
+  near(mb.P.feed, 2400);                 // 240000 × 0.01
+  near(mb.N.harv, 4050);                 // 150000 × 0.027
+  near(mb.P.harv, 900);
+  near(mb.N.water, 1720.32);             // 10752 × 0.16
+  near(mb.P.water, 273.6);               // 2400 × 0.114
+  near(mb.N.rest, 4981.68);
+  near(mb.Vtot, 120000);                 // 只排干一次
+  near(mb.cTN, 14.336);                  // 1720.32 × 1000 / 120000
+  near(mb.cTP, 2.28);
+  near(mb.dischargePerKg, 0.8);
+  assert.equal(mb.warnings.length, 0);
+});
+
+test('换水量与本底浓度叠加', () => {
+  const mb = T.massBalance(baseInput({ dailyPct: 2, bgTN: 1.0, bgTP: 0.1 }));
+  near(mb.Vexch, 120000 * 0.02 * 240);   // 576000
+  near(mb.Vtot, 696000);
+  near(mb.cTN, 1.0 + 1720.32 * 1000 / 696000);
+  near(mb.cTP, 0.1 + 273.6 * 1000 / 696000);
+});
+
+test('收支不闭合时给出警告', () => {
+  const mb = T.massBalance(baseInput({ fcr: 0.5 }));
+  assert.ok(mb.warnings.some(w => w.includes('氮收支不闭合')));
+});
+
+test('规模: 分池水深、边坡系数、水力负荷控制', () => {
+  const p = baseInput();
+  const tr = T.sizeTreatment(Object.assign({ water: 'fw' }, p), T.massBalance(p));
+  near(tr.hW, 2.2);                      // 0.4×2.5 + 0.2×2 + 0.4×2
+  near(tr.qDrain, 2400);                 // 120000 × 10% / 5
+  near(tr.qExch, 0);
+  near(tr.qDesign, 2400);
+  near(tr.aRatio, 4000);                 // 66666.67 × 6%
+  near(tr.aHL, 4800);                    // 2400 / 0.5
+  near(tr.aHRT, 2400 / (0.9 * 2.2));     // 1212.1
+  near(tr.aSettle, 2400 * 8 / 24 / (0.9 * 0.4 * 2.5));   // 888.9
+  near(tr.aReq, 4800);
+  assert.equal(tr.governing, 'hl');
+  near(tr.volSed, 0.9 * 1920 * 2.5);     // 4320
+  near(tr.vol, 4320 + 1728 + 3456);      // 9504
+  near(tr.hrt, 9504 / 2400);             // 3.96 d
+  near(tr.settleH, 4320 / 2400 * 24);    // 43.2 h
+  near(tr.hl, 0.5);
+  assert.equal(tr.aeration.heads, 320);  // ceil(960 / 3)
+  near(tr.aeration.kW, 9.6);
+  assert.deepEqual(tr.dam, { n: 2, L: 4, W: 1, section: 3.2 });
+});
+
+test('规模: 日常换水乘变化系数 b', () => {
+  const p = baseInput({ dailyPct: 5, exchDuringDrain: false });
+  const tr = T.sizeTreatment(Object.assign({ water: 'fw' }, p), T.massBalance(p));
+  near(tr.qExchRaw, 6000);
+  near(tr.qExch, 7200);                  // × 1.2
+  assert.equal(tr.qGoverning, 'exch');
+  near(tr.aReq, 14400);                  // 7200 / 0.5
+});
+
+test('规模: 排干沉淀 8 h 可成为控制项', () => {
+  const p = baseInput({ splitSed: 5, splitAer: 45, splitEco: 50, minSettleH: 24 });
+  const tr = T.sizeTreatment(Object.assign({ water: 'fw' }, p), T.massBalance(p));
+  near(tr.aSettle, 2400 * 24 / 24 / (0.9 * 0.05 * 2.5));
+  assert.equal(tr.governing, 'settle');
+  near(tr.settleH, 24);
+});
+
+test('规模: 淡水面积比控制, 海水不计面积比', () => {
+  const over = { simultaneousPct: 2, drainDays: 10, areaRatioPct: 5 };
+  const p = baseInput(over);
+  const mb = T.massBalance(p);
+  const fw = T.sizeTreatment(Object.assign({ water: 'fw' }, p), mb);
+  assert.equal(fw.governing, 'ratio');
+  near(fw.aReq, 66666.6667 * 0.05, 1e-6);
+  const sw = T.sizeTreatment(Object.assign({ water: 'sw' }, p), mb);
+  assert.equal(sw.governing, 'hl');
+  near(sw.aReq, 240 / 0.5);              // qDrain = 120000 × 2% / 10
+  assert.equal(sw.ratioControls, false);
+});
+
+test('大场过滤坝', () => {
+  const p = baseInput({ areaMu: 500 });
+  const tr = T.sizeTreatment(Object.assign({ water: 'fw' }, p), T.massBalance(p));
+  assert.deepEqual(tr.dam, { n: 2, L: 6, W: 2, section: 4.8 });
+});
+
+test('面积比默认值', () => {
+  assert.equal(T.defaultAreaRatio('shrimp', 'GD_FW'), 5);
+  assert.equal(T.defaultAreaRatio('shrimp', 'JX'), 8);
+  assert.equal(T.defaultAreaRatio('crab', 'JS_FW'), 6);
+  assert.equal(T.defaultAreaRatio('eel_turtle', 'JX'), 10);
+  for (const sp of T.SPECIES) assert.ok(T.defaultAreaRatio(sp.group, 'JX') > 0, sp.id);
+});
+
+test('去除模型 C* + (Cin − C*)(1 − R·f)', () => {
+  near(T.effluent(120, 50, 0.85, 20), 20 + 100 * (1 - 0.425));   // 77.5
+  near(T.effluent(0.8, 50, 1, 1.0), 0.8);                         // 低于 C* 不变
+  near(T.effluent(10, 50, 0.5, 1.0), 1 + 9 * 0.75);
+});
+
+test('达标对照 (江西一级, 春秋)', () => {
+  const r = T.run(baseInput(ROUTINE));
+  assert.equal(r.grade.grade, 1);
+  const ss = r.compliance.find(x => x.key === 'SS');
+  near(ss.cout, 77.5);
+  near(ss.coutWorst, 20 + 100 * (1 - 0.40 * 0.85));   // 86
+  near(ss.coutBest, 20 + 100 * (1 - 0.60 * 0.85));    // 69
+  assert.equal(ss.status, 'fail');                     // 一级 45
+  const tn = r.compliance.find(x => x.key === 'TN');
+  near(tn.cout, 1 + 13.336 * (1 - 0.425));
+  near(tn.needEta, (1 - 3.0 / 14.336) * 100);
+  const nh = r.compliance.find(x => x.key === 'NH3N');
+  assert.equal(nh.status, null);                       // 江西不考核氨氮
+  assert.equal(r.summary.verdict, 'fail');
+  assert.equal(r.summary.n, 4);
+});
+
+test('边界判定与氨氮考核 (上海)', () => {
+  const r = T.run(baseInput(Object.assign({ standardId: 'SH', receiving: 'IV-V', SS: 130, COD: 20 }, ROUTINE)));
+  const ss = r.compliance.find(x => x.key === 'SS');        // 限值 85
+  near(ss.cout, 20 + 110 * 0.575);                          // 83.25 ≤ 85
+  near(ss.coutWorst, 20 + 110 * 0.66);                      // 92.6 > 85
+  assert.equal(ss.status, 'edge');
+  const nh = r.compliance.find(x => x.key === 'NH3N');
+  assert.equal(nh.limit, 2.0);
+  assert.equal(nh.status, 'pass');
+});
+
+test('海水参数与冬季系数', () => {
+  const r = T.run(baseInput(Object.assign({ standardId: 'SD', receiving: '3', season: 'cold' }, ROUTINE)));
+  assert.equal(r.water, 'sw');
+  const tn = r.compliance.find(x => x.key === 'TN');
+  near(tn.R, 40);
+  near(tn.f, 0.5);
+  near(tn.cout, 1 + 13.336 * (1 - 0.20));
+  const cod = r.compliance.find(x => x.key === 'COD');
+  near(cod.cout, 4 + 16 * (1 - 0.40 * 0.8));
+});
+
+test('排干工况: 末 20% SS 1000 (Boyd 2000), TN 不计生态池 16.3; 无换水时负荷全在排干', () => {
+  const r = T.run(baseInput());            // dailyPct 0 → 无日常排水, 流失负荷全部在排干
+  assert.equal(r.hasRoutine, false); assert.equal(r.summary, null);
+  near(r.drainSS, 1000); assert.equal(r.drainSSBasis, 'boyd'); near(r.drainSSFirst, 180);
+  const ss = r.complianceDrain.find(x => x.key === 'SS');
+  near(ss.cin, 1000);
+  const tn = r.complianceDrain.find(x => x.key === 'TN');
+  near(tn.cin, 14.336);                    // 1720.32 kg / 120000 m³
+  near(tn.R, 50 - 16.3);
+  near(tn.cout, 1 + 13.336 * (1 - 0.337 * 0.85));
+  near(T.run(baseInput({ drainSS: 400 })).drainSS, 400);
+  const held = T.run(baseInput({ lastPortionHeld: true }));
+  near(held.drainSS, 180); assert.equal(held.drainSSBasis, 'first80');
+  assert.equal(r.settleOk, true);
+});
+test('v0.6 氮磷负荷按 Briggs 拆分到日常与排干', () => {
+  // fN 35%: 流失 3763.2 kg; d = 35%; Vexch 864000, Vdrain 120000
+  const mb = T.massBalance(baseInput({ dailyPct: 3, fN: 35, fP: 10, drainLoadPct: 35 }));
+  near(mb.routine.TN, 3763.2 * 0.65 * 1000 / 864000);    // 2.831
+  near(mb.drain.TN, 3763.2 * 0.35 * 1000 / 120000);      // 10.98
+  near(mb.cTN, 3763.2 * 1000 / 984000);                  // 周期平均 3.824 仍保留
+  near(mb.drainShareUsed, 0.35);
+  const noEx = T.massBalance(baseInput({ dailyPct: 0, drainLoadPct: 35 }));
+  assert.ok(isNaN(noEx.routine.TN)); near(noEx.drainShareUsed, 1); near(noEx.drain.TN, 14.336);
+  const noDr = T.massBalance(baseInput({ dailyPct: 3, drainsPerCycle: 0, drainLoadPct: 35 }));
+  assert.ok(isNaN(noDr.drain.TN)); near(noDr.drainShareUsed, 0); near(noDr.routine.TN, 1720.32 * 1000 / 864000);
+  // 默认草鱼 (日常换水) 排干期 TN 超过广东二级 5.0, 日常期达标
+  const r = T.run(baseInput({ standardId: 'GD_FW', receiving: 'IV-V', dailyPct: 3, fN: 35, fP: 10 }));
+  assert.equal(r.compliance.find(c => c.key === 'TN').status, 'pass');
+  assert.equal(r.complianceDrain.find(c => c.key === 'TN').status, 'fail');
+});
+
+test('未提供的参数取默认值 (曝气规格)', () => {
+  const inp = baseInput();
+  delete inp.m2PerHead; delete inp.kWPer100Heads;
+  const r = T.run(inp);
+  assert.equal(r.treatment.aeration.heads, 320);
+  near(r.treatment.aeration.kW, 9.6);
+});
+
+test('用户调整去除率中值', () => {
+  const r = T.run(baseInput(Object.assign({ rMid: { SS: 70, COD: 45, TN: 50, TP: 40, NH3N: 70 } }, ROUTINE)));
+  const ss = r.compliance.find(x => x.key === 'SS');
+  near(ss.cout, 20 + 100 * (1 - 0.70 * 0.85));
+  near(ss.coutBest, ss.cout);           // 区间上限扩到包含中值
+});
+
+test('分级判定', () => {
+  const g = (id, rcv, ovr) => T.resolveGrade(T.findStandard(id), rcv, ovr || 'auto', false);
+  assert.equal(g('GD_FW', 'III').grade, 1);
+  assert.equal(g('GD_FW', 'IV-V').grade, 2);
+  assert.equal(g('GD_FW', 'I-II').grade, 1);            // 广东 5.2.1.1: Ⅰ–Ⅲ 类执行一级, 无禁排条款
+  assert.equal(g('GD_FW', 'I-II').prohibited, false);
+  assert.equal(g('GD_FW', 'SPECIAL').prohibited, true);
+  assert.equal(g('JX', 'I-II').grade, 1);
+  assert.equal(g('JX', 'SPECIAL').prohibited, true);    // 江西: 饮用水源保护区等不得设口
+  for (const id of ['HI_FW', 'CQ', 'SC', 'HA', 'HB', 'HN', 'FJ_FW']) assert.equal(g(id, 'I-II').prohibited, true, id);
+  assert.equal(g('TJ', '1').prohibited, true);          // 天津未规定第一类海域
+  assert.equal(g('TJ', '2').grade, 1);
+  assert.equal(g('HI_SW', '1').prohibited, true);
+  assert.equal(g('SH', 'IV-V').single, true);
+  assert.equal(g('SD', '2').grade, 1);
+  assert.equal(g('SD', '3').grade, 2);
+  assert.equal(g('FJ_SW', '1').prohibited, true);
+  assert.equal(g('SD', '1').prohibited, false);
+  assert.equal(g('GD_FW', 'IV-V', '1').grade, 1);
+});
+
+test('限值取用: 特别限值、变体、第二阶段', () => {
+  const js = T.findStandard('JS_FW');
+  assert.equal(T.limitsFor(js, T.resolveGrade(js, 'III', 'auto', true)).COD, 8);
+  const fj = T.findStandard('FJ_SW');
+  assert.equal(T.limitsFor(fj, T.resolveGrade(fj, '3', 'auto'), { variant: true }).TN, 7.0);
+  const zj = T.findStandard('ZJ');
+  assert.equal(T.limitsFor(zj, T.resolveGrade(zj, '2', 'auto'), { phase2: true }).TN, 4.0);
+  assert.equal(T.limitsFor(T.findStandard('HA'), { grade: 2 }).TN, 15);
+});
+
+test('湖北 DB42/2330-2024', () => {
+  const hb = T.findStandard('HB');
+  assert.deepEqual([hb.grades[1].SS, hb.grades[1].COD, hb.grades[1].TN, hb.grades[1].TP], [45, 15, 3.0, 0.4]);
+  assert.deepEqual([hb.grades[2].SS, hb.grades[2].COD, hb.grades[2].TN, hb.grades[2].TP], [90, 25, 5.0, 1.0]);
+  assert.equal(hb.grades[1].NH3N, undefined);              // 湖北不考核氨氮
+  assert.equal(T.resolveGrade(hb, 'I-II', 'auto').prohibited, true);
+  assert.equal(T.resolveGrade(hb, 'III', 'auto').grade, 1);
+  assert.equal(T.resolveGrade(hb, 'IV-V', 'auto').grade, 2);
+  assert.equal(T.applicability(hb, 150).applies, false);    // 门槛 200 亩
+  assert.equal(T.applicability(hb, 200).applies, true);
+});
+
+test('湖南 DB43/1752-2020', () => {
+  const hn = T.findStandard('HN');
+  assert.deepEqual([hn.grades[1].SS, hn.grades[1].COD, hn.grades[1].TN, hn.grades[1].TP], [45, 15, 2.5, 0.4]);
+  assert.deepEqual([hn.grades[2].SS, hn.grades[2].COD, hn.grades[2].TN, hn.grades[2].TP], [90, 25, 5.0, 0.8]);
+  assert.equal(T.resolveGrade(hn, 'I-II', 'auto').prohibited, true);
+  assert.equal(T.resolveGrade(hn, 'III', 'auto').grade, 1);
+  assert.equal(T.resolveGrade(hn, 'IV-V', 'auto').grade, 2);
+  assert.equal(T.applicability(hn, 5).applies, true);       // 无规模门槛
+  assert.equal(T.applicability(hn, 5).text, '无规模门槛, 适用');
+});
+
+test('河北 DB13/5879-2023', () => {
+  const he = T.findStandard('HE');
+  assert.equal(he.water, 'sw');
+  assert.deepEqual([he.grades[1].SS, he.grades[1].COD, he.grades[1].TN, he.grades[1].TP], [40, 10, 5.0, 0.5]);
+  assert.deepEqual([he.grades[2].SS, he.grades[2].COD, he.grades[2].TN, he.grades[2].TP], [100, 20, 8.0, 1.0]);
+  assert.equal(T.resolveGrade(he, '2', 'auto').grade, 1);
+  assert.equal(T.resolveGrade(he, '3', 'auto').grade, 2);
+  assert.ok(/未核实/.test(he.sourceNote));
+});
+
+test('适用性门槛', () => {
+  assert.equal(T.applicability(T.findStandard('HA'), 80).applies, false);
+  assert.equal(T.applicability(T.findStandard('HA'), 100).applies, true);
+  assert.equal(T.applicability(T.findStandard('SC'), 1).applies, true);
+  assert.ok(T.applicability(T.findStandard('GD_FW'), 20).text.startsWith('参照执行'));
+});
+
+test('v0.6 现有排放口: 禁止新建的水域按一级参照; 四川重点区域一律一级', () => {
+  const g = (id, rcv, o) => T.resolveGrade(T.findStandard(id), rcv, 'auto', o);
+  const ex = g('CQ', 'I-II', { existingOutlet: true });
+  assert.equal(ex.prohibited, false); assert.equal(ex.grade, 1); assert.equal(ex.reference, true);
+  assert.equal(g('CQ', 'I-II', { existingOutlet: false }).prohibited, true);
+  assert.equal(g('CQ', 'III', { existingOutlet: true }).reference, false);   // 非禁排水域不受影响
+  const r = T.run(baseInput({ standardId: 'CQ', receiving: 'I-II', existingOutlet: true, dailyPct: 1 }));
+  assert.ok(r.limits && r.limits.TN === 3.0); assert.equal(r.grade.reference, true);
+  assert.equal(g('SC', 'IV-V', { keyArea: true }).grade, 1);
+  assert.equal(g('SC', 'IV-V', { keyArea: false }).grade, 2);
+  assert.equal(g('SC', 'I-II', { keyArea: true }).prohibited, true);         // 重点区域不解除禁排
+  assert.equal(g('GD_FW', 'IV-V', { keyArea: true }).grade, 2);             // 仅四川有此规则
+  assert.equal(g('SCT9101', 'III').grade, 1); assert.equal(g('SCT9101', 'IV-V').grade, 2);
+  assert.equal(T.limitsFor(T.findStandard('SCT9103'), g('SCT9103', '2')).TN, null);
+});
+test('禁止排放时无限值', () => {
+  const r = T.run(baseInput({ standardId: 'HI_FW', receiving: 'I-II' }));
+  assert.equal(r.limits, null);
+  assert.equal(r.summary, null);
+});
+
+test('v0.3 实测原水: 日常取实测值, 排干按模型比例推算', () => {
+  // dailyPct 1: Vexch 288000, Vdrain 120000; 模型 排干/日常 浓度比 = (0.35/120000)/(0.65/288000)
+  const k = (0.35 / 120000) / (0.65 / 288000);
+  const r = T.run(baseInput({ dailyPct: 1, rawMode: 'measured', measTN: 3.13, measTP: 0.37 }));
+  assert.equal(r.raw.mode, 'measured');
+  near(r.compliance.find(c => c.key === 'TN').cin, 3.13);
+  near(r.compliance.find(c => c.key === 'TP').cin, 0.37);
+  near(r.complianceDrain.find(c => c.key === 'TN').cin, 3.13 * k);
+  assert.equal(r.raw.drainBasis.TN, 'scaled');
+  near(r.raw.estTN, 1720.32 * 1000 / 408000);   // 周期平均估算值仍保留作对照
+  const e = T.run(baseInput({ dailyPct: 1 }));  // 缺省仍为估算
+  assert.equal(e.raw.mode, 'estimate');
+  near(e.compliance.find(c => c.key === 'TN').cin, 1720.32 * 0.65 * 1000 / 288000);
+  assert.ok(isNaN(e.raw.impliedFN));
+  const noEx = T.run(baseInput({ rawMode: 'measured', measTN: 3.13, measTP: 0.37 }));   // 无换水: 排干 = 实测值
+  near(noEx.complianceDrain.find(c => c.key === 'TN').cin, 3.13);
+});
+test('v0.3 由实测反推流失比例 (无换水: 排干实测即全部)', () => {
+  // Vtot = Vdrain 120000 m³; 饲料 N 10752 kg、P 2400 kg
+  const r = T.run(baseInput({ rawMode: 'measured', measTN: 4.0, measTP: 0.4, bgTN: 0.5, bgTP: 0.05 }));
+  near(r.raw.impliedFN, 3.5 * 120000 / 1000 / 10752 * 100);   // 3.906%
+  near(r.raw.impliedFP, 0.35 * 120000 / 1000 / 2400 * 100);   // 1.75%
+  const back = T.massBalance(baseInput({ fN: r.raw.impliedFN, fP: r.raw.impliedFP, bgTN: 0.5, bgTP: 0.05 }));
+  near(back.drain.TN, 4.0); near(back.drain.TP, 0.4);
+});
+test('v0.3 估算值与国内实测范围对照', () => {
+  assert.equal(T.fieldCheck('TN', 14.336), 'above');
+  assert.equal(T.fieldCheck('TN', 3.824), 'within');
+  assert.equal(T.fieldCheck('TP', 0.1), 'below');
+  assert.equal(T.fieldCheck('COD', 10), null);
+  const lo = T.run(baseInput({ dailyPct: 0.5, fN: 35 }));           // 很少换水: 日常 TN 17.0
+  assert.equal(lo.raw.check.TN, 'above');
+  const rt = T.run(baseInput({ dailyPct: 3, fN: 35, fP: 10 }));    // 日常换水: Vexch 864000
+  near(rt.raw.TN, 3763.2 * 0.65 * 1000 / 864000);                 // 2.831
+  near(rt.raw.TP, 240 * 0.65 * 1000 / 864000);                    // 0.181
+  assert.equal(rt.raw.check.TN, 'within'); assert.equal(rt.raw.check.TP, 'within');
+});
+test('v0.3 品种默认值落在实测范围内 (淡水投饵品种)', () => {
+  assert.equal(T.SPECIES.find(s => s.id === 'grasscarp').exchange, 'routine');
+  assert.equal(T.SPECIES.find(s => s.id === 'tilapia').exchange, 'routine');
+  for (const sp of T.SPECIES.filter(s => s.water === 'fw')) {
+    const ex = T.EXCHANGE_PRESETS[sp.exchange];
+    const r = T.run(baseInput({ yieldKgMu: sp.yieldKgMu, fcr: sp.fcr, cp: sp.cp, pFeed: sp.pFeed, bodyN: sp.bodyN,
+      bodyP: sp.bodyP, days: sp.days, fN: ex.fN, fP: ex.fP, dailyPct: ex.dailyPct }));
+    assert.ok(r.raw.check.TN !== 'above', sp.id + ' TN ' + r.raw.TN);
+    assert.ok(r.raw.check.TP !== 'above', sp.id + ' TP ' + r.raw.TP);
+  }
+});
+test('v0.4 禁止排放不可被指定级别覆盖', () => {
+  for (const [id, rec] of [['GD_FW', 'SPECIAL'], ['HI_FW', 'I-II'], ['HB', 'I-II'], ['HN', 'I-II'], ['FJ_SW', '1'], ['SD', 'SPECIAL']]) {
+    const std = T.findStandard(id);
+    for (const ov of ['1', '2']) {
+      const g = T.resolveGrade(std, rec, ov);
+      assert.equal(g.prohibited, true, id + ' 指定' + ov);
+      assert.ok(/禁止排放/.test(g.overrideRejected || ''), id + ' 应说明禁止排放不能覆盖');
+      assert.equal(T.limitsFor(std, g), null);
+    }
+    const r = T.run(baseInput({ standardId: id, receiving: rec, gradeOverride: '1' }));
+    assert.equal(r.limits, null); assert.equal(r.summary, null);
+  }
+});
+test('v0.4 指定级别只能更严', () => {
+  const gd = T.findStandard('GD_FW');
+  const loosen = T.resolveGrade(gd, 'III', '2');          // 自动一级, 指定二级 → 拒绝
+  assert.equal(loosen.grade, 1); assert.ok(loosen.overrideRejected);
+  assert.equal(T.limitsFor(gd, loosen).TN, gd.grades[1].TN);
+  const tighten = T.resolveGrade(gd, 'IV-V', '1');        // 自动二级, 指定一级 → 接受
+  assert.equal(tighten.grade, 1); assert.equal(tighten.override, 1); assert.equal(tighten.overrideRejected, null);
+  const same = T.resolveGrade(gd, 'IV-V', '2');           // 与自动相同 → 无变化
+  assert.equal(same.grade, 2); assert.equal(same.overrideRejected, null);
+  const sw = T.resolveGrade(T.findStandard('SD'), '2', '2');
+  assert.equal(sw.grade, 1); assert.ok(sw.overrideRejected);
+  const single = T.resolveGrade(T.findStandard('SH'), 'III', '1');
+  assert.equal(single.single, true); assert.ok(single.overrideRejected);
+});
+test('v0.4 输入校验: 空白与非法值报错, 不出结果', () => {
+  assert.deepEqual(T.validate(Object.assign({ water: 'fw' }, baseInput())).errors, []);
+  const cases = [{ areaMu: NaN }, { areaMu: 0 }, { areaMu: -5 }, { pondDepth: 0 }, { slopeA: 0 }, { slopeA: 1.2 },
+    { maxHL: 0 }, { drainDays: 0 }, { fN: 120 }, { flowFactor: 0.8 }, { splitSed: 0, splitAer: 0, splitEco: 0 },
+    { dailyPct: 0, drainsPerCycle: 0 }, { rMid: { TN: 150 } }, { rMid: { TP: NaN } }, { drainSS: -10 }];
+  for (const c of cases) {
+    const r = T.run(baseInput(c));
+    assert.equal(r.invalid, true, JSON.stringify(c));
+    assert.ok(r.validation.errors.length > 0, JSON.stringify(c));
+    assert.equal(r.compliance, undefined);
+  }
+});
+test('v0.4 输入校验: 实测模式必须填实测值; 选填项留空可通过', () => {
+  assert.equal(T.run(baseInput({ rawMode: 'measured', measTN: NaN, measTP: 0.4 })).invalid, true);
+  assert.equal(T.run(baseInput({ rawMode: 'measured', measTN: 0, measTP: 0.4 })).invalid, true);
+  assert.equal(T.run(baseInput({ rawMode: 'estimate', measTN: NaN, measTP: NaN })).invalid, false);
+  assert.equal(T.run(baseInput({ drainSS: NaN, drainTN: NaN, drainTP: undefined })).invalid, false);
+});
+test('v0.4 输入校验: 警告不阻断计算', () => {
+  const r = T.run(baseInput({ slopeA: 0.7, rMid: { TN: 80 } }));
+  assert.equal(r.invalid, false);
+  assert.ok(r.validation.warnings.some(w => w.indexOf('边坡系数') >= 0));
+  assert.ok(r.validation.warnings.some(w => w.indexOf('TN 去除率中值') >= 0));
+});
+test('v0.4 汇总判定: 达标 / 有风险 / 超标', () => {
+  const ok = T.run(baseInput({ dailyPct: 1, rawMode: 'measured', measTN: 2.0, measTP: 0.2, SS: 40, COD: 8, NH3N: 0.5 }));
+  assert.equal(ok.summary.verdict, 'pass');
+  // 江西一级 TN 限值下, 找一个中值达标、不利端超标的进水
+  const L = ok.limits.TN, t = T.REMOVAL.fw.TN, f = T.SEASONS.mild.f.TN;
+  const cin = t.Cstar + (L - t.Cstar) / (1 - t.R * f / 100) - 0.01;   // 中值出水略低于限值
+  const risk = T.run(baseInput({ dailyPct: 1, rawMode: 'measured', measTN: cin, measTP: 0.2, SS: 40, COD: 8, NH3N: 0.5 }));
+  assert.equal(risk.compliance.find(c => c.key === 'TN').status, 'edge');
+  assert.equal(risk.summary.verdict, 'risk');
+  assert.equal(T.run(baseInput(ROUTINE)).summary.verdict, 'fail');
+});
+test('v0.4 排干末段 TN、TP: 实测优先, 未填时按模型推算并标记', () => {
+  const k = (0.35 / 120000) / (0.65 / 288000);
+  const a = T.run(baseInput({ dailyPct: 1, rawMode: 'measured', measTN: 3, measTP: 0.4 }));
+  assert.deepEqual(a.drainAssumed, { TN: true, TP: true });
+  near(a.complianceDrain.find(c => c.key === 'TN').cin, 3 * k);
+  const b = T.run(baseInput({ dailyPct: 1, rawMode: 'measured', measTN: 3, measTP: 0.4, drainTN: 6, drainTP: 1.2 }));
+  assert.deepEqual(b.drainAssumed, { TN: false, TP: false });
+  near(b.complianceDrain.find(c => c.key === 'TN').cin, 6);
+  near(b.complianceDrain.find(c => c.key === 'TP').cin, 1.2);
+  near(b.compliance.find(c => c.key === 'TN').cin, 3);          // 日常工况不受影响
+});
+test('v0.5 每周期排干 0 次: 无排干流量, 不做排干沉淀校核', () => {
+  const p = baseInput({ drainsPerCycle: 0, dailyPct: 3 });
+  const tr = T.sizeTreatment(Object.assign({ water: 'fw' }, p), T.massBalance(p));
+  assert.equal(tr.qDrain, 0); assert.equal(tr.aSettle, 0);
+  near(tr.qDesign, 120000 * 0.03 * 1.2);                 // 只剩换水 4320
+  assert.equal(T.run(p).settleOk, true);
+  const q = baseInput({ drainsPerCycle: 1, dailyPct: 3 });
+  near(T.sizeTreatment(Object.assign({ water: 'fw' }, q), T.massBalance(q)).qDrain, 2400);
+});
+test('v0.5 设计流量: 排干期间是否继续换水', () => {
+  const sz = o => { const p = baseInput(o); return T.sizeTreatment(Object.assign({ water: 'fw' }, p), T.massBalance(p)); };
+  const both = sz({ dailyPct: 5, exchDuringDrain: true });   // 2400 + 7200 × 0.9
+  near(both.qDesign, 8880); near(both.aReq, 17760); assert.equal(both.qGoverning, 'both');
+  near(sz({ dailyPct: 5, exchDuringDrain: false }).qDesign, 7200);
+  near(sz({ dailyPct: 5 }).qDesign, 8880);                   // 缺省为继续换水 (保守)
+  near(sz({ dailyPct: 0, exchDuringDrain: true }).qDesign, 2400);
+  near(sz({ dailyPct: 5, drainsPerCycle: 0, exchDuringDrain: true }).qDesign, 7200);
+  // 排干历时很长时换水单独更大: 说明应为 "换水控制"
+  assert.equal(sz({ dailyPct: 5, drainDays: 30, exchDuringDrain: true }).qGoverning, 'exch');
+});
+test('v0.6 设计流量口径: 广东草案 (周期平均 × b) 与排干峰值', () => {
+  const sz = o => { const p = baseInput(o); return T.sizeTreatment(Object.assign({ water: 'fw' }, p), T.massBalance(p)); };
+  const d = sz({ dailyPct: 3, designFlowMode: 'draft' });    // Vtot 984000 / 240 d × 1.2
+  near(d.qDesign, 984000 / 240 * 1.2); assert.equal(d.qGoverning, 'avg'); near(d.qPeak, 2400 + 4320 * 0.9);
+  near(d.aSettle, 2400 * 8 / 24 / (0.9 * 0.4 * 2.5));        // 排干沉淀校核仍用排干峰值
+  near(sz({ dailyPct: 3, designFlowMode: 'peak' }).qDesign, 2400 + 4320 * 0.9);
+  const def = baseInput({ dailyPct: 3 }); delete def.designFlowMode;
+  assert.equal(T.sizeTreatment(Object.assign({ water: 'fw' }, T.DEFAULTS, def), T.massBalance(def)).designFlowMode, 'draft');
+});
+test('v0.5 实测反推分日常与排干两部分', () => {
+  // Vexch = 120000 × 3% × 240 = 864000; Vdrain = 120000; 饲料 N 10752 kg
+  const a = T.run(baseInput({ dailyPct: 3, rawMode: 'measured', measTN: 4, measTP: 0.4, drainTN: 10 }));
+  near(a.raw.impliedN.routine, 4 * 864000 / 1000 / 10752 * 100);
+  near(a.raw.impliedN.drain, 10 * 120000 / 1000 / 10752 * 100);
+  near(a.raw.impliedFN, a.raw.impliedN.routine + a.raw.impliedN.drain);
+  assert.equal(a.raw.drainBasis.TN, 'measured'); assert.equal(a.raw.drainBasis.TP, 'scaled');
+  const b = T.run(baseInput({ dailyPct: 3, rawMode: 'measured', measTN: 4, measTP: 0.4 }));
+  const k = (0.35 / 120000) / (0.65 / 864000);                     // 模型 排干/日常 比
+  near(b.raw.impliedN.drain, 4 * k * 120000 / 1000 / 10752 * 100); // 排干按模型比例放大
+  near(b.raw.impliedN.routine, a.raw.impliedN.routine);           // 日常部分与排干数据无关
+  assert.equal(b.raw.drainBasis.TN, 'scaled');
+  near(b.raw.drainShare, 120000 / 984000);
+});
+test('v0.5 三池结构: 缺一个单元即报错, 偏离推荐区间给警告', () => {
+  for (const o of [{ splitAer: 0 }, { splitSed: 0 }, { splitEco: 0 }, { splitSed: 100, splitAer: 0, splitEco: 0 }]) {
+    const r = T.run(baseInput(o));
+    assert.equal(r.invalid, true, JSON.stringify(o));
+    assert.ok(r.validation.errors.some(e => e.indexOf('三池两坝必须') >= 0));
+  }
+  const w = T.run(baseInput({ splitSed: 60, splitAer: 10, splitEco: 30, floatBedPct: 10, recircPct: 50 }));
+  assert.equal(w.invalid, false);
+  for (const k of ['沉淀池占 60%', '生态净化池占 30%', '浮床 10%', '内循环 50%']) assert.ok(w.validation.warnings.some(x => x.indexOf(k) >= 0), k);
+  assert.ok(!w.validation.warnings.some(x => x.indexOf('曝气池占') >= 0));
+  assert.deepEqual(T.run(baseInput()).validation.warnings, []);
+});
+test('v0.5 适用性三态', () => {
+  const hb = T.findStandard('HB');
+  const below = T.applicability(hb, 150);
+  assert.equal(below.status, 'reference'); assert.ok(below.text.indexOf('不等于可以不处理') >= 0);
+  assert.equal(T.applicability(hb, 200).status, 'mandatory');
+  assert.equal(T.applicability(T.findStandard('SC'), 1).status, 'mandatory');
+  assert.equal(T.applicability(Object.assign({}, hb, { thresholdUnknown: true }), 500).status, 'pending');
+});
+test('v0.5 未来阶段限值标为情景', () => {
+  const zj = T.STANDARDS.find(s => s.phase2);
+  const base = { standardId: zj.id, receiving: '2', season: 'mild', rawMode: 'measured', measTN: 3, measTP: 0.2 };
+  const now = T.run(baseInput(base)), fut = T.run(baseInput(Object.assign({ usePhase2: true }, base)));
+  assert.equal(now.scenario.phase2, false); assert.equal(fut.scenario.phase2, true);
+  assert.equal(fut.scenario.phase2From, zj.phase2.from);
+  assert.ok(fut.limits.TN < now.limits.TN);
+});
+test('标准库与参数表完整性', () => {
+  const ids = new Set();
+  for (const s of T.STANDARDS) {
+    assert.ok(!ids.has(s.id), 'id 重复 ' + s.id); ids.add(s.id);
+    assert.ok(/^https?:\/\//.test(s.source), s.id + ' 缺来源');
+    const gs = Object.values(s.grades);
+    for (const g of gs) for (const k of ['SS', 'COD', 'TN', 'TP']) assert.ok(g[k] > 0 || (g[k] === null && s.id === 'SCT9103'), s.id + ' ' + k);
+    if (gs.length === 2) for (const k of ['SS', 'COD', 'TN', 'TP']) assert.ok(s.grades[1][k] == null || s.grades[1][k] <= s.grades[2][k], s.id + ' 一级应严于二级 ' + k);
+  }
+  for (const w of ['fw', 'sw']) for (const k of T.POLLUTANTS) {
+    const t = T.REMOVAL[w][k];
+    assert.ok(t.lo <= t.R && t.R <= t.hi && t.Cstar > 0, w + ' ' + k);
+  }
+  for (const s of Object.values(T.SEASONS)) for (const k of T.POLLUTANTS) assert.ok(s.f[k] > 0 && s.f[k] <= 1);
+});
+}
+</script>
+<script>
+(function () {
+  'use strict';
+  var T = window.TailwaterCore;
+  var D = T.DEFAULTS;
+  var STORE_KEY = 'tailwaterForm_v06';
+  var $ = function (id) { return document.getElementById(id); };
+  var R_FIELDS = { SS: 'rSS', COD: 'rCOD', TN: 'rTN', TP: 'rTP', NH3N: 'rNH3N' };
+  var NUM_FIELDS = ['areaMu','pondDepth','yieldKgMu','days','fcr','cp','pFeed','bodyN','bodyP','fN','fP','dailyPct',
+    'drainsPerCycle','simultaneousPct','drainDays','bgTN','bgTP','measTN','measTP','SS','drainSS','drainTN','drainTP','drainLoadPct','COD','NH3N','areaRatioPct',
+    'splitSed','splitAer','splitEco','depthSed','depthAer','depthEco','slopeA','flowFactor','minHRT','maxHL','minSettleH',
+    'recircPct','floatBedPct','sedFloatPct','rSS','rCOD','rTN','rTP','rNH3N'];
+  var SEL_FIELDS = ['water','standardId','receiving','gradeOverride','speciesId','exchange','season','rawMode','exchDuringDrain','designFlowMode'];
+  var CHK_FIELDS = ['useSpecial','useVariant','usePhase2','existingOutlet','keyArea','lastPortionHeld'];
+  var NAME = { SS: '悬浮物 SS', COD: '', TN: '总氮 TN', TP: '总磷 TP', NH3N: '氨氮 NH₃-N' };
+  var DP = { SS: 0, COD: 1, TN: 1, TP: 2, NH3N: 2 };
+
+  function fmt(x, d) {
+    if (x === null || x === undefined || !isFinite(x)) return '—';
+    return Number(x).toLocaleString('zh-CN', { minimumFractionDigits: d, maximumFractionDigits: d });
+  }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function species() { return T.SPECIES.filter(function (s) { return s.id === $('speciesId').value; })[0] || T.SPECIES[0]; }
+
+  /* ---------- 选项 ---------- */
+  function fillStandards() {
+    var w = $('water').value, cur = $('standardId').value;
+    $('standardId').innerHTML = T.STANDARDS.filter(function (s) { return s.water === w; })
+      .map(function (s) { return '<option value="' + s.id + '">' + s.region + ' · ' + s.code + '</option>'; }).join('');
+    if ([].some.call($('standardId').options, function (o) { return o.value === cur; })) $('standardId').value = cur;
+  }
+  function fillReceiving() {
+    var w = $('water').value, cur = $('receiving').value;
+    var opts = w === 'fw'
+      ? [['SPECIAL','法律禁止设排污口的特殊保护水域（饮用水源保护区等）'],['I-II','GB 3838 Ⅰ–Ⅱ 类'],['III','GB 3838 Ⅲ 类'],['IV-V','GB 3838 Ⅳ–Ⅴ 类 / 未划类']]
+      : [['SPECIAL','法律禁止设排污口的海域'],['1','GB 3097 第一类海域'],['2','GB 3097 第二类海域'],['3','GB 3097 第三类海域'],['4','GB 3097 第四类海域']];
+    $('receiving').innerHTML = opts.map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join('');
+    $('receiving').value = opts.some(function (o) { return o[0] === cur; }) ? cur : (w === 'fw' ? 'IV-V' : '2');
+  }
+  function fillSpecies() {
+    var w = $('water').value, cur = $('speciesId').value;
+    var list = T.SPECIES.filter(function (s) { return s.water === w || s.water === 'any'; });
+    $('speciesId').innerHTML = list.map(function (s) { return '<option value="' + s.id + '">' + s.name + '</option>'; }).join('');
+    if (list.some(function (s) { return s.id === cur; })) $('speciesId').value = cur;
+  }
+  function fillStatic() {
+    $('exchange').innerHTML = Object.keys(T.EXCHANGE_PRESETS).map(function (k) {
+      return '<option value="' + k + '">' + T.EXCHANGE_PRESETS[k].label + '</option>'; }).join('');
+    $('season').innerHTML = Object.keys(T.SEASONS).map(function (k) {
+      return '<option value="' + k + '">' + T.SEASONS[k].label + '</option>'; }).join('');
+  }
+
+  var ratioTouched = false;   // v0.6: 用户手改过面积比后, 切换省份不再覆盖
+  function applySpecies() {
+    var sp = species(); ratioTouched = false;
+    $('yieldKgMu').value = sp.yieldKgMu; $('fcr').value = sp.fcr; $('cp').value = sp.cp; $('pFeed').value = sp.pFeed;
+    $('bodyN').value = sp.bodyN; $('bodyP').value = sp.bodyP; $('days').value = sp.days;
+    $('areaRatioPct').value = T.defaultAreaRatio(sp.group, $('standardId').value);
+    $('exchange').value = sp.exchange; applyExchange();
+  }
+  function applyExchange() {
+    var ex = T.EXCHANGE_PRESETS[$('exchange').value];
+    $('fN').value = ex.fN; $('fP').value = ex.fP; $('dailyPct').value = ex.dailyPct; $('drainLoadPct').value = ex.drainLoadPct;
+  }
+  function applyRemovalDefaults() {
+    var tab = T.REMOVAL[$('water').value === 'sw' ? 'sw' : 'fw'];
+    Object.keys(R_FIELDS).forEach(function (k) { $(R_FIELDS[k]).value = tab[k].R; });
+  }
+
+  function setDefaults() {
+    $('water').value = 'fw'; fillStandards(); fillReceiving(); fillSpecies();
+    $('standardId').value = 'GD_FW'; $('receiving').value = 'IV-V'; $('gradeOverride').value = 'auto';
+    CHK_FIELDS.forEach(function (id) { $(id).checked = false; });
+    $('speciesId').value = 'grasscarp'; $('season').value = 'mild';
+    $('areaMu').value = 100; $('pondDepth').value = D.pondDepth;
+    $('drainsPerCycle').value = D.drainsPerCycle; $('simultaneousPct').value = D.simultaneousPct; $('drainDays').value = D.drainDays;
+    $('bgTN').value = D.bgTN; $('bgTP').value = D.bgTP; $('SS').value = D.SS; $('drainSS').value = ''; $('drainTN').value = ''; $('drainTP').value = '';
+    $('COD').value = D.COD; $('NH3N').value = D.NH3N;
+    $('rawMode').value = D.rawMode; $('exchDuringDrain').value = D.exchDuringDrain ? '1' : '0'; $('designFlowMode').value = D.designFlowMode; $('measTN').value = D.measTN; $('measTP').value = D.measTP;
+    ['splitSed','splitAer','splitEco','depthSed','depthAer','depthEco','slopeA','flowFactor','minHRT','maxHL','minSettleH',
+     'recircPct','floatBedPct','sedFloatPct'].forEach(function (id) { $(id).value = D[id]; });
+    applySpecies(); applyRemovalDefaults();
+  }
+
+  /* ---------- 存取 ---------- */
+  function save() {
+    var o = {};
+    NUM_FIELDS.concat(SEL_FIELDS).forEach(function (id) { o[id] = $(id).value; });
+    CHK_FIELDS.forEach(function (id) { o[id] = $(id).checked; });
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(o)); } catch (e) {}
+  }
+  function load() {
+    var o = null;
+    try { o = JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); } catch (e) { o = null; }
+    if (!o) return false;
+    $('water').value = o.water === 'sw' ? 'sw' : 'fw';
+    fillStandards(); fillReceiving(); fillSpecies();
+    SEL_FIELDS.forEach(function (id) { if (o[id] != null) $(id).value = o[id]; });
+    NUM_FIELDS.forEach(function (id) { if (o[id] != null) $(id).value = o[id]; });
+    CHK_FIELDS.forEach(function (id) { $(id).checked = !!o[id]; });
+    if (!$('standardId').value) fillStandards();
+    if (!$('season').value) $('season').value = 'mild';
+    if (!$('rawMode').value) $('rawMode').value = 'estimate';
+    if (!$('exchDuringDrain').value) $('exchDuringDrain').value = '1';
+    if (!$('designFlowMode').value) $('designFlowMode').value = 'draft';
+    if ($('drainLoadPct').value === '') $('drainLoadPct').value = (T.EXCHANGE_PRESETS[$('exchange').value] || T.EXCHANGE_PRESETS.routine).drainLoadPct;
+    return true;
+  }
+
+  function readInput() {
+    // v0.4: 空白或无法解析 → NaN, 交给核心校验报错 (不再静默按 0 计算)
+    var v = function (id) { var t = String($(id).value).trim(); var x = t === '' ? NaN : Number(t); return isFinite(x) ? x : NaN; };
+    var inp = {
+      standardId: $('standardId').value, receiving: $('receiving').value, gradeOverride: $('gradeOverride').value,
+      useSpecial: $('useSpecial').checked, useVariant: $('useVariant').checked, usePhase2: $('usePhase2').checked,
+      existingOutlet: $('existingOutlet').checked, keyArea: $('keyArea').checked, lastPortionHeld: $('lastPortionHeld').checked,
+      designFlowMode: $('designFlowMode').value,
+      season: $('season').value, rawMode: $('rawMode').value, exchDuringDrain: $('exchDuringDrain').value !== '0', rMid: {}
+    };
+    NUM_FIELDS.forEach(function (id) { inp[id] = v(id); });
+    Object.keys(R_FIELDS).forEach(function (k) { inp.rMid[k] = v(R_FIELDS[k]); });
+    return inp;
+  }
+
+  /* ---------- 渲染 ---------- */
+  function stdInfo(std) {
+    var w = $('water').value;
+    ['Special','Variant','Phase2','KeyArea'].forEach(function (k) { $('wrap' + k).hidden = true; });
+    if (std.keyArea) { $('wrapKeyArea').hidden = false; $('lblKeyArea').textContent = '位于四川' + std.keyArea; }
+    if (std.special) { $('wrapSpecial').hidden = false; $('lblSpecial').textContent = '执行' + std.special.label; }
+    if (std.variant) { $('wrapVariant').hidden = false; $('lblVariant').textContent = std.variant.label; }
+    if (std.phase2) { $('wrapPhase2').hidden = false; $('lblPhase2').textContent = '按 ' + std.phase2.from + ' 起的第二阶段 TN 限值核算'; }
+    $('lblCOD').innerHTML = w === 'fw' ? '尾水 COD<sub>Mn</sub>' : '尾水 COD (碱性 KMnO₄ 法)';
+    $('stdBox').innerHTML = '<b>' + esc(std.region) + ' ' + esc(std.code) + '</b>（' + std.nature + '）· 实施 ' + std.effective +
+      (std.existing ? ' · 现有养殖场 ' + esc(std.existing) + ' 起执行' : '') + '<br>适用范围：' + esc(std.thresholdNote) +
+      (std.sourceNote ? '<br><span style="color:#fcd34d">数据来源：' + esc(std.sourceNote) + '</span>' : '') +
+      '<br><a href="' + std.source + '" target="_blank" rel="noopener">' + (std.sourceNote ? (std.gradeRule === 'SCT' ? '来源说明' : '官方解读') : '标准原文') + '</a>';
+    var g = T.AREA_RATIO[species().group] || T.AREA_RATIO.general;
+    $('ratioBox').innerHTML = w === 'sw'
+      ? '<b>海水池塘</b>：没有官方面积比，规模由流量、水力负荷和沉淀停留决定；此处面积比只作对照。'
+      : '<b>' + esc(T.GROUP_LABEL[species().group] || '') + '</b> 面积比区间 ' + g.lo + (g.hi !== g.lo ? '–' + g.hi : '') + '%：' + esc(g.note);
+    var tab = T.REMOVAL[w === 'sw' ? 'sw' : 'fw'];
+    $('removalBox').innerHTML = '实测区间（' + (w === 'sw' ? '海水' : '淡水') + '）：' + T.POLLUTANTS.map(function (k) {
+      return k.replace('NH3N', '氨氮') + ' ' + tab[k].lo + '–' + tab[k].hi + '%，C* ' + tab[k].Cstar; }).join('；') +
+      '。中值可按本地经验修改；区间端点用于给出出水范围。';
+  }
+
+  function pillFor(st) {
+    if (st === 'pass') return '<span class="pill ok">达标</span>';
+    if (st === 'edge') return '<span class="pill edge">临界</span>';
+    if (st === 'fail') return '<span class="pill no">超标</span>';
+    return '<span class="pill na">不考核</span>';
+  }
+
+  function compTable(rows, opts) {
+    var h = ['<div class="table-wrapper"><table class="tw"><thead><tr><th>指标</th><th>进水</th><th>需要去除率</th><th>去除率 R×f</th><th>出水（中值）</th><th>出水区间</th><th>限值</th><th>结论</th></tr></thead><tbody>'];
+    rows.forEach(function (c) {
+      var tag = opts.tags[c.key] ? ' <span class="muted">(' + opts.tags[c.key] + ')</span>' : '';
+      var d = DP[c.key];
+      var need = c.needEta == null ? '—' : (c.needEta === 0 ? '无需' : fmt(c.needEta, 0) + '%');
+      var rng = fmt(c.coutBest, d) + ' – ' + fmt(c.coutWorst, d);
+      h.push('<tr><td>' + NAME[c.key] + tag + '</td><td>' + fmt(c.cin, d) + '</td><td>' + need + '</td><td>' + fmt(c.Reff, 0) + '%</td><td>' +
+        fmt(c.cout, d) + '</td><td>' + rng + '</td><td>' + (c.limit == null ? '—' : fmt(c.limit, d)) + '</td><td>' + pillFor(c.status) + '</td></tr>');
+    });
+    if (opts.limits) h.push('<tr><td>pH</td><td colspan="5" class="l muted">需实测</td><td>' + opts.limits.pH[0] + '–' + opts.limits.pH[1] + '</td><td><span class="pill na">需实测</span></td></tr>');
+    h.push('</tbody></table></div>');
+    return h.join('');
+  }
+
+  function render() {
+    var std = T.findStandard($('standardId').value);
+    if (!std) return;
+    stdInfo(std);
+    var inp = readInput();
+    var r = T.run(inp);
+    var meas = inp.rawMode === 'measured';
+    $('wrapMeasTN').hidden = !meas; $('wrapMeasTP').hidden = !meas;
+    if (r.invalid) {
+      $('results').innerHTML = '<div class="note bad"><span class="label">输入有误，暂不计算</span>：以下参数需要修改，修改后结果会自动更新。<ul style="margin:4px 0 0 18px;padding:0">' +
+        r.validation.errors.map(function (e) { return '<li>' + esc(e) + '</li>'; }).join('') + '</ul></div>';
+      $('metaLine').textContent = std.region + ' · 输入有误 · v' + T.VERSION;
+      renderSources(std); save();
+      return;
+    }
+    var mb = r.massBalance, tr = r.treatment, gi = r.grade, L = r.limits, w = r.water, raw = r.raw;
+    NAME.COD = w === 'fw' ? '高锰酸盐指数 COD<sub>Mn</sub>' : '化学需氧量 COD';
+    var sp = species();
+    var season = T.SEASONS[inp.season] || T.SEASONS.mild;
+    var h = [];
+
+    /* KPI */
+    $('wrapExisting').hidden = !(gi.prohibited || gi.reference);
+    var gradeTxt = gi.prohibited ? '不得新建排放口' : (gi.single ? '单一限值' : (gi.reference ? '参照一级' : (gi.grade === 1 ? '一级' : '二级')) + (gi.special ? '（特别限值）' : ''));
+    var verdict = function (s) {
+      if (!s) return gi.prohibited ? { cls: 'bad', txt: '不可排放', sub: gi.note } : { cls: '', txt: '无此工况', sub: '' };
+      if (s.verdict === 'fail') return { cls: 'bad', txt: '超标 ' + s.fail + ' 项' + (s.edge ? '，临界 ' + s.edge + ' 项' : ''), sub: '模型预测：按去除率中值即超标' };
+      if (s.verdict === 'risk') return { cls: 'warn', txt: '有风险：' + s.edge + ' 项临界', sub: '模型预测：中值达标，去除率偏低时超标' };
+      return { cls: 'good', txt: '达标', sub: '模型预测：去除率取不利端仍达标，非实测保证' };
+    };
+    var v1 = verdict(r.summary), v2 = verdict(r.summaryDrain);
+    h.push('<div class="kpi-row">');
+    h.push('<div class="kpi ' + (gi.prohibited ? 'bad' : '') + '"><div class="label">执行标准</div><div class="value txt">' + esc(std.region) + ' · ' + gradeTxt + '</div><div class="sub">' + esc(std.code) + (r.scenario.phase2 ? ' · <b>未来情景：' + esc(r.scenario.phase2From) + ' 起 TN 限值</b>' : '') + '</div></div>');
+    var APPL = { mandatory: '强制适用', reference: '参照执行', pending: '待核对' };
+    h.push('<div class="kpi ' + (r.applicability.status === 'mandatory' ? '' : 'warn') + '"><div class="label">适用性（' + fmt(inp.areaMu, 0) + ' 亩）</div><div class="value txt">' + APPL[r.applicability.status] + '</div><div class="sub">' + esc(r.applicability.text) + '</div></div>');
+    h.push('<div class="kpi"><div class="label">三池两坝总面积</div><div class="value">' + fmt(tr.aReq, 0) + '<span class="muted" style="font-size:11px"> m²</span></div><div class="sub">' + fmt(tr.aReqMu, 1) + ' 亩 · 占养殖面积 ' + fmt(tr.pctOfFarm, 1) + '%</div></div>');
+    if (!r.hasRoutine && !gi.prohibited) { v1 = { cls: '', txt: '无此工况', sub: '日换水率为 0，养殖期无日常排水' }; }
+    if (!r.hasDrain && !gi.prohibited) { v2 = { cls: '', txt: '无此工况', sub: '每周期排干 0 次' }; }
+    h.push('<div class="kpi ' + v1.cls + '"><div class="label">日常换水排水 · ' + esc(season.label.split(' ')[0]) + '</div><div class="value txt">' + v1.txt + '</div><div class="sub">' + esc(v1.sub) + '</div></div>');
+    h.push('<div class="kpi ' + v2.cls + '"><div class="label">收获排干期</div><div class="value txt">' + v2.txt + '</div><div class="sub">' + esc(v2.sub && r.hasDrain && !gi.prohibited ? v2.sub + '；SS 进水 ' + fmt(r.drainSS, 0) : v2.sub) + '</div></div>');
+    h.push('</div>');
+
+    /* 提示 */
+    if (gi.prohibited) h.push('<div class="note bad"><span class="label">不得新建排放口</span>：' + esc(gi.note) + '。新建项目应改为循环利用、零排放，或另选受纳水体。</div>');
+    else if (gi.reference) h.push('<div class="note warn"><span class="label">参照执行</span>：' + esc(gi.note) + '。</div>');
+    else h.push('<div class="note"><span class="label">级别依据</span>：' + esc(gi.note) + '。</div>');
+    if (r.scenario.phase2) h.push('<div class="note warn"><span class="label">未来情景</span>：TN 按 ' + esc(r.scenario.phase2From) + ' 起生效的第二阶段限值核算，不是现行限值；核算现行达标请取消勾选。</div>');
+    if (gi.overrideRejected) h.push('<div class="note warn"><span class="label">指定级别未采用</span>：' + esc(gi.overrideRejected) + '。</div>');
+    r.validation.warnings.forEach(function (m) { h.push('<div class="note warn"><span class="label">参数提示</span>：' + esc(m) + '</div>'); });
+    mb.warnings.forEach(function (m) { h.push('<div class="note bad"><span class="label">质量平衡</span>：' + esc(m) + '</div>'); });
+    if (w === 'sw') h.push('<div class="note warn"><span class="label">海水池塘</span>：去除参数取自唯一一项全规模海水实测（烟台对虾，TN 43%、COD 40%），代表性有限；盐度高于 20‰ 时浮床与挺水植物基本失效，不计入去除。海水一级 pH 另要求不超出背景值 ±0.5。</div>');
+    if (!tr.splitOk) h.push('<div class="note warn"><span class="label">面积分配</span>：沉淀、曝气、净化三池比例之和不是 100%，已按比例归一。</div>');
+    var FR = T.FIELD_REF;
+    if (!meas) {
+      var hi = ['TN', 'TP'].filter(function (k) { return raw.check[k] === 'above'; });
+      if (hi.length) h.push('<div class="note warn"><span class="label">估算偏高</span>：估算原水 ' + hi.map(function (k) { return k + ' ' + fmt(raw[k], DP[k]) + ' mg/L'; }).join('、') +
+        ' 高于国内实测尾水范围上限（TN ' + FR.TN.hi + '、TP ' + FR.TP.hi + ' mg/L）。"少换水、收获时一次排干"的流失比例来自美国斑点叉尾鮰池塘，用于高产池塘时会把氮磷集中到很少的排水量里，结果偏悲观。建议在⑤改用本场实测，或在④改为"养殖期日常换水"。</div>');
+      else h.push('<div class="note"><span class="label">原水估算</span>：TN ' + fmt(raw.TN, 1) + '、TP ' + fmt(raw.TP, 2) + ' mg/L，国内实测尾水范围 TN ' + FR.TN.lo + '–' + FR.TN.hi + '、TP ' + FR.TP.lo + '–' + FR.TP.hi + ' mg/L（广东 25 点均值 ' + FR.TN.typ + ' / ' + FR.TP.typ + '）。有实测数据时请在⑤改用实测。</div>');
+    }
+    r.compliance.forEach(function (c) { if (c.floorExceeds) h.push('<div class="note bad"><span class="label">' + NAME[c.key] + '</span>：实测出水下限 C* = ' + c.Cstar + ' mg/L 已高于限值 ' + c.limit + ' mg/L，生态处理难以稳定达标，需要化学处理或源头削减。</div>'); });
+
+    /* 达标对照 */
+    var srcTag = meas ? '实测' : '估算·负荷拆分';
+    var tagsR = { SS: '实测', COD: '实测', TN: srcTag, TP: srcTag, NH3N: '实测' };
+    if (r.hasRoutine) {
+    h.push('<h2>达标对照 · 日常换水排水</h2>');
+    h.push(compTable(r.compliance, { tags: tagsR, limits: L }));
+    h.push('<div class="src">浓度单位 mg/L。出水 = C* + (进水 − C*)(1 − R·f)，季节系数 f 取' + esc(season.label) + '。"出水区间"按实测去除率区间的上、下端计算；中值达标但区间下端超标判为"临界"。' + (meas ? 'TN、TP 进水为本场实测值。' : 'TN、TP 进水为质量平衡估算的日常换水浓度（流失量 × ' + fmt(100 - mb.drainShareUsed * 100, 0) + '% ÷ 周期换水量）。') + '</div>');
+    } else h.push('<h2>达标对照 · 日常换水排水</h2><div class="note">日换水率为 0：养殖期没有日常排水，只评价收获排干期。</div>');
+
+    var dTag = function (k) { var b = raw.drainBasis[k]; return b === 'measured' ? '实测' : (b === 'scaled' ? '日常实测 × 模型比例' : '估算·负荷拆分'); };
+    var sTag = { measured: '实测末 20%', boyd: '末 20% 按 Boyd 2000', first80: '前 80% 水，日常 × 1.5' }[r.drainSSBasis];
+    var tagsD = { SS: sTag, COD: '沿用日常', TN: dTag('TN'), TP: dTag('TP'), NH3N: '沿用日常' };
+    if (r.hasDrain) {
+    h.push('<h2>达标对照 · 收获排干期</h2>');
+    h.push(compTable(r.complianceDrain, { tags: tagsD, limits: L }));
+    h.push('<div class="src">排干 SS：前 80% 水取日常 × 1.5、最后 20% 水缺省 ' + fmt(T.DEFAULTS.drainSSLast, 0) + ' mg/L（Boyd 2000 对虾池实测：池水约 100、前 80% 约 150、末 20% 约 1000 mg/L），评价取末 20%，除非勾选"单独收集静置"。TN 去除扣除生态净化池贡献 ' + T.DRAIN_ECO_TN_CREDIT + ' 个百分点（刘梅 2021 单元贡献）。' +
+      (raw.drainBasis.TN === 'model' ? 'TN、TP 进水 = 流失量 × 排干份额 ' + fmt(mb.drainShareUsed * 100, 0) + '% ÷ 排干水量（Briggs & Funge-Smith 1994：63–67% 随日常换水排出，其余在排干时）。' : (raw.drainBasis.TN === 'scaled' ? 'TN、TP 进水按日常实测 × 模型的排干/日常浓度比推算，未填排干实测时仅为估计。' : 'TN、TP 进水为排干末段实测值。')) +
+      'COD、氨氮沿用日常值。目前没有国内排干期实测数据，本表为工程估算。</div>');
+    } else h.push('<h2>达标对照 · 收获排干期</h2><div class="note">每周期排干 0 次：不评价排干工况。</div>');
+
+    var fails = r.compliance.concat(r.complianceDrain).filter(function (c) { return c.status === 'fail' || c.status === 'edge'; }).map(function (c) { return c.key; });
+    if (fails.length) {
+      var tips = [];
+      if (fails.indexOf('TP') >= 0) tips.push('TP：可在沉淀池投加铝盐或铁盐化学除磷（目前无公开实测效果），或扩大生态净化池与人工湿地');
+      if (fails.indexOf('TN') >= 0) tips.push('TN：生态处理脱氮有限，冬季更低；可延长停留时间、降低水力负荷、增设人工湿地，或从源头降低饲料蛋白、提高饲料利用率');
+      if (fails.indexOf('SS') >= 0) tips.push('SS：排干末段单独收集、静置 ≥8 h 后再进入系统；注意藻类形成的 SS 无法靠沉淀去除');
+      if (fails.indexOf('COD') >= 0) tips.push('COD：增强曝气池供氧（DO 2–4 mg/L），控制排干末段底泥扰动');
+      if (fails.indexOf('NH3N') >= 0) tips.push('氨氮：保证曝气池供氧与停留时间，冬季硝化显著变慢');
+      h.push('<div class="note warn"><span class="label">超标或临界项的常见对策</span><ul style="margin:4px 0 0 18px;padding:0">' + tips.map(function (t) { return '<li>' + t + '</li>'; }).join('') + '</ul></div>');
+    }
+
+    /* 氮磷收支 */
+    var pct = function (x, tot) { return tot > 0 ? fmt(x / tot * 100, 1) + '%' : '—'; };
+    h.push('<h2>氮磷收支（每养殖周期）</h2><div class="table-wrapper"><table class="tw"><thead><tr><th>去向</th><th>氮 kg</th><th>占饲料氮</th><th>磷 kg</th><th>占饲料磷</th></tr></thead><tbody>');
+    h.push('<tr class="total"><td>饲料投入</td><td>' + fmt(mb.N.feed, 0) + '</td><td>100%</td><td>' + fmt(mb.P.feed, 0) + '</td><td>100%</td></tr>');
+    h.push('<tr><td>产品留存</td><td>' + fmt(mb.N.harv, 0) + '</td><td>' + pct(mb.N.harv, mb.N.feed) + '</td><td>' + fmt(mb.P.harv, 0) + '</td><td>' + pct(mb.P.harv, mb.P.feed) + '</td></tr>');
+    h.push('<tr><td>随排水流失</td><td>' + fmt(mb.N.water, 0) + '</td><td>' + pct(mb.N.water, mb.N.feed) + '</td><td>' + fmt(mb.P.water, 0) + '</td><td>' + pct(mb.P.water, mb.P.feed) + '</td></tr>');
+    h.push('<tr><td>底泥沉积及气态逸失</td><td>' + fmt(mb.N.rest, 0) + '</td><td>' + pct(mb.N.rest, mb.N.feed) + '</td><td>' + fmt(mb.P.rest, 0) + '</td><td>' + pct(mb.P.rest, mb.P.feed) + '</td></tr>');
+    h.push('</tbody></table></div>');
+    h.push('<div class="table-wrapper"><table class="tw"><tbody>' +
+      '<tr><td>产量 / 投饵量</td><td>' + fmt(mb.prod / 1000, 1) + ' t / ' + fmt(mb.feed / 1000, 1) + ' t</td></tr>' +
+      '<tr><td>养殖水体</td><td>' + fmt(mb.pondVol, 0) + ' m³</td></tr>' +
+      '<tr><td>周期排水量（换水 + 排干）</td><td>' + fmt(mb.Vexch, 0) + ' + ' + fmt(mb.Vdrain, 0) + ' = ' + fmt(mb.Vtot, 0) + ' m³</td></tr>' +
+      '<tr><td>折合每 kg 产品排水</td><td>' + fmt(mb.dischargePerKg, 2) + ' m³/kg</td></tr>' +
+      '<tr><td>估算日常换水 TN / TP</td><td>' + fmt(mb.routine.TN, 1) + ' / ' + fmt(mb.routine.TP, 2) + ' mg/L（流失量 × ' + fmt(100 - mb.drainShareUsed * 100, 0) + '% ÷ 换水量' + (meas ? '，未采用' : '') + '）</td></tr>' +
+      '<tr><td>估算排干期 TN / TP</td><td>' + fmt(mb.drain.TN, 1) + ' / ' + fmt(mb.drain.TP, 2) + ' mg/L（流失量 × ' + fmt(mb.drainShareUsed * 100, 0) + '% ÷ 排干水量' + (raw.drainBasis.TN === 'model' ? '' : '，未采用') + '）</td></tr>' +
+      '<tr><td>周期平均 TN / TP（仅对照）</td><td>' + fmt(mb.cTN, 1) + ' / ' + fmt(mb.cTP, 2) + ' mg/L</td></tr>' +
+      (meas ? '<tr><td>实测日常尾水 TN / TP</td><td>' + fmt(raw.TN, 1) + ' / ' + fmt(raw.TP, 2) + ' mg/L（估算 ÷ 实测 = ' + fmt(mb.routine.TN / raw.TN, 1) + ' / ' + fmt(mb.routine.TP / raw.TP, 1) + '）</td></tr>' +
+        '<tr><td>反推流失比例 · 日常换水部分</td><td>氮 ' + fmt(raw.impliedN.routine, 1) + '%、磷 ' + fmt(raw.impliedP.routine, 1) + '%（由日常实测确定）</td></tr>' +
+        '<tr><td>反推流失比例 · 排干部分</td><td>氮 ' + fmt(raw.impliedN.drain, 1) + '%（' + (raw.drainBasis.TN === 'measured' ? '排干实测' : '<b>按模型比例推算</b>') + '）、磷 ' + fmt(raw.impliedP.drain, 1) + '%（' + (raw.drainBasis.TP === 'measured' ? '排干实测' : '<b>按模型比例推算</b>') + '）；排干水量占周期 ' + fmt(raw.drainShare * 100, 0) + '%</td></tr>' +
+        '<tr class="total"><td>反推流失比例 · 全周期</td><td>氮 ' + fmt(raw.impliedFN, 1) + '%、磷 ' + fmt(raw.impliedFP, 1) + '%（当前设定 ' + fmt(inp.fN, 1) + '% / ' + fmt(inp.fP, 1) + '%） <button class="btn" type="button" id="btnCalib" style="padding:2px 8px;font-size:12px">填入④</button></td></tr>' : '') +
+      '</tbody></table></div>');
+    h.push('<div class="src">尾水浓度 = 水源本底 + 随排水流失量 ÷ 周期排水量。随排水流失比例强烈依赖换水与排干方式，默认值来自文献中的两类池塘。' +
+      (meas ? '反推比例 = Σ(各工况实测 − 本底) × 该工况水量 ÷ 饲料氮（磷）投入，日常换水与排干分开计。' + ((raw.drainBasis.TN === 'assumed' || raw.drainBasis.TP === 'assumed') && raw.drainShare > 0 ? '<b>未填排干末段实测时，排干部分按模型比例推算，全周期比例不能由日常实测唯一确定</b>（排干水量占 ' + fmt(raw.drainShare * 100, 0) + '%，占比越大不确定性越大）。' : '') + '填入④后切回"估算"，可用本场校准过的比例推算换品种、改单产或改换水方式后的尾水浓度。' : '有实测数据时，在⑤选"本场实测"即可反推本场的流失比例。') + '</div>');
+
+    /* 三池两坝 */
+    var govTxt = { ratio: '面积比', hl: '水力负荷', hrt: '停留时间', settle: '排干沉淀停留' };
+    var gv = function (k) { return tr.governing === k ? ' <span class="pill gov">控制</span>' : ''; };
+    h.push('<h2>三池两坝规模</h2><div class="table-wrapper"><table class="tw"><thead><tr><th>项目</th><th>数值</th><th>说明</th></tr></thead><tbody>');
+    h.push('<tr><td>排干峰值流量</td><td>' + fmt(tr.qDrain, 0) + ' m³/d</td><td class="l">' + (inp.drainsPerCycle > 0 ? '养殖水体 × ' + fmt(inp.simultaneousPct, 0) + '% ÷ ' + fmt(inp.drainDays, 1) + ' d' : '每周期不排干，不计') + '</td></tr>');
+    h.push('<tr><td>日常换水流量</td><td>' + fmt(tr.qExch, 0) + ' m³/d</td><td class="l">养殖水体 × ' + fmt(inp.dailyPct, 1) + '%/d × 变化系数 ' + fmt(inp.flowFactor, 2) + '</td></tr>');
+    var qTxt = tr.qGoverning === 'avg'
+      ? '广东草案口径：周期排水量 ' + fmt(mb.Vtot, 0) + ' m³ ÷ ' + fmt(inp.days, 0) + ' d × 变化系数 ' + fmt(inp.flowFactor, 2) + '（排干峰值口径为 ' + fmt(tr.qPeak, 0) + ' m³/d，排干沉淀校核仍按峰值）'
+      : (tr.qGoverning === 'both'
+        ? '排干峰值口径，排干期间其余池塘照常换水：排干 ' + fmt(tr.qDrain, 0) + ' + 其余池塘换水 ' + fmt(tr.qExchOthers, 0) + '（换水 × ' + fmt(100 - inp.simultaneousPct, 0) + '%）'
+        : '排干峰值口径' + (tr.concurrent ? '' : '，排干期间停止换水') + '：取两者较大值（' + (tr.qGoverning === 'drain' ? '排干控制' : '换水控制') + '）');
+    h.push('<tr class="total"><td>设计流量</td><td>' + fmt(tr.qDesign, 0) + ' m³/d</td><td class="l">' + qTxt + '</td></tr>');
+    h.push('<tr><td>按面积比' + gv('ratio') + '</td><td>' + fmt(tr.aRatio, 0) + ' m²</td><td class="l">' + fmt(inp.areaRatioPct, 1) + '% × 养殖面积' + (tr.ratioControls ? '' : '（海水只作对照，不参与控制）') + '</td></tr>');
+    h.push('<tr><td>按水力负荷' + gv('hl') + '</td><td>' + fmt(tr.aHL, 0) + ' m²</td><td class="l">设计流量 ÷ ' + fmt(inp.maxHL, 2) + ' m³/(m²·d)</td></tr>');
+    h.push('<tr><td>按停留时间' + gv('hrt') + '</td><td>' + fmt(tr.aHRT, 0) + ' m²</td><td class="l">设计流量 × ' + fmt(inp.minHRT, 1) + ' d ÷ (边坡系数 ' + fmt(tr.slopeA, 2) + ' × 加权水深 ' + fmt(tr.hW, 2) + ' m)</td></tr>');
+    h.push('<tr><td>按排干沉淀停留' + gv('settle') + '</td><td>' + fmt(tr.aSettle, 0) + ' m²</td><td class="l">排干峰值下沉淀池停留 ≥' + fmt(inp.minSettleH, 0) + ' h</td></tr>');
+    h.push('<tr class="total"><td>采用总面积</td><td>' + fmt(tr.aReq, 0) + ' m²</td><td class="l">' + fmt(tr.aReqMu, 1) + ' 亩，占养殖面积 ' + fmt(tr.pctOfFarm, 1) + '%，由' + govTxt[tr.governing] + '控制</td></tr>');
+    h.push('<tr><td>沉淀池</td><td>' + fmt(tr.aSed, 0) + ' m²</td><td class="l">水深 ' + fmt(inp.depthSed, 1) + ' m，有效容积 ' + fmt(tr.volSed, 0) + ' m³' + (tr.sedFloat > 0 ? '，浮床 ' + fmt(tr.sedFloat, 0) + ' m²' : '') + '；不曝气</td></tr>');
+    h.push('<tr><td>曝气池</td><td>' + fmt(tr.aAer, 0) + ' m²</td><td class="l">水深 ' + fmt(inp.depthAer, 1) + ' m，有效容积 ' + fmt(tr.volAer, 0) + ' m³；曝气头 ' + fmt(tr.aeration.heads, 0) + ' 个、风机约 ' + fmt(tr.aeration.kW, 1) + ' kW（广东草案"每 3 kW 宜配不少于 100 个曝气头"，即按头数折算的功率上限；经验估算，未按需氧量、氧转移效率和管路损失计算），DO 2–4 mg/L</td></tr>');
+    h.push('<tr><td>生态净化池</td><td>' + fmt(tr.aEco, 0) + ' m²</td><td class="l">水深 ' + fmt(inp.depthEco, 1) + ' m，有效容积 ' + fmt(tr.volEco, 0) + ' m³，浮床 ' + fmt(tr.floatBed, 0) + ' m²；可放养鲢鳙 30–100 尾/亩、螺蚌 30–100 kg/亩（各文件不一）</td></tr>');
+    h.push('<tr><td>总有效容积 / 停留时间</td><td>' + fmt(tr.vol, 0) + ' m³</td><td class="l">' + (isFinite(tr.hrt) ? fmt(tr.hrt, 1) + ' d' : '—') + '（要求 ≥' + fmt(inp.minHRT, 1) + ' d）</td></tr>');
+    h.push('<tr><td>实际水力负荷</td><td>' + fmt(tr.hl, 2) + '</td><td class="l">m³/(m²·d)（上限 ' + fmt(inp.maxHL, 2) + '，借自水平潜流湿地）</td></tr>');
+    h.push('<tr><td>排干沉淀停留</td><td>' + (isFinite(tr.settleH) ? fmt(tr.settleH, 1) + ' h' : '—') + '</td><td class="l">沉淀池容积 ÷ 排干峰值流量（要求 ≥' + fmt(inp.minSettleH, 0) + ' h）' + (r.settleOk ? '' : ' <span class="pill no">不足</span>') + '</td></tr>');
+    h.push('<tr><td>过滤坝</td><td>' + tr.dam.n + ' 道</td><td class="l">每道长 ≥' + tr.dam.L + ' m、宽 ≥' + tr.dam.W + ' m，过流断面 ≥' + tr.dam.section + ' m²，过流水深 ≥1.5 m（养殖面积' + (tr.bigFarm ? '大于' : '不超过') + ' 300 亩）</td></tr>');
+    h.push('<tr><td>内循环泵</td><td>' + fmt(tr.recirc, 0) + ' m³/d</td><td class="l">≈ ' + fmt(tr.recirc / 24, 1) + ' m³/h，设计日流量的 ' + fmt(inp.recircPct, 0) + '%（区间 70–150%）；循环水量不计入上面的负荷校核</td></tr>');
+    h.push('</tbody></table></div>');
+    if (tr.governing !== 'ratio' && tr.ratioControls) h.push('<div class="note warn"><span class="label">面积由' + govTxt[tr.governing] + '控制</span>：排干或换水流量决定了处理设施规模。错开各池塘的排干时间、延长排干历时，或先把排干水暂存在空闲池塘再匀速处理，可以把面积降到面积比要求的 ' + fmt(tr.aRatio, 0) + ' m²。</div>');
+
+    $('results').innerHTML = h.join('');
+    if ($('btnCalib')) $('btnCalib').addEventListener('click', function () {
+      $('fN').value = +raw.impliedFN.toFixed(1); $('fP').value = +raw.impliedFP.toFixed(1); render();
+    });
+    $('metaLine').textContent = std.region + ' · ' + (sp.name || '') + ' · ' + fmt(inp.areaMu, 0) + ' 亩 · v' + T.VERSION;
+    renderSources(std);
+    save();
+  }
+
+  function renderSources(std) {
+    var ex = T.EXCHANGE_PRESETS;
+    var unv = T.UNVERIFIED.map(function (u) { return '<li>' + esc(u.region) + ' ' + esc(u.code) + '：' + esc(u.note) + '</li>'; }).join('');
+    $('sources').innerHTML = '<ul class="src">' +
+      '<li>排放限值：<a href="' + std.source + '" target="_blank" rel="noopener">' + esc(std.region + ' ' + std.code) + (std.sourceNote ? ' 官方解读' : ' 原文') + '</a>；本工具收录 ' + T.STANDARDS.length + ' 套限值：除河北取自官方解读、SC/T 9101/9103 取自项目笔记外均已对照标准原文（核对日期 2026-10-12；湖南据用户提供的标准第 1–2 页）。v0.6 起各省 Ⅰ–Ⅱ 类水体的规定按原文逐省区分：广东 5.2.1.1、江西 4.2 执行一级；福建、海南、重庆、四川、河南、湖北、湖南为"不得新建排放口，现有排放口按国家和地方法规执行"；天津未规定第一类海域；四川附录 A 重点控制区域一律一级。</li>' +
+      '<li>饲料氮磷随排水流失比例：' + esc(ex.low.source) + '：N ' + ex.low.fN + '%、P ' + ex.low.fP + '%；' + esc(ex.routine.source) + '：N ' + ex.routine.fN + '%、P ' + ex.routine.fP + '%。v0.3 起草鱼、罗非默认按日常换水计算：按少换水、一次排干算得 TN 14–18 mg/L，是广东实测进水的 3–5 倍；按日常换水算得 3.8 / 5.6 mg/L，与实测相符。</li>' +
+      '<li>国内淡水池塘尾水实测范围（用于校核估算值）：TN ' + T.FIELD_REF.TN.lo + '–' + T.FIELD_REF.TN.hi + '、TP ' + T.FIELD_REF.TP.lo + '–' + T.FIELD_REF.TP.hi + ' mg/L，来自' + esc(T.FIELD_REF.note) + '；均为日常换水期的少量采样，不含排干末段。实测示例值取广东 25 点进水均值 TN ' + T.FIELD_REF.TN.typ + '、TP ' + T.FIELD_REF.TP.typ + ' mg/L。</li>' +
+      '<li>产品成分：对虾含氮 2.9%、含磷 0.34%（Boyd 2004）；鱼类、鳖、蟹为一般范围取值，建议按实测修改。各品种的饲料系数、蛋白、含磷与单产为常见典型值，仅作起点。</li>' +
+      '<li>设计参数主要来自<a href="https://gdses.org.cn/u_file/2510/file/aba70b2ef0.pdf" target="_blank" rel="noopener">广东《淡水池塘养殖尾水处理技术规范 三池两坝技术》征求意见稿</a>（未发布，<a href="https://www.gdses.org.cn/u_file/2510/file/c49618f5d3.pdf" target="_blank" rel="noopener">编制说明</a> 2025-10，适用于 30 亩以上连片淡水池塘）：三池比例区间、净化池浮床 ≥20%、沉淀池浮床 10–30%、内循环 70–150%、边坡系数 0.85–0.95、流量变化系数 1.1–1.3、过滤坝尺寸与过流断面、曝气每 3 m² 1 个头且每 100 头 ≥3 kW。水力负荷 0.5 m³/(m²·d) 为该草案借自 HJ 2005—2010 水平潜流湿地的数值。</li>' +
+      '<li>面积比区间与分池水深：<a href="https://www.ttbz.org.cn/upload/1/cms/content/20260423/2047246675671166976.pdf" target="_blank" rel="noopener">T/SNLT 草案</a>、<a href="https://www.ttbz.org.cn/upload/file/20230630/6382373605799229555890463.pdf" target="_blank" rel="noopener">T/GDNB 草案</a>、T/JSYX 7—2025、<a href="https://hbnysy.hubei.gov.cn/zfxxgk/zc/qtzdgkwj/202208/t20220811_4259225.shtml" target="_blank" rel="noopener">湖北 2022 推介模式</a>、海盐县甲鱼养殖尾水指导意见。蟹类 3% 仅见广东编制说明（引自粤农农办〔2021〕40号，原文未核），默认改用 T/SNLT 的 6%。</li>' +
+      '<li>去除效果：淡水参数锚定<a href="https://hjgcjsxb.org.cn/article/doi/10.12153/j.issn.1674-991X.20200153" target="_blank" rel="noopener">刘梅等 2021</a>（仅摘要）、<a href="https://www.jeesci.com/CN/abstract/abstract4917.shtml" target="_blank" rel="noopener">邹等 2024</a>、<a href="https://xuebao.dlou.edu.cn/article/2022/2095-1388/202201013.html" target="_blank" rel="noopener">徐嘉波等 2022</a>；海水参数锚定<a href="https://files.sciengine.com/pdfs/1007-6336/09F8A40331B34CA9A4AF1145D3E9AF9D.pdf" target="_blank" rel="noopener">王磊等 2023</a>（烟台对虾）。HJ 1217 编制说明中的 TN ≥50%、TP ≥40% 是达标门槛，不是实测值。中值、C* 取整与季节系数属工程判断。</li>' +
+      '<li>排干期：<a href="https://www.globalseafood.org/advocate/farm-effluent-during-draining-for-harvest/" target="_blank" rel="noopener">Boyd 2000, Farm effluent during draining for harvest</a>（对虾池：池水 TSS 约 100、前 80% 约 150、末 20% 约 1000 mg/L）；<a href="https://www.srac.msstate.edu/Project%20PDFs/Effluent%20Mgt..pdf" target="_blank" rel="noopener">美国 SRAC 池塘排水管理报告</a>（末 10% 比首 10% 高 40–70%，为相对值；建议末段静置 8 h）；氮磷排干份额取 Briggs & Funge-Smith 1994（63–67% 随日常换水排出）；生态池 TN 贡献 16.3 个百分点取自刘梅 2021。</li>' +
+      '<li>完整依据见《三池两坝处理效果与设计参数审计》（2026-10-12）。</li>' +
+      '<li>已发布但限值未能核实、暂未纳入计算：<ul style="margin:2px 0 0 16px;padding:0">' + unv + '</ul></li>' +
+      '</ul>';
+  }
+
+  /* ---------- 排放标准汇总 (v0.7, 由 T.STANDARDS 生成, 与计算同源) ---------- */
+  var GRADE_RULES = {
+    JX: 'GB 3838 Ⅰ–Ⅲ 类执行一级 (4.2), Ⅳ–Ⅴ 类二级; 未明确功能水域执行二级, 县级以上政府可要求一级; 法律法规禁止设排污口的特殊保护水域 (饮用水源保护区等) 不得设置养殖尾水排放口。',
+    GD_FW: 'GB 3838 Ⅰ、Ⅱ、Ⅲ 类为重点保护水域, 执行一级 (5.2.1.1), 正文无禁排条款; Ⅳ、Ⅴ 类及未明确功能水体执行二级; 水功能重要、容量小或未达标地区, 地级以上市政府可要求执行一级 (5.2.2.3)。',
+    SH: '单一限值, 不分级; 另考核氨氮 2.0 mg/L。',
+    JS_FW: '按受纳水体功能划分, 渔业水域等执行一级; 太湖一、二级保护区执行特别限值。具体以当地生态环境部门认定为准。',
+    FJ_FW: 'Ⅰ–Ⅱ 类为特殊保护水域, 不得新建排放口, 现有排放口按法规执行; Ⅲ 类一级, Ⅳ–Ⅴ 类二级; 政府划定区域/时段执行表 3 特别排放限值。另规定基准排水量 (鳗鲡工厂化、高位池对虾 ≤3.0 新建 / 6.0 现有 m³/kg), 超出时实测浓度按比例折算 (4.4.2)。',
+    HI_FW: 'Ⅰ、Ⅱ 类及 Ⅲ 类中的保护区、游泳区为特殊保护水域, 不得新建排放口, 已有排放口按法规执行; Ⅲ 类一级, Ⅳ–Ⅴ 类二级。',
+    CQ: 'Ⅰ–Ⅱ 类不应新建排污口, 已有排污口按法规执行 (4.2.3); Ⅲ 类 (饮用水源保护区除外) 一级, Ⅳ–Ⅴ 类二级; 有容量且水质稳定的 Ⅲ 类经批准可执行二级 (4.2.4); 未达标水体可要求一级 (4.2.5)。',
+    SC: '特殊保护水域 (含 Ⅰ–Ⅱ 类) 不得新建排放口; Ⅲ 类 (饮用水源保护区除外) 一级; 附录 A 重点控制区域 (成都、眉山、乐山等 10 市 62 县) 不论类别一律一级, 有容量且稳定达 Ⅲ 类的经论证可执行二级 (5.2); Ⅳ–Ⅴ 类二级。底泥不得排入公共水域 (5.5)。',
+    HA: 'Ⅰ、Ⅱ 类为特殊保护水域, 不应新建排放口 (6.2 a); 一级仅针对 Ⅲ 类中的渔业水域及游泳区 (5 b), 其他 Ⅲ 类水域未明确归类; Ⅳ、Ⅴ 类及未明确功能水域二级。',
+    HB: 'Ⅰ、Ⅱ 类及 Ⅲ 类中划定的保护区为特殊保护水域, 不得新建排放口; Ⅲ 类一级, Ⅳ–Ⅴ 类二级; Ⅱ、Ⅲ 类水质目标湖库保护区外围 500 m 内的养殖池塘不论排向一律执行一级。',
+    HN: '法律法规禁止设排污口的特殊保护水域不得设养殖尾水排放口; Ⅲ 类 (饮用水源保护区除外) 一级, Ⅳ–Ⅴ 类及未明确功能水域二级; 经未明确功能水域排入湖库的, 县级以上政府可要求一级。',
+    GD_SW: 'GB 3097 第一、二类海域执行一级 (5.2.1.1), 第三、四类及未明确功能海域执行二级。',
+    JS_SW: 'GB 3097 第一、二类海域一级, 第三、四类二级。一级 pH 不超出背景值 ±0.5。',
+    ZJ: '第一、二类海域一级, 第三、四类二级; TN 分两阶段, 2027-10-01 起执行第二阶段限值。适用于盐度 ≥3 的海水养殖。',
+    FJ_SW: '第一类海域为特殊保护水域, 不得新建排放口; 第二类一级, 第三、四类二级; 提水式池塘 TN 放宽; 表 3 特别排放限值对淡水、海水同一表。',
+    HI_SW: '第一类海域为特殊保护水域, 不得新建排放口, 已有排放口按法规执行; 第二类一级, 第三、四类及未明确水质目标海域二级。',
+    SD: '第一、二类海域一级, 第三、四类二级。不含网箱、筏式、吊笼、底播。',
+    LN: '第一、二类海域一级, 第三、四类二级。',
+    TJ: '4.1 只规定第二类海域执行一级、第三、四类二级, 未规定第一类海域。尾水定义明确包含清塘水; 池塘每次排放前自测。循环水工厂化另有表 2 (SS 60/80、COD 15/20、TN 8.0/10.0、TP 0.8/1.0、氨氮 2.0/2.0), 本工具不涉及。',
+    HE: '第一、二类海域一级, 第三、四类二级 (据官方解读)。不含网箱、筏式、吊笼、滩涂底播。',
+    SCT9101: '推荐性行业标准, 无省标地区参照。一般按 Ⅲ 类一级、Ⅳ–Ⅴ 类二级引用; 另考核 BOD₅、铜、锌、硫化物、总余氯等, 本工具未建模。',
+    SCT9103: '推荐性行业标准, 无省标地区参照。考核无机氮、活性磷酸盐而非 TN、TP, 另有 BOD₅ 等, 本工具未建模。'
+  };
+  function limCell(v, d) { return v == null ? '—' : fmt(v, d); }
+  function stdGradeRows(st) {
+    var rows = [];
+    var add = function (label, g) {
+      rows.push('<tr><td>' + label + '</td><td>' + limCell(g.SS, 0) + '</td><td>' + limCell(g.COD, 1) + '</td><td>' + limCell(g.TN, 1) +
+        '</td><td>' + limCell(g.TP, 2) + '</td><td>' + (g.pH ? g.pH[0] + '–' + g.pH[1] : '—') + '</td><td>' + (g.NH3N != null ? '氨氮 ' + g.NH3N : '') + '</td></tr>');
+    };
+    Object.keys(st.grades).sort().forEach(function (k) { add(k === '0' ? '单一限值' : (k === '1' ? '一级' : '二级'), st.grades[k]); });
+    if (st.special) Object.keys(st.special.grades).sort().forEach(function (k) {
+      if (k === '2' && JSON.stringify(st.special.grades[1]) === JSON.stringify(st.special.grades[2])) return;
+      add('特别限值', st.special.grades[k]);
+    });
+    if (st.variant && st.variant.TN) rows.push('<tr><td>' + esc(st.variant.label) + '</td><td colspan="6" class="l">TN 一级 ' + st.variant.TN[1] + ' / 二级 ' + st.variant.TN[2] + '，其余同上</td></tr>');
+    if (st.phase2 && st.phase2.TN) rows.push('<tr><td>第二阶段（' + st.phase2.from + ' 起）</td><td colspan="6" class="l">TN 一级 ' + st.phase2.TN[1] + ' / 二级 ' + st.phase2.TN[2] + '，其余同上</td></tr>');
+    return rows.join('');
+  }
+  function renderStandards() {
+    var w = $('stdWater').value, q = ($('stdQuery').value || '').trim().toLowerCase();
+    var list = T.STANDARDS.filter(function (st) {
+      if (w !== 'all' && st.water !== w) return false;
+      return !q || (st.region + ' ' + st.code).toLowerCase().indexOf(q) >= 0;
+    });
+    $('stdCount').textContent = '共 ' + list.length + ' 套';
+    $('stdList').innerHTML = list.map(function (st) {
+      var codName = st.water === 'fw' ? 'COD<sub>Mn</sub>' : 'COD';
+      return '<div class="std-card"><div class="hd"><div><b>' + esc(st.region) + ' · ' + esc(st.code) + '</b> <span class="muted">' +
+        (st.water === 'fw' ? '淡水' : '海水') + ' · ' + esc(st.nature) + '</span></div>' +
+        '<button class="btn" type="button" data-use="' + st.id + '">用此标准计算 →</button></div>' +
+        '<div class="facts"><div><span>实施：</span>' + esc(st.effective) + '</div><div><span>现有养殖场：</span>' + esc(st.existing || '未规定') +
+        '</div><div style="grid-column:1/-1"><span>适用范围：</span>' + esc(st.thresholdNote) + '</div></div>' +
+        '<div class="table-wrapper"><table class="tw"><thead><tr><th>级别</th><th>SS</th><th>' + codName + '</th><th>TN</th><th>TP</th><th>pH</th><th>其他</th></tr></thead><tbody>' +
+        stdGradeRows(st) + '</tbody></table></div>' +
+        '<div class="rule"><b>执行级别：</b>' + esc(GRADE_RULES[st.id] || '') + '</div>' +
+        (st.sourceNote ? '<div class="flag">数据说明：' + esc(st.sourceNote) + '</div>' : '') +
+        (st.gradeRule === 'SCT' ? '' : '<div class="rule"><a href="' + st.source + '" target="_blank" rel="noopener">' + (st.sourceNote ? '官方解读' : '标准原文') + '</a></div>') +
+        '</div>';
+    }).join('') || '<div class="note">没有匹配的标准。</div>';
+    $('stdExtra').innerHTML =
+      '<h3>已发布但未能核实限值（不参与计算）</h3><ul>' + T.UNVERIFIED.map(function (u) { return '<li><b>' + esc(u.region) + ' ' + esc(u.code) + '</b>：' + esc(u.note) + '</li>'; }).join('') + '</ul>' +
+      '<h3>国家层面文件</h3><ul><li>HJ 1217-2023《地方水产养殖业水污染物排放控制标准制订技术导则》（2023-03-01 起）：指导各省制订标准，本身不设限值；编制说明提出生态处理 TN 去除 ≥50%、TP ≥40% 的预期。</li>' +
+      '<li>SC/T 9101-2007《淡水池塘养殖水排放要求》、SC/T 9103-2007《海水养殖水排放要求》：推荐性行业标准，无省标地区可参照。</li></ul>' +
+      '<h3>采样要求</h3><p>在最终排放口或集中处理设施出口，各排放口分别采样；多数标准规定在尾水排放期间采样。天津要求池塘每次排放前自测、工厂化至少每季度一次。除天津的尾水定义明确包含清塘水外，未见针对清塘水的单独规定。</p>' +
+      '<h3>尚未检索到地方标准的地区</h3><p>浙江（淡水）、云南、贵州、陕西、黑龙江、吉林、北京、宁夏、新疆、山西；内蒙古、甘肃、青海、西藏未逐一检索。这些地区可参照 SC/T 9101 / 9103，并以当地生态环境部门要求为准。</p>' +
+      '<p class="muted">核对日期 2026-10-12。湖南据标准第 1–2 页核对，现有养殖场执行日期未查到；河北限值取自官方解读；江西、湖南、河北标准原文未能完整打开。标准原文经网页文本提取阅读，合并单元格和表注可能遗漏，使用前请对照原文。</p>';
+  }
+
+  /* ---------- 分页 ---------- */
+  var TABS = ['calc', 'standards', 'guide'];
+  function showTab(name, noHash) {
+    if (TABS.indexOf(name) < 0) name = 'calc';
+    TABS.forEach(function (t) { $('tab-' + t).hidden = t !== name; });
+    [].forEach.call(document.querySelectorAll('.tab'), function (b) { b.setAttribute('aria-selected', b.getAttribute('data-tab') === name ? 'true' : 'false'); });
+    if (name === 'standards') renderStandards();
+    if (!noHash) try { history.replaceState(null, '', name === 'calc' ? location.pathname + location.search : '#' + name); } catch (e) {}
+  }
+  function useStandard(id) {
+    var st = T.findStandard(id); if (!st) return;
+    $('water').value = st.water; fillStandards(); fillReceiving(); fillSpecies(); applySpecies(); applyRemovalDefaults();
+    $('standardId').value = id; $('areaRatioPct').value = T.defaultAreaRatio(species().group, id);
+    showTab('calc'); render(); window.scrollTo(0, 0);
+  }
+
+  /* ---------- 页面自检 (?selftest=1): 运行内嵌的全部单元测试 ---------- */
+  function selftest() {
+    var cases = [];
+    var test = function (name, fn) { cases.push({ name: name, fn: fn }); };
+    var fail = function (msg) { throw new Error(msg); };
+    var same = function (a, b) { return JSON.stringify(a) === JSON.stringify(b); };
+    var assert = {
+      ok: function (v, msg) { if (!v) fail(msg || '断言为假'); },
+      equal: function (a, b, msg) { if (a !== b) fail((msg ? msg + ': ' : '') + a + ' !== ' + b); },
+      deepEqual: function (a, b, msg) { if (!same(a, b)) fail((msg ? msg + ': ' : '') + JSON.stringify(a) + ' ≠ ' + JSON.stringify(b)); }
+    };
+    var results = [];
+    try { TailwaterTests(T, test, assert); } catch (e) { results.push({ name: '测试定义', ok: false, err: e.message }); }
+    cases.forEach(function (c) {
+      try { c.fn(); results.push({ name: c.name, ok: true }); }
+      catch (e) { results.push({ name: c.name, ok: false, err: e && e.message }); }
+    });
+    var pass = results.filter(function (r) { return r.ok; }).length;
+    var allOk = pass === results.length && results.length > 0;
+    window.__tailwaterSelftest = { pass: pass, total: results.length, results: results };
+    var el = $('selftest');
+    el.style.display = 'block';
+    el.innerHTML = '<b style="color:' + (allOk ? '#86efac' : '#fca5a5') + '">单元测试 ' + pass + '/' + results.length + (allOk ? ' 全部通过' : ' 有失败项') + '</b>' +
+      '<ul style="margin:6px 0 0 16px;padding:0;max-height:50vh;overflow:auto">' + results.map(function (r) {
+        return '<li>' + (r.ok ? '✓ ' : '✗ ') + esc(r.name) + (r.ok ? '' : '<br><span style="color:#fca5a5">' + esc(r.err) + '</span>') + '</li>'; }).join('') + '</ul>' +
+      '<button class="btn" type="button" style="margin-top:8px" onclick="this.parentNode.style.display=\'none\'">关闭</button>';
+  }
+
+  /* ---------- 事件 ---------- */
+  function init() {
+    fillStatic();
+    if (!load()) setDefaults();
+    $('water').addEventListener('change', function () { fillStandards(); fillReceiving(); fillSpecies(); applySpecies(); applyRemovalDefaults(); render(); });
+    $('speciesId').addEventListener('change', function () { applySpecies(); render(); });
+    $('areaRatioPct').addEventListener('input', function () { ratioTouched = true; });
+    $('standardId').addEventListener('change', function () {
+      if (!ratioTouched) $('areaRatioPct').value = T.defaultAreaRatio(species().group, $('standardId').value);
+    });
+    $('exchange').addEventListener('change', function () { applyExchange(); render(); });
+    var skip = ['water', 'speciesId', 'exchange'];
+    $('form').addEventListener('input', function (e) { if (skip.indexOf(e.target.id) < 0) render(); });
+    $('form').addEventListener('change', function (e) { if (skip.indexOf(e.target.id) < 0) render(); });
+    $('btnReset').addEventListener('click', function () { setDefaults(); showTab('calc'); render(); });
+    $('btnPrint').addEventListener('click', function () { window.print(); });
+    [].forEach.call(document.querySelectorAll('.tab'), function (b) { b.addEventListener('click', function () { showTab(b.getAttribute('data-tab')); window.scrollTo(0, 0); }); });
+    $('stdWater').addEventListener('change', renderStandards);
+    $('stdQuery').addEventListener('input', renderStandards);
+    $('stdList').addEventListener('click', function (e) { var b = e.target.closest('[data-use]'); if (b) useStandard(b.getAttribute('data-use')); });
+    [].forEach.call(document.querySelectorAll('.toc a'), function (a) { a.addEventListener('click', function (e) {
+      var el = document.getElementById(a.getAttribute('href').slice(1)); if (el) { e.preventDefault(); el.scrollIntoView({ behavior: 'smooth' }); } }); });
+    showTab((location.hash || '').replace('#', ''), true);
+    render();
+    if (/[?&]selftest=1/.test(location.search)) selftest();
+  }
+  init();
+})();
+</script>
+</body>
+</html>

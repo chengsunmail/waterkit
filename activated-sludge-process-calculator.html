@@ -752,7 +752,7 @@
   .footer-inner { max-width: 1280px; margin: 0 auto; }
   .footer-main {
     display: grid;
-    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1.5fr 1fr 1.1fr 1fr 1fr 1fr;
     gap: 40px;
     padding-bottom: 32px;
     margin-bottom: 24px;
@@ -760,6 +760,12 @@
   }
   @media (max-width: 720px) {
     .footer-main { grid-template-columns: 1fr 1fr; gap: 28px; }
+  }
+  @media (min-width: 721px) and (max-width: 1100px) {
+    .footer-main { grid-template-columns: repeat(3, 1fr); gap: 32px; }
+  }
+  @media (max-width: 1100px) {
+    .footer-about-col { grid-column: 1 / -1; }
   }
   .footer-about-col .brand { margin-bottom: 14px; }
   .footer-col h4 {
@@ -2194,6 +2200,13 @@
           <li><a href="pump-selection-calculator.html">水泵选型</a></li>
           <li><a href="blower-selection-calculator.html">鼓风机选型</a></li>
           <li><a href="water-quality-unit-converter.html">水质换算</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>水产养殖</h4>
+        <ul>
+          <li><a href="tailwater.html">池塘养殖尾水处理</a></li>
+          <li><a href="aquanor-2027-guide-cn.html">Aqua Nor 2027 观展指南</a></li>
         </ul>
       </div>
       <div class="footer-col">

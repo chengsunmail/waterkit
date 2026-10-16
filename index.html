@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>水处理工具箱 · WaterKit · 工艺工程师在线计算平台</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230891b2'/%3E%3Ctext x='16' y='22.5' font-size='18' font-weight='700' text-anchor='middle' fill='white' font-family='Arial,sans-serif'%3EW%3C/text%3E%3C/svg%3E">
-<meta name="description" content="专为水处理设计师、水厂运行工程师打造的 14 个在线计算工具:管道水力（基础版/加强版）、明渠、堰流、孔口出流、曝气量、污泥产量、加药量、活性污泥工艺、MBBR、MBR、水泵选型、鼓风机选型、水质换算。依据GB 50014、HJ 576等现行规范。">
+<meta name="description" content="专为水处理设计师、水厂运行工程师打造的 16 个在线工具:管道水力（基础版/加强版）、明渠、堰流、孔口出流、曝气量、污泥产量、加药量、活性污泥工艺、MBBR、MBR、水泵选型、鼓风机选型、水质换算,以及池塘养殖尾水处理、Aqua Nor 2027 观展与采购指南。依据GB 50014、HJ 576等现行规范。">
 <link rel="canonical" href="https://waterkit.cn/">
-<meta name="keywords" content="曝气量计算,管道水力,明渠水力,堰流,污泥产量,加药量,水质换算,水泵选型,水处理计算,污水处理设计">
+<meta name="keywords" content="曝气量计算,管道水力,明渠水力,堰流,污泥产量,加药量,水质换算,水泵选型,水处理计算,污水处理设计,养殖尾水处理,三池两坝,Aqua Nor">
 <style>
   :root {
     --brand: #0891b2;
@@ -286,12 +286,19 @@
 
   .cat-nav {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 12px;
     margin-bottom: 48px;
   }
+  @media (max-width: 1100px) {
+    .cat-nav { grid-template-columns: repeat(6, 1fr); }
+    .cat-nav a { grid-column: span 2; }
+    .cat-nav a:nth-child(4), .cat-nav a:nth-child(5) { grid-column: span 3; }
+  }
   @media (max-width: 720px) {
     .cat-nav { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .cat-nav a, .cat-nav a:nth-child(4) { grid-column: auto; }
+    .cat-nav a:nth-child(5) { grid-column: 1 / -1; }
   }
   .cat-nav a {
     background: var(--bg-soft);
@@ -469,7 +476,7 @@
   .footer-inner { max-width: 1280px; margin: 0 auto; }
   .footer-main {
     display: grid;
-    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1.5fr 1fr 1.1fr 1fr 1fr 1fr;
     gap: 40px;
     padding-bottom: 32px;
     margin-bottom: 24px;
@@ -477,6 +484,12 @@
   }
   @media (max-width: 720px) {
     .footer-main { grid-template-columns: 1fr 1fr; gap: 28px; }
+  }
+  @media (min-width: 721px) and (max-width: 1100px) {
+    .footer-main { grid-template-columns: repeat(3, 1fr); gap: 32px; }
+  }
+  @media (max-width: 1100px) {
+    .footer-about-col { grid-column: 1 / -1; }
   }
   .footer-about-col .brand { margin-bottom: 14px; }
   .footer-col h4 {
@@ -571,9 +584,9 @@
     <span class="badge"><span class="dot"></span>持续更新中</span>
     <span>依据 GB 50014 / HJ 576 / GB 50013</span>
     <span class="sep">·</span>
-    <span>共 14 个工具</span>
+    <span>共 16 个工具</span>
     <span class="sep">·</span>
-    <span>最后更新：2026-10-15</span>
+    <span>最后更新：2026-10-16</span>
   </div>
 
   <div class="hero-grid">
@@ -585,7 +598,7 @@
       <p class="hero-text">
         <strong>水处理工具箱</strong>是为设计院工程师、水厂运行人员、环保公司技术员准备的在线计算平台。告别 Excel 到处找、手册翻半天——高频工艺与水力计算整合在此,依据国标与行业规范,可用于方案阶段估算与初步校核（施工图设计请以规范与实测数据复核）。
         <br><br>
-        覆盖<strong>水力、工艺、设备、换算</strong>四大类,14 个工具处理从方案设计到运行管理的主要计算场景,参数可调、结果实时、全站免费。
+        覆盖<strong>水力、工艺、设备、换算、水产养殖</strong>五大类,16 个工具处理从方案设计到运行管理的主要计算场景,参数可调、结果实时、全站免费。
       </p>
       <div class="hero-cta">
         <a href="#tools" class="btn-primary">进入工具箱 →</a>
@@ -595,8 +608,8 @@
 
     <aside class="stats-card">
       <div class="stats-card-title">SITE METRICS</div>
-      <div class="stat-row"><span class="stat-label">在线计算工具</span><span class="stat-val">14<span class="unit">个</span></span></div>
-      <div class="stat-row"><span class="stat-label">工具分类</span><span class="stat-val">04<span class="unit">大类</span></span></div>
+      <div class="stat-row"><span class="stat-label">在线计算工具</span><span class="stat-val">16<span class="unit">个</span></span></div>
+      <div class="stat-row"><span class="stat-label">工具分类</span><span class="stat-val">05<span class="unit">大类</span></span></div>
       <div class="stat-row"><span class="stat-label">累计参数覆盖</span><span class="stat-val">500+<span class="unit">项</span></span></div>
       <div class="stat-row"><span class="stat-label">引用规范</span><span class="stat-val">7<span class="unit">部</span></span></div>
       <div class="stat-row"><span class="stat-label">使用成本</span><span class="stat-val">免费<span class="unit">· 无需注册</span></span></div>
@@ -607,7 +620,7 @@
 <section class="tools-section" id="tools">
   <div class="section-head">
     <h2>工具目录</h2>
-    <span class="meta">14 Items · 4 Categories</span>
+    <span class="meta">16 Items · 5 Categories</span>
   </div>
 
   <nav class="cat-nav">
@@ -615,6 +628,7 @@
     <a href="#cat-process"><span class="cat-num">02</span><span class="cat-info"><span class="cat-name">工艺计算</span><span class="cat-count">6 Tools</span></span></a>
     <a href="#cat-equipment"><span class="cat-num">03</span><span class="cat-info"><span class="cat-name">设备选型</span><span class="cat-count">2 Tools</span></span></a>
     <a href="#cat-utilities"><span class="cat-num">04</span><span class="cat-info"><span class="cat-name">基础换算</span><span class="cat-count">1 Tool</span></span></a>
+    <a href="#cat-aquaculture"><span class="cat-num">05</span><span class="cat-info"><span class="cat-name">水产养殖</span><span class="cat-count">2 Tools</span></span></a>
   </nav>
 
   <div class="tool-group" id="cat-hydraulics">
@@ -782,6 +796,33 @@
       </a>
     </div>
   </div>
+  <div class="tool-group" id="cat-aquaculture">
+    <div class="tool-group-head">
+      <span class="tool-group-num">05 养殖</span>
+      <h3 class="tool-group-title">水产养殖</h3>
+      <span class="tool-group-desc">AQUACULTURE · 养殖尾水 / 行业展会 / 采购</span>
+    </div>
+    <div class="tools-grid">
+      <a class="tool-card" href="tailwater.html">
+        <div class="tool-arrow">↗</div>
+        <div class="tool-head"><span class="tool-num">A-01</span><span class="tool-tag">尾水</span></div>
+        <div class="tool-body">
+          <div class="tool-title">池塘养殖尾水处理设计计算</div>
+          <div class="tool-desc">按各省水产养殖尾水排放标准自动判定执行级别,用氮磷质量平衡估算尾水浓度,计算三池两坝处理设施规模。附排放标准汇总与使用说明。</div>
+          <div class="tool-specs"><span><span class="mark"></span>3 Tab</span><span><span class="mark"></span>各省排放标准</span><span><span class="mark"></span>三池两坝</span></div>
+        </div>
+      </a>
+      <a class="tool-card" href="aquanor-2027-guide-cn.html">
+        <div class="tool-arrow">↗</div>
+        <div class="tool-head"><span class="tool-num">A-02</span><span class="tool-tag">指南</span></div>
+        <div class="tool-body">
+          <div class="tool-title">Aqua Nor 2027 观展与采购指南</div>
+          <div class="tool-desc">2027 年 8 月 24–26 日挪威特隆赫姆水产养殖展,写给中国采购方的实操手册:倒推时间表、住宿、申根签证与 EES、约见、费用估算与行前清单。</div>
+          <div class="tool-specs"><span><span class="mark"></span>倒推时间表</span><span><span class="mark"></span>签证 / 住宿</span><span><span class="mark"></span>费用估算</span></div>
+        </div>
+      </a>
+    </div>
+  </div>
 </section>
 
 <footer class="site-footer" id="about">
@@ -819,6 +860,13 @@
           <li><a href="pump-selection-calculator.html">水泵选型</a></li>
           <li><a href="blower-selection-calculator.html">鼓风机选型</a></li>
           <li><a href="water-quality-unit-converter.html">水质换算</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>水产养殖</h4>
+        <ul>
+          <li><a href="tailwater.html">池塘养殖尾水处理</a></li>
+          <li><a href="aquanor-2027-guide-cn.html">Aqua Nor 2027 观展指南</a></li>
         </ul>
       </div>
       <div class="footer-col">
