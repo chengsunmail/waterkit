@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>水处理工具箱 · WaterKit · 工艺工程师在线计算平台</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230891b2'/%3E%3Ctext x='16' y='22.5' font-size='18' font-weight='700' text-anchor='middle' fill='white' font-family='Arial,sans-serif'%3EW%3C/text%3E%3C/svg%3E">
-<meta name="description" content="专为水处理设计师、水厂运行工程师打造的 13 个在线计算工具:管道水力、明渠、堰流、孔口出流、曝气量、污泥产量、加药量、活性污泥工艺、MBBR、MBR、水泵选型、鼓风机选型、水质换算。依据GB 50014、HJ 576等现行规范。">
+<meta name="description" content="专为水处理设计师、水厂运行工程师打造的 14 个在线计算工具:管道水力（基础版/加强版）、明渠、堰流、孔口出流、曝气量、污泥产量、加药量、活性污泥工艺、MBBR、MBR、水泵选型、鼓风机选型、水质换算。依据GB 50014、HJ 576等现行规范。">
 <link rel="canonical" href="https://waterkit.cn/">
 <meta name="keywords" content="曝气量计算,管道水力,明渠水力,堰流,污泥产量,加药量,水质换算,水泵选型,水处理计算,污水处理设计">
 <style>
@@ -544,6 +544,7 @@
   .tool-card:nth-child(2) { animation-delay: 0.12s; }
   .tool-card:nth-child(3) { animation-delay: 0.19s; }
   .tool-card:nth-child(4) { animation-delay: 0.26s; }
+  .tool-card:nth-child(5) { animation-delay: 0.33s; }
 </style>
 </head>
 <body>
@@ -570,7 +571,7 @@
     <span class="badge"><span class="dot"></span>持续更新中</span>
     <span>依据 GB 50014 / HJ 576 / GB 50013</span>
     <span class="sep">·</span>
-    <span>共 13 个工具</span>
+    <span>共 14 个工具</span>
     <span class="sep">·</span>
     <span>最后更新：2026-10-15</span>
   </div>
@@ -584,7 +585,7 @@
       <p class="hero-text">
         <strong>水处理工具箱</strong>是为设计院工程师、水厂运行人员、环保公司技术员准备的在线计算平台。告别 Excel 到处找、手册翻半天——高频工艺与水力计算整合在此,依据国标与行业规范,可用于方案阶段估算与初步校核（施工图设计请以规范与实测数据复核）。
         <br><br>
-        覆盖<strong>水力、工艺、设备、换算</strong>四大类,13 个工具处理从方案设计到运行管理的主要计算场景,参数可调、结果实时、全站免费。
+        覆盖<strong>水力、工艺、设备、换算</strong>四大类,14 个工具处理从方案设计到运行管理的主要计算场景,参数可调、结果实时、全站免费。
       </p>
       <div class="hero-cta">
         <a href="#tools" class="btn-primary">进入工具箱 →</a>
@@ -594,7 +595,7 @@
 
     <aside class="stats-card">
       <div class="stats-card-title">SITE METRICS</div>
-      <div class="stat-row"><span class="stat-label">在线计算工具</span><span class="stat-val">13<span class="unit">个</span></span></div>
+      <div class="stat-row"><span class="stat-label">在线计算工具</span><span class="stat-val">14<span class="unit">个</span></span></div>
       <div class="stat-row"><span class="stat-label">工具分类</span><span class="stat-val">04<span class="unit">大类</span></span></div>
       <div class="stat-row"><span class="stat-label">累计参数覆盖</span><span class="stat-val">500+<span class="unit">项</span></span></div>
       <div class="stat-row"><span class="stat-label">引用规范</span><span class="stat-val">7<span class="unit">部</span></span></div>
@@ -606,11 +607,11 @@
 <section class="tools-section" id="tools">
   <div class="section-head">
     <h2>工具目录</h2>
-    <span class="meta">13 Items · 4 Categories</span>
+    <span class="meta">14 Items · 4 Categories</span>
   </div>
 
   <nav class="cat-nav">
-    <a href="#cat-hydraulics"><span class="cat-num">01</span><span class="cat-info"><span class="cat-name">水力计算</span><span class="cat-count">4 Tools</span></span></a>
+    <a href="#cat-hydraulics"><span class="cat-num">01</span><span class="cat-info"><span class="cat-name">水力计算</span><span class="cat-count">5 Tools</span></span></a>
     <a href="#cat-process"><span class="cat-num">02</span><span class="cat-info"><span class="cat-name">工艺计算</span><span class="cat-count">6 Tools</span></span></a>
     <a href="#cat-equipment"><span class="cat-num">03</span><span class="cat-info"><span class="cat-name">设备选型</span><span class="cat-count">2 Tools</span></span></a>
     <a href="#cat-utilities"><span class="cat-num">04</span><span class="cat-info"><span class="cat-name">基础换算</span><span class="cat-count">1 Tool</span></span></a>
@@ -657,6 +658,15 @@
           <div class="tool-title">孔口管嘴出流计算器</div>
           <div class="tool-desc">薄壁小孔 / 管嘴 / 大孔口 多种出流形式,淹没与自由出流,恒定水头与变水头泄流时间。</div>
           <div class="tool-specs"><span><span class="mark"></span>恒定出流</span><span><span class="mark"></span>变水头泄流</span><span><span class="mark"></span>流量系数</span></div>
+        </div>
+      </a>
+      <a class="tool-card" href="pipe-hydraulic-pro.html">
+        <div class="tool-arrow">↗</div>
+        <div class="tool-head"><span class="tool-num">H-05</span><span class="tool-tag">加强版</span></div>
+        <div class="tool-body">
+          <div class="tool-title">管道水力计算器（加强版）</div>
+          <div class="tool-desc">9 种管材真实内径体系,管件局部阻力清单,Manning 重力流定径与坡度反解,PN 承压校核与温度折减。</div>
+          <div class="tool-specs"><span><span class="mark"></span>真实内径</span><span><span class="mark"></span>管件清单</span><span><span class="mark"></span>重力流 / PN</span></div>
         </div>
       </a>
     </div>
@@ -791,6 +801,7 @@
         <h4>水力计算</h4>
         <ul>
           <li><a href="pipe-hydraulic-calculator.html">管道水力</a></li>
+          <li><a href="pipe-hydraulic-pro.html">管道水力（加强版）</a></li>
           <li><a href="open-channel-calculator.html">明渠水力</a></li>
           <li><a href="weir-flow-calculator.html">堰流计算</a></li>
           <li><a href="orifice-nozzle-calculator.html">孔口出流</a></li>
