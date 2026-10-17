@@ -482,8 +482,8 @@
       <input type="number" id="d_SRT" value="30" step="1" oninput="calc()">
       <div class="helper">MBR 常 20-30d</div></div>
     <div class="field"><label for="d_SF">硝化安全系数 SF</label>
-      <input type="number" id="d_SF" value="1.5" step="0.1" oninput="calc()">
-      <div class="helper">仅用于校核好氧泥龄 ≥ SF × SRT_min(T_min)，不乘池容；SRT_min 已按出水 NH₄ 的 Monod 项求得，M&amp;E 此法取 SF 1.5（峰/均 TKN 比）</div></div>
+      <input type="number" id="d_SF" value="2.0" step="0.1" oninput="calc()">
+      <div class="helper">即 GB 50014 式中 F（宜 1.5～3.0；城镇默认 2.0、工业 3.0）。仅用于校核好氧泥龄 ≥ F × SRT_min(T_min)，不乘池容</div></div>
     <div class="field"><label for="d_HRT_AN">厌氧段 HRT <span class="unit">h</span></label>
       <input type="number" id="d_HRT_AN" value="1.0" step="0.1" oninput="calc()">
       <div class="helper">仅 AAO 配置有效</div></div>
@@ -532,10 +532,8 @@
     <div class="grid">
       <div class="field"><label for="d_Y">Y</label><input type="number" id="d_Y" value="0.55" step="0.05" oninput="calc()"></div>
       <div class="field"><label for="d_Kd">Kd</label><input type="number" id="d_Kd" value="0.05" step="0.01" oninput="calc()"></div>
-      <div class="field"><label for="d_mumax">硝化菌 μ_max <span class="unit">d⁻¹ @20°C</span></label><input type="number" id="d_mumax" value="0.75" step="0.05" oninput="calc()">
-        <div class="helper">用于最小泥龄 SRT_min 校核</div></div>
-      <div class="field"><label for="d_Kn">氨氮半饱和常数 K_N <span class="unit">mg/L</span></label><input type="number" id="d_Kn" value="1.0" step="0.1" oninput="calc()">
-        <div class="helper">SRT_min 中 NH₄ Monod 项，常取 0.5-1.0</div></div>
+      <div class="field"><label for="d_Kn">硝化半速率常数 K_N <span class="unit">mg/L</span></label><input type="number" id="d_Kn" value="1.0" step="0.1" oninput="calc()">
+        <div class="helper">全站口径固定 1.0（GB 50014）；改动后将与活性污泥工具不一致。SRT_min = 1/μ，μ = 0.47·N_a/(K_N+N_a)·e^0.098(T_min−15)，依据 GB 50014-2021 式（7.6.17），θ 按 e^0.098≈1.103/℃，不计衰减</div></div>
       <div class="field"><label for="d_SDNR20">SDNR₂₀ <span class="unit">g N/g VSS·d</span></label><input type="number" id="d_SDNR20" value="0.08" step="0.01" oninput="calc()">
         <div class="helper">用于缺氧池容校核（θ=1.08，依据 GB 50014）</div></div>
       <div class="field"><label for="d_fss">进水 SS 污泥转换率 f</label><input type="number" id="d_fss" value="0.5" step="0.05" oninput="calc()">
@@ -680,6 +678,10 @@
   <div class="buttons">
     <button class="btn btn-primary" onclick="copyDesignResult()">📋 复制结果</button>
     <button class="btn btn-secondary" onclick="resetAll()">🔄 恢复默认</button>
+  </div>
+
+  <div class="note">
+    ℹ️ <b>硝化泥龄校核：</b>θ_co = F · SRT_min，SRT_min = 1/μ，μ = 0.47 · N_a/(K_N + N_a) · e^{0.098(T_min − 15)}；N_a 取出水 NH₄-N（下限 0.5 mg/L），K_N 取 1.0 mg/L，T 取最低设计水温 T_min，不含 DO 项。依据 GB 50014-2021 式（7.6.17），θ 按 e^0.098≈1.103/℃，不计衰减。以好氧泥龄 SRT × V_O / V 与 F × SRT_min 比较。
   </div>
 
   <div class="note">
@@ -1493,6 +1495,7 @@
           <li><a href="dosing-calculator.html">加药量</a></li>
           <li><a href="activated-sludge-process-calculator.html">活性污泥工艺</a></li>
           <li><a href="mbbr-design.html">MBBR 工程设计</a></li>
+          <li><a href="ifas-design.html">IFAS 工程设计</a></li>
           <li><a href="mbr-design.html">MBR 工程设计</a></li>
           <li><a href="pump-selection-calculator.html">水泵选型</a></li>
           <li><a href="blower-selection-calculator.html">鼓风机选型</a></li>
@@ -1552,10 +1555,10 @@ const STD_HELPER = {
 
 // 预设显式设置出水标准与最低设计水温（不沿用上一个预设）
 const PRESETS = {
-  municipal: { d_Q:3, d_T:20, d_Tmin:12, d_COD0:400, d_BOD0:180, d_TN0:45, d_NH40:35, d_TP0:5, d_SS0:200, d_MLSS:10000, d_SRT:30, d_standard:'grade4' },
-  industrial: { d_Q:2, d_T:25, d_Tmin:15, d_COD0:800, d_BOD0:350, d_TN0:60, d_NH40:45, d_TP0:8, d_SS0:400, d_MLSS:10000, d_SRT:30, d_standard:'1A' },
-  leachate: { d_Q:0.1, d_T:20, d_Tmin:15, d_COD0:8000, d_BOD0:3000, d_TN0:2000, d_NH40:1800, d_TP0:20, d_SS0:1000, d_MLSS:12000, d_SRT:40, d_standard:'gb16889' },
-  reuse: { d_Q:5, d_T:20, d_Tmin:12, d_COD0:300, d_BOD0:120, d_TN0:35, d_NH40:25, d_TP0:3.5, d_SS0:150, d_MLSS:10000, d_SRT:30, d_standard:'grade4' },
+  municipal: { d_SF:2.0, d_Q:3, d_T:20, d_Tmin:12, d_COD0:400, d_BOD0:180, d_TN0:45, d_NH40:35, d_TP0:5, d_SS0:200, d_MLSS:10000, d_SRT:30, d_standard:'grade4' },
+  industrial: { d_SF:3.0, d_Q:2, d_T:25, d_Tmin:15, d_COD0:800, d_BOD0:350, d_TN0:60, d_NH40:45, d_TP0:8, d_SS0:400, d_MLSS:10000, d_SRT:30, d_standard:'1A' },
+  leachate: { d_SF:3.0, d_Q:0.1, d_T:20, d_Tmin:15, d_COD0:8000, d_BOD0:3000, d_TN0:2000, d_NH40:1800, d_TP0:20, d_SS0:1000, d_MLSS:12000, d_SRT:40, d_standard:'gb16889' },
+  reuse: { d_SF:2.0, d_Q:5, d_T:20, d_Tmin:12, d_COD0:300, d_BOD0:120, d_TN0:35, d_NH40:25, d_TP0:3.5, d_SS0:150, d_MLSS:10000, d_SRT:30, d_standard:'grade4' },
 };
 
 // ============ 案例库数据 ============
@@ -1750,10 +1753,10 @@ function calc() {
   const bad = validateInputs([
     ['d_Q','进水流量 Q','pos'], ['d_T','水温 T','num'],
     ['d_COD0','COD₀','nn'], ['d_BOD0','BOD₅₀','nn'], ['d_TN0','TN₀','nn'], ['d_NH40','NH₄-N₀','nn'], ['d_TP0','TP₀','nn'], ['d_SS0','SS₀','nn'],
-    ['d_CODe','COD出','nn'], ['d_BODe','BOD出','nn'], ['d_NH4e','NH₄-N出（硝化泥龄 Monod 项需要，可取 0.5 等小值）','pos'], ['d_TNe','TN出','nn'], ['d_TPe','TP出','nn'],
+    ['d_CODe','COD出','nn'], ['d_BODe','BOD出','nn'], ['d_NH4e','NH₄-N出','nn'], ['d_TNe','TN出','nn'], ['d_TPe','TP出','nn'],
     ['d_MLSS','MLSS','pos'], ['d_VSS_SS','MLVSS/MLSS','pos'], ['d_SRT','SRT','pos'], ['d_SF','安全系数 SF','pos'], ['d_HRT_AN','厌氧段 HRT','nn'],
     ['d_J20','设计通量 J₂₀','pos'], ['d_peakFactor','峰值系数','pos'], ['d_Tmin','最低设计水温 T_min','num'], ['d_runRatio','运行时间比','pos'], ['d_moduleArea','单组件膜面积','pos'], ['d_TMP','设计 TMP','nn'],
-    ['d_Y','Y','nn'], ['d_Kd','Kd','nn'], ['d_fss','SS 污泥转换率 f','nn'], ['d_mumax','μ_max','pos'], ['d_Kn','K_N','pos'], ['d_SDNR20','SDNR₂₀','pos'], ['d_bioP','生物除磷量','nn'], ['d_alpha','α','pos'], ['d_beta','β','pos'],
+    ['d_Y','Y','nn'], ['d_Kd','Kd','nn'], ['d_fss','SS 污泥转换率 f','nn'], ['d_Kn','K_N','pos'], ['d_SDNR20','SDNR₂₀','pos'], ['d_bioP','生物除磷量','nn'], ['d_alpha','α','pos'], ['d_beta','β','pos'],
     ['d_SADm','膜曝气强度 SADm','nn'], ['d_Hd','淹没深度 H_d','pos'], ['d_OTE','OTE','pos'], ['d_blowerEff','鼓风机效率','pos'], ['d_recirc','内回流比','nn'], ['d_memRecirc','膜池回流比','nn'], ['d_cleanCycle','化学清洗周期','pos'],
   ]);
   // 进出水逻辑校验：COD₀ > 0，且进水须高于出水
@@ -1783,7 +1786,7 @@ function calc() {
   const J20 = g('d_J20'), peakFactor = g('d_peakFactor'), runRatio = g('d_runRatio') / 100;
   const moduleArea = g('d_moduleArea'), TMP = g('d_TMP');
   const Y = g('d_Y'), Kd = g('d_Kd'), alpha = g('d_alpha'), beta = g('d_beta');
-  const mumax = g('d_mumax'), SDNR20 = g('d_SDNR20');
+  const SDNR20 = g('d_SDNR20');
   const SADm = g('d_SADm'), Hd = g('d_Hd'), OTE = g('d_OTE'), blowerEff = g('d_blowerEff') / 100;
   const Tmin = g('d_Tmin'), Kn = g('d_Kn');
   // 单好氧无缺氧段，不设内回流（能耗与同步值均按 0 计）
@@ -1845,14 +1848,13 @@ function calc() {
   const V_AN = bioConfig === 'aao' ? HRT_AN / 24 * Q : 0;
   const HRT_total = (V_total + V_AN) / Q * 24;
 
-  // 硝化最小泥龄（Metcalf & Eddy），按最低设计水温 T_min 校核（GB 50014：按最低月平均水温）：
-  //   SRT_min = 1 / [μmax·1.07^(T−20)·NH₄e/(K_N+NH₄e)·DO/(K_O+DO) − b]，b = 0.17·1.04^(T−20)，K_O = 0.5 mg/L
+  // 硝化最小泥龄（全站统一口径，GB 50014-2021 第 7.6.17 条）：按最低设计水温 T_min 校核
+  //   θco = F·SRT_min，SRT_min = 1/μ，μ = 0.47·Na/(K_N+Na)·e^{0.098(T−15)}；Na = max(NH₄ₑ, 0.5)，不计衰减、不含 DO 项
   //   以好氧泥龄 SRT_O = SRT × V_O / V_total 与 SF × SRT_min 比较
-  const K_O = 0.5;
   const T_nit = Math.min(T, Tmin);
-  const mu_n = mumax * Math.pow(1.07, T_nit - 20) * NH4e / (Kn + NH4e) * DO_run / (K_O + DO_run);
-  const b_n = 0.17 * Math.pow(1.04, T_nit - 20);
-  const SRT_min = mu_n > b_n + 1e-9 ? 1 / (mu_n - b_n) : Infinity;
+  const Na_nit = Math.max(NH4e, 0.5);
+  const mu_n = 0.47 * Na_nit / (Kn + Na_nit) * Math.exp(0.098 * (T_nit - 15));
+  const SRT_min = mu_n > 1e-9 ? 1 / mu_n : Infinity;
   const SRT_req = SF * SRT_min;
   const SRT_O = SRT * V_O / V_total;
 
@@ -1964,7 +1966,7 @@ function checkDesign({ J_T, J20, T, Tmin, A_m, V_total, HRT_total, MLSS, SRT, SR
   if (Tmin_factor < 0.75) { items.push({type:'warn',ic:'⚠',text:`<b>低温影响显著</b>: T_min=${Tmin}°C 下通量修正系数 ${Tmin_factor.toFixed(2)}，冬季膜面积较 20°C 增加 ${((1/Tmin_factor-1)*100).toFixed(0)}%`}); score -= 10; }
   if (MLSS < 8000) { items.push({type:'warn',ic:'⚠',text:`<b>MLSS 偏低</b>: ${MLSS} mg/L < 8000，未充分发挥 MBR 浓缩优势`}); score -= 8; }
   if (MLSS > 12000) { items.push({type:'warn',ic:'⚠',text:`<b>MLSS 偏高</b>: ${MLSS} mg/L > 12000，膜污染速率加快，需强化清洗`}); score -= 8; }
-  if (!isFinite(SRT_min)) { items.push({type:'bad',ic:'✗',text:`<b>无法硝化</b>: 最低设计水温 ${T_nit}°C 下硝化菌净比增长速率 ≤ 0（μ_max·温度修正·NH₄ₑ/DO Monod 项后不大于衰减速率 b），请核对 μ_max、出水氨氮目标与水温`}); score -= 20; }
+  if (!isFinite(SRT_min)) { items.push({type:'bad',ic:'✗',text:`<b>无法硝化</b>: 最低设计水温 ${T_nit}°C 下硝化菌比生长速率 μ ≤ 0（GB 50014-2021 式 7.6.17），请核对 K_N、出水氨氮目标与水温`}); score -= 20; }
   else if (SRT_O < SRT_req - 1e-6) { items.push({type:'warn',ic:'⚠',text:`<b>硝化泥龄不足</b>: 按最低设计水温 ${T_nit}°C 校核，好氧泥龄 SRT×V_O/V = ${SRT_O.toFixed(1)} d < SF × SRT_min = ${SF} × ${SRT_min.toFixed(1)} = ${SRT_req.toFixed(1)} d，冬季硝化安全余量不足，宜加大 SRT 或好氧段比例`}); score -= 12; }
   if (SRT < 20) { items.push({type:'warn',ic:'⚠',text:`<b>SRT 偏短</b>: ${SRT}d < 20d，MBR 通常 SRT 20-30d 以保证硝化和低污泥量`}); score -= 8; }
   if (HRT_total < 4) { items.push({type:'warn',ic:'⚠',text:`<b>HRT 偏短</b>: ${HRT_total.toFixed(1)}h < 4h，生物反应不充分`}); score -= 12; }
@@ -2206,7 +2208,7 @@ function copyDesignResult() {
   const txt = `MBR 工程设计结果（${$('d_titleSub').textContent}）
 生物池容: ${r('d_r_V')} m³  总 HRT: ${r('d_r_HRT')} h
 厌氧 V_AN: ${r('d_r_VAN')} m³  缺氧 V_AX: ${r('d_r_VAX')} m³  好氧/膜段 V_O: ${r('d_r_VO')} m³
-硝化 SRT_min / SF×SRT_min（按最低设计水温 T_min）: ${r('d_r_SRTmin')} d
+硝化 SRT_min / SF×SRT_min（GB 50014-2021 式 7.6.17，按最低设计水温 T_min，SF=${$('d_SF').value}）: ${r('d_r_SRTmin')} d
 反硝化氮量 内碳源/需外加碳源: ${r('d_r_Ndn')} kg N/d  外加碳源: ${r('d_r_Cext')} kg COD/d
 总膜面积: ${r('d_r_Am')} m²（控制工况: ${r('d_r_ctrl')}）  允许通量 J(T)/J(T_min): ${r('d_r_JT')} LMH
 运行通量 平均/峰值: ${r('d_r_Javg')} / ${r('d_r_Jpeak')} LMH（上限 ${r('d_r_Jlim')}）

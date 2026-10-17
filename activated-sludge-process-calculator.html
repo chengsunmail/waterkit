@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>活性污泥法工艺计算器 | 水处理工具箱 · WaterKit</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230891b2'/%3E%3Ctext x='16' y='22.5' font-size='18' font-weight='700' text-anchor='middle' fill='white' font-family='Arial,sans-serif'%3EW%3C/text%3E%3C/svg%3E">
-<meta name="description" content="AAO / A²O / AO / SBR / MBR / MBBR / 氧化沟 七种主流活性污泥法工艺在线设计计算,同步脱氮除磷,城镇污水与工业废水双预设,依据GB 50014/HJ 576/Metcalf & Eddy。">
+<meta name="description" content="AAO / 缺氧-好氧 / 厌氧-好氧 / 间歇式(SBR/CASS/UNITANK) / 氧化沟 5 种活性污泥法工艺在线设计计算, 同步脱氮除磷, 城镇污水与工业废水双预设, 依据 GB 50014-2021 / HJ 576 / Metcalf &amp; Eddy 第 5 版; MBR、MBBR、IFAS 见专用工具。">
 <link rel="canonical" href="https://waterkit.cn/activated-sludge-process-calculator.html">
-<meta name="keywords" content="AAO计算,A2O设计,活性污泥法,污水处理工艺,脱氮除磷,SBR计算,MBR设计,MBBR,氧化沟,污水厂设计">
+<meta name="keywords" content="AAO计算,A2O设计,活性污泥法,污水处理工艺,脱氮除磷,SBR计算,CASS,氧化沟,硝化泥龄,污水厂设计">
 <style>
   :root {
     --brand: #0891b2;
@@ -137,6 +137,11 @@
     scrollbar-width: none;
   }
   .process-tabs-wrap::-webkit-scrollbar { display: none; }
+  /* 横向滑动提示: 可继续滑动的一侧渐隐 (JS 按滚动位置切换) */
+  .process-tabs-wrap.fade-r { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent); }
+  .process-tabs-wrap.fade-l { -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(to left, #000 calc(100% - 36px), transparent); }
+  .process-tabs-wrap.fade-l.fade-r { -webkit-mask-image: linear-gradient(to right, transparent, #000 36px, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(to right, transparent, #000 36px, #000 calc(100% - 36px), transparent); }
+  .tabs-swipe-hint { display: none; font-size: 11.5px; color: var(--text-faint); text-align: right; margin: -18px 4px 16px; }
   .process-tabs {
     display: flex;
     gap: 4px;
@@ -801,15 +806,37 @@
   }
   .footer-bottom a:hover { color: var(--brand); }
 
+  .beta-bar { background: #fffbeb; border-bottom: 1px solid #fcd34d; color: #92400e; font-size: 12.5px; line-height: 1.6; padding: 8px 16px; text-align: center; }
+  .beta-bar b { color: #b45309; }
+  header.tool-header p a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+
   @media (max-width: 640px) {
     .main-wrap { padding: 8px; }
     .body { padding: 16px; }
     header.tool-header { padding: 20px 18px 16px; }
     header.tool-header h1 { font-size: 19px; }
     .process-tab { font-size: 12px; min-width: 90px; padding: 10px 8px; }
+    .tabs-swipe-hint.show { display: block; }
+    /* 流程图在手机上保持可读尺寸, 容器横向滚动 */
+    .flow-diagram svg { min-width: 680px; max-width: none; }
+    .flow-diagram::after { content: '← 左右滑动查看完整流程图 →'; display: block; text-align: center; font-size: 11px; color: var(--text-faint); margin-top: 6px; position: sticky; left: 0; width: calc(100vw - 72px); }
     .result-value { font-size: 15px; }
     .result-value.big { font-size: 18px; }
     .site-footer { padding: 36px 20px 24px; }
+  }
+  @media print {
+    .topbar, .breadcrumb, .beta-bar, .site-footer, .tool-inner-footer, .buttons, .process-tabs-wrap, .tabs-swipe-hint,
+    .water-preset, .subtype-tabs, .advanced-toggle, .auto-calc-notice { display: none !important; }
+    .advanced-params { display: block !important; }
+    body, .main-wrap { background: #fff !important; padding: 0 !important; }
+    .container { box-shadow: none !important; border: 0 !important; max-width: none !important; }
+    header.tool-header { background: none !important; color: #000 !important; padding: 0 0 8px !important; }
+    .body { padding: 0 !important; }
+    .result-group, .check-item, .flow-diagram, .field, .score-ring { break-inside: avoid; page-break-inside: avoid; }
+    .flow-diagram { overflow: visible !important; }
+    .flow-diagram svg { min-width: 0 !important; max-width: 100% !important; }
+    .flow-diagram::after { display: none !important; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   }
 </style>
 </head>
@@ -832,6 +859,7 @@
     </nav>
   </div>
 </header>
+<div class="beta-bar">🚧 <b>Beta · 开发中</b>：本工具仍在开发与校核中，计算结果仅供方案估算参考。发现问题欢迎 <a href="https://github.com/chengsunmail/waterkit/issues" target="_blank" rel="noopener">反馈 Issue</a>。</div>
 
 <!-- 面包屑 -->
 <div class="breadcrumb">
@@ -846,7 +874,7 @@
 <div class="container">
   <header class="tool-header">
     <h1>🔬 活性污泥法工艺计算器</h1>
-    <p>AAO / 缺氧-好氧 / 厌氧-好氧 / SBR / 氧化沟 / MBR-AAO / MBBR · 同步脱氮除磷设计 · 城镇污水与工业废水双预设</p>
+    <p>AAO / 缺氧-好氧 / 厌氧-好氧 / 间歇式 / 氧化沟 5 种工艺 · 同步脱氮除磷设计 · 城镇污水与工业废水双预设 · MBR、MBBR、IFAS 见专用工具: <a href="mbr-design.html">MBR</a> · <a href="mbbr-design.html">MBBR</a> · <a href="ifas-design.html">IFAS</a></p>
   </header>
 
   <div class="body">
@@ -878,6 +906,7 @@
         </a>
       </div>
     </div>
+    <div class="tabs-swipe-hint" id="tabsHint" aria-hidden="true">← 左右滑动查看更多工艺 →</div>
 
     <!-- ==== AAO 面板 ==== -->
     <div class="process-panel" id="panel-aao">
@@ -923,6 +952,7 @@
         <div class="field">
           <label for="NH40">NH₄-N₀ <span class="unit">mg/L</span></label>
           <input type="number" id="NH40" value="35" step="1">
+          <div class="helper">TKN₀ 的下限参考: 本页以 TN₀ 代 TKN₀, 须 TN₀ ≥ NH₄-N₀</div>
         </div>
         <div class="field">
           <label for="TP0">TP₀ <span class="unit">mg/L</span></label>
@@ -939,7 +969,7 @@
             <option value="1A">一级 A (GB 18918)</option>
             <option value="1B">一级 B (GB 18918)</option>
             <option value="grade4">准 IV 类(地方标准, 限值按所在地调整)</option>
-            <option value="grade3">地表 III 类</option>
+            <option value="grade3">地表 III 类 (TN 5 为参考值, 非 GB 3838 限值)</option>
             <option value="custom">自定义</option>
           </select>
         </div>
@@ -986,9 +1016,9 @@
           <div class="helper">二沉池底部浓度, 常取 8000-12000</div>
         </div>
         <div class="field linked">
-          <label for="SRT">好氧泥龄 SRT_O <span class="unit">d (自动推荐)</span></label>
-          <input type="number" id="SRT" value="10" step="0.5">
-          <div class="helper">好氧段泥龄, V_O 按此计算; 系统总泥龄见结果区</div>
+          <label for="SRT">好氧泥龄 SRT_O <span class="unit">d (留空自动)</span></label>
+          <input type="number" id="SRT" value="" step="0.5" placeholder="留空 = 自动">
+          <div class="helper">好氧段泥龄, V_O 按此计算; 留空 = max(SF×SRT_min, 常用下限 10 d); 系统总泥龄见结果区</div>
         </div>
         <div class="field">
           <label for="SF_SRT">SRT 安全系数 <span class="unit">—</span></label>
@@ -1038,20 +1068,8 @@
             <input type="number" id="Kd" value="0.06" step="0.01">
           </div>
           <div class="field">
-            <label for="mu_max">μ_max (硝化菌) <span class="unit">1/d @20℃</span></label>
-            <input type="number" id="mu_max" value="0.75" step="0.05">
-          </div>
-          <div class="field">
-            <label for="Kn">Kn (饱和常数) <span class="unit">mgN/L</span></label>
-            <input type="number" id="Kn" value="1.0" step="0.1">
-          </div>
-          <div class="field">
             <label for="SDNR20">SDNR₂₀ (反硝化速率) <span class="unit">gN/gVSS·d</span></label>
             <input type="number" id="SDNR20" value="0.08" step="0.01">
-          </div>
-          <div class="field">
-            <label for="theta_T">θ_T 温度修正 <span class="unit">—</span></label>
-            <input type="number" id="theta_T" value="1.103" step="0.001">
           </div>
           <div class="field">
             <label for="alpha">α (氧传质修正) <span class="unit">—</span></label>
@@ -1065,6 +1083,11 @@
             <label for="H_diff">曝气器淹没深度 H_d <span class="unit">m</span></label>
             <input type="number" id="H_diff" value="5.5" step="0.1" min="0">
             <div class="helper">SOR 水深修正用; 0 = 表面曝气不修正</div>
+          </div>
+          <div class="field">
+            <label for="AlP">化学除磷 Al/P 摩尔比 <span class="unit">—</span></label>
+            <input type="number" id="AlP" value="2" step="0.1" min="1">
+            <div class="helper">生物除磷不足时按化学计量投加 PAC (10% Al₂O₃ 液体), 化学污泥计入 ΔX; 须 ≥ 1, TP出 ≤ 0.5 常取 1.5–2.0</div>
           </div>
         </div>
       </div>
@@ -1189,6 +1212,27 @@
           </div>
         </div>
 
+        <!-- 出水预测 -->
+        <div class="result-group">
+          <div class="result-group-title"><span class="ic">🧪</span> 脱氮 & 除磷效果 <span class="sub" style="font-weight:400;font-size:11px;color:var(--text-faint);">(估算)</span></div>
+          <div class="result-row"><span class="result-label">出水 NO₃-N <span class="sub">(内回流封顶 800% 后, NOx − N_DN)</span></span>
+            <span><span class="result-value" id="r_NO3e">—</span><span class="result-unit">mg/L</span></span></div>
+          <div class="result-row highlight-row"><span class="result-label"><b>出水 TN 预测</b> <span class="sub">(NH₄ₑ + 有机Nₑ + NO₃ₑ)</span></span>
+            <span><span class="result-value big" id="r_TNpred">—</span><span class="result-unit">mg/L</span></span></div>
+          <div class="result-row"><span class="result-label">生物除磷出水 TP <span class="sub">(经验估算)</span></span>
+            <span><span class="result-value" id="r_TPbio">—</span><span class="result-unit">mg/L</span></span></div>
+          <div class="result-row"><span class="result-label">化学除磷量 ΔTP_chem <span class="sub">(max(0, TP_生物出水 − TP出))</span></span>
+            <span><span class="result-value" id="r_dTPchem">—</span><span class="result-unit">mg/L</span></span></div>
+          <div class="result-row"><span class="result-label">PAC 投加量 <span class="sub">(10% Al₂O₃ 液体)</span></span>
+            <span><span class="result-value" id="r_PAC">—</span><span class="result-unit">mg/L</span></span></div>
+          <div class="result-row"><span class="result-label">PAC 日投加量</span>
+            <span><span class="result-value" id="r_PACkg">—</span><span class="result-unit">kg/d</span></span></div>
+          <div class="result-row"><span class="result-label">化学污泥 ΔX_chem <span class="sub">(已计入剩余污泥)</span></span>
+            <span><span class="result-value" id="r_chemSludge">—</span><span class="result-unit">kg DS/d</span></span></div>
+          <div class="result-row highlight-row"><span class="result-label"><b>出水 TP 预测</b> <span class="sub">(含化学除磷)</span></span>
+            <span><span class="result-value big" id="r_TPe">—</span><span class="result-unit">mg/L</span></span></div>
+        </div>
+
         <!-- 比值与平衡 -->
         <div class="result-group">
           <div class="result-group-title"><span class="ic">⚖️</span> 工艺比值与平衡</div>
@@ -1243,13 +1287,12 @@
 
       <!-- 公式说明 -->
       <div class="formula-box" id="formulaBox">
-        <h3>① 泥龄 SRT 推导(Monod + Arrhenius)</h3>
-        <code>μ_max(T) = μ_max(20) × θ_T^(T-20)</code>
-        <code>SRT_min = 1 / [μ_max(T) × NH4/(Kn+NH4) - Kd]</code>
-        <code>Kn(T) = Kn(20) × 1.05^(T-20),  Kd(T) = Kd(20) × 1.04^(T-20),  NH4 取 max(NH4出, 0.5)</code>
-        <code>硝化校核温度取最低设计水温 T_min (留空 = min(T, 12 ℃)); Y_obs 的 Kd 仍按设计水温 T</code>
-        <code>SRT_O,设计 = SF × SRT_min  (好氧泥龄; 自动推荐时不低于 GB 50014 下限 10 d, T&lt;15℃ 时 15 d)</code>
-        <p>依据: Metcalf & Eddy 第 4 版 Ch.8, θ_T = 1.103, SF 安全系数 1.5-3。</p>
+        <h3>① 硝化最小泥龄 (GB 50014-2021 好氧区设计泥龄式)</h3>
+        <code>θ_co = F × 1/μ</code>
+        <code>μ = 0.47 × N_a/(K_N + N_a) × e^(0.098 × (T − 15))</code>
+        <code>N_a 取出水 NH₄-N (下限 0.5 mg/L);  K_N = 1.0 mg/L;  T 取最低设计水温 T_min (留空 = min(T, 12 ℃))</code>
+        <code>SRT_min = 1/μ;  SRT_O,自动 = max(F × SRT_min, 常用下限 10 d)  (好氧泥龄; 手动输入时按 F × SRT_min 校核)</code>
+        <p>依据 GB 50014-2021 式（7.6.17），θ 按 e^0.098≈1.103/℃，不计衰减。0.47 为 15 ℃ 时硝化菌最大比生长速率 (d⁻¹); F 安全系数, 规范宜为 1.5–3.0 (本页城镇 2.0、工业 3.0)。低温不另设泥龄硬下限, 由按 T_min 的硝化校核把关; Y_obs 的 Kd 仍按设计水温 T。</p>
 
         <h3>② 好氧段池容(GB 50014 泥龄法, MLSS 口径)</h3>
         <code>V_O = Q × (S₀ - Sₑ) × θ_co × Y_t / (1000 × X)   (X = MLSS, g/L)</code>
@@ -1263,12 +1306,13 @@
         <code>NO3允许 = TN出 - NH4出 - 有机N出</code>
         <code>出水 NO3 ≈ NOx生成 / (1 + R + r)</code>
         <code>R = NOx生成 / NO3允许 - 1 - r  (限 50%-800%)</code>
-        <p>常规范围: R = 100%-400%; &gt; 400% 偏高, &gt; 600% 水力冲击大。</p>
+        <code>R 封顶 800% 时: NO3ₑ = NOx生成/(1 + R + r), N_DN = NOx生成 − NO3ₑ (未反硝化部分不计氧回收与碳源), TN预测 = NH4出 + 有机N出 + NO3ₑ</code>
+        <p>常规范围: R = 100%–400% (GB 50014-2021 第 7.6.17 条: 混合液回流比不宜大于 400%); &gt; 400% 偏高, &gt; 600% 水力冲击大; R &lt; 100% 由 TN 目标宽松所致, 不扣分。</p>
 
         <h3>④ 缺氧段池容(反硝化)</h3>
         <code>SDNR(T) = SDNR(20) × 1.08^(T-20)  (θ=1.08 依据 GB 50014)</code>
         <code>V_A = Q × NOx_还原 / (SDNR × X_v)   (X_v = MLVSS, SDNR 以 VSS 计)</code>
-        <p>SDNR 比反硝化速率, 与 BOD/NO3 比相关, 见 Metcalf 表 8-12。</p>
+        <p>SDNR 比反硝化速率, 与 F/M、BOD/NO3 比相关, 见 Metcalf &amp; Eddy 第 5 版 (反硝化章节)。</p>
 
         <h3>⑤ 厌氧段池容(释磷时间)</h3>
         <code>V_AN = Q × HRT_AN  (按设计进水流量 Q 计, 不含回流)</code>
@@ -1277,7 +1321,7 @@
         <h3>⑥ 外回流比 r(污泥浓度平衡)</h3>
         <code>MLSS × (Q + Q_r) = MLSS_r × Q_r</code>
         <code>r = MLSS / (MLSS_r - MLSS)</code>
-        <p>常用范围 50%-100%, GB 50014 限值 100%。</p>
+        <p>常用范围 50%–100%; &gt; 100% 二沉池需加强浓缩, &gt; 120% 浓缩能力不足。</p>
 
         <h3>⑦ 实际需氧量 AOR</h3>
         <code>AOR_BOD = 1.47 × Q × (BOD₀ - BODₑ) - 1.42 × ΔX_VSS  (GB 50014, 取 ≥ 0)</code>
@@ -1297,8 +1341,15 @@
         <h3>⑨ 剩余污泥量</h3>
         <code>ΔX_VSS = Y_obs × Q × (BOD₀ - BODₑ)</code>
         <code>Y_obs = Y / (1 + Kd × SRT_总)  (Kd 按 1.04^(T-20) 温度修正; SRT_总 见 ②)</code>
-        <code>ΔX = ΔX_VSS + f_ss × Q × (SS₀ - SSₑ) + 0.3 × COD_外加碳源  (GB 50014; 甲醇产率 0.3 kgVSS/kgCOD 为经验值)</code>
+        <code>ΔX = ΔX_VSS + f_ss × Q × (SS₀ - SSₑ) + 0.3 × COD_外加碳源 + ΔX_chem  (GB 50014; 甲醇产率 0.3 kgVSS/kgCOD 为经验值)</code>
+        <code>ΔX_chem = Q × ΔTP_chem × [122/31 + (Al/P − 1) × 78/31]  (AlPO₄ + 过量 Al(OH)₃)</code>
         <p>f_ss 为 SS 污泥转换率 0.5–0.7 (本工具取 0.5), SSₑ 出水 SS 取 10 mg/L。硝化菌产泥一般占比 &lt; 5%, 可并入考虑。</p>
+
+        <h3>⑨-2 出水 TP 预测与辅助化学除磷 (与厌氧-好氧面板同一口径)</h3>
+        <code>P_生物 = min(0.025 × (BOD₀ − BODₑ) × f_T, TP₀ − 0.3),  f_T = max(0.4, 1 − 0.05 × max(0, 20 − T))</code>
+        <code>TP_生物出水 = max(0.3, TP₀ − P_生物 − 0.02 × Y_obs × (BOD₀ − BODₑ))</code>
+        <code>ΔTP_chem = max(0, TP_生物出水 − TP出);  PAC = ΔTP_chem × (Al/P) × 27/31 ÷ 0.0529  (10% Al₂O₃ 液体)</code>
+        <p>生物除磷系数为经验值 (无规范出处), 未扣除出水 SS 所含颗粒磷; Al/P 须 ≥ 1。</p>
 
         <h3>⑩ F/M 污泥负荷</h3>
         <code>F/M = Q × S₀ / (V_总 × MLSS)  [kgBOD₅/(kgMLSS·d)]</code>
@@ -1308,13 +1359,14 @@
         <table>
           <tr><th>指标</th><th>正常范围</th><th>警告阈值</th></tr>
           <tr><td>BOD/TN</td><td>4-8</td><td>&lt; 4 偏低; &lt; 3 需加碳源</td></tr>
-          <tr><td>BOD/TP</td><td>≥ 20</td><td>&lt; 17 除磷困难, 建议投 PAC</td></tr>
+          <tr><td>BOD/TP</td><td>≥ 20</td><td>&lt; 20 临界; &lt; 15 生物除磷效率低, 需化学除磷</td></tr>
           <tr><td>好氧泥龄 SRT_O</td><td>≥ SRT_min × SF, ≤ 25 d</td><td>&lt; SRT_min × SF 硝化不稳; &gt; 25 d 老化</td></tr>
           <tr><td>F/M (Q·S₀/(V·MLSS))</td><td>0.05-0.15</td><td>0.15-0.3 偏高(提示); &gt; 0.3 污泥膨胀风险</td></tr>
           <tr><td>HRT 总</td><td>6-24 h</td><td>&lt; 6h 反应不充分</td></tr>
           <tr><td>水温</td><td>≥ 12℃ 硝化正常</td><td>&lt; 12℃ 警告; &lt; 10℃ 严重</td></tr>
-          <tr><td>R 内回流</td><td>100-400%</td><td>&gt; 400% 偏高; &gt; 600% 水力冲击大</td></tr>
-          <tr><td>r 外回流</td><td>50-100%</td><td>&gt; 100% 达上限; &gt; 120% 二沉浓缩不足</td></tr>
+          <tr><td>R 内回流</td><td>100-400%</td><td>&gt; 400% 偏高; &gt; 600% 水力冲击大; &lt; 100% 由 TN 目标宽松所致, 不扣分</td></tr>
+          <tr><td>出水 TN 预测</td><td>≤ TN出</td><td>R 封顶 800% 仍超标 → ✗ TN 不达标</td></tr>
+          <tr><td>r 外回流</td><td>50-100%</td><td>&gt; 100% 偏高 (提示); &gt; 120% 二沉浓缩不足</td></tr>
         </table>
 
         <h3>参考规范与文献</h3>
@@ -1322,7 +1374,7 @@
         <p>2. <strong>HJ 576-2010</strong> 厌氧-缺氧-好氧活性污泥法污水处理工程技术规范</p>
         <p>3. <strong>GB 18918-2002</strong> 城镇污水处理厂污染物排放标准</p>
         <p>4. <strong>《给水排水设计手册(第二版)第5册)</strong> 中国建筑工业出版社</p>
-        <p>5. Metcalf & Eddy, <em>Wastewater Engineering: Treatment and Resource Recovery</em>, 5th ed.</p>
+        <p>5. Metcalf &amp; Eddy, <em>Wastewater Engineering: Treatment and Resource Recovery</em>, 第 5 版 (5th ed.)</p>
       </div>
 
       <div class="note">
@@ -1370,7 +1422,7 @@
         <div class="field"><label for="aoan_standard">排放标准</label>
           <select id="aoan_standard" onchange="applyStandardAOAN()">
             <option value="1A">一级 A</option><option value="1B">一级 B</option>
-            <option value="grade4">准 IV 类(地方标准, 限值按所在地调整)</option><option value="grade3">地表 III 类</option>
+            <option value="grade4">准 IV 类(地方标准, 限值按所在地调整)</option><option value="grade3">地表 III 类 (TN 5 为参考值, 非 GB 3838 限值)</option>
             <option value="custom">自定义</option>
           </select></div>
         <div class="field"><label for="aoan_CODe">COD出 <span class="unit">mg/L</span></label>
@@ -1396,7 +1448,8 @@
         <div class="field"><label for="aoan_MLSSr">污泥回流 MLSS_r <span class="unit">mg/L</span></label>
           <input type="number" id="aoan_MLSSr" value="10000" step="500"></div>
         <div class="field"><label for="aoan_SRT">好氧泥龄 SRT_O <span class="unit">d</span></label>
-          <input type="number" id="aoan_SRT" value="10" step="0.5"></div>
+          <input type="number" id="aoan_SRT" value="" step="0.5" placeholder="留空 = 自动">
+          <div class="helper">留空 = max(SF×SRT_min, 常用下限 10 d)</div></div>
         <div class="field"><label for="aoan_SF_SRT">SF 安全系数</label>
           <input type="number" id="aoan_SF_SRT" value="2.0" step="0.1"></div>
         <div class="field"><label for="aoan_Y">Y <span class="unit">kgVSS/kgBOD</span></label>
@@ -1405,12 +1458,6 @@
           <input type="number" id="aoan_Kd" value="0.06" step="0.01"></div>
         <div class="field"><label for="aoan_SDNR20">SDNR₂₀ <span class="unit">gN/gVSS·d</span></label>
           <input type="number" id="aoan_SDNR20" value="0.08" step="0.01"></div>
-        <div class="field"><label for="aoan_mu_max">μ_max <span class="unit">1/d</span></label>
-          <input type="number" id="aoan_mu_max" value="0.75" step="0.05"></div>
-        <div class="field"><label for="aoan_Kn">Kn <span class="unit">mgN/L</span></label>
-          <input type="number" id="aoan_Kn" value="1.0" step="0.1"></div>
-        <div class="field"><label for="aoan_theta_T">θ_T 硝化温度修正 <span class="unit">—</span></label>
-          <input type="number" id="aoan_theta_T" value="1.103" step="0.001"></div>
         <div class="field"><label for="aoan_alpha">α <span class="unit">氧传质</span></label>
           <input type="number" id="aoan_alpha" value="0.7" step="0.05"></div>
         <div class="field"><label for="aoan_beta">β <span class="unit">饱和修正</span></label>
@@ -1466,6 +1513,10 @@
             <span><span class="result-value" id="aoan_r_SRTtot">—</span><span class="result-unit">d</span></span></div>
           <div class="result-row"><span class="result-label">最小泥龄 SRT_min <span class="sub">(按 T_min)</span></span>
             <span><span class="result-value" id="aoan_r_SRTmin">—</span><span class="result-unit">d</span></span></div>
+          <div class="result-row"><span class="result-label">出水 NO₃-N <span class="sub">(内回流封顶 800% 后)</span></span>
+            <span><span class="result-value" id="aoan_r_NO3e">—</span><span class="result-unit">mg/L</span></span></div>
+          <div class="result-row"><span class="result-label">出水 TN 预测 <span class="sub">(NH₄ₑ + 有机Nₑ + NO₃ₑ)</span></span>
+            <span><span class="result-value" id="aoan_r_TNpred">—</span><span class="result-unit">mg/L</span></span></div>
         </div>
 
         <div class="result-group">
@@ -1556,9 +1607,11 @@
       <div class="grid">
         <div class="field"><label for="aop_standard">排放标准</label>
           <select id="aop_standard" onchange="applyStandardAOP()">
+            <option value="ponly" selected>仅控磷 (NH₄/TN 不考核, COD/BOD/TP 同一级 A)</option>
             <option value="1A">一级 A</option><option value="1B">一级 B</option>
-            <option value="grade4">准 IV 类(地方标准, 限值按所在地调整)</option><option value="custom">自定义</option>
-          </select></div>
+            <option value="grade4">准 IV 类(地方标准, 限值按所在地调整)</option><option value="custom">自定义 (NH₄ 按下方输入考核)</option>
+          </select>
+          <div class="helper">本工艺默认不强制硝化; 选一级 A/B 等含 NH₄/TN 限值的标准时按标准考核出水</div></div>
         <div class="field"><label for="aop_CODe">COD出 <span class="unit">mg/L</span></label>
           <input type="number" id="aop_CODe" value="50" step="1"></div>
         <div class="field"><label for="aop_BODe">BOD出 <span class="unit">mg/L</span></label>
@@ -1591,12 +1644,6 @@
           <input type="number" id="aop_Y" value="0.65" step="0.05"></div>
         <div class="field"><label for="aop_Kd">Kd</label>
           <input type="number" id="aop_Kd" value="0.06" step="0.01"></div>
-        <div class="field"><label for="aop_mu_max">μ_max</label>
-          <input type="number" id="aop_mu_max" value="0.75" step="0.05"></div>
-        <div class="field"><label for="aop_Kn">Kn <span class="unit">mgN/L</span></label>
-          <input type="number" id="aop_Kn" value="1.0" step="0.1"></div>
-        <div class="field"><label for="aop_theta_T">θ_T 硝化温度修正 <span class="unit">—</span></label>
-          <input type="number" id="aop_theta_T" value="1.103" step="0.001"></div>
         <div class="field"><label for="aop_alpha">α</label>
           <input type="number" id="aop_alpha" value="0.7" step="0.05"></div>
         <div class="field"><label for="aop_beta">β</label>
@@ -1674,7 +1721,7 @@
             <span><span class="result-value" id="aop_r_NO3e">—</span><span class="result-unit">mg/L</span></span></div>
           <div class="result-row"><span class="result-label">出水 TN(估算)</span>
             <span><span class="result-value" id="aop_r_TNe">—</span><span class="result-unit">mg/L</span></span></div>
-          <div class="result-row"><span class="result-label">TN 去除率(仅合成)</span>
+          <div class="result-row"><span class="result-label">TN 去除率 <span class="sub">(仅污泥合成同化)</span></span>
             <span><span class="result-value" id="aop_r_TNr">—</span><span class="result-unit"></span></span></div>
         </div>
 
@@ -1709,7 +1756,7 @@
       </div>
 
       <div class="note">
-        ⚠️ A/O 厌氧-好氧工艺<strong>仅除磷</strong>, TN 去除仅靠合成(20-30%)。若出水 TN 有要求,请勾选<b>含硝化氮模式</b>评估或选 AAO 工艺。
+        ⚠️ A/O 厌氧-好氧工艺<strong>仅除磷</strong>, 无反硝化, TN 去除仅靠污泥合成同化 (按 0.12·ΔX_VSS 计, 去除率见结果区)。本工艺默认不强制硝化; 需要满足 NH₄/TN 时, 请改用 AAO 或开启硝化 (加长泥龄至 ≥ SF×SRT_min)。
       </div>
     </div>
 
@@ -1790,14 +1837,14 @@
           <div class="helper">分池并联, 大规模建议 4-6</div>
         </div>
         <div class="field"><label for="sbr_ratio">排出比 1/n</label>
-          <input type="number" id="sbr_ratio" value="0.30" step="0.01" min="0.15" max="0.5">
-          <div class="helper">每次排水占池容比例 (充水比); GB 50014: 需脱氮时 0.15-0.3, 仅除磷 0.25-0.5</div>
+          <input type="number" id="sbr_ratio" value="0.25" step="0.01" min="0.15" max="0.5">
+          <div class="helper">每次排水占池容比例 (充水比); GB 50014: 需脱氮时 0.15-0.3, 仅除磷 0.25-0.5; 脱氮上限 N_DN ≤ (1 − 1/n)·NOx</div>
         </div>
         <div class="field"><label for="sbr_tfill">进水时段 <span class="unit">h/周期</span></label>
           <input type="number" id="sbr_tfill" value="0.5" step="0.1"></div>
         <div class="field"><label for="sbr_treact">反应时段(含曝气+缺氧) <span class="unit">h</span></label>
           <input type="number" id="sbr_treact" value="4.0" step="0.1">
-          <div class="helper">GB 50014: t_R ≥ 24·S₀·(1/n)/(1000·Ls·X), 默认工况 ≈ 3.7 h → 取 4.0 h</div></div>
+          <div class="helper">GB 50014: t_R ≥ 24·S₀·(1/n)/(1000·Ls·X), 默认工况 (1/n = 0.25) ≈ 3.1 h → 取 4.0 h</div></div>
         <div class="field"><label for="sbr_taer">其中曝气时长 <span class="unit">h/周期</span></label>
           <input type="number" id="sbr_taer" value="3.0" step="0.1">
           <div class="helper">反应时段中实际曝气的时长 (其余为缺氧搅拌), 用于峰值需氧与好氧泥龄; 不超过反应时段</div></div>
@@ -1822,17 +1869,14 @@
             <input type="number" id="sbr_VSS_SS" value="0.75" step="0.01"></div>
           <div class="field"><label for="sbr_SRT">设计泥龄 SRT <span class="unit">d</span></label>
             <input type="number" id="sbr_SRT" value="10" step="0.5">
-            <div class="helper">校核目标 / 迭代初值 (GB 50014 脱氮: T≥15℃ 不宜小于 10 d, T&lt;15℃ 不宜小于 15 d); 实际泥龄由池容与产泥量反算 (MLSS/ΔX_SS 口径, 按反应时间占比折算)</div></div>
+            <div class="helper">校核目标 / 迭代初值; 留空 = max(SF×SRT_min, 常用下限 10 d)。实际泥龄由池容与产泥量反算 (MLSS/ΔX_SS 口径, 按反应时间占比折算); 低温由按 T_min 的硝化校核把关 (好氧泥龄 ≥ SF×SRT_min)</div></div>
+          <div class="field"><label for="sbr_SF_SRT">SF 安全系数 <span class="unit">—</span></label>
+            <input type="number" id="sbr_SF_SRT" value="2.0" step="0.1">
+            <div class="helper">好氧泥龄 ≥ SF×SRT_min; 城镇 2.0, 工业 3.0 (GB 50014 F 宜为 1.5–3.0)</div></div>
           <div class="field"><label for="sbr_Y">Y</label>
             <input type="number" id="sbr_Y" value="0.6" step="0.05"></div>
           <div class="field"><label for="sbr_Kd">Kd</label>
             <input type="number" id="sbr_Kd" value="0.06" step="0.01"></div>
-          <div class="field"><label for="sbr_mu_max">μ_max</label>
-            <input type="number" id="sbr_mu_max" value="0.75" step="0.05"></div>
-          <div class="field"><label for="sbr_Kn">Kn <span class="unit">mgN/L</span></label>
-            <input type="number" id="sbr_Kn" value="1.0" step="0.1"></div>
-          <div class="field"><label for="sbr_theta_T">θ_T 硝化温度修正 <span class="unit">—</span></label>
-            <input type="number" id="sbr_theta_T" value="1.103" step="0.001"></div>
           <div class="field"><label for="sbr_alpha">α</label>
             <input type="number" id="sbr_alpha" value="0.7" step="0.05"></div>
           <div class="field"><label for="sbr_beta">β</label>
@@ -1843,6 +1887,9 @@
           <div class="field"><label for="sbr_Ls">污泥负荷 Ls (校核用) <span class="unit">kgBOD/kgMLSS·d</span></label>
             <input type="number" id="sbr_Ls" value="0.1" step="0.01" min="0.01">
             <div class="helper">GB 50014 污泥负荷法校核 V = 24·Q·S₀/(1000·m·t_R·Ls·X), 不改池容</div></div>
+          <div class="field"><label for="sbr_AlP">化学除磷 Al/P 摩尔比</label>
+            <input type="number" id="sbr_AlP" value="2" step="0.1" min="1">
+            <div class="helper">生物除磷不足时按化学计量投加 PAC (10% Al₂O₃ 液体), 化学污泥计入 ΔX; 须 ≥ 1</div></div>
         </div>
       </div>
 
@@ -1911,6 +1958,20 @@
             <span><span class="result-value" id="sbr_r_Yobs">—</span><span class="result-unit">kgVSS/kgBOD</span></span></div>
           <div class="result-row"><span class="result-label">最小泥龄 SRT_min <span class="sub">(硝化, 按 T_min)</span></span>
             <span><span class="result-value" id="sbr_r_SRTmin">—</span><span class="result-unit">d</span></span></div>
+          <div class="result-row"><span class="result-label">出水 NO₃-N <span class="sub">(N_DN ≤ (1 − 1/n)·NOx)</span></span>
+            <span><span class="result-value" id="sbr_r_NO3e">—</span><span class="result-unit">mg/L</span></span></div>
+          <div class="result-row"><span class="result-label">出水 TN 预测 <span class="sub">(NH₄ₑ + 有机Nₑ + NO₃ₑ)</span></span>
+            <span><span class="result-value" id="sbr_r_TNpred">—</span><span class="result-unit">mg/L</span></span></div>
+          <div class="result-row"><span class="result-label">生物除磷出水 TP <span class="sub">(经验估算)</span></span>
+            <span><span class="result-value" id="sbr_r_TPbio">—</span><span class="result-unit">mg/L</span></span></div>
+          <div class="result-row"><span class="result-label">PAC 投加量 <span class="sub">(10% Al₂O₃ 液体; ΔTP_chem = max(0, TP_生物 − TP出))</span></span>
+            <span><span class="result-value" id="sbr_r_PAC">—</span><span class="result-unit">mg/L</span></span></div>
+          <div class="result-row"><span class="result-label">PAC 日投加量</span>
+            <span><span class="result-value" id="sbr_r_PACkg">—</span><span class="result-unit">kg/d</span></span></div>
+          <div class="result-row"><span class="result-label">化学污泥 ΔX_chem <span class="sub">(已计入剩余污泥)</span></span>
+            <span><span class="result-value" id="sbr_r_chemSludge">—</span><span class="result-unit">kg DS/d</span></span></div>
+          <div class="result-row"><span class="result-label">出水 TP 预测 <span class="sub">(含化学除磷)</span></span>
+            <span><span class="result-value" id="sbr_r_TPe">—</span><span class="result-unit">mg/L</span></span></div>
           <div class="result-row"><span class="result-label">F/M 污泥负荷 <span class="sub">(Q·S₀/(V_总·MLSS))</span></span>
             <span><span class="result-value" id="sbr_r_FM">—</span><span class="result-unit">kgBOD/kgMLSS·d</span></span></div>
         </div>
@@ -1992,6 +2053,7 @@
         <div class="field"><label for="oxi_BODe">BOD出</label><input type="number" id="oxi_BODe" value="10" step="0.5"></div>
         <div class="field"><label for="oxi_NH4e">NH₄-N出</label><input type="number" id="oxi_NH4e" value="5" step="0.5"></div>
         <div class="field"><label for="oxi_TNe">TN出</label><input type="number" id="oxi_TNe" value="15" step="0.5"></div>
+        <div class="field"><label for="oxi_TPe">TP出 <span class="unit">mg/L</span></label><input type="number" id="oxi_TPe" value="0.5" step="0.1"></div>
         <div class="field"><label for="oxi_orgNe">出水有机氮 <span class="unit">mg/L</span></label>
           <input type="number" id="oxi_orgNe" value="1.5" step="0.1" min="0">
           <div class="helper">不可硝化溶解性有机氮; ΔTKN = TN₀(代 TKN₀) − NH₄ₑ − 有机Nₑ</div></div>
@@ -2008,7 +2070,7 @@
           <input type="number" id="oxi_MLSSr" value="8000" step="500"></div>
         <div class="field"><label for="oxi_SRT">系统总泥龄 SRT <span class="unit">d</span></label>
           <input type="number" id="oxi_SRT" value="25" step="1">
-          <div class="helper">全沟泥龄 (含缺氧区), 氧化沟常 20-30d; 好氧泥龄 = SRT × (1 − 缺氧占比)</div></div>
+          <div class="helper">全沟泥龄 (含缺氧区), 氧化沟常用 20–30 d; 好氧泥龄 = SRT × (1 − 缺氧占比); 留空 = max(SF×SRT_min/(1−缺氧占比), 20 d)</div></div>
         <div class="field"><label for="oxi_SF_SRT">SF 安全系数</label>
           <input type="number" id="oxi_SF_SRT" value="2.5" step="0.1"></div>
         <div class="field"><label for="oxi_v">沟内流速 v <span class="unit">m/s</span></label>
@@ -2030,18 +2092,19 @@
         <div class="grid">
           <div class="field"><label for="oxi_Y">Y</label><input type="number" id="oxi_Y" value="0.6" step="0.05"></div>
           <div class="field"><label for="oxi_Kd">Kd</label><input type="number" id="oxi_Kd" value="0.06" step="0.01"></div>
-          <div class="field"><label for="oxi_mu_max">μ_max</label><input type="number" id="oxi_mu_max" value="0.75" step="0.05"></div>
-          <div class="field"><label for="oxi_Kn">Kn <span class="unit">mgN/L</span></label><input type="number" id="oxi_Kn" value="1.0" step="0.1"></div>
-          <div class="field"><label for="oxi_theta_T">θ_T 硝化温度修正 <span class="unit">—</span></label><input type="number" id="oxi_theta_T" value="1.103" step="0.001"></div>
           <div class="field"><label for="oxi_SDNR20">SDNR₂₀</label><input type="number" id="oxi_SDNR20" value="0.05" step="0.01"></div>
-          <div class="field"><label for="oxi_alpha">α</label><input type="number" id="oxi_alpha" value="0.65" step="0.05"></div>
+          <div class="field"><label for="oxi_alpha">α</label><input type="number" id="oxi_alpha" value="0.8" step="0.05">
+            <div class="helper">机械表曝/转刷常用 0.8–0.85, 鼓风微孔 0.5–0.7 (默认按机械曝气: 城镇 0.8, 工业 0.7)</div></div>
           <div class="field"><label for="oxi_beta">β</label><input type="number" id="oxi_beta" value="0.95" step="0.01"></div>
           <div class="field"><label for="oxi_anoxOverride">手动 anoxRatio 覆盖 <span class="unit">% (0=自动)</span></label>
             <input type="number" id="oxi_anoxOverride" value="0" step="1" min="0" max="70">
             <div class="helper" id="oxi_anoxHelper">默认 0 (按 v/H/F-M 自动算): 缺氧区为总池容的一部分 (V_缺氧 = anoxRatio × V_总), 自动修正值已满足缺氧区容积校核; 切换亚型时按校核自动重设</div></div>
           <div class="field"><label for="oxi_H_diff">曝气器淹没深度 H_d <span class="unit">m</span></label>
             <input type="number" id="oxi_H_diff" value="0" step="0.1" min="0">
-            <div class="helper">转刷/表曝机取 0 (不作水深修正); 底部微孔曝气取实际淹没深度</div></div>
+            <div class="helper">转刷/表曝机取 0 (不作水深修正); 底部微孔曝气取实际淹没深度, 并将 α 改为 0.5–0.7</div></div>
+          <div class="field"><label for="oxi_AlP">化学除磷 Al/P 摩尔比</label>
+            <input type="number" id="oxi_AlP" value="2" step="0.1" min="1">
+            <div class="helper">生物除磷不足时按化学计量投加 PAC (10% Al₂O₃ 液体), 化学污泥计入 ΔX; 须 ≥ 1</div></div>
         </div>
       </div>
 
@@ -2078,7 +2141,7 @@
             <span><span class="result-value" id="oxi_r_nch">—</span><span class="result-unit">条</span></span></div>
           <div class="result-row"><span class="result-label">单沟长度 <span class="sub">(L_总/n)</span></span>
             <span><span class="result-value" id="oxi_r_lenSingle">—</span><span class="result-unit">m</span></span></div>
-          <div class="result-row"><span class="result-label">循环流量 Q_循</span>
+          <div class="result-row"><span class="result-label">循环流量 Q_循 <span class="sub">(单沟, A·v)</span></span>
             <span><span class="result-value" id="oxi_r_Qcycle">—</span><span class="result-unit">m³/h</span></span></div>
           <div class="result-row"><span class="result-label">循环时间 <span class="sub">(单沟)</span></span>
             <span><span class="result-value" id="oxi_r_tcycle">—</span><span class="result-unit">min</span></span></div>
@@ -2127,6 +2190,24 @@
         </div>
 
         <div class="result-group">
+          <div class="result-group-title"><span class="ic">🧪</span> 脱氮 & 除磷效果 <span class="sub" style="font-weight:400;font-size:11px;color:var(--text-faint);">(估算)</span></div>
+          <div class="result-row"><span class="result-label">实际反硝化 N_DN <span class="sub">(≤ V_缺氧·SDNR_T·MLVSS/Q)</span></span>
+            <span><span class="result-value" id="oxi_r_NDN">—</span><span class="result-unit">mg/L</span></span></div>
+          <div class="result-row highlight-row"><span class="result-label"><b>出水 TN 预测</b> <span class="sub">(NH₄ₑ + 有机Nₑ + NO₃ₑ)</span></span>
+            <span><span class="result-value big" id="oxi_r_TNpred">—</span><span class="result-unit">mg/L</span></span></div>
+          <div class="result-row"><span class="result-label">生物除磷出水 TP <span class="sub">(经验估算)</span></span>
+            <span><span class="result-value" id="oxi_r_TPbio">—</span><span class="result-unit">mg/L</span></span></div>
+          <div class="result-row"><span class="result-label">PAC 投加量 <span class="sub">(10% Al₂O₃ 液体)</span></span>
+            <span><span class="result-value" id="oxi_r_PAC">—</span><span class="result-unit">mg/L</span></span></div>
+          <div class="result-row"><span class="result-label">PAC 日投加量</span>
+            <span><span class="result-value" id="oxi_r_PACkg">—</span><span class="result-unit">kg/d</span></span></div>
+          <div class="result-row"><span class="result-label">化学污泥 ΔX_chem <span class="sub">(已计入剩余污泥)</span></span>
+            <span><span class="result-value" id="oxi_r_chemSludge">—</span><span class="result-unit">kg DS/d</span></span></div>
+          <div class="result-row highlight-row"><span class="result-label"><b>出水 TP 预测</b> <span class="sub">(含化学除磷)</span></span>
+            <span><span class="result-value big" id="oxi_r_TPe">—</span><span class="result-unit">mg/L</span></span></div>
+        </div>
+
+        <div class="result-group">
           <div class="result-group-title"><span class="ic">🔎</span> 设计校核 & 警告</div>
           <div class="check-list" id="oxi_checkList"></div>
           <div class="score-ring">
@@ -2152,8 +2233,7 @@
     <div class="process-panel" id="panel-others" style="display:none;">
       <div class="coming-soon-panel">
         <h3>🎉 当前版本已涵盖 5 种主流活性污泥法工艺</h3>
-        <p>AAO / 缺氧-好氧 / 厌氧-好氧 / 间歇式 / 氧化沟; MBR / MBBR 见专用工程设计平台。</p>
-        <div class="soon-badge">V1.0 正式版</div>
+        <p>AAO / 缺氧-好氧 / 厌氧-好氧 / 间歇式 / 氧化沟; MBR、MBBR、IFAS 见专用工具: <a href="mbr-design.html">MBR</a> · <a href="mbbr-design.html">MBBR</a> · <a href="ifas-design.html">IFAS</a>。</p>
       </div>
     </div>
 
@@ -2196,6 +2276,7 @@
           <li><a href="dosing-calculator.html">加药量</a></li>
           <li><a href="activated-sludge-process-calculator.html">活性污泥工艺</a></li>
           <li><a href="mbbr-design.html">MBBR 工程设计</a></li>
+          <li><a href="ifas-design.html">IFAS 工程设计</a></li>
           <li><a href="mbr-design.html">MBR 工程设计</a></li>
           <li><a href="pump-selection-calculator.html">水泵选型</a></li>
           <li><a href="blower-selection-calculator.html">鼓风机选型</a></li>
@@ -2282,6 +2363,20 @@ function iterSRT(step, SRT0) {
 function tminOf(prefix, T) { const v = parseFloat($(prefix + 'Tmin').value); return isNaN(v) ? Math.min(T, 12) : v; }
 // 出水有机氮 (不可硝化的溶解性有机氮): 留空时取 1.5 mg/L; 合法 0 不被吞
 function orgNeOf(prefix) { const v = parseFloat($(prefix + 'orgNe').value); return isNaN(v) ? 1.5 : v; }
+// ============ 硝化最小泥龄 (全站统一口径: GB 50014-2021 第 7.6.17 条好氧区设计泥龄式) ============
+// θ_co = F·1/μ,  μ = 0.47·N_a/(K_N + N_a)·e^{0.098(T − 15)}
+// 0.47 = 15 ℃ 硝化菌最大比生长速率 (d⁻¹); K_N = 1.0 mg/L (规范条文说明典型值); T 取最低设计水温 T_min;
+// N_a 取出水 NH₄-N (下限 0.5 mg/L); 不含衰减项与 DO 项; e^0.098 ≈ 1.103/℃
+const GB_MU15 = 0.47, GB_KN = 1.0, GB_KT = 0.098;
+function nitSRTmin(NH4e, Tmin) {
+  const Na = Math.max(NH4e, 0.5);
+  const mu = GB_MU15 * Na / (GB_KN + Na) * Math.exp(GB_KT * (Tmin - 15));
+  return { mu, Na, SRT_min: mu > 0 ? 1 / mu : 999 };
+}
+// 泥龄留空时的自动值 = max(F·SRT_min, 工艺常用下限), 向上取 0.5 d 的倍数 (1e-9 容差)
+const SRT_FLOOR_DN = 10;    // 脱氮工艺 (AAO / 缺氧-好氧) 好氧泥龄常用下限 d (工程经验值)
+const SRT_FLOOR_OXI = 20;   // 氧化沟系统总泥龄常用下限 d (工程经验值, 常用 20–30 d)
+function autoSRT(rec, floor) { return Math.ceil(Math.max(rec, floor) * 2 - 1e-9) / 2; }
 // 可硝化氮 ΔTKN = TKN₀ − NH₄ₑ − 有机Nₑ; 本页无 TKN 输入, 以 TN₀ 代 TKN₀ (假定进水 NOx ≈ 0)
 // 反硝化碳源上限: 可生物降解 BOD 支持的反硝化量 N_DN,max = ΔBOD / [2.86/(1 − 1.42·Y_obs)]
 // 超出部分按外加碳源 (甲醇) 计: 需 COD = N_ext × 2.86/(1 − 1.42·Y_M), Y_M ≈ 0.3 kgVSS/kgCOD (经验值),
@@ -2295,21 +2390,67 @@ function dnSplit(NOx_DN, dBOD, Yobs, Q) {
   const extCOD_kg = ext * MEOH_COD_N * Q / 1000;                 // kgCOD/d
   return { cn, bio, ext, extCOD_kg, meoh_kg: extCOD_kg / 1.5, dX_meoh: MEOH_Y * extCOD_kg };
 }
+// ============ 内回流封顶后的实际反硝化量 (AAO / 缺氧-好氧共用) ============
+// 需要 R_req = NOx/NO3_允许 − 1 − r; R 限 50%–800%; 回流可达出水 NO₃ₑ = NOx/(1+R+r)
+// 实际可反硝化 N_DN = min(NOx − NO3_允许, NOx − NO₃ₑ); 未反硝化部分随出水排出 (不计氧回收、不计碳源)
+function recycleDN(NOx, NO3_allow, r) {
+  const R_req = NOx > 0 ? (NO3_allow > 0 ? NOx / NO3_allow - 1 - r : Infinity) : 1;
+  const R = Math.max(0.5, Math.min(R_req, 8));
+  const NO3e_rec = NOx / (1 + R + r);
+  const N_DN = Math.max(0, Math.min(NOx - NO3_allow, NOx - NO3e_rec));
+  return { R_req, R, capped: R_req > 8, N_DN, NO3e: NOx - N_DN };
+}
+// ============ 生物除磷 + 辅助化学除磷 (厌氧-好氧 / AAO / 间歇式 / 氧化沟共用, 与 MBBR/MBR/污泥产量页口径一致) ============
+// 生物除磷: 每去除 1 mgBOD 除磷约 0.025 mg (经验值, 无规范出处) × 温度系数 max(0.4, 1 − 0.05·max(0, 20 − T));
+// 合成除磷 0.02·Y_obs·ΔBOD; 生物除磷稳定下限 0.3 mg/L (进水更低时按进水)
+// 化学除磷: ΔTP_chem = max(0, TP_生物出水 − TP出); PAC = ΔTP_chem·(Al/P)·27/31 ÷ 0.0529 (10% Al₂O₃ 液体)
+// 化学污泥 = ΔP·[122/31 + (Al/P − 1)·78/31] (AlPO₄ + 过量 Al(OH)₃), 计入剩余污泥
+function tpModel(TP0, TPe_target, dBOD, Yobs, T, AlP, Q, chemOn) {
+  const fT = Math.max(0.4, 1 - 0.05 * Math.max(0, 20 - T));
+  const floorP = Math.min(0.3, TP0);
+  const P_bio = Math.min(Math.max(0, dBOD) * 0.025 * fT, Math.max(0, TP0 - floorP));
+  const P_assim = 0.02 * Yobs * Math.max(0, dBOD);
+  const TPe_bio = Math.max(floorP, TP0 - Math.min(TP0 - floorP, P_bio + P_assim));
+  const dTP_chem = chemOn ? Math.max(0, TPe_bio - TPe_target) : 0;
+  const PAC_dose = dTP_chem * AlP * 27 / 31 / 0.0529;
+  return { TPe_bio, dTP_chem, PAC_dose, PAC_kg: PAC_dose * Q / 1000,
+           chemSludge: dTP_chem * Q / 1000 * (122 / 31 + Math.max(0, AlP - 1) * 78 / 31),
+           TPe_est: TPe_bio - dTP_chem };
+}
+function tpCheck(t, TPe_target, AlP) {
+  if (t.dTP_chem > 1e-6) return { type: 'info', ic: 'ℹ', text: `<b>生物除磷不足, 需辅助化学除磷</b>: 生物除磷出水估算 ${t.TPe_bio.toFixed(2)} mg/L &gt; 目标 ${TPe_target} mg/L, 化学除磷 ΔTP = ${t.dTP_chem.toFixed(2)} mg/L, PAC (10% Al₂O₃ 液体, Al/P=${AlP}) ≈ ${t.PAC_dose.toFixed(1)} mg/L (${t.PAC_kg.toFixed(0)} kg/d), 化学污泥 ${t.chemSludge.toFixed(0)} kg DS/d 已计入剩余污泥; 出水 TP ≈ ${t.TPe_est.toFixed(2)} mg/L` };
+  return { type: 'ok', ic: '✓', text: `<b>除磷达标(生物除磷)</b>: 生物除磷出水估算 ${t.TPe_bio.toFixed(2)} mg/L ≤ 目标 ${TPe_target} mg/L, 无需化学除磷 (经验估算, 建议预留加药点)` };
+}
 function extCarbonCheck(dn) {
   return { type: 'warn', ic: '⚠', text: `<b>可生物降解碳源不足, 需外加碳源</b>: 需反硝化 ${(dn.bio + dn.ext).toFixed(1)} mg/L, 进水 BOD 可支持 ${dn.bio.toFixed(1)} mg/L (C/N = 2.86/(1−1.42·Y_obs) = ${dn.cn.toFixed(2)} gBOD/gN), 缺口 ${dn.ext.toFixed(1)} mg/L 按甲醇计: COD ${dn.extCOD_kg.toFixed(0)} kg/d ≈ 甲醇 ${dn.meoh_kg.toFixed(0)} kg/d (${MEOH_COD_N.toFixed(2)} gCOD/gN), 产泥 ${dn.dX_meoh.toFixed(0)} kgVSS/d 已计入剩余污泥; 外加碳源脱氮不计入反硝化氧回收` };
 }
 
 // ============ 输入校验 ============
-// specs: [输入框 id, 名称, 'pos' (须 > 0) | 'nonneg' (不得为负, 允许 0/留空)]
+// specs: [输入框 id, 名称, 'pos' (须 > 0) | 'nonneg' (须 ≥ 0, 不得留空) | 'opt' (可留空 = 自动/默认值, 填写时须 ≥ 0)]
+// 留空不再按 0 计算: 必填项留空判为无效并提示; 可留空项 (泥龄 / T_min / 出水有机氮 / anoxRatio 覆盖) 取自动或默认值
+const OPTIONAL_IDS = /(^|_)(SRT|Tmin|orgNe|anoxOverride)$/;
 function validateInputs(specs, bod) {
   const msgs = [];
   specs.forEach(([id, name, mode]) => {
     const el = $(id); if (!el) return;
     const v = parseFloat(el.value);
-    const ok = mode === 'nonneg' ? (isNaN(v) || v >= 0) : (!isNaN(v) && v > 0);
+    if (mode === 'nonneg' && OPTIONAL_IDS.test(id)) mode = 'opt';
+    const ok = mode === 'opt' ? (isNaN(v) || v >= 0) : mode === 'nonneg' ? (!isNaN(v) && v >= 0) : (!isNaN(v) && v > 0);
     el.classList.toggle('invalid', !ok);
-    if (!ok) msgs.push(mode === 'nonneg' ? `请输入不小于 0 的 ${name}` : `请输入大于 0 的 ${name}`);
+    if (!ok) msgs.push(isNaN(v) ? `${name} 不能留空, 请输入数值` : mode === 'pos' ? `请输入大于 0 的 ${name}` : `请输入不小于 0 的 ${name}`);
   });
+  // Al/P 摩尔比须 ≥ 1 (AlPO₄ 化学计量下限)
+  specs.filter(([id]) => /(^|_)AlP$/.test(id)).forEach(([id]) => {
+    const el = $(id), v = parseFloat(el.value);
+    if (!isNaN(v) && v > 0 && v < 1) { el.classList.add('invalid'); msgs.push('化学除磷 Al/P 摩尔比须 ≥ 1 (AlPO₄ 化学计量下限)'); }
+  });
+  // TN₀ 须 ≥ NH₄-N₀ (TN = TKN + NOx, TKN ≥ NH₄; 本页以 TN₀ 代 TKN₀, NH₄-N₀ 作为其下限校核)
+  const tnSpec = specs.find(([id]) => /(^|_)TN0$/.test(id));
+  if (tnSpec && msgs.length === 0) {
+    const pre = tnSpec[0].replace(/TN0$/, '');
+    const tn = parseFloat($(pre + 'TN0').value), nh = parseFloat($(pre + 'NH40').value);
+    if (tn < nh - 1e-9) { $(pre + 'TN0').classList.add('invalid'); msgs.push(`进水 TN₀ (${tn}) 须 ≥ NH₄-N₀ (${nh}): TN = TKN + NOx, TKN ≥ NH₄-N`); }
+  }
   // 进水 BOD 须大于出水 BOD, 否则池容为负
   if (bod && msgs.length === 0) {
     const b0 = parseFloat($(bod[0]).value), be = parseFloat($(bod[1]).value) || 0;
@@ -2333,20 +2474,20 @@ function specsFor(prefix, pos, nonneg) {
 }
 const CONC_SPECS = [['COD0','COD₀'],['BOD0','BOD₅'],['SS0','SS₀'],['TN0','TN₀'],['NH40','NH₄-N₀'],['TP0','TP₀'],
   ['CODe','出水 COD'],['BODe','出水 BOD'],['NH4e','出水 NH₄-N'],['TNe','出水 TN'],['TPe','出水 TP'],
-  ['SRT','泥龄 SRT'],['Kd','Kd'],['mu_max','μ_max'],['Kn','Kn'],['H_diff','曝气器淹没深度'],['HRT_AN','厌氧 HRT'],
+  ['SRT','泥龄 SRT'],['Kd','Kd'],['H_diff','曝气器淹没深度'],['HRT_AN','厌氧 HRT'],
   ['Tmin','最低设计水温'],['orgNe','出水有机氮']];
 const VALID_AAO = specsFor('', [['Q','设计规模 Q'],['MLSS','MLSS'],['VSS_SS','MLVSS/MLSS'],['MLSSr','回流污泥浓度'],
-  ['Y','产泥系数 Y'],['SDNR20','SDNR₂₀'],['theta_T','θ_T'],['SF_SRT','SRT 安全系数'],['alpha','α'],['beta','β']], CONC_SPECS);
+  ['Y','产泥系数 Y'],['SDNR20','SDNR₂₀'],['SF_SRT','SRT 安全系数'],['alpha','α'],['beta','β'],['AlP','Al/P 摩尔比']], CONC_SPECS);
 const VALID_AOAN = specsFor('aoan_', [['Q','设计规模 Q'],['MLSS','MLSS'],['VSS_SS','MLVSS/MLSS'],['MLSSr','回流污泥浓度'],
-  ['Y','产泥系数 Y'],['SDNR20','SDNR₂₀'],['theta_T','θ_T'],['SF_SRT','SRT 安全系数'],['alpha','α'],['beta','β']], CONC_SPECS);
+  ['Y','产泥系数 Y'],['SDNR20','SDNR₂₀'],['SF_SRT','SRT 安全系数'],['alpha','α'],['beta','β']], CONC_SPECS);
 const VALID_AOP = specsFor('aop_', [['Q','设计规模 Q'],['MLSS','MLSS'],['VSS_SS','MLVSS/MLSS'],['MLSSr','回流污泥浓度'],
-  ['Y','产泥系数 Y'],['theta_T','θ_T'],['SF_SRT','SRT 安全系数'],['alpha','α'],['beta','β'],['AlP','Al/P 摩尔比']], CONC_SPECS);
+  ['Y','产泥系数 Y'],['SF_SRT','SRT 安全系数'],['alpha','α'],['beta','β'],['AlP','Al/P 摩尔比']], CONC_SPECS);
 const VALID_SBR = specsFor('sbr_', [['Q','设计规模 Q'],['MLSS','MLSS'],['VSS_SS','MLVSS/MLSS'],['Y','产泥系数 Y'],
-  ['theta_T','θ_T'],['alpha','α'],['beta','β'],['m','周期数 m'],['N','池数 N'],['ratio','排出比 1/n'],['Ls','污泥负荷 Ls']],
+  ['SF_SRT','SF 安全系数'],['alpha','α'],['beta','β'],['m','周期数 m'],['N','池数 N'],['ratio','排出比 1/n'],['Ls','污泥负荷 Ls'],['AlP','Al/P 摩尔比']],
   CONC_SPECS.concat([['tfill','进水时段'],['treact','反应时段'],['taer','曝气时长'],['tsettle','沉淀时段'],['tdraw','排水时段'],['tidle','闲置时段']]));
 const VALID_OXI = specsFor('oxi_', [['Q','设计规模 Q'],['MLSS','MLSS'],['VSS_SS','MLVSS/MLSS'],['MLSSr','回流污泥浓度'],
-  ['Y','产泥系数 Y'],['SDNR20','SDNR₂₀'],['theta_T','θ_T'],['SF_SRT','SRT 安全系数'],['alpha','α'],['beta','β'],
-  ['v','沟内流速 v'],['H','沟深 H'],['BH','沟宽/深比']], CONC_SPECS.concat([['anoxOverride','anoxRatio 覆盖值']]));
+  ['Y','产泥系数 Y'],['SDNR20','SDNR₂₀'],['SF_SRT','SRT 安全系数'],['alpha','α'],['beta','β'],
+  ['v','沟内流速 v'],['H','沟深 H'],['BH','沟宽/深比'],['AlP','Al/P 摩尔比']], CONC_SPECS.concat([['anoxOverride','anoxRatio 覆盖值']]));
 
 // ============ 水种预设 ============
 const PRESETS = {
@@ -2354,7 +2495,6 @@ const PRESETS = {
     COD0: 400, BOD0: 180, SS0: 200, TN0: 45, NH40: 35, TP0: 5,
     MLSS: 3500, VSS_SS: 0.75, MLSSr: 10000,
     Y: 0.6, Kd: 0.06,
-    mu_max: 0.75, Kn: 1.0,
     SDNR20: 0.08,
     SF_SRT: 2.0, HRT_AN: 1.5,
     alpha: 0.7, beta: 0.95,
@@ -2364,7 +2504,6 @@ const PRESETS = {
     COD0: 800, BOD0: 320, SS0: 250, TN0: 60, NH40: 45, TP0: 8,
     MLSS: 4500, VSS_SS: 0.70, MLSSr: 10000,
     Y: 0.45, Kd: 0.04,
-    mu_max: 0.5, Kn: 2.5,
     SDNR20: 0.04,
     SF_SRT: 3.0, HRT_AN: 2.0,
     alpha: 0.6, beta: 0.93,
@@ -2377,7 +2516,9 @@ const STANDARDS = {
   '1A':    { CODe: 50,  BODe: 10, NH4e: 5,  TNe: 15, TPe: 0.5 },
   '1B':    { CODe: 60,  BODe: 20, NH4e: 8,  TNe: 20, TPe: 1.0 },
   'grade4':{ CODe: 30,  BODe: 6,  NH4e: 1.5,TNe: 10, TPe: 0.3 },  // 准 IV 类: 地方标准, 限值按项目所在地调整
-  'grade3':{ CODe: 20,  BODe: 4,  NH4e: 1.0,TNe: 5,  TPe: 0.2 }
+  'grade3':{ CODe: 20,  BODe: 4,  NH4e: 1.0,TNe: 5,  TPe: 0.2 },  // TN 5 为参考值, 非 GB 3838 限值 (GB 3838 III 类 TN 限值仅适用湖库, 为 1.0)
+  // 仅控磷 (厌氧-好氧面板默认): NH₄/TN 不作达标考核, NH₄-N出 仅用于硝化泥龄判断
+  'ponly': { CODe: 50,  BODe: 10, NH4e: 5,  TPe: 0.5, noN: true }
 };
 
 let currentPreset = 'municipal';
@@ -2404,30 +2545,22 @@ function setProcess(proc) {
   calc();
 }
 
-// ============ SRT 自动填入(含规范下限) ============
-// GB 50014: 脱氮工艺设计泥龄 T<15℃ 不宜小于 15 d, 否则不宜小于 10 d
-// floorOverride: 非脱氮工艺 (厌氧-好氧只除磷) 传入自身下限, 不套脱氮下限
-function fillSRT(inputId, SRT_rec, T, floorOverride, floorNote) {
-  const floorSRT = floorOverride > 0 ? floorOverride : (T < 15 ? 15 : 10);
-  // 向上取 0.5 的倍数, 保证填入值不低于推荐值 (1e-9 容差避免 16.0000001 → 16.5)
-  const SRT_design = Math.ceil(Math.max(SRT_rec, floorSRT) * 2 - 1e-9) / 2;
+// ============ SRT 输入框提示 ============
+// 脱氮面板 (AAO / 缺氧-好氧 / 氧化沟) 的泥龄输入默认留空 = 自动值, 每次计算实时刷新 (不再依赖点预设回填)
+function srtTip(inputId, text) {
   const el = $(inputId);
-  el.value = SRT_design;
-  // 在标签旁提示是否已按规范下限调整
   let tip = el.parentElement.querySelector('.srt-floor-tip');
   if (!tip) {
     tip = document.createElement('div');
     tip.className = 'helper srt-floor-tip';
     el.parentElement.appendChild(tip);
   }
-  if (floorNote) {
-    tip.textContent = floorNote;
-  } else if (SRT_rec < floorSRT) {
-    tip.textContent = `已按规范下限调整: 推算 ${SRT_rec.toFixed(1)} d → ${SRT_design} d (GB 50014, T${T < 15 ? '<' : '≥'}15℃ 不宜小于 ${floorSRT} d)`;
-    console.info(`[${inputId}] SRT 已按规范下限调整: ${SRT_rec.toFixed(1)} → ${SRT_design} d`);
-  } else {
-    tip.textContent = '';
-  }
+  tip.textContent = text;
+}
+// 厌氧-好氧 (只除磷) 面板: 泥龄取生物除磷常用值 (不按硝化放大), 预设时填入
+function fillSRT(inputId, value, note) {
+  $(inputId).value = value;
+  srtTip(inputId, note || '');
 }
 
 // ============ 应用水种预设 ============
@@ -2440,11 +2573,7 @@ function setPreset(key) {
   Object.keys(p).forEach(k => {
     if ($(k)) $(k).value = p[k];
   });
-  // 切换预设后,先用默认值计算一次得到推荐 SRT,再自动填入
-  const r = calcAAO();
-  if (r.SRT_rec > 0 && r.SRT_rec < 30) {
-    fillSRT('SRT', r.SRT_rec, num('T'));
-  }
+  $('SRT').value = '';   // 好氧泥龄留空 = 自动值 max(SF×SRT_min, 常用下限), 随 T_min / NH₄ₑ / SF 实时更新
   calc();
 }
 
@@ -2455,12 +2584,7 @@ function applyStandard() {
   const s = STANDARDS[std];
   if (!s) return;
   Object.keys(s).forEach(k => { if ($(k)) $(k).value = s[k]; });
-  // 出水标准变更后,推荐 SRT 也可能变,重算后自动填
-  const r = calcAAO();
-  if (r.SRT_rec > 0 && r.SRT_rec < 30) {
-    fillSRT('SRT', r.SRT_rec, num('T'));
-  }
-  calc();
+  calc();   // SRT 留空时自动值随出水 NH₄ 实时更新
 }
 
 // ============ 高级参数展开 ============
@@ -2499,35 +2623,22 @@ function calcAAO() {
   // 动力学参数
   const Y = num('Y');
   const Kd20 = num('Kd');
-  const mu_max20 = num('mu_max');
-  const Kn20 = num('Kn');
   const SDNR20 = num('SDNR20');
-  const theta_T = num('theta_T');
   const alpha = num('alpha');
   const beta = num('beta');
   const H_diff = num('H_diff');   // 曝气器淹没深度 (m), SOR 水深修正
 
   // 温度修正
-  const mu_max_T = mu_max20 * Math.pow(theta_T, Tn - 20);
   const Kd_T = Kd20 * Math.pow(1.04, T - 20);
   const SDNR_T = SDNR20 * Math.pow(1.08, T - 20);  // θ=1.08 依据 GB 50014: Kde(T)=Kde(20)·1.08^(T−20)
-  const Kn = Kn20 * Math.pow(1.05, Tn - 20);  // P1: Kn 温度修正
 
-  // ========== 1. 泥龄 SRT 推导 ==========
-  // 基于出水 NH4 反推有效硝化生长率
-  const NH4_use = Math.max(NH4e, 0.5); // 避免除零
-  const mu_net = mu_max_T * NH4_use / (Kn + NH4_use) - Kd20 * Math.pow(1.04, Tn - 20);  // 硝化按最低设计水温 T_min 校核
-  let SRT_min;
-  if (mu_net > 0) {
-    SRT_min = 1 / mu_net;
-  } else {
-    SRT_min = 999; // 硝化不能维持
-  }
-  const SRT_rec = SRT_min * SF;
-
-  // 用户可覆盖:取输入值(若合理)
+  // ========== 1. 泥龄 SRT (GB 50014-2021 式 7.6.17, 按最低设计水温 T_min) ==========
+  const { mu: mu_N, SRT_min } = nitSRTmin(NH4e, Tn);
+  const SRT_rec = SRT_min * SF;                       // θ_co = F/μ
+  const SRT_auto = autoSRT(SRT_rec, SRT_FLOOR_DN);     // 留空自动值 = max(F·SRT_min, 常用下限 10 d)
   const SRT_user = num('SRT');
-  const SRT = SRT_user > 0 ? SRT_user : SRT_rec;
+  const SRT_isAuto = !(SRT_user > 0);
+  const SRT = SRT_isAuto ? SRT_auto : SRT_user;
 
   // ========== 2-3. 池容-泥龄自洽迭代 (GB 50014 口径) ==========
   // 好氧区 V_O = Q·(S₀−Sₑ)·θ_co·Y_t / (1000·X), X = MLSS (g/L); MLSS 以 mg/L 输入时 1000 约去
@@ -2544,41 +2655,35 @@ function calcAAO() {
   const NH4_total = Math.max(0, TN0 - orgNe);
   const NO3_allowed = Math.max(0, TNe - NH4e - orgNe);
   const V_AN = Q * (HRT_AN_hr / 24);              // 厌氧段: 按设计进水流量 Q × HRT_AN (不含回流)
+  const r_est = MLSS / Math.max(MLSSr - MLSS, 100);  // 外回流比 (MLSS 平衡)
+  const AlP = num('AlP');
   const it = iterSRT(SRT_tot => {
     const Yobs = Y / (1 + Kd_T * SRT_tot);
     const dX_VSS = Yobs * BOD_removed;
     const N_assimilated = 0.12 * Yobs * (BOD0 - BODe);
     const NOx_produced = Math.max(0, NH4_total - NH4e - N_assimilated);
-    const NOx_to_DN = Math.max(0, NOx_produced - NO3_allowed);
+    const rc = recycleDN(NOx_produced, NO3_allowed, r_est);   // 内回流封顶 800% 后的实际反硝化量
+    const NOx_to_DN = rc.N_DN;
     const dn = dnSplit(NOx_to_DN, BOD0 - BODe, Yobs, Q);   // 碳源上限; 外加甲醇产泥计入 ΔX
-    const dX_SS = dX_VSS + dX_inert + dn.dX_meoh;
+    const tp = tpModel(TP0, TPe, BOD0 - BODe, Yobs, T, AlP, Q, true);   // 生物除磷 + 辅助化学除磷
+    const dX_SS = dX_VSS + dX_inert + dn.dX_meoh + tp.chemSludge;
     const Yt = BOD_removed > 0 ? dX_SS / BOD_removed : NaN;
     const V_O = Q * (BOD0 - BODe) * SRT * Yt / MLSS;
     // 缺氧段 V_A = Q × NOx_还原 / (SDNR × MLVSS) (SDNR 以 VSS 计); 无需反硝化时取好氧段 30%
     const V_A = NOx_to_DN > 0 ? Q * NOx_to_DN / (SDNR_T * MLVSS) : V_O * 0.3;
     const V_total = V_O + V_A + V_AN;
-    return { Yobs, dX_VSS, dX_SS, Yt, V_O, N_assimilated, NOx_produced, NOx_to_DN, dn, V_A, V_total,
+    return { Yobs, dX_VSS, dX_SS, Yt, V_O, N_assimilated, NOx_produced, NOx_to_DN, rc, dn, tp, V_A, V_total,
              SRT_next: dX_SS > 0 ? MLSS * V_total / 1000 / dX_SS : NaN };
   }, SRT);
-  const { Yobs, dX_VSS, dX_SS, Yt, V_O, N_assimilated, NOx_produced, NOx_to_DN, dn, V_A, V_total } = it.st;
+  const { Yobs, dX_VSS, dX_SS, Yt, V_O, N_assimilated, NOx_produced, NOx_to_DN, rc, dn, tp, V_A, V_total } = it.st;
+  const NO3_e = rc.NO3e;                                    // 出水 NO₃-N (含内回流封顶后未反硝化部分)
+  const TN_pred = NH4e + orgNe + NO3_e;                     // 出水 TN 预测
   const SRT_conv = it.conv;
   const SRT_total = it.conv ? it.SRT : NaN;   // 系统总泥龄 = MLSS·V_总/ΔX_SS
 
   // ========== 4. 内回流比 R ==========
-  // 简化:外回流 r 先估算
-  const r_est = MLSS / Math.max(MLSSr - MLSS, 100);
-
-  // 出水 NO3 = NOx_produced / (1 + R + r)
-  // 目标:出水 NO3 ≤ NO3_allowed
-  let R;
-  if (NOx_produced > 0 && NO3_allowed > 0) {
-    R = NOx_produced / NO3_allowed - 1 - r_est;
-  } else if (NOx_produced > 0 && NO3_allowed === 0) {
-    R = 10; // 极端,取上限
-  } else {
-    R = 1; // 不需反硝化
-  }
-  R = Math.max(0.5, Math.min(R, 8)); // 限制 50%-800%
+  // 出水 NO3 = NOx_produced / (1 + R + r), 目标出水 NO3 ≤ NO3_allowed; R 限 50%–800% (见 recycleDN, 已在迭代内计算)
+  const R = rc.R, R_req = rc.R_req;
 
   // (缺氧段 V_A、厌氧段 V_AN 已在上方池容-泥龄迭代中计算)
 
@@ -2623,7 +2728,7 @@ function calcAAO() {
   // ========== 返回结果 ==========
   return {
     // 基础
-    Q, Q_wan, T, SRT, SRT_min, SRT_rec, SRT_total, SRT_conv, Yt,
+    Q, Q_wan, T, SRT, SRT_min, SRT_rec, SRT_auto, SRT_isAuto, mu_N, SF, SRT_total, SRT_conv, Yt,
     // 池容
     V_AN, V_A, V_O, V_total,
     HRT_AN_calc, HRT_A, HRT_O, HRT_total,
@@ -2636,6 +2741,7 @@ function calcAAO() {
     // 比值
     BOD_TN, BOD_TP,
     NOx_produced, NOx_to_DN, N_assimilated, dn, Tn, orgNe,
+    R_req, Rcapped: rc.capped, NO3_e, TN_pred, NO3_allowed, tp, AlP, TPe, TNe,
     // 其他
     MLVSS
   };
@@ -2683,19 +2789,19 @@ function checkAAO(r) {
     score -= 20;
   }
   if (r.SRT_min > 30) {
-    checks.push({ type: 'bad', ic: '✗', text: `<b>硝化难以维持</b>: 在 T=${T}℃ 下,最小泥龄 SRT_min = ${r.SRT_min.toFixed(1)}d 已超出工程可行范围,需提高温度或投加硝化菌。` });
+    checks.push({ type: 'bad', ic: '✗', text: `<b>硝化难以维持</b>: 在 T_min=${r.Tn}℃ 下,最小泥龄 SRT_min = ${r.SRT_min.toFixed(1)}d 已超出工程可行范围,需提高温度或投加硝化菌。` });
     score -= 30;
   } else if (SRT_user < SRT_safe * 0.85 - 1e-6) {
-    checks.push({ type: 'bad', ic: '✗', text: `<b>泥龄不足</b>: 当前好氧泥龄 SRT_O=${fx(SRT_user, 1)}d 明显低于安全泥龄 ${SRT_safe.toFixed(1)}d (= SRT_min × SF), 硝化稳定性不足。建议 SRT ≥ ${SRT_safe.toFixed(1)}d。` });
+    checks.push({ type: 'bad', ic: '✗', text: `<b>泥龄不足</b>: 当前好氧泥龄 SRT_O=${fx(SRT_user, 1)}d 明显低于安全泥龄 ${SRT_safe.toFixed(1)}d (= SRT_min × SF, 按 T_min=${r.Tn}℃), 硝化稳定性不足。建议 SRT ≥ ${SRT_safe.toFixed(1)}d。` });
     score -= 20;
   } else if (SRT_user < SRT_safe - 1e-6) {
-    checks.push({ type: 'warn', ic: '⚠', text: `<b>泥龄接近临界</b>: 好氧泥龄 SRT_O=${fx(SRT_user, 1)}d, 推荐安全泥龄 ${SRT_safe.toFixed(1)}d (= SRT_min ${r.SRT_min.toFixed(1)} × SF ${num('SF_SRT')})。差距 ${(SRT_safe-SRT_user).toFixed(1)}d, 低温冲击时可能硝化不稳。` });
+    checks.push({ type: 'warn', ic: '⚠', text: `<b>泥龄接近临界</b>: 好氧泥龄 SRT_O=${fx(SRT_user, 1)}d, 推荐安全泥龄 ${SRT_safe.toFixed(1)}d (= SRT_min ${r.SRT_min.toFixed(1)} × SF ${num('SF_SRT')})。差距 ${(SRT_safe-SRT_user).toFixed(1)}d, 按 T_min=${r.Tn}℃ 硝化不稳。` });
     score -= 15;
   } else if (SRT_user > 25) {
     checks.push({ type: 'warn', ic: '⚠', text: `<b>泥龄偏高</b>: 好氧泥龄 SRT_O=${fx(SRT_user, 1)}d 偏长 (系统总泥龄 ≈ ${fx(r.SRT_total, 1)}d), 污泥老化风险,可能影响活性。多数情况下好氧泥龄 15-20d 已足够。` });
     score -= 5;
   } else {
-    checks.push({ type: 'ok', ic: '✓', text: `<b>泥龄合理</b>: 好氧泥龄 SRT_O=${fx(SRT_user, 1)}d ≥ 安全泥龄 ${SRT_safe.toFixed(1)}d (SRT_min × SF, SRT_min 按最低设计水温 ${r.Tn}℃), 硝化稳定; 系统总泥龄 = MLSS·V_总/ΔX_SS ≈ ${fx(r.SRT_total, 1)}d (GB 50014 表列 AAO 泥龄指全池泥龄, 取值以现行规范原文为准)。` });
+    checks.push({ type: 'ok', ic: '✓', text: `<b>泥龄合理</b>: 好氧泥龄 SRT_O=${fx(SRT_user, 1)}d${r.SRT_isAuto ? ' (留空自动值 = max(SF×SRT_min, 常用下限 ' + SRT_FLOOR_DN + ' d))' : ''} ≥ 安全泥龄 ${SRT_safe.toFixed(1)}d (SF × SRT_min, SRT_min 按 GB 50014-2021 式 7.6.17、最低设计水温 ${r.Tn}℃), 硝化稳定; 系统总泥龄 = MLSS·V_总/ΔX_SS ≈ ${fx(r.SRT_total, 1)}d (GB 50014 表列 AAO 泥龄指全池泥龄, 取值以现行规范原文为准)。` });
   }
 
   // 2. 水温
@@ -2708,17 +2814,15 @@ function checkAAO(r) {
   }
 
   // 3. BOD/TN 碳氮比
-  if (r.BOD_TN < 3) {
-    // 按 BOD/TN=5 安全值反算需要补多少BOD
+  if (r.BOD_TN < 3 && !(r.dn && r.dn.ext > 1e-6)) {
+    // 碳源上限校核无缺口 (dn.ext = 0): 只提示, 不按 BOD/TN = 5 估算外加碳源
+    checks.push({ type: 'info', ic: 'ℹ', text: `<b>碳氮比偏低</b>: BOD/TN = ${r.BOD_TN.toFixed(2)} &lt; 3, 但按碳源上限校核 (C/N = ${r.dn.cn.toFixed(2)} gBOD/gN) 进水 BOD 可支持所需反硝化 ${r.NOx_to_DN.toFixed(1)} mg/L, 无需外加碳源; 运行中注意进水碳源波动。` });
+  } else if (r.BOD_TN < 3) {
+    // 碳源缺口按 dnSplit 计 (见下方碳源上限校核); 另给 BOD/TN=5 补碳的保守上限
     const BOD0_v = num('BOD0'), TN0_v = num('TN0'), Q_v = num('Q');
-    const BOD_needed = 5 * TN0_v;          // 目标 BOD浓度
-    const BOD_add = Math.max(0, BOD_needed - BOD0_v);   // 需补充浓度
-    const BOD_add_kg = BOD_add * Q_v * 10; // 日需补BOD (kg/d, Q单位万m³/d→m³/d÷1000→×10000÷1000)
-    // 碳源当量 (补充 BOD 按易降解 COD 计): 甲醇 1.5 kg COD/kg; 乙酸钠 0.78 kg COD/kg (全站统一, 按无水乙酸钠计;
-    // 商品药剂再乘有效含量, 如三水乙酸钠固体约 58% → 0.45 kg COD/kg 商品)
-    const methanol_kg = BOD_add_kg / 1.5;
-    const sodium_acetate_kg = BOD_add_kg / 0.78;
-    checks.push({ type: 'bad', ic: '✗', text: `<b>碳源严重不足</b>: BOD/TN = ${r.BOD_TN.toFixed(2)} &lt; 3, 反硝化无法完成,必须投加外加碳源。${r.dn && r.dn.ext > 1e-6 ? `按反硝化缺口计 (见下方碳源上限校核): 甲醇 ≈ ${r.dn.meoh_kg.toFixed(0)} kg/d, 或乙酸钠(按无水计, 0.78 gCOD/g) ≈ ${(r.dn.extCOD_kg / 0.78).toFixed(0)} kg/d; 按 BOD/TN=5 补碳的保守上限: 补 BOD ≈ ${BOD_add.toFixed(0)} mg/L (${BOD_add_kg.toFixed(0)} kg/d), 甲醇 ≈ ${methanol_kg.toFixed(0)} kg/d` : `按 BOD/TN=5 估算: 建议补 BOD ≈ ${BOD_add.toFixed(0)} mg/L (${BOD_add_kg.toFixed(0)} kg/d),对应甲醇 ≈ ${methanol_kg.toFixed(0)} kg/d 或乙酸钠(按无水计, 0.78 gCOD/g) ≈ ${sodium_acetate_kg.toFixed(0)} kg/d`}。` });
+    const BOD_add = Math.max(0, 5 * TN0_v - BOD0_v);
+    const BOD_add_kg = BOD_add * Q_v * 10;
+    checks.push({ type: 'bad', ic: '✗', text: `<b>碳源严重不足</b>: BOD/TN = ${r.BOD_TN.toFixed(2)} &lt; 3, 必须投加外加碳源。按反硝化缺口计 (见下方碳源上限校核): 甲醇 ≈ ${r.dn.meoh_kg.toFixed(0)} kg/d, 或乙酸钠(按无水计, 0.78 gCOD/g) ≈ ${(r.dn.extCOD_kg / 0.78).toFixed(0)} kg/d; 按 BOD/TN=5 补碳的保守上限: 补 BOD ≈ ${BOD_add.toFixed(0)} mg/L (${BOD_add_kg.toFixed(0)} kg/d), 甲醇 ≈ ${(BOD_add_kg / 1.5).toFixed(0)} kg/d。` });
     score -= 20;
   } else if (r.BOD_TN < 4) {
     checks.push({ type: 'warn', ic: '⚠', text: `<b>碳氮比偏低</b>: BOD/TN = ${r.BOD_TN.toFixed(2)} &lt; 4, 反硝化接近极限,建议考虑加少量碳源或采用预缺氧工艺。` });
@@ -2730,28 +2834,37 @@ function checkAAO(r) {
   }
 
   // 4. BOD/TP 碳磷比
-  if (r.BOD_TP < 17) {
-    checks.push({ type: 'warn', ic: '⚠', text: `<b>除磷困难</b>: BOD/TP = ${r.BOD_TP.toFixed(1)} &lt; 17, 生物除磷效果差,建议配套化学除磷(PAC/PAFC 等)。` });
-    score -= 10;
+  if (r.BOD_TP < 15) {
+    checks.push({ type: 'bad', ic: '✗', text: `<b>BOD/TP 不足</b>: BOD/TP = ${r.BOD_TP.toFixed(1)} &lt; 15, 生物除磷效率低, 需配套化学除磷 (PAC/PAFC 等)。` });
+    score -= 20;
   } else if (r.BOD_TP < 20) {
-    checks.push({ type: 'info', ic: 'ℹ', text: `<b>除磷临界</b>: BOD/TP = ${r.BOD_TP.toFixed(1)}, 生物除磷可达标但冗余不大,建议预留加药点。` });
-    score -= 3;
+    checks.push({ type: 'warn', ic: '⚠', text: `<b>BOD/TP 临界</b>: BOD/TP = ${r.BOD_TP.toFixed(1)} &lt; 20, 生物除磷冗余不大, 建议预留加药点。` });
+    score -= 8;
   } else {
-    checks.push({ type: 'ok', ic: '✓', text: `<b>碳磷比良好</b>: BOD/TP = ${r.BOD_TP.toFixed(1)}, 生物除磷条件充分。` });
+    if (r.tp.dTP_chem > 1e-6) checks.push({ type: 'info', ic: 'ℹ', text: `<b>BOD/TP 满足, 但 TP 负荷高, 需化学辅助除磷</b>: BOD/TP = ${r.BOD_TP.toFixed(1)} ≥ 20, 生物除磷出水估算 ${r.tp.TPe_bio.toFixed(2)} mg/L &gt; 目标 ${r.TPe} mg/L (见下方化学除磷)。` });
+    else checks.push({ type: 'ok', ic: '✓', text: `<b>碳磷比良好</b>: BOD/TP = ${r.BOD_TP.toFixed(1)}, 生物除磷条件充分。` });
   }
+  checks.push(tpCheck(r.tp, r.TPe, r.AlP));
 
-  // 5. 内回流比 R
+  // 5. 内回流比 R (常规 100–400%; GB 50014-2021 第 7.6.17 条: 混合液回流比不宜大于 400%)
+  if (r.NOx_produced > 0 && r.NO3_allowed <= 0) {
+    checks.push({ type: 'warn', ic: '⚠', text: `<b>TN 目标过严</b>: TN出 − NH₄-N出 − 有机Nₑ = ${(r.TNe - num('NH4e') - r.orgNe).toFixed(1)} ≤ 0, 出水允许 NO₃-N 为 0, 仅靠内回流无法达标, R 已取上限 800%; 请放宽 TN 目标或设后置缺氧/外加碳源` });
+    score -= 5;
+  }
+  if (r.TN_pred > r.TNe + 1e-6) {
+    checks.push({ type: 'bad', ic: '✗', text: `<b>TN 不达标</b>: 需内回流 R ≈ ${isFinite(r.R_req) ? (r.R_req*100).toFixed(0) + '%' : '∞'}, 已封顶 800%, 回流可达出水 NO₃-N = NOx/(1+R+r) ≈ ${r.NO3_e.toFixed(1)} mg/L; 出水 TN 预测 ≈ ${r.TN_pred.toFixed(1)} mg/L &gt; 目标 ${r.TNe} mg/L (未反硝化部分已从 N_DN、反硝化氧回收与碳源中扣除)。需设后置缺氧区 + 外加碳源或深度脱氮。` });
+    score -= 15;
+  }
   if (r.R > 6) {
     checks.push({ type: 'bad', ic: '✗', text: `<b>内回流过高</b>: R=${(r.R*100).toFixed(0)}% &gt; 600%, 水力冲击大,能耗高,且溶氧带入缺氧段影响反硝化。出水 TN 目标或需要放宽。` });
     score -= 15;
   } else if (r.R > 4) {
-    checks.push({ type: 'warn', ic: '⚠', text: `<b>内回流偏高</b>: R=${(r.R*100).toFixed(0)}%, 超出常规 200-400% 区间, 能耗增加。` });
+    checks.push({ type: 'warn', ic: '⚠', text: `<b>内回流偏高</b>: R=${(r.R*100).toFixed(0)}%, 超出常规 100–400% (GB 50014: 混合液回流比不宜大于 400%), 能耗增加。` });
     score -= 5;
   } else if (r.R < 1) {
-    checks.push({ type: 'warn', ic: '⚠', text: `<b>内回流偏低</b>: R=${(r.R*100).toFixed(0)}% &lt; 100%, 反硝化受限,可能有硝酸盐剩余。` });
-    score -= 5;
+    checks.push({ type: 'info', ic: 'ℹ', text: `<b>内回流偏低</b>: R=${(r.R*100).toFixed(0)}% &lt; 100%, 由 TN 目标较宽松所致 (按目标反算即可达标), 不扣分; 工程上可按 100% 配置回流泵留余量。` });
   } else {
-    checks.push({ type: 'ok', ic: '✓', text: `<b>内回流合理</b>: R=${(r.R*100).toFixed(0)}%, 在 100-400% 区间内。` });
+    checks.push({ type: 'ok', ic: '✓', text: `<b>内回流合理</b>: R=${(r.R*100).toFixed(0)}%, 在常规 100–400% 区间内; 出水 TN 预测 ≈ ${r.TN_pred.toFixed(1)} mg/L ≤ 目标 ${r.TNe} mg/L。` });
   }
 
   // 6. 外回流比 r
@@ -2759,7 +2872,7 @@ function checkAAO(r) {
     checks.push({ type: 'warn', ic: '⚠', text: `<b>外回流过高</b>: r=${(r.r*100).toFixed(0)}% &gt; 120%, 二沉池浓缩效率下降,建议降低 MLSS 或提高二沉排泥浓度 MLSS_r。` });
     score -= 5;
   } else if (r.r > 1) {
-    checks.push({ type: 'info', ic: 'ℹ', text: `<b>外回流上限</b>: r=${(r.r*100).toFixed(0)}%, 已到规范上限 100%, 二沉需加强污泥浓缩。` });
+    checks.push({ type: 'info', ic: 'ℹ', text: `<b>外回流偏高</b>: r=${(r.r*100).toFixed(0)}%, 已超常用上限 100%, 二沉需加强污泥浓缩。` });
   }
 
   // 7. HRT 总
@@ -2857,9 +2970,9 @@ function drawFlow(r, ratios) {
 
   // 各段宽度按池容比例,总宽度 500px,起点 x=150
   const totalW = 500, startX = 150, poolY = 90, poolH = 90;
-  const wAN = Math.max(40, ratios.AN * totalW);
-  const wA = Math.max(50, ratios.A * totalW);
-  const wO = Math.max(60, ratios.O * totalW);
+  const wAN = Math.max(90, ratios.AN * totalW);   // 最小宽度保证池下标注不互相遮挡
+  const wA = Math.max(90, ratios.A * totalW);
+  const wO = Math.max(90, ratios.O * totalW);
   const scale = totalW / (wAN + wA + wO);
   const wAN2 = wAN * scale, wA2 = wA * scale, wO2 = wO * scale;
 
@@ -2942,14 +3055,14 @@ function drawFlow(r, ratios) {
   // 外回流 r(二沉底部 → 厌氧)
   const bottomY = poolY + poolH + 50;
   svgContent += `<line x1="${settlerX + settlerW/2}" y1="${settlerY + settlerH}" x2="${settlerX + settlerW/2}" y2="${bottomY}" stroke="#dc2626" stroke-width="1.5"/>`;
-  svgContent += `<line x1="${settlerX + settlerW/2}" y1="${bottomY}" x2="${x1 + wAN2/2}" y2="${bottomY}" stroke="#dc2626" stroke-width="1.5"/>`;
-  svgContent += `<line x1="${x1 + wAN2/2}" y1="${bottomY}" x2="${x1 + wAN2/2}" y2="${poolY + poolH + 4}" stroke="#dc2626" stroke-width="1.5" marker-end="url(#arrhead2)"/>`;
-  svgContent += `<text x="${(settlerX + settlerW/2 + x1 + wAN2/2) / 2}" y="${bottomY - 5}" font-size="11" fill="#dc2626" font-weight="500" text-anchor="middle">外回流 r = ${(r.r*100).toFixed(0)}% (Q_r = ${r.Qr_wan.toFixed(2)} 万m³/d)</text>`;
+  // 外回流从厌氧池左侧壁下部进入, 不穿过池下的容积/HRT 标注
+  svgContent += `<polyline points="${settlerX + settlerW/2},${bottomY} ${x1 - 14},${bottomY} ${x1 - 14},${poolY + poolH - 18} ${x1 - 4},${poolY + poolH - 18}" fill="none" stroke="#dc2626" stroke-width="1.5" marker-end="url(#arrhead2)"/>`;
+  svgContent += `<text x="${(settlerX + settlerW/2 + x1) / 2}" y="${bottomY - 5}" font-size="11" fill="#dc2626" font-weight="500" text-anchor="middle">外回流 r = ${(r.r*100).toFixed(0)}% (Q_r = ${r.Qr_wan.toFixed(2)} 万m³/d)</text>`;
 
   // 剩余污泥(二沉底部 → 脱水)
-  const wasteX = settlerX + settlerW + 45;
-  svgContent += `<line x1="${settlerX + settlerW/2}" y1="${settlerY + settlerH}" x2="${wasteX}" y2="${settlerY + settlerH + 30}" stroke="#92400e" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrhead)"/>`;
-  svgContent += `<text x="${wasteX + 5}" y="${settlerY + settlerH + 35}" font-size="10.5" fill="#92400e">剩余污泥 ${r.dX_SS.toFixed(0)} kg/d</text>`;
+  const wasteX = settlerX + settlerW + 30;
+  svgContent += `<line x1="${settlerX + settlerW/2}" y1="${settlerY + settlerH}" x2="${wasteX}" y2="${settlerY + settlerH + 22}" stroke="#92400e" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrhead)"/>`;
+  svgContent += `<text x="896" y="${settlerY + settlerH + 40}" font-size="10.5" fill="#92400e" text-anchor="end">剩余污泥 ${r.dX_SS.toFixed(0)} kg/d</text>`;
 
   // 内回流 R(好氧 → 缺氧)
   const topY = poolY - 30;
@@ -2973,12 +3086,27 @@ function drawFlow(r, ratios) {
 }
 
 // ============ 主计算 ============
+const PANEL_OF = { aao: 'panel-aao', ao_an: 'panel-ao-an', ao_p: 'panel-ao-p', sbr: 'panel-sbr', oxi: 'panel-oxi' };
 function calc() {
-  if (currentProcess === 'aao') { calcAndRenderAAO(); return; }
-  if (currentProcess === 'ao_an') { calcAndRenderAOAN(); return; }
-  if (currentProcess === 'ao_p') { calcAndRenderAOP(); return; }
-  if (currentProcess === 'sbr') { calcAndRenderSBR(); return; }
-  if (currentProcess === 'oxi') { calcAndRenderOXI(); return; }
+  if (currentProcess === 'aao') calcAndRenderAAO();
+  else if (currentProcess === 'ao_an') calcAndRenderAOAN();
+  else if (currentProcess === 'ao_p') calcAndRenderAOP();
+  else if (currentProcess === 'sbr') calcAndRenderSBR();
+  else if (currentProcess === 'oxi') calcAndRenderOXI();
+  else return;
+  groupDigitsIn($(PANEL_OF[currentProcess]).querySelector('.results'));
+}
+
+// ============ 数值千分位 (zh-CN) ============
+// 结果区 / 校核文字 / 流程图中 ≥ 4 位的整数部分加千分位; 跳过标准号 (GB/HJ xxxx)、年份 (-2021)、小数部分与公式常数 (1000·X)
+const DIGITS_RE = /(?<![\w.\-\/,])(?<!(?:GB|HJ|GB\/T)\s)(\d{4,})(?![\d,·])/g;
+function groupDigits(t) { return t.replace(DIGITS_RE, d => Number(d).toLocaleString('zh-CN')); }
+function groupDigitsIn(root) {
+  if (!root) return;
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  for (let n = w.nextNode(); n; n = w.nextNode()) {
+    if (/\d{4}/.test(n.nodeValue)) { const g = groupDigits(n.nodeValue); if (g !== n.nodeValue) n.nodeValue = g; }
+  }
 }
 
 function calcAndRenderAAO() {
@@ -3004,6 +3132,7 @@ function calcAndRenderAAO() {
   $('r_SRT').textContent = r.SRT.toFixed(1);
   $('r_SRTmin').textContent = r.SRT_min < 100 ? r.SRT_min.toFixed(2) : '> 30';
   $('r_SRTtot').textContent = fx(r.SRT_total, 1);
+  srtTip('SRT', r.SRT_isAuto ? `自动值: max(SF×SRT_min = ${r.SRT_rec.toFixed(1)} d, 常用下限 ${SRT_FLOOR_DN} d) → ${r.SRT} d (按 T_min=${r.Tn}℃ 实时计算)` : `已手动输入; 留空则取 max(SF×SRT_min = ${r.SRT_rec.toFixed(1)} d, ${SRT_FLOOR_DN} d) = ${r.SRT_auto} d`);
 
   $('r_AOR').textContent = r.AOR.toFixed(0);
   $('r_SOR').textContent = fx(r.SOR, 0);
@@ -3013,6 +3142,14 @@ function calcAndRenderAAO() {
   $('r_dX').textContent = r.dX_SS.toFixed(0);
   $('r_FM').textContent = r.F_over_M.toFixed(3);
 
+  $('r_NO3e').textContent = r.NO3_e.toFixed(1);
+  $('r_TNpred').textContent = r.TN_pred.toFixed(1);
+  $('r_TPbio').textContent = r.tp.TPe_bio.toFixed(2);
+  $('r_dTPchem').textContent = r.tp.dTP_chem.toFixed(2);
+  $('r_PAC').textContent = r.tp.PAC_dose.toFixed(1);
+  $('r_PACkg').textContent = r.tp.PAC_kg.toFixed(0);
+  $('r_chemSludge').textContent = r.tp.chemSludge.toFixed(0);
+  $('r_TPe').textContent = r.tp.TPe_est.toFixed(2);
   $('r_BODTN').textContent = r.BOD_TN.toFixed(2);
   $('r_BODTP').textContent = r.BOD_TP.toFixed(1);
   $('r_CforDN').textContent = (2.86 * r.NOx_to_DN).toFixed(1);
@@ -3037,7 +3174,7 @@ function calcAndRenderAAO() {
   $('scoreNum').textContent = chk.score;
   let scoreTitle, scoreDesc;
   if (chk.score >= 85) {
-    scoreTitle = '🎉 设计优秀'; scoreDesc = '各项指标均衡,可直接进入施工图阶段。';
+    scoreTitle = '🎉 设计优秀'; scoreDesc = '指标均衡，可作方案比选参考。';
   } else if (chk.score >= 70) {
     scoreTitle = '👍 设计合格'; scoreDesc = '基本合理,可能需要少量调整或加强某些工艺单元。';
   } else if (chk.score >= 50) {
@@ -3066,18 +3203,19 @@ function copyResults() {
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 【进水】
 设计规模 Q = ${r.Q_wan} 万m³/d
-水温 T = ${num('T')}℃
-COD₀/BOD₀/TN₀/TP₀ = ${num('COD0')}/${num('BOD0')}/${num('TN0')}/${num('TP0')} mg/L
+水温 T = ${num('T')}℃, 最低设计水温 T_min = ${r.Tn}℃ (硝化泥龄校核用)
+COD₀/BOD₀/SS₀/TN₀/NH₄-N₀/TP₀ = ${num('COD0')}/${num('BOD0')}/${num('SS0')}/${num('TN0')}/${num('NH40')}/${num('TP0')} mg/L
 BOD/TN = ${r.BOD_TN.toFixed(2)}, BOD/TP = ${r.BOD_TP.toFixed(1)}
 
 【出水目标】
 COD/BOD/NH4/TN/TP = ${num('CODe')}/${num('BODe')}/${num('NH4e')}/${num('TNe')}/${num('TPe')} mg/L
+出水有机氮 = ${r.orgNe} mg/L (ΔTKN = TN₀ − NH₄ₑ − 有机Nₑ)
 
 【核心设计结果】
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 总反应池容 V = ${r.V_total.toFixed(0)} m³
 总 HRT = ${r.HRT_total.toFixed(2)} h
-池容比 V_AN:V_A:V_O = ${(chk.ratios.AN*100).toFixed(0)}:${(chk.ratios.A*100).toFixed(0)}:${(chk.ratios.O*100).toFixed(0)}
+V_AN : V_A : V_O = ${(chk.ratios.AN*100).toFixed(0)} : ${(chk.ratios.A*100).toFixed(0)} : ${(chk.ratios.O*100).toFixed(0)} %
 
   厌氧段 V_AN = ${r.V_AN.toFixed(0)} m³  (${r.HRT_AN_calc.toFixed(2)} h)
   缺氧段 V_A  = ${r.V_A.toFixed(0)} m³  (${r.HRT_A.toFixed(2)} h)
@@ -3086,7 +3224,7 @@ COD/BOD/NH4/TN/TP = ${num('CODe')}/${num('BODe')}/${num('NH4e')}/${num('TNe')}/$
 【回流系统】
 内回流比 R = ${(r.R*100).toFixed(0)}%  (Q_R = ${r.QR_wan.toFixed(2)} 万m³/d)
 外回流比 r = ${(r.r*100).toFixed(0)}%  (Q_r = ${r.Qr_wan.toFixed(2)} 万m³/d)
-好氧泥龄 SRT_O = ${r.SRT.toFixed(1)} d (最小 ${r.SRT_min < 100 ? r.SRT_min.toFixed(2) : '> 30'} d)
+好氧泥龄 SRT_O = ${r.SRT.toFixed(1)} d${r.SRT_isAuto ? ' (留空自动值)' : ''} (SRT_min = ${r.SRT_min < 100 ? r.SRT_min.toFixed(2) : '> 30'} d, 按 GB 50014-2021 式 7.6.17、T_min = ${r.Tn}℃; SF = ${r.SF})
 系统总泥龄 = ${fx(r.SRT_total, 1)} d (MLSS·V_总/ΔX_SS, 与池容迭代收敛)
 池容口径: V_O = Q·(S₀−Sₑ)·θ_co·Y_t/(1000·X), X = MLSS, Y_t = ΔX_SS/ΔBOD = ${fx(r.Yt, 3)} kgSS/kgBOD
 
@@ -3100,14 +3238,18 @@ COD/BOD/NH4/TN/TP = ${num('CODe')}/${num('BODe')}/${num('NH4e')}/${num('TNe')}/$
 理论反硝化需碳 = ${(2.86 * r.NOx_to_DN).toFixed(1)} mgCOD/L (2.86 gCOD/gN 理论下限; 实际约 4–5 gCOD/gN ≈ ${(4 * r.NOx_to_DN).toFixed(0)}–${(5 * r.NOx_to_DN).toFixed(0)} mgCOD/L)
 F/M 污泥负荷 = ${r.F_over_M.toFixed(3)} kgBOD/kgMLSS·d (Q·S₀/(V_总·MLSS))
 
+【出水预测】
+出水 NO₃-N ≈ ${r.NO3_e.toFixed(1)} mg/L, 出水 TN 预测 ≈ ${r.TN_pred.toFixed(1)} mg/L
+生物除磷出水 TP ≈ ${r.tp.TPe_bio.toFixed(2)} mg/L, PAC ${r.tp.PAC_dose.toFixed(1)} mg/L (${r.tp.PAC_kg.toFixed(0)} kg/d), 化学污泥 ${r.tp.chemSludge.toFixed(0)} kg DS/d (已计入 ΔX), 出水 TP ≈ ${r.tp.TPe_est.toFixed(2)} mg/L
+
 【设计评分 ${chk.score}/100】(经验评分, 仅供方案比选参考)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-${chk.checks.map(c => c.ic + ' ' + c.text.replace(/<[^>]+>/g, '')).join('\n')}
+${chk.checks.map(c => c.ic + ' ' + c.text.replace(/<[^>]+>/g, '').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&amp;/g, '&')).join('\n')}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 水处理工具箱 WaterKit · waterkit.cn
 by 海南登登科技咨询有限公司`;
-  writeClipboard(txt);
+  writeClipboard(groupDigits(txt));
 }
 
 // 非 AAO 面板: 按结果区 DOM 读取 标签 + 数值 + 单位 拼接
@@ -3162,13 +3304,13 @@ const PRESETS_AOAN = {
   municipal: {
     aoan_COD0: 400, aoan_BOD0: 180, aoan_SS0: 200, aoan_TN0: 40, aoan_NH40: 30,
     aoan_MLSS: 3500, aoan_VSS_SS: 0.75, aoan_MLSSr: 10000,
-    aoan_Y: 0.6, aoan_Kd: 0.06, aoan_mu_max: 0.75, aoan_Kn: 1.0, aoan_SDNR20: 0.08,
+    aoan_Y: 0.6, aoan_Kd: 0.06, aoan_SDNR20: 0.08,
     aoan_SF_SRT: 2.0, aoan_alpha: 0.7, aoan_beta: 0.95
   },
   industrial: {
     aoan_COD0: 800, aoan_BOD0: 320, aoan_SS0: 250, aoan_TN0: 60, aoan_NH40: 45,
     aoan_MLSS: 4500, aoan_VSS_SS: 0.70, aoan_MLSSr: 10000,
-    aoan_Y: 0.45, aoan_Kd: 0.04, aoan_mu_max: 0.5, aoan_Kn: 2.5, aoan_SDNR20: 0.04,
+    aoan_Y: 0.45, aoan_Kd: 0.04, aoan_SDNR20: 0.04,
     aoan_SF_SRT: 3.0, aoan_alpha: 0.6, aoan_beta: 0.93
   }
 };
@@ -3178,8 +3320,7 @@ function setPresetAOAN(key) {
   document.querySelector(`[data-preset-ao-an="${key}"]`).classList.add('active');
   const p = PRESETS_AOAN[key];
   Object.keys(p).forEach(k => { if ($(k)) $(k).value = p[k]; });
-  const r = calcAOAN();
-  if (r.SRT_rec > 0 && r.SRT_rec < 30) fillSRT('aoan_SRT', r.SRT_rec, num('aoan_T'));
+  $('aoan_SRT').value = '';   // 留空 = 自动值
   calc();
 }
 
@@ -3190,8 +3331,6 @@ function applyStandardAOAN() {
   if (!s) return;
   $('aoan_CODe').value = s.CODe; $('aoan_BODe').value = s.BODe;
   $('aoan_NH4e').value = s.NH4e; $('aoan_TNe').value = s.TNe;
-  const r = calcAOAN();
-  if (r.SRT_rec > 0 && r.SRT_rec < 30) fillSRT('aoan_SRT', r.SRT_rec, num('aoan_T'));
   calc();
 }
 
@@ -3205,19 +3344,18 @@ function calcAOAN() {
   const MLSS = get('MLSS'), VSS_SS = get('VSS_SS'), MLSSr = get('MLSSr');
   const MLVSS = MLSS * VSS_SS;
   const SF = get('SF_SRT');
-  const Y = get('Y'), Kd20 = get('Kd'), mu_max20 = get('mu_max');
+  const Y = get('Y'), Kd20 = get('Kd');
   const SDNR20 = get('SDNR20'), alpha = get('alpha'), beta = get('beta');
-  const Kn20 = get('Kn'), theta_T = get('theta_T'); const Kn = Kn20 * Math.pow(1.05, Tn - 20); // P1:Kn温度修正
 
-  const mu_max_T = mu_max20 * Math.pow(theta_T, Tn - 20);
   const Kd_T = Kd20 * Math.pow(1.04, T - 20);
   const SDNR_T = SDNR20 * Math.pow(1.08, T - 20);  // θ=1.08 依据 GB 50014: Kde(T)=Kde(20)·1.08^(T−20)
 
-  const NH4_use = Math.max(NH4e, 0.5);
-  const mu_net = mu_max_T * NH4_use / (Kn + NH4_use) - Kd20 * Math.pow(1.04, Tn - 20);  // 硝化按最低设计水温 T_min 校核
-  const SRT_min = mu_net > 0 ? 1 / mu_net : 999;
+  // 硝化泥龄: GB 50014-2021 式 7.6.17, 按最低设计水温 T_min
+  const { mu: mu_N, SRT_min } = nitSRTmin(NH4e, Tn);
   const SRT_rec = SRT_min * SF;
-  const SRT = get('SRT') > 0 ? get('SRT') : SRT_rec;
+  const SRT_auto = autoSRT(SRT_rec, SRT_FLOOR_DN);
+  const SRT_isAuto = !(get('SRT') > 0);
+  const SRT = SRT_isAuto ? SRT_auto : get('SRT');
 
   // 池容-泥龄自洽迭代 (GB 50014 口径, 与 AAO 一致):
   // V_O = Q·(S₀−Sₑ)·θ_co·Y_t/(1000·X), X = MLSS; Y_t = ΔX_SS/ΔBOD; Y_obs 按 SRT_总 = MLSS·V_总/ΔX_SS 计
@@ -3226,32 +3364,27 @@ function calcAOAN() {
   const dX_inert = f_ss * Q * Math.max(0, SS0 - SSe) / 1000;
   const NH4_total = Math.max(0, TN0 - orgNe);   // ΔTKN 口径: TKN₀(以 TN₀ 代) − 出水有机氮
   const NO3_allow = Math.max(0, TNe - NH4e - orgNe);
+  const r_est = MLSS / Math.max(MLSSr - MLSS, 100);
   const it = iterSRT(SRT_tot => {
     const Yobs = Y / (1 + Kd_T * SRT_tot);
     const dX_VSS = Yobs * BOD_rem;
     const N_assim = 0.12 * Yobs * (BOD0 - BODe);
     const NOx_prod = Math.max(0, NH4_total - NH4e - N_assim);
-    const NOx_DN = Math.max(0, NOx_prod - NO3_allow);
+    const rc = recycleDN(NOx_prod, NO3_allow, r_est);   // 与 AAO 一致: R 按 TN 目标反算, 封顶 800% 后扣除未反硝化部分
+    const NOx_DN = rc.N_DN;
     const dn = dnSplit(NOx_DN, BOD0 - BODe, Yobs, Q);
     const dX_SS = dX_VSS + dX_inert + dn.dX_meoh;
     const Yt = BOD_rem > 0 ? dX_SS / BOD_rem : NaN;
     const V_O = Q * (BOD0 - BODe) * SRT * Yt / MLSS;
     const V_A = NOx_DN > 0 ? Q * NOx_DN / (SDNR_T * MLVSS) : V_O * 0.3;
     const V_total = V_A + V_O;
-    return { Yobs, dX_VSS, dX_SS, Yt, V_O, NOx_prod, NOx_DN, dn, V_A, V_total,
+    return { Yobs, dX_VSS, dX_SS, Yt, V_O, NOx_prod, NOx_DN, rc, dn, V_A, V_total,
              SRT_next: dX_SS > 0 ? MLSS * V_total / 1000 / dX_SS : NaN };
   }, SRT);
-  const { Yobs, dX_VSS, dX_SS, Yt, V_O, NOx_prod, NOx_DN, dn, V_A, V_total } = it.st;
+  const { Yobs, dX_VSS, dX_SS, Yt, V_O, NOx_prod, NOx_DN, rc, dn, V_A, V_total } = it.st;
   const SRT_conv = it.conv;
   const SRT_total = it.conv ? it.SRT : NaN;   // 系统总泥龄 = MLSS·V_总/ΔX_SS
-
-  const r_est = MLSS / Math.max(MLSSr - MLSS, 100);
-  let R;
-  // 与 AAO 一致: 需反硝化时按 TN 目标反算; NO3 允许值为 0 时取上限; 不需反硝化时取最小值 100%
-  if (NOx_prod > 0 && NO3_allow > 0) R = NOx_prod / NO3_allow - 1 - r_est;
-  else if (NOx_prod > 0) R = 10;   // 极端, 下方限幅为 800%, 校核另行提示
-  else R = 1;                      // 不需反硝化
-  R = Math.max(0.5, Math.min(R, 8));
+  const R = rc.R;
 
   const HRT_O = V_O / Q * 24, HRT_A = V_A / Q * 24, HRT_total = V_total / Q * 24;
 
@@ -3268,11 +3401,11 @@ function calcAOAN() {
   const BOD_TN = BOD0 / Math.max(TN0, 1);
 
   return {
-    Q, Q_wan, T, SRT, SRT_min, SRT_rec, SRT_total, SRT_conv, Yt,
+    Q, Q_wan, T, SRT, SRT_min, SRT_rec, SRT_auto, SRT_isAuto, mu_N, SF, SRT_total, SRT_conv, Yt,
     V_A, V_O, V_total, HRT_A, HRT_O, HRT_total,
     R, r: r_est, QR_wan: Q * R / 10000, Qr_wan: Q * r_est / 10000,
     AOR, SOR, dX_SS, F_over_M, BOD_TN, Yobs,
-    NH40, NH4e, TN0, TNe, TN_approx: NH4e + NO3_allow + orgNe, NOx_prod, NO3_allow, dn, Tn, orgNe,
+    NH40, NH4e, TN0, TNe, TN_pred: NH4e + orgNe + rc.NO3e, NO3_e: rc.NO3e, R_req: rc.R_req, NOx_DN, NOx_prod, NO3_allow, dn, Tn, orgNe,
     BOD0, BODe, COD0, CODe
   };
 }
@@ -3294,23 +3427,29 @@ function checkAOAN(r) {
   // SRT
   const SRT_safe = r.SRT_min * SF;
   if (!r.SRT_conv) { checks.push({type:'bad', ic:'✗', text:`<b>池容-泥龄迭代未收敛</b>: SRT_总 = MLSS·V_总/ΔX_SS 无法确定, 池容/产泥仅为最后一次迭代值, 请核对 MLSS、Y、Kd、SS₀`}); score -= 20; }
-  if (r.SRT_min > 30) { checks.push({type:'bad', ic:'✗', text:`<b>硝化难维持</b>: SRT_min=${r.SRT_min.toFixed(1)}d`}); score -= 30; }
-  else if (SRT < SRT_safe * 0.85 - 1e-6) { checks.push({type:'bad', ic:'✗', text:`<b>泥龄不足</b>: 好氧泥龄建议≥${SRT_safe.toFixed(1)}d`}); score -= 20; }
-  else if (SRT < SRT_safe - 1e-6) { checks.push({type:'warn', ic:'⚠', text:`<b>泥龄接近临界</b>: 好氧泥龄推荐 ${SRT_safe.toFixed(1)}d`}); score -= 15; }
-  else { checks.push({type:'ok', ic:'✓', text:`<b>泥龄合理</b>: 好氧泥龄 ${fx(SRT, 1)}d (系统总泥龄 MLSS·V_总/ΔX_SS = ${fx(r.SRT_total, 1)}d)`}); }
+  if (r.SRT_min > 30) { checks.push({type:'bad', ic:'✗', text:`<b>硝化难维持</b>: 按 T_min=${r.Tn}℃, SRT_min=${r.SRT_min.toFixed(1)}d`}); score -= 30; }
+  else if (SRT < SRT_safe * 0.85 - 1e-6) { checks.push({type:'bad', ic:'✗', text:`<b>泥龄不足</b>: 好氧泥龄 ${fx(SRT, 1)}d 明显低于 SF×SRT_min = ${SRT_safe.toFixed(1)}d (按 T_min=${r.Tn}℃), 硝化不稳`}); score -= 20; }
+  else if (SRT < SRT_safe - 1e-6) { checks.push({type:'warn', ic:'⚠', text:`<b>泥龄接近临界</b>: 好氧泥龄 ${fx(SRT, 1)}d &lt; SF×SRT_min = ${SRT_safe.toFixed(1)}d (按 T_min=${r.Tn}℃)`}); score -= 15; }
+  else { checks.push({type:'ok', ic:'✓', text:`<b>泥龄合理</b>: 好氧泥龄 ${fx(SRT, 1)}d${r.SRT_isAuto ? ' (留空自动值)' : ''} ≥ SF×SRT_min = ${SRT_safe.toFixed(1)}d (按 T_min=${r.Tn}℃); 系统总泥龄 MLSS·V_总/ΔX_SS = ${fx(r.SRT_total, 1)}d`}); }
 
   // 反硝化需求
   if (r.NOx_prod <= 0) {
     checks.push({type:'info', ic:'ℹ', text:`<b>无需反硝化</b>: 硝化产生的 NOx ≈ 0, 内回流取最小值 100%`});
   } else if (r.NO3_allow <= 0) {
-    checks.push({type:'warn', ic:'⚠', text:`<b>TN 目标过严</b>: TN出 − NH₄-N出 − 1 ≤ 0, 出水允许 NO₃-N 为 0, 仅靠内回流无法达标, R 已取上限 800%; 请放宽 TN 目标或设后置缺氧/外加碳源`}); score -= 5;
+    checks.push({type:'warn', ic:'⚠', text:`<b>TN 目标过严</b>: TN出 − NH₄-N出 − 有机Nₑ = ${(r.TNe - r.NH4e - r.orgNe).toFixed(1)} ≤ 0, 出水允许 NO₃-N 为 0, 仅靠内回流无法达标, R 已取上限 800%; 请放宽 TN 目标或设后置缺氧/外加碳源`}); score -= 5;
+  }
+  if (r.TN_pred > r.TNe + 1e-6) {
+    checks.push({type:'bad', ic:'✗', text:`<b>TN 不达标</b>: 需内回流 R ≈ ${isFinite(r.R_req) ? (r.R_req*100).toFixed(0) + '%' : '∞'}, 已封顶 800%, 出水 NO₃-N ≈ ${r.NO3_e.toFixed(1)} mg/L, 出水 TN 预测 ≈ ${r.TN_pred.toFixed(1)} mg/L &gt; 目标 ${r.TNe} mg/L (未反硝化部分已从 N_DN、氧回收与碳源中扣除); 需设后置缺氧区 + 外加碳源`}); score -= 15;
   }
 
   // BOD/TN
-  if (r.BOD_TN < 3) {
+  if (r.BOD_TN < 3 && !(r.dn && r.dn.ext > 1e-6)) {
+    // dnSplit 判定无碳源缺口: 只提示, 不按 BOD/TN = 5 估算甲醇
+    checks.push({type:'info', ic:'ℹ', text:`<b>碳氮比偏低</b>: BOD/TN=${r.BOD_TN.toFixed(2)} &lt; 3, 但按碳源上限校核 (C/N = ${r.dn.cn.toFixed(2)} gBOD/gN) 进水 BOD 可支持所需反硝化 ${r.NOx_DN.toFixed(1)} mg/L, 无需外加碳源; 注意进水碳源波动`});
+  } else if (r.BOD_TN < 3) {
     const BOD_add = Math.max(0, 5 * get('TN0') - get('BOD0'));
     const BOD_add_kg = BOD_add * r.Q / 1000;
-    checks.push({type:'bad', ic:'✗', text:`<b>碳源严重不足</b>: BOD/TN=${r.BOD_TN.toFixed(2)}, ${r.dn && r.dn.ext > 1e-6 ? `按反硝化缺口需甲醇 ≈ ${r.dn.meoh_kg.toFixed(0)} kg/d (见碳源上限校核); 按 BOD/TN=5 保守补碳 ≈ ${(BOD_add_kg/1.5).toFixed(0)} kg/d` : `按 BOD/TN=5 需加甲醇≈${(BOD_add_kg/1.5).toFixed(0)} kg/d`}`});
+    checks.push({type:'bad', ic:'✗', text:`<b>碳源严重不足</b>: BOD/TN=${r.BOD_TN.toFixed(2)}, 按反硝化缺口需甲醇 ≈ ${r.dn.meoh_kg.toFixed(0)} kg/d (见碳源上限校核); 按 BOD/TN=5 保守补碳 ≈ ${(BOD_add_kg/1.5).toFixed(0)} kg/d`});
     score -= 20;
   } else if (r.BOD_TN < 4) { checks.push({type:'warn', ic:'⚠', text:`<b>碳氮比偏低</b>: ${r.BOD_TN.toFixed(2)}`}); score -= 10; }
   else if (r.BOD_TN > 8) checks.push({type:'info', ic:'ℹ', text:`<b>碳源充裕</b>: ${r.BOD_TN.toFixed(2)}, 本工艺合适`});
@@ -3322,9 +3461,9 @@ function checkAOAN(r) {
 
   // R/r
   if (r.R > 6) { checks.push({type:'bad', ic:'✗', text:`内回流过高 ${(r.R*100).toFixed(0)}%`}); score -= 15; }
-  else if (r.R > 4) { checks.push({type:'warn', ic:'⚠', text:`内回流偏高 ${(r.R*100).toFixed(0)}%`}); score -= 5; }
-  else if (r.R < 1) { checks.push({type:'warn', ic:'⚠', text:`内回流偏低 ${(r.R*100).toFixed(0)}%`}); score -= 5; }
-  else { checks.push({type:'ok', ic:'✓', text:`内回流合理 ${(r.R*100).toFixed(0)}%`}); }
+  else if (r.R > 4) { checks.push({type:'warn', ic:'⚠', text:`<b>内回流偏高</b> ${(r.R*100).toFixed(0)}%, 超出常规 100–400% (GB 50014: 混合液回流比不宜大于 400%)`}); score -= 5; }
+  else if (r.R < 1) { checks.push({type:'info', ic:'ℹ', text:`<b>内回流偏低</b> ${(r.R*100).toFixed(0)}% &lt; 100%, 由 TN 目标较宽松所致, 不扣分`}); }
+  else { checks.push({type:'ok', ic:'✓', text:`<b>内回流合理</b> ${(r.R*100).toFixed(0)}% (常规 100–400%); 出水 TN 预测 ≈ ${r.TN_pred.toFixed(1)} mg/L`}); }
 
   // 池容比
   const total = r.V_total;
@@ -3354,7 +3493,7 @@ function checkAOAN(r) {
 function drawAOANFlow(r, ratios) {
   const svg = $('aoanFlowSvg');
   const W = 900, totalW = 500, startX = 160, poolY = 80, poolH = 90;
-  const wA = Math.max(100, ratios.A * totalW);
+  const wA = Math.max(120, ratios.A * totalW);
   const wO = Math.max(120, ratios.O * totalW);
   const scale = totalW / (wA + wO);
   const wA2 = wA * scale, wO2 = wO * scale;
@@ -3395,9 +3534,8 @@ function drawAOANFlow(r, ratios) {
   // 外回流
   const bY = poolY + poolH + 40;
   h += `<line x1="${sX+sW/2}" y1="${poolY+poolH}" x2="${sX+sW/2}" y2="${bY}" stroke="#dc2626" stroke-width="1.5"/>`;
-  h += `<line x1="${sX+sW/2}" y1="${bY}" x2="${x1+wA2/2}" y2="${bY}" stroke="#dc2626" stroke-width="1.5"/>`;
-  h += `<line x1="${x1+wA2/2}" y1="${bY}" x2="${x1+wA2/2}" y2="${poolY+poolH+4}" stroke="#dc2626" stroke-width="1.5" marker-end="url(#aoanArrR)"/>`;
-  h += `<text x="${(sX+sW/2+x1+wA2/2)/2}" y="${bY-5}" font-size="11" fill="#dc2626" font-weight="500" text-anchor="middle">外回流 r=${(r.r*100).toFixed(0)}% (${r.Qr_wan.toFixed(2)}万m³/d)</text>`;
+  h += `<polyline points="${sX+sW/2},${bY} ${x1-14},${bY} ${x1-14},${poolY+poolH-18} ${x1-4},${poolY+poolH-18}" fill="none" stroke="#dc2626" stroke-width="1.5" marker-end="url(#aoanArrR)"/>`;
+  h += `<text x="${(sX+sW/2+x1)/2}" y="${bY-5}" font-size="11" fill="#dc2626" font-weight="500" text-anchor="middle">外回流 r=${(r.r*100).toFixed(0)}% (${r.Qr_wan.toFixed(2)}万m³/d)</text>`;
   // 内回流
   const tY = poolY - 30;
   h += `<line x1="${x2+wO2-10}" y1="${poolY}" x2="${x2+wO2-10}" y2="${tY}" stroke="#d97706" stroke-width="1.5"/>`;
@@ -3424,6 +3562,9 @@ function calcAndRenderAOAN() {
   $('aoan_r_SRT').textContent = r.SRT.toFixed(1);
   $('aoan_r_SRTmin').textContent = r.SRT_min < 100 ? r.SRT_min.toFixed(2) : '>30';
   $('aoan_r_SRTtot').textContent = fx(r.SRT_total, 1);
+  srtTip('aoan_SRT', r.SRT_isAuto ? `自动值: max(SF×SRT_min = ${r.SRT_rec.toFixed(1)} d, ${SRT_FLOOR_DN} d) → ${r.SRT} d (按 T_min=${r.Tn}℃)` : `已手动输入; 留空则取 ${r.SRT_auto} d`);
+  $('aoan_r_NO3e').textContent = r.NO3_e.toFixed(1);
+  $('aoan_r_TNpred').textContent = r.TN_pred.toFixed(1);
   $('aoan_r_AOR').textContent = r.AOR.toFixed(0);
   $('aoan_r_SOR').textContent = fx(r.SOR, 0);
   $('aoan_r_dX').textContent = r.dX_SS.toFixed(0);
@@ -3438,7 +3579,7 @@ function calcAndRenderAOAN() {
     `<div class="check-item check-${c.type}"><span class="ic">${c.ic}</span><span>${c.text}</span></div>`).join('');
 
   $('aoan_scoreNum').textContent = chk.score;
-  const t = chk.score >= 85 ? ['🎉 设计优秀','各项指标均衡'] :
+  const t = chk.score >= 85 ? ['🎉 设计优秀','指标均衡，可作方案比选参考'] :
             chk.score >= 70 ? ['👍 设计合格','基本合理'] :
             chk.score >= 50 ? ['⚠ 设计有风险','需调整'] : ['✗ 设计不可行','需重评估'];
   $('aoan_scoreTitle').textContent = t[0];
@@ -3457,14 +3598,14 @@ const PRESETS_AOP = {
   municipal: {
     aop_COD0: 350, aop_BOD0: 160, aop_SS0: 200, aop_TN0: 25, aop_NH40: 20, aop_TP0: 6,
     aop_MLSS: 3000, aop_VSS_SS: 0.75, aop_MLSSr: 9000,
-    aop_Y: 0.65, aop_Kd: 0.06, aop_mu_max: 0.75, aop_Kn: 1.0,
+    aop_Y: 0.65, aop_Kd: 0.06,
     aop_SF_SRT: 2.0, aop_HRT_AN: 1.5,
     aop_alpha: 0.7, aop_beta: 0.95
   },
   industrial: {
     aop_COD0: 700, aop_BOD0: 280, aop_SS0: 250, aop_TN0: 30, aop_NH40: 22, aop_TP0: 12,
     aop_MLSS: 3500, aop_VSS_SS: 0.70, aop_MLSSr: 9000,
-    aop_Y: 0.5, aop_Kd: 0.04, aop_mu_max: 0.5, aop_Kn: 2.5,
+    aop_Y: 0.5, aop_Kd: 0.04,
     aop_SF_SRT: 2.5, aop_HRT_AN: 2.0,
     aop_alpha: 0.6, aop_beta: 0.93
   }
@@ -3475,8 +3616,8 @@ function setPresetAOP(key) {
   document.querySelector(`[data-preset-ao-p="${key}"]`).classList.add('active');
   const p = PRESETS_AOP[key];
   Object.keys(p).forEach(k => { if ($(k)) $(k).value = p[k]; });
-  // 只除磷工艺: 不套脱氮泥龄下限, 取 GB 50014 生物除磷泥龄 (3.5–7 d) 下限 5 d, 默认不强制硝化
-  fillSRT('aop_SRT', AOP_SRT_DEFAULT, num('aop_T'), AOP_SRT_DEFAULT);
+  // 只除磷工艺: 不按硝化放大泥龄, 取生物除磷常用泥龄 5 d, 默认不强制硝化
+  fillSRT('aop_SRT', AOP_SRT_DEFAULT);
   calc();
 }
 
@@ -3500,17 +3641,13 @@ function calcAOP() {
   const MLSS = get('MLSS'), VSS_SS = get('VSS_SS'), MLSSr = get('MLSSr');
   const MLVSS = MLSS * VSS_SS;
   const SF = get('SF_SRT'), HRT_AN_hr = get('HRT_AN');
-  const Y = get('Y'), Kd20 = get('Kd'), mu_max20 = get('mu_max');
+  const Y = get('Y'), Kd20 = get('Kd');
   const alpha = get('alpha'), beta = get('beta');
-  const Kn20 = get('Kn'), theta_T = get('theta_T'); const Kn = Kn20 * Math.pow(1.05, Tn - 20); // P1:Kn温度修正
 
-  const mu_max_T = mu_max20 * Math.pow(theta_T, Tn - 20);
   const Kd_T = Kd20 * Math.pow(1.04, T - 20);
 
-  // 泥龄: 生物除磷工艺 SRT 较短 (GB 50014 约 3.5–7 d), 默认取下限 5 d, 不按硝化放大
-  const NH4_use = Math.max(NH4e, 0.5);
-  const mu_net = mu_max_T * NH4_use / (Kn + NH4_use) - Kd20 * Math.pow(1.04, Tn - 20);  // 硝化按最低设计水温 T_min 校核
-  const SRT_min = mu_net > 0 ? 1 / mu_net : 999;
+  // 泥龄: 生物除磷工艺 SRT 较短, 默认取 5 d, 不按硝化放大; 硝化判断按 GB 50014-2021 式 7.6.17 (T_min)
+  const { SRT_min } = nitSRTmin(NH4e, Tn);
   const SRT_rec = SRT_min * SF;          // 稳定硝化所需好氧泥龄 (SF×SRT_min), 仅作硝化判断
   const SRT = get('SRT') > 0 ? get('SRT') : AOP_SRT_DEFAULT;
 
@@ -3525,26 +3662,12 @@ function calcAOP() {
   const V_AN = Q * (HRT_AN_hr / 24);
   const r_est = MLSS / Math.max(MLSSr - MLSS, 100);
 
-  // ========== 除磷效果估算 ==========
-  // 生物除磷:每去除100 mgBOD 可除磷约 1.5-2.5 mg(A/O厌氧-好氧典型) 【经验值, 无规范出处】
-  // 生物除磷稳定下限约 0.3 mg/L (若进水TP更低则按进水处理)
-  // ⚠️ 温度修正:PAO 活性强烈依赖水温(Metcalf & Eddy 第5章 PAO 温度敏感性)
-  //    T≥20℃: 系数 1.0 (最优), T=15℃: 0.75, T=10℃: 0.5, T<8℃: 0.4
-  //    经验公式 factor = max(0.4, 1 - 0.05 × max(0, 20 - T))
-  // 【存疑, 仅标注】出水 SS 中所含颗粒磷 (约 SSe × 2–4%) 未扣除
-  const P_bio_T_factor = Math.max(0.4, 1 - 0.05 * Math.max(0, 20 - T));
-  const BIO_P_FLOOR = Math.min(0.3, TP0);  // 若进水<0.3, 底限就是进水本身
-  const BOD_rem_conc = BOD0 - BODe;
-  const P_bio = Math.min(BOD_rem_conc * 0.025 * P_bio_T_factor, Math.max(0, TP0 - BIO_P_FLOOR));
-
-  // ========== 辅助化学除磷 (按化学计量, 与 MBBR/MBR/污泥产量页口径一致) ==========
-  // ΔTP_chem = max(0, TP_生物出水 − TP出目标)
-  // PAC(mg/L) = ΔTP_chem × (Al/P 摩尔比) × 27/31 ÷ 0.0529  (PAC 含 Al₂O₃ 10% → Al 质量分数 0.10×54/102 = 0.0529)
-  // 【存疑, 仅标注】有效含量固定按 10% Al₂O₃ 液体 PAC; 固体 PAC (约 28–30% Al₂O₃) 按实际含量折算
-  // 化学污泥 ΔX_chem = ΔP × [122/31 + (Al/P − 1) × 78/31]  (AlPO₄ + 过量 Al 生成 Al(OH)₃)
+  // ========== 除磷效果估算 (生物 + 辅助化学除磷, 见 tpModel; 与 AAO / 间歇式 / 氧化沟同一口径) ==========
+  // 【存疑, 仅标注】出水 SS 中所含颗粒磷 (约 SSe × 2–4%) 未扣除; PAC 有效含量固定按 10% Al₂O₃ 液体计
   const chemP = $('aop_chemP').checked;
   const AlP = get('AlP');
   const f_ss = 0.5, SSe = 10, SS0 = get('SS0');   // GB 50014: f_ss 0.5–0.7, SSe 取 10 mg/L
+  const BOD_rem_conc = BOD0 - BODe;
   const BOD_rem_kg = BOD_rem_conc * Q / 1000;
   const dX_inert = f_ss * Q * Math.max(0, SS0 - SSe) / 1000;
 
@@ -3553,27 +3676,21 @@ function calcAOP() {
   // Y_obs 按 SRT_总 = MLSS·V_总/ΔX_SS 计, 与 V_总 迭代至收敛
   const it = iterSRT(SRT_tot => {
     const Yobs = Y / (1 + Kd_T * SRT_tot);
-    const P_assim = 0.02 * Yobs * BOD_rem_conc;   // 污泥合成除磷 (不受温度影响)
-    const P_total_removed = Math.min(TP0 - BIO_P_FLOOR, P_bio + P_assim);
-    const TPe_bio = Math.max(BIO_P_FLOOR, TP0 - P_total_removed);   // 生物除磷出水 TP
-    const dTP_chem = chemP ? Math.max(0, TPe_bio - TPe_target) : 0;
-    const chemSludge = dTP_chem * Q / 1000 * (122 / 31 + Math.max(0, AlP - 1) * 78 / 31);  // kg DS/d
+    const tp = tpModel(TP0, TPe_target, BOD_rem_conc, Yobs, T, AlP, Q, chemP);
     const dX_VSS = Yobs * BOD_rem_kg;
-    const dX_SS = dX_VSS + dX_inert + chemSludge;   // 含化学污泥
+    const dX_SS = dX_VSS + dX_inert + tp.chemSludge;   // 含化学污泥
     const Yt = BOD_rem_kg > 0 ? dX_SS / BOD_rem_kg : NaN;
     const V_O = Q * BOD_rem_conc * SRT * Yt / MLSS;
     const V_total = V_AN + V_O;
-    return { Yobs, TPe_bio, dTP_chem, chemSludge, dX_VSS, dX_SS, Yt, V_O, V_total,
+    return { Yobs, tp, dX_VSS, dX_SS, Yt, V_O, V_total,
              SRT_next: dX_SS > 0 ? MLSS * V_total / 1000 / dX_SS : NaN };
   }, SRT);
-  const { Yobs, TPe_bio, dTP_chem, chemSludge, dX_VSS, dX_SS, Yt, V_O, V_total } = it.st;
+  const { Yobs, tp, dX_VSS, dX_SS, Yt, V_O, V_total } = it.st;
+  const { TPe_bio, dTP_chem, chemSludge, PAC_dose, PAC_kg, TPe_est } = tp;
   const SRT_conv = it.conv;
   const SRT_total = it.conv ? it.SRT : NaN;   // 系统总泥龄 = MLSS·V_总/ΔX_SS
 
   const HRT_O = V_O / Q * 24, HRT_AN = V_AN / Q * 24, HRT_total = V_total / Q * 24;
-  const PAC_dose = dTP_chem * AlP * 27 / 31 / 0.0529;             // mg/L
-  const PAC_kg = PAC_dose * Q / 1000;                              // kg/d
-  const TPe_est = TPe_bio - dTP_chem;                               // 最终出水 TP
   const TP_removal_rate = (TP0 - TPe_est) / Math.max(TP0, 0.01);
 
   // ========== 氮平衡(含有机氮氨化) ==========
@@ -3652,8 +3769,20 @@ function checkAOP(r) {
   } else if (r.SRT_min < 999 && SRT > r.SRT_min) {
     checks.push({type:'info', ic:'ℹ', text:`<b>可能部分硝化</b>: 好氧泥龄 ${fx(SRT, 1)}d &gt; SRT_min ${r.SRT_min.toFixed(2)}d 但 &lt; SF×SRT_min ${fx(r.SRT_rec, 1)}d, 未计入硝化; 夏季可能出现硝化, 回流硝酸盐会影响厌氧释磷`});
   }
-  if (!r.includeN && r.NH4e_est > get('NH4e') + 1e-6) {
-    checks.push({type:'info', ic:'ℹ', text:`<b>未计硝化</b>: 出水 NH₄-N 估算 ≈ ${r.NH4e_est.toFixed(1)} mg/L, 高于目标 ${get('NH4e')} mg/L; 本工艺以除磷为主, 氨氮有要求时需加长泥龄 (注意回流硝酸盐影响除磷) 或改用 AAO`});
+  // 出水 NH₄ / TN 合规: 超出所选标准时 ⚠ 并扣分 (仅控磷标准不考核 NH₄/TN; 自定义按 NH₄-N出 输入考核)
+  const stdKey = $('aop_standard').value, stdLim = STANDARDS[stdKey];
+  const limNH4 = stdKey === 'custom' ? get('NH4e') : (stdLim && !stdLim.noN ? stdLim.NH4e : null);
+  const limTN = stdKey !== 'custom' && stdLim && !stdLim.noN ? stdLim.TNe : null;
+  const stdName = $('aop_standard').selectedOptions[0] ? $('aop_standard').selectedOptions[0].textContent : '';
+  let nWarn = false;
+  if (limNH4 !== null && r.NH4e_est > limNH4 + 1e-6) {
+    checks.push({type:'warn', ic:'⚠', text:`<b>出水 NH₄-N 超出所选标准</b>: 估算 ≈ ${r.NH4e_est.toFixed(1)} mg/L &gt; ${limNH4} mg/L (${stdName})。本工艺默认不强制硝化; 需要满足 NH₄/TN 时, 请改用 AAO 或开启硝化 (好氧泥龄 ≥ SF×SRT_min = ${fx(r.SRT_rec, 1)}d)`}); score -= 10; nWarn = true;
+  }
+  if (limTN !== null && r.TN_e !== null && r.TN_e > limTN + 1e-6) {
+    checks.push({type:'warn', ic:'⚠', text:`<b>出水 TN 超出所选标准</b>: 估算 ≈ ${r.TN_e.toFixed(1)} mg/L &gt; ${limTN} mg/L (${stdName}); 本工艺无反硝化, TN 有要求时请改用 AAO`}); score -= 10; nWarn = true;
+  }
+  if (!nWarn && !r.includeN && r.NH4e_est > get('NH4e') + 1e-6) {
+    checks.push({type:'info', ic:'ℹ', text:`<b>未计硝化</b>: 出水 NH₄-N 估算 ≈ ${r.NH4e_est.toFixed(1)} mg/L, 高于 NH₄-N出 输入值 ${get('NH4e')} mg/L (所选标准不考核 NH₄); 本工艺以除磷为主, 氨氮有要求时需加长泥龄 (注意回流硝酸盐影响除磷) 或改用 AAO`});
   }
 
   // BOD/TP
@@ -3662,14 +3791,15 @@ function checkAOP(r) {
   else if (r.BOD_TP > 30) { checks.push({type:'ok', ic:'✓', text:`<b>BOD/TP 充足</b>: ${r.BOD_TP.toFixed(1)}`}); }
   else { checks.push({type:'ok', ic:'✓', text:`<b>BOD/TP 合适</b>: ${r.BOD_TP.toFixed(1)}`}); }
 
-  // 除磷效果
+  // 除磷效果 (仅控磷标准下注明 NH₄/TN 未考核)
+  const nNote = $('aop_standard').value === 'ponly' ? '（NH₄/TN 未考核）' : '';
   if (r.TPe_bio > r.TPe_target && r.chemP) {
-    checks.push({type:'ok', ic:'✓', text:`<b>除磷达标(生物 + 辅助化学除磷)</b>: 生物除磷出水估算 ${r.TPe_bio.toFixed(2)} mg/L &gt; 目标 ${r.TPe_target}, 化学除磷 ΔTP = ${r.dTP_chem.toFixed(2)} mg/L, PAC (10% Al₂O₃, Al/P=${r.AlP}) ≈ ${r.PAC_dose.toFixed(1)} mg/L (${r.PAC_kg.toFixed(0)} kg/d), 化学污泥 ${r.chemSludge.toFixed(0)} kg DS/d 已计入剩余污泥; 出水 TP ≈ ${r.TPe_est.toFixed(2)} mg/L`});
+    checks.push({type:'ok', ic:'✓', text:`<b>除磷达标(生物 + 辅助化学除磷)</b>: 生物除磷出水估算 ${r.TPe_bio.toFixed(2)} mg/L &gt; 目标 ${r.TPe_target}, 化学除磷 ΔTP = ${r.dTP_chem.toFixed(2)} mg/L, PAC (10% Al₂O₃, Al/P=${r.AlP}) ≈ ${r.PAC_dose.toFixed(1)} mg/L (${r.PAC_kg.toFixed(0)} kg/d), 化学污泥 ${r.chemSludge.toFixed(0)} kg DS/d 已计入剩余污泥; 出水 TP ≈ ${r.TPe_est.toFixed(2)} mg/L${nNote}`});
   } else if (r.TPe_est > r.TPe_target) {
     checks.push({type:'warn', ic:'⚠', text:`<b>出水TP 可能超标</b>: 估算 ${r.TPe_est.toFixed(2)} mg/L &gt; 目标 ${r.TPe_target}, 需配套化学除磷 (可勾选\"辅助化学除磷\"计算 PAC 投加量)`});
     score -= 15;
   } else {
-    checks.push({type:'ok', ic:'✓', text:`<b>除磷达标</b>: 估算 ${r.TPe_est.toFixed(2)} mg/L(去除率 ${(r.TP_removal_rate*100).toFixed(0)}%)`});
+    checks.push({type:'ok', ic:'✓', text:`<b>除磷达标</b>: 估算 ${r.TPe_est.toFixed(2)} mg/L(去除率 ${(r.TP_removal_rate*100).toFixed(0)}%)${nNote}`});
   }
 
   // 含硝化氮模式提醒
@@ -3680,8 +3810,7 @@ function checkAOP(r) {
     checks.push({type:'info', ic:'ℹ', text:`<b>TN₀ 未填写或为 0</b>: 无法估算出水 TN 与 TN 去除率, 请输入进水 TN₀。`});
   }
   if (r.includeN && r.TN_removal !== null) {
-    checks.push({type:'info', ic:'ℹ', text:`<b>含硝化氮模式已启用</b>: 出水 NO₃-N ≈ ${r.NO3_e.toFixed(1)} mg/L, 总 TN ≈ ${r.TN_e.toFixed(1)} mg/L。无反硝化,TN 去除 ${(r.TN_removal*100).toFixed(0)}% 仅靠合成。`});
-    if (r.TN_e > 20) { checks.push({type:'warn', ic:'⚠', text:`<b>出水 TN 偏高</b>: ${r.TN_e.toFixed(1)} mg/L, 若 TN 有要求需选 AAO`}); score -= 10; }
+    checks.push({type:'info', ic:'ℹ', text:`<b>含硝化氮模式已启用</b>: 出水 NO₃-N ≈ ${r.NO3_e.toFixed(1)} mg/L, 总 TN ≈ ${r.TN_e.toFixed(1)} mg/L。无反硝化, TN 去除 ${(r.TN_removal*100).toFixed(0)}% 仅靠污泥合成同化 (0.12·ΔX_VSS)。`});
   } else if (get('TN0') > 30) {
     checks.push({type:'warn', ic:'⚠', text:`<b>进水 TN 偏高</b> (${get('TN0')} mg/L), 建议勾选"含硝化氮模式"评估出水影响或改用 AAO`});
     score -= 5;
@@ -3707,7 +3836,7 @@ function checkAOP(r) {
 function drawAOPFlow(r, ratios) {
   const svg = $('aopFlowSvg');
   const totalW = 500, startX = 160, poolY = 80, poolH = 90;
-  const wAN = Math.max(80, ratios.AN * totalW);
+  const wAN = Math.max(120, ratios.AN * totalW);   // 最小宽度保证标注不溢出
   const wO = Math.max(160, ratios.O * totalW);
   const scale = totalW / (wAN + wO);
   const wAN2 = wAN * scale, wO2 = wO * scale;
@@ -3744,14 +3873,14 @@ function drawAOPFlow(r, ratios) {
   h += `<line x1="${sX+sW}" y1="${poolY+20}" x2="${sX+sW+48}" y2="${poolY+20}" stroke="${brand}" stroke-width="2" marker-end="url(#aopArr)"/>`;
   h += `<text x="${sX+sW+52}" y="${poolY+25}" font-size="12" fill="${ink}" font-weight="500">出水</text>`;
   // 出水 TP 标注
-  h += `<text x="${sX+sW+52}" y="${poolY+42}" font-size="10" fill="#059669">TP ≈ ${r.TPe_est.toFixed(2)} mg/L${r.dTP_chem > 0 ? ' (含 PAC)' : ''}</text>`;
-  if (r.includeN) h += `<text x="${sX+sW+52}" y="${poolY+56}" font-size="10" fill="#b45309">NO₃ ≈ ${r.NO3_e.toFixed(1)} mg/L</text>`;
+  h += `<text x="896" y="${poolY+42}" font-size="10" fill="#059669" text-anchor="end">TP≈${r.TPe_est.toFixed(2)} mg/L</text>`;
+  if (r.dTP_chem > 0) h += `<text x="896" y="${poolY+55}" font-size="10" fill="#059669" text-anchor="end">(含 PAC)</text>`;
+  if (r.includeN) h += `<text x="896" y="${poolY+(r.dTP_chem > 0 ? 68 : 55)}" font-size="10" fill="#b45309" text-anchor="end">NO₃≈${r.NO3_e.toFixed(1)} mg/L</text>`;
   // 外回流
   const bY = poolY + poolH + 40;
   h += `<line x1="${sX+sW/2}" y1="${poolY+poolH}" x2="${sX+sW/2}" y2="${bY}" stroke="#dc2626" stroke-width="1.5"/>`;
-  h += `<line x1="${sX+sW/2}" y1="${bY}" x2="${x1+wAN2/2}" y2="${bY}" stroke="#dc2626" stroke-width="1.5"/>`;
-  h += `<line x1="${x1+wAN2/2}" y1="${bY}" x2="${x1+wAN2/2}" y2="${poolY+poolH+4}" stroke="#dc2626" stroke-width="1.5" marker-end="url(#aopArrR)"/>`;
-  h += `<text x="${(sX+sW/2+x1+wAN2/2)/2}" y="${bY-5}" font-size="11" fill="#dc2626" font-weight="500" text-anchor="middle">外回流 r=${(r.r*100).toFixed(0)}% (${r.Qr_wan.toFixed(2)}万m³/d)</text>`;
+  h += `<polyline points="${sX+sW/2},${bY} ${x1-14},${bY} ${x1-14},${poolY+poolH-18} ${x1-4},${poolY+poolH-18}" fill="none" stroke="#dc2626" stroke-width="1.5" marker-end="url(#aopArrR)"/>`;
+  h += `<text x="${(sX+sW/2+x1)/2}" y="${bY-5}" font-size="11" fill="#dc2626" font-weight="500" text-anchor="middle">外回流 r=${(r.r*100).toFixed(0)}% (${r.Qr_wan.toFixed(2)}万m³/d)</text>`;
   svg.innerHTML = h;
 }
 
@@ -3795,7 +3924,7 @@ function calcAndRenderAOP() {
   $('aop_checkList').innerHTML = chk.checks.map(c =>
     `<div class="check-item check-${c.type}"><span class="ic">${c.ic}</span><span>${c.text}</span></div>`).join('');
   $('aop_scoreNum').textContent = chk.score;
-  const t = chk.score >= 85 ? ['🎉 设计优秀','指标均衡'] :
+  const t = chk.score >= 85 ? ['🎉 设计优秀','指标均衡，可作方案比选参考'] :
             chk.score >= 70 ? ['👍 设计合格','基本合理'] :
             chk.score >= 50 ? ['⚠ 设计有风险','需调整'] : ['✗ 设计不可行','需重评估'];
   $('aop_scoreTitle').textContent = t[0];
@@ -3809,20 +3938,20 @@ function calcAndRenderAOP() {
 
 // 工业预设 (低温 T_min 下硝化慢, 高负荷): 提高 MLSS 并按亚型调低排出比, 保证好氧泥龄与污泥负荷法校核
 const SBR_IND_MLSS = 5000;
-const SBR_INDUSTRIAL_ADJ = { sbr: { ratio: 0.25 }, cass: { ratio: 0.15 }, unitank: { ratio: 0.15 } };
+const SBR_INDUSTRIAL_ADJ = { sbr: { ratio: 0.18 }, cass: { ratio: 0.15 }, unitank: { ratio: 0.15 } };   // 工业 TN₀ 60: 脱氮可行性 N_DN ≤ (1 − 1/n)·NOx 需 1/n ≤ 约 0.2
 let sbrPreset = 'municipal';
 
 const PRESETS_SBR = {
   municipal: {
     sbr_COD0: 400, sbr_BOD0: 180, sbr_SS0: 200, sbr_TN0: 45, sbr_NH40: 35, sbr_TP0: 5,
-    sbr_MLSS: 3500, sbr_VSS_SS: 0.75, sbr_SRT: 10,
-    sbr_Y: 0.6, sbr_Kd: 0.06, sbr_mu_max: 0.75, sbr_Kn: 1.0,
+    sbr_MLSS: 3500, sbr_VSS_SS: 0.75, sbr_SRT: 10, sbr_SF_SRT: 2.0,
+    sbr_Y: 0.6, sbr_Kd: 0.06,
     sbr_alpha: 0.7, sbr_beta: 0.95
   },
   industrial: {
     sbr_COD0: 800, sbr_BOD0: 320, sbr_SS0: 250, sbr_TN0: 60, sbr_NH40: 45, sbr_TP0: 8,
-    sbr_MLSS: SBR_IND_MLSS, sbr_VSS_SS: 0.70, sbr_SRT: 10,
-    sbr_Y: 0.45, sbr_Kd: 0.04, sbr_mu_max: 0.5, sbr_Kn: 2.5,
+    sbr_MLSS: SBR_IND_MLSS, sbr_VSS_SS: 0.70, sbr_SRT: 10, sbr_SF_SRT: 3.0,
+    sbr_Y: 0.45, sbr_Kd: 0.04,
     sbr_alpha: 0.6, sbr_beta: 0.93
   }
 };
@@ -3830,10 +3959,11 @@ const PRESETS_SBR = {
 // 各亚型默认参数
 const SBR_SUBTYPE_DEFAULTS = {
   // 反应时间按 GB 50014 t_R = 24·S₀·(1/n)/(1000·Ls·X) 取值 (城镇默认 S₀=180, Ls=0.1, X=3.5 g/L):
-  //   SBR 1/n=0.30 → t_R ≥ 3.7 h, 取 4.0 h (6 h 周期: 进水 0.5 + 反应 4.0 + 沉淀 1.0 + 排水 0.5);
+  //   SBR 1/n=0.25 → t_R ≥ 3.1 h, 取 4.0 h (6 h 周期: 进水 0.5 + 反应 4.0 + 沉淀 1.0 + 排水 0.5);
+  //   1/n 取 0.25 而非 0.30: 脱氮可行性 N_DN ≤ (1 − 1/n)·NOx, 城镇默认 (TN 45 → 15) 需 1/n ≤ 约 0.27
   //   CASS/UNITANK 4 h 周期, 反应时段 ≤ 2.5–3.0 h, 充水比取 0.20 (GB 50014 脱氮 0.15–0.3) → t_R ≥ 2.47 h
   // 曝气时长 taer: 反应时段中实际曝气部分, 约占 75–85% (其余缺氧搅拌反硝化), 经验取值, 按实际运行程序调整
-  sbr: { m: 4, N: 2, ratio: 0.30, tfill: 0.5, treact: 4.0, taer: 3.0, tsettle: 1.0, tdraw: 0.5, tidle: 0.0 },
+  sbr: { m: 4, N: 2, ratio: 0.25, tfill: 0.5, treact: 4.0, taer: 3.0, tsettle: 1.0, tdraw: 0.5, tidle: 0.0 },
   cass: { m: 6, N: 3, ratio: 0.20, tfill: 0.0, treact: 2.5, taer: 2.0, tsettle: 1.0, tdraw: 0.5, tidle: 0.0 },
   unitank: { m: 6, N: 3, ratio: 0.20, tfill: 0.0, treact: 3.0, taer: 2.5, tsettle: 1.0, tdraw: 0.0, tidle: 0.0 }
 };
@@ -3905,19 +4035,19 @@ function calcSBR() {
   const MLSS = get('MLSS'), VSS_SS = get('VSS_SS');
   const MLVSS = MLSS * VSS_SS;
   const SRT = get('SRT');
-  const Y = get('Y'), Kd20 = get('Kd'), mu_max20 = get('mu_max');
+  const Y = get('Y'), Kd20 = get('Kd'), SF = get('SF_SRT');
   const alpha = get('alpha'), beta = get('beta');
   const m = get('m'), N = get('N'), ratio_1n = get('ratio');
   const tfill = get('tfill'), treact = get('treact');
   const taer_in = get('taer'), taer = Math.min(taer_in, treact);   // 曝气时长不超过反应时段
   const tsettle = get('tsettle'), tdraw = get('tdraw'), tidle = get('tidle');
-  const Kn20 = get('Kn'), theta_T = get('theta_T'); const Kn = Kn20 * Math.pow(1.05, Tn - 20); // P1:Kn温度修正
 
   const Kd_T = Kd20 * Math.pow(1.04, T - 20);
-  const mu_max_T = mu_max20 * Math.pow(theta_T, Tn - 20);
-  const NH4_use = Math.max(NH4e, 0.5);
-  const mu_net = mu_max_T * NH4_use / (Kn + NH4_use) - Kd20 * Math.pow(1.04, Tn - 20);  // 硝化按最低设计水温 T_min 校核
-  const SRT_min = mu_net > 0 ? 1 / mu_net : 999;
+  // 硝化泥龄: GB 50014-2021 式 7.6.17, 按最低设计水温 T_min; 好氧泥龄须 ≥ SF·SRT_min
+  const { SRT_min } = nitSRTmin(NH4e, Tn);
+  const SRT_rec = SF * SRT_min;
+  const SRT_isAuto = !(SRT > 0);
+  const SRT_target = SRT_isAuto ? autoSRT(SRT_rec, SRT_FLOOR_DN) : SRT;   // 设计泥龄 (留空 = 自动值)
 
   // 间歇式池容核心公式
   // 日总周期数 = m × N (所有池子所有周期)
@@ -3948,17 +4078,27 @@ function calcSBR() {
   const M_react = V_total * reactFrac * MLSS / 1000;   // kg SS (反应时间折算)
   const NH4_total = Math.max(0, TN0 - orgNe);          // ΔTKN 口径: TKN₀(以 TN₀ 代) − 出水有机氮
   const NO3_allow = Math.max(0, TNe - NH4e - orgNe);
+  const TPe = get('TPe'), AlP = get('AlP');
   const it = iterSRT(s => {
     const Yobs = Y / (1 + Kd_T * s);
     const dX_VSS = Yobs * BOD_rem_kg;
     const N_assim = 0.12 * Yobs * (BOD0 - BODe);
     const NOx_prod = Math.max(0, NH4_total - NH4e - N_assim);
-    const NOx_DN = Math.max(0, NOx_prod - NO3_allow);   // SBR 反应段含缺氧期 ⇒ 反硝化一部分
+    // 脱氮可行性: 每周期排出 1/n 的上清液, 其中 NO₃ 随出水排出; 留池 (1 − 1/n) 部分在下一周期缺氧期反硝化
+    // ⇒ N_DN ≤ (1 − 1/n)·NOx; 超出部分不计入反硝化氧回收与碳源
+    const NOx_DN_req = Math.max(0, NOx_prod - NO3_allow);
+    const NOx_DN_max = Math.max(0, 1 - ratio_1n) * NOx_prod;
+    const NOx_DN = Math.min(NOx_DN_req, NOx_DN_max);
     const dn = dnSplit(NOx_DN, BOD0 - BODe, Yobs, Q);
-    const dX_SS = dX_VSS + dX_inert + dn.dX_meoh;
-    return { Yobs, dX_VSS, dX_SS, NOx_prod, NOx_DN, dn, SRT_next: dX_SS > 0 ? M_react / dX_SS : NaN };
-  }, SRT > 0 ? SRT : 10);
-  const { Yobs, dX_VSS, dX_SS, NOx_prod, NOx_DN, dn } = it.st;
+    const tp = tpModel(TP0, TPe, BOD0 - BODe, Yobs, T, AlP, Q, true);   // 生物除磷 + 辅助化学除磷, 化学污泥计入 ΔX
+    const dX_SS = dX_VSS + dX_inert + dn.dX_meoh + tp.chemSludge;
+    return { Yobs, dX_VSS, dX_SS, NOx_prod, NOx_DN, NOx_DN_req, NOx_DN_max, dn, tp, SRT_next: dX_SS > 0 ? M_react / dX_SS : NaN };
+  }, SRT_target);
+  const { Yobs, dX_VSS, dX_SS, NOx_prod, NOx_DN, NOx_DN_req, NOx_DN_max, dn, tp } = it.st;
+  const NO3_e = NOx_prod - NOx_DN, TN_pred = NH4e + orgNe + NO3_e;
+  // 不收敛诊断: 惰性 SS 产泥 ≈ 0 (SS₀ 留空/过低) 时, 池内污泥量 M 只能靠生物产泥维持;
+  // 若 Y·ΔBOD ≤ Kd_T·M (衰减量大于最大合成量), SRT = M/ΔX_SS 无不动点 (泥龄 → ∞)
+  const diag = { dX_inert, fixed: dX_inert + tp.chemSludge + dn.dX_meoh, YB: Y * BOD_rem_kg, kM: Kd_T * M_react, M_react, SSlow: SS0 <= SSe };
   const SRT_conv = it.conv, SRT_iter = it.iter;
   const SRT_act = it.conv ? it.SRT : NaN;
   const SRT_full = (it.conv && dX_SS > 0) ? V_total * MLSS / 1000 / dX_SS : NaN;   // 全池泥龄 (不折算)
@@ -3989,13 +4129,14 @@ function calcSBR() {
   const V_Ls = (Ls > 0 && treact > 0) ? 24 * Q * BOD0 / (1000 * m * treact * Ls * (MLSS / 1000)) : NaN;
 
   return {
-    Q, Q_wan, T, SRT, SRT_act, SRT_iter, SRT_conv, SRT_full, SRT_aer, reactFrac, aerFrac, SRT_min, N, m, ratio_1n,
+    Q, Q_wan, T, SRT: SRT_target, SRT_isAuto, SRT_rec, SF, SRT_act, SRT_iter, SRT_conv, SRT_full, SRT_aer, reactFrac, aerFrac, SRT_min, N, m, ratio_1n,
     V_single, V_total, V_fill, V_draw,
     T_cycle, T_cycle_target, HRT,
     tfill, treact, taer, taer_in, tsettle, tdraw, tidle,
     AOR, AOR_peak, SOR, SOR_peak, AOR_peak_pool, SOR_peak_pool, dX_SS, F_over_M, Ls, V_Ls,
     BOD_TN: BOD0 / Math.max(TN0, 1), BOD_TP: BOD0 / Math.max(TP0, 0.1),
-    BOD0, BODe, COD0, TP0, TN0, NH40, NH4e, TNe, Yobs, dn, Tn, orgNe
+    BOD0, BODe, COD0, TP0, TN0, NH40, NH4e, TNe, Yobs, dn, Tn, orgNe,
+    NOx_prod, NOx_DN, NOx_DN_req, NOx_DN_max, NO3_e, TN_pred, tp, TPe, AlP, diag
   };
 }
 
@@ -4025,16 +4166,26 @@ function checkSBR(r) {
 
   // 泥龄 (GB 50014 口径: 实际泥龄 = V_总×t_R/T_周期×MLSS/ΔX_SS, 与产泥迭代收敛; 硝化按好氧泥龄校核)
   if (!r.SRT_conv) {
-    checks.push({type:'bad', ic:'✗', text:`<b>实际泥龄迭代未收敛</b>: SRT = V_反应·MLSS/ΔX_SS(SRT) 无法收敛, 实际泥龄、剩余污泥与需氧量仅为最后一次迭代值, 不可用于设计; 请核对 MLSS / 池容 / Y / Kd / SS₀`});
+    const d = r.diag;
+    const why = d.YB + d.fixed <= d.kM * 1.05
+      ? `池内污泥量 M = V_总×t_R/T_周期×MLSS ≈ ${d.M_react.toFixed(0)} kg, 按 Kd 衰减需 ${d.kM.toFixed(0)} kg/d, 而生物最大合成量 Y·ΔBOD 仅 ${d.YB.toFixed(0)} kg/d${d.SSlow ? `, 且 SS₀ 过低 (≤ 出水 SS 10 mg/L) 时惰性 SS 产泥为 0` : `, 惰性 SS 等不衰减产泥 ${d.fixed.toFixed(0)} kg/d 亦不足`} —— 产泥量维持不了设定的 MLSS, 泥龄 → ∞`
+      : `迭代振荡或超出 1000 d`;
+    checks.push({type:'bad', ic:'✗', text:`<b>实际泥龄迭代未收敛</b>: ${why}; 实际泥龄、剩余污泥与需氧量仅为最后一次迭代值, 不可用于设计。请填写实际进水 SS₀, 或降低 MLSS / 减小池容 (增大排出比、减少池数)`});
     score -= 20;
-  } else if (r.SRT_aer < r.SRT_min * 1.5 - 1e-6) {
-    checks.push({type:'bad', ic:'✗', text:`<b>好氧泥龄不足</b>: 好氧泥龄 ${r.SRT_aer.toFixed(1)}d (全池泥龄 ${r.SRT_full.toFixed(1)}d × 曝气时间占比 ${(r.aerFrac*100).toFixed(0)}%) &lt; 1.5×SRT_min=${(r.SRT_min*1.5).toFixed(1)}d, 硝化不稳`});
+  } else if (r.SRT_min > 30) {
+    checks.push({type:'bad', ic:'✗', text:`<b>硝化难以维持</b>: 按 T_min=${r.Tn}℃, SRT_min = ${r.SRT_min < 100 ? r.SRT_min.toFixed(1) : '&gt; 30'}d`});
+    score -= 30;
+  } else if (r.SRT_aer < r.SRT_rec * 0.85 - 1e-6) {
+    checks.push({type:'bad', ic:'✗', text:`<b>好氧泥龄不足</b>: 好氧泥龄 ${r.SRT_aer.toFixed(1)}d (全池泥龄 ${r.SRT_full.toFixed(1)}d × 曝气时间占比 ${(r.aerFrac*100).toFixed(0)}%) 明显低于 SF×SRT_min = ${r.SF}×${r.SRT_min.toFixed(2)} = ${r.SRT_rec.toFixed(1)}d (按 T_min=${r.Tn}℃), 硝化不稳; 请提高 MLSS / 延长曝气时长 / 降低排出比`});
     score -= 15;
-  } else if (r.SRT > 0 && r.SRT_act < r.SRT - 1e-6) {
-    checks.push({type:'warn', ic:'⚠', text:`<b>实际泥龄低于设计泥龄</b>: 实际 ${r.SRT_act.toFixed(1)}d (V_总×t_R/T_周期×MLSS/ΔX_SS) &lt; 设计 ${r.SRT}d, 可提高 MLSS 或增大池容`});
+  } else if (r.SRT_aer < r.SRT_rec - 1e-6) {
+    checks.push({type:'warn', ic:'⚠', text:`<b>好氧泥龄接近临界</b>: 好氧泥龄 ${r.SRT_aer.toFixed(1)}d &lt; SF×SRT_min = ${r.SRT_rec.toFixed(1)}d (按 T_min=${r.Tn}℃), 低温时硝化可能不稳`});
+    score -= 8;
+  } else if (r.SRT_act < r.SRT - 1e-6) {
+    checks.push({type:'warn', ic:'⚠', text:`<b>实际泥龄低于设计泥龄</b>: 实际 ${r.SRT_act.toFixed(1)}d (V_总×t_R/T_周期×MLSS/ΔX_SS) &lt; 设计 ${r.SRT}d${r.SRT_isAuto ? ' (留空自动值)' : ''}, 可提高 MLSS 或增大池容`});
     score -= 5;
   } else {
-    checks.push({type:'ok', ic:'✓', text:`<b>泥龄合理</b>: 实际泥龄 ${r.SRT_act.toFixed(1)}d (V_总×t_R/T_周期×MLSS/ΔX_SS, 反应时间占比 ${(r.reactFrac*100).toFixed(0)}%)${r.SRT > 0 ? ` ≥ 设计泥龄 ${r.SRT}d` : ''}; 好氧泥龄 ${r.SRT_aer.toFixed(1)}d ≥ 1.5×SRT_min=${(r.SRT_min*1.5).toFixed(1)}d`});
+    checks.push({type:'ok', ic:'✓', text:`<b>泥龄合理</b>: 实际泥龄 ${r.SRT_act.toFixed(1)}d (V_总×t_R/T_周期×MLSS/ΔX_SS, 反应时间占比 ${(r.reactFrac*100).toFixed(0)}%) ≥ 设计泥龄 ${r.SRT}d${r.SRT_isAuto ? ' (留空自动值)' : ''}; 好氧泥龄 ${r.SRT_aer.toFixed(1)}d ≥ SF×SRT_min = ${r.SRT_rec.toFixed(1)}d (按 T_min=${r.Tn}℃)`});
   }
   // 曝气时长
   if (r.taer_in > r.treact + 1e-6) {
@@ -4044,7 +4195,7 @@ function checkSBR(r) {
 
   // 排出比
   if (r.ratio_1n > 0.4) { checks.push({type:'warn', ic:'⚠', text:`<b>排出比过大</b>: ${r.ratio_1n}, 水位变化剧烈,建议≤0.33`}); score -= 8; }
-  else if (r.ratio_1n < 0.2) { checks.push({type:'info', ic:'ℹ', text:`<b>排出比偏小</b>: ${r.ratio_1n}, 池容利用率低`}); }
+  else if (r.ratio_1n < 0.15) { checks.push({type:'info', ic:'ℹ', text:`<b>排出比偏小</b>: ${r.ratio_1n} &lt; 0.15, 池容利用率低 (GB 50014: 需脱氮时 0.15–0.3)`}); }
   else { checks.push({type:'ok', ic:'✓', text:`<b>排出比合理</b>: ${r.ratio_1n}`}); }
 
   // 池数
@@ -4078,6 +4229,20 @@ function checkSBR(r) {
   // 碳氮比
   if (r.BOD_TN < 4) { checks.push({type:'warn', ic:'⚠', text:`<b>BOD/TN=${r.BOD_TN.toFixed(2)} 偏低</b>, 反硝化受限`}); score -= 8; }
   else { checks.push({type:'ok', ic:'✓', text:`<b>BOD/TN=${r.BOD_TN.toFixed(2)}</b> 合适`}); }
+
+  // 脱氮可行性: N_DN ≤ (1 − 1/n)·NOx (排出的 1/n 上清液中 NO₃ 无法反硝化)
+  if (r.TN_pred > r.TNe + 1e-6) {
+    checks.push({type: 'bad', ic: '✗', text:`<b>TN 不达标</b>: 需反硝化 ${r.NOx_DN_req.toFixed(1)} mg/L &gt; (1 − 1/n)·NOx = (1 − ${r.ratio_1n})×${r.NOx_prod.toFixed(1)} = ${r.NOx_DN_max.toFixed(1)} mg/L, 出水 NO₃-N ≈ ${r.NO3_e.toFixed(1)} mg/L, 出水 TN 预测 ≈ ${r.TN_pred.toFixed(1)} mg/L &gt; 目标 ${r.TNe} mg/L (超出部分不计氧回收); 请降低排出比 1/n 或外加碳源后置反硝化`});
+    score -= 15;
+  } else if (r.NOx_DN_req > 0 && r.TN_pred >= 0.9 * r.TNe) {
+    checks.push({type:'info', ic:'ℹ', text:`<b>脱氮可行, TN 接近上限</b>: 需反硝化 ${r.NOx_DN_req.toFixed(1)} mg/L ≤ (1 − 1/n)·NOx = ${r.NOx_DN_max.toFixed(1)} mg/L, 出水 TN 预测 ≈ ${r.TN_pred.toFixed(1)} mg/L, 为目标 ${r.TNe} mg/L 的 ${(r.TN_pred / r.TNe * 100).toFixed(0)}% (90–100%), 余量小`});
+  } else if (r.NOx_DN_req > 0) {
+    checks.push({type:'ok', ic:'✓', text:`<b>脱氮可行</b>: 需反硝化 ${r.NOx_DN_req.toFixed(1)} mg/L ≤ (1 − 1/n)·NOx = ${r.NOx_DN_max.toFixed(1)} mg/L, 出水 TN 预测 ≈ ${r.TN_pred.toFixed(1)} mg/L`});
+  }
+  // BOD/TP 与除磷 (与厌氧-好氧面板同一阈值与模型)
+  if (r.BOD_TP < 15) { checks.push({type:'bad', ic:'✗', text:`<b>BOD/TP 不足</b>: ${r.BOD_TP.toFixed(1)} &lt; 15, 生物除磷效率低, 需化学除磷`}); score -= 20; }
+  else if (r.BOD_TP < 20) { checks.push({type:'warn', ic:'⚠', text:`<b>BOD/TP 临界</b>: ${r.BOD_TP.toFixed(1)} &lt; 20, 建议预留加药点`}); score -= 8; }
+  checks.push(tpCheck(r.tp, r.TPe, r.AlP));
 
   // 低温
   if (T < 12) { checks.push({type:'warn', ic:'⚠', text:`低温 T=${T}℃`}); score -= 5; }
@@ -4284,13 +4449,21 @@ function calcAndRenderSBR() {
   $('sbr_r_dX').textContent = r.dX_SS.toFixed(0);
   $('sbr_r_SRTact').textContent = isFinite(r.SRT_act) ? r.SRT_act.toFixed(1) : '—';
   $('sbr_r_Yobs').textContent = r.Yobs.toFixed(3);
+  srtTip('sbr_SRT', r.SRT_isAuto ? `自动值: max(SF×SRT_min = ${r.SRT_rec.toFixed(1)} d, ${SRT_FLOOR_DN} d) → ${r.SRT} d` : '');
   $('sbr_r_SRTmin').textContent = r.SRT_min < 100 ? r.SRT_min.toFixed(2) : '>30';
   $('sbr_r_FM').textContent = r.F_over_M.toFixed(3);
+  $('sbr_r_NO3e').textContent = r.NO3_e.toFixed(1);
+  $('sbr_r_TNpred').textContent = r.TN_pred.toFixed(1);
+  $('sbr_r_TPbio').textContent = r.tp.TPe_bio.toFixed(2);
+  $('sbr_r_PAC').textContent = r.tp.PAC_dose.toFixed(1);
+  $('sbr_r_PACkg').textContent = r.tp.PAC_kg.toFixed(0);
+  $('sbr_r_chemSludge').textContent = r.tp.chemSludge.toFixed(0);
+  $('sbr_r_TPe').textContent = r.tp.TPe_est.toFixed(2);
 
   $('sbr_checkList').innerHTML = chk.checks.map(c =>
     `<div class="check-item check-${c.type}"><span class="ic">${c.ic}</span><span>${c.text}</span></div>`).join('');
   $('sbr_scoreNum').textContent = chk.score;
-  const t = chk.score >= 85 ? ['🎉 设计优秀','指标均衡'] :
+  const t = chk.score >= 85 ? ['🎉 设计优秀','指标均衡，可作方案比选参考'] :
             chk.score >= 70 ? ['👍 设计合格','基本合理'] :
             chk.score >= 50 ? ['⚠ 设计有风险','需调整'] : ['✗ 设计不可行','需重评估'];
   $('sbr_scoreTitle').textContent = t[0];
@@ -4306,15 +4479,15 @@ const PRESETS_OXI = {
   municipal: {
     oxi_COD0: 400, oxi_BOD0: 180, oxi_SS0: 200, oxi_TN0: 45, oxi_NH40: 35, oxi_TP0: 5,
     oxi_MLSS: 3500, oxi_VSS_SS: 0.75, oxi_MLSSr: 8000,
-    oxi_Y: 0.6, oxi_Kd: 0.06, oxi_mu_max: 0.75, oxi_Kn: 1.0, oxi_SDNR20: 0.05,
-    oxi_SF_SRT: 2.5, oxi_alpha: 0.65, oxi_beta: 0.95,
+    oxi_Y: 0.6, oxi_Kd: 0.06, oxi_SDNR20: 0.05,
+    oxi_SF_SRT: 2.5, oxi_alpha: 0.8, oxi_beta: 0.95,
     oxi_v: 0.35, oxi_H: 4.5, oxi_BH: 2.2
   },
   industrial: {
     oxi_COD0: 700, oxi_BOD0: 280, oxi_SS0: 250, oxi_TN0: 55, oxi_NH40: 42, oxi_TP0: 7,
     oxi_MLSS: 4500, oxi_VSS_SS: 0.70, oxi_MLSSr: 9000,
-    oxi_Y: 0.45, oxi_Kd: 0.04, oxi_mu_max: 0.5, oxi_Kn: 2.5, oxi_SDNR20: 0.03,
-    oxi_SF_SRT: 3.0, oxi_alpha: 0.55, oxi_beta: 0.93,
+    oxi_Y: 0.45, oxi_Kd: 0.04, oxi_SDNR20: 0.03,
+    oxi_SF_SRT: 3.0, oxi_alpha: 0.7, oxi_beta: 0.93,
     oxi_v: 0.35, oxi_H: 4.0, oxi_BH: 1.8
   }
 };
@@ -4344,6 +4517,7 @@ function setPresetOXI(key) {
   Object.keys(p).forEach(k => { if ($(k)) $(k).value = p[k]; });
   oxiPreset = key;
   $('oxi_SRT').value = oxiSRTDefault(oxiSubtype);   // 城镇显式复位, 工业加长
+  syncOXIAnoxOverride(oxiSubtype);                   // 预设变化后按缺氧区容积校核重设覆盖值并同步 helper
   calc();
 }
 
@@ -4374,7 +4548,7 @@ function syncOXIAnoxOverride(sub) {
   const r = calcOXI();
   const title = OXI_SUBTYPE_INFO[sub].title;
   let tip;
-  if (!(r.NOx_DN > 0) || !isFinite(r.V_anox_req) || r.V_anox >= r.V_anox_req) {
+  if (!(r.NOx_DN_req > 0) || !isFinite(r.V_anox_req) || r.V_anox >= r.V_anox_req - 1e-6) {
     tip = `${title}: 自动修正缺氧占比 ${(r.anoxRatio_auto*100).toFixed(0)}% 已满足缺氧区容积校核, 覆盖值已清零 (按自动值计算)`;
   } else {
     const need = r.V_anox_req / r.V_total;
@@ -4393,7 +4567,7 @@ function applyStandardOXI() {
   const s = STANDARDS[std];
   if (!s) return;
   $('oxi_CODe').value = s.CODe; $('oxi_BODe').value = s.BODe;
-  $('oxi_NH4e').value = s.NH4e; $('oxi_TNe').value = s.TNe;
+  $('oxi_NH4e').value = s.NH4e; $('oxi_TNe').value = s.TNe; $('oxi_TPe').value = s.TPe;
   calc();
 }
 
@@ -4410,25 +4584,25 @@ function calcOXI() {
   const TN0 = get('TN0'), NH40 = get('NH40'), NH4e = get('NH4e'), TNe = get('TNe');
   const MLSS = get('MLSS'), VSS_SS = get('VSS_SS'), MLSSr = get('MLSSr');
   const MLVSS = MLSS * VSS_SS;
-  const Y = get('Y'), Kd20 = get('Kd'), mu_max20 = get('mu_max');
+  const Y = get('Y'), Kd20 = get('Kd');
   const SDNR20 = get('SDNR20'), SF = get('SF_SRT');
   const alpha = get('alpha'), beta = get('beta');
   const v = get('v'), H = get('H'), BH = get('BH');
-  const Kn20 = get('Kn'), theta_T = get('theta_T'); const Kn = Kn20 * Math.pow(1.05, Tn - 20); // P1:Kn温度修正
 
   const Kd_T = Kd20 * Math.pow(1.04, T - 20);
-  const mu_max_T = mu_max20 * Math.pow(theta_T, Tn - 20);
   const SDNR_T = SDNR20 * Math.pow(1.08, T - 20);  // θ=1.08 依据 GB 50014: Kde(T)=Kde(20)·1.08^(T−20)
 
-  const NH4_use = Math.max(NH4e, 0.5);
-  const mu_net = mu_max_T * NH4_use / (Kn + NH4_use) - Kd20 * Math.pow(1.04, Tn - 20);  // 硝化按最低设计水温 T_min 校核
-  const SRT_min = mu_net > 0 ? 1 / mu_net : 999;
+  // 硝化泥龄: GB 50014-2021 式 7.6.17, 按最低设计水温 T_min
+  const { SRT_min } = nitSRTmin(NH4e, Tn);
   const SRT_rec = SRT_min * SF;          // 稳定硝化所需好氧泥龄
   // 输入泥龄为氧化沟系统总泥龄 θ (全沟, 含缺氧区); 好氧泥龄 = (1 − anoxRatio)·θ
   // 留空时: 好氧泥龄要求 SRT_rec 折算为系统总泥龄 = SRT_rec/(1−anoxRatio); anoxRatio 取覆盖值, 否则取不含 F/M 修正的自动估计 (F/M 需先知池容)
   const anoxGuess = get('anoxOverride') > 0 ? Math.min(0.7, get('anoxOverride') / 100)
     : Math.min(0.6, OXI_SUBTYPE_INFO[oxiSubtype].anoxRatio * Math.pow(0.35 / Math.max(get('v'), 0.15), 0.4) * (get('H') > 4 ? 1 + (get('H') - 4) * 0.05 : 1));
-  const SRT = get('SRT') > 0 ? get('SRT') : SRT_rec / (1 - anoxGuess);
+  // 留空自动值 = max(SF·SRT_min/(1−缺氧占比), 氧化沟常用下限 20 d)
+  const SRT_auto = autoSRT(SRT_rec / (1 - anoxGuess), SRT_FLOOR_OXI);
+  const SRT_isAuto = !(get('SRT') > 0);
+  const SRT = SRT_isAuto ? SRT_auto : get('SRT');
   const Yobs = Y / (1 + Kd_T * SRT);
 
   // 氧化沟总池容 (GB 50014 口径, 与其他面板一致): V_总 = Q·(S₀−Sₑ)·θ·Y_t/(1000·X), X = MLSS
@@ -4442,46 +4616,48 @@ function calcOXI() {
   const N_assim = 0.12 * Yobs * (BOD0 - BODe);
   const NOx_prod = Math.max(0, NH4_total - NH4e - N_assim);
   const NO3_allow = Math.max(0, TNe - NH4e - orgNe);
-  const NOx_DN = Math.max(0, NOx_prod - NO3_allow);
-  const dn = dnSplit(NOx_DN, BOD0 - BODe, Yobs, Q);
-  const dX_SS = dX_VSS + f_ss * Q * Math.max(0, SS0 - SSe) / 1000 + dn.dX_meoh;
-  const Yt = BOD_rem > 0 ? dX_SS / BOD_rem : NaN;
-  const V_total = Q * (BOD0 - BODe) * SRT * Yt / MLSS;
-  const SRT_total = dX_SS > 0 ? MLSS * V_total / 1000 / dX_SS : NaN;
+  const NOx_DN_req = Math.max(0, NOx_prod - NO3_allow);
+  const dX_inert = f_ss * Q * Math.max(0, SS0 - SSe) / 1000;
+  // 生物除磷 + 辅助化学除磷 (与厌氧-好氧面板同一口径), 化学污泥计入 ΔX
+  const TP0 = get('TP0'), TPe = get('TPe'), AlP = get('AlP');
+  const tp = tpModel(TP0, TPe, BOD0 - BODe, Yobs, T, AlP, Q, true);
 
   // ========== anoxRatio 多因素修正 ==========
   // 【经验值】本节基准值、修正指数/系数 (0.4 / 0.05 / 2 / 上限 0.6)
   //  均为工程经验估算, 无规范出处, 仅供方案比选; 以实测 DO 分布 / 设计手册为准
-  // 基准值(按亚型):Carrousel 0.35 / Orbal 0.45 / 传统 0.20
-  // 手动覆盖优先级最高
+  // 基准值(按亚型):Carrousel 0.35 / Orbal 0.45 / 传统 0.20; 手动覆盖优先级最高
   const anoxOverride = get('anoxOverride') / 100;
   const anoxRatio_base = OXI_SUBTYPE_INFO[oxiSubtype].anoxRatio;
-  let v_factor = 1.0, H_factor = 1.0, FM_factor = 1.0;
-  let anoxRatio, anoxRatio_auto, anoxSource;
+  // v 修正: 流速低→DO 梯度陡→缺氧区扩大, 基准 0.35 m/s; H 修正: 水深 > 4m 底部缺氧增加
+  const v_factor = Math.pow(0.35 / Math.max(v, 0.15), 0.4);
+  const H_factor = H > 4 ? 1 + (H - 4) * 0.05 : 1.0;
+  let FM_factor = 1.0, anoxRatio, anoxRatio_auto, anoxSource;
 
-  // F/M (按去除 BOD 与 MLVSS 计, 用于缺氧占比修正)
-  const F_over_M_est = ((BOD0 - BODe) * Q / 1000) / (V_total * MLVSS / 1000);
-
-  // 修正因子
-  // v 修正: 流速低→DO 梯度陡→缺氧区扩大, 基准 0.35 m/s
-  v_factor = Math.pow(0.35 / Math.max(v, 0.15), 0.4);
-  // H 修正: 水深 > 4m 底部缺氧增加
-  H_factor = H > 4 ? 1 + (H - 4) * 0.05 : 1.0;
-  // F/M 修正: 高负荷(>0.15)→曝气不够→缺氧区扩大
-  FM_factor = F_over_M_est > 0.15 ? 1 + (F_over_M_est - 0.15) * 2 : 1.0;
-
-  anoxRatio_auto = Math.min(0.6, anoxRatio_base * v_factor * H_factor * FM_factor);
-
-  if (anoxOverride > 0) {
-    anoxRatio = Math.min(0.7, anoxOverride);  // 手动最高 70%
-    anoxSource = 'manual';
-  } else {
-    anoxRatio = anoxRatio_auto;
-    anoxSource = 'auto';
+  // 缺氧区反硝化能力: N_DN ≤ V_缺氧·SDNR_T·MLVSS/Q (mg/L), 不足部分不计氧回收与碳源 (外加甲醇产泥随之联动)
+  // N_DN ↔ 甲醇产泥 ↔ V_总 ↔ V_缺氧 弱耦合, 不动点迭代至稳定
+  let NOx_DN = NOx_DN_req, dn, dX_SS, Yt, V_total, V_anox, NDN_cap, F_over_M_est;
+  for (let i = 0; i < 50; i++) {
+    dn = dnSplit(NOx_DN, BOD0 - BODe, Yobs, Q);
+    dX_SS = dX_VSS + dX_inert + dn.dX_meoh + tp.chemSludge;
+    Yt = BOD_rem > 0 ? dX_SS / BOD_rem : NaN;
+    V_total = Q * (BOD0 - BODe) * SRT * Yt / MLSS;
+    // F/M (按去除 BOD 与 MLVSS 计, 用于缺氧占比修正): 高负荷(>0.15)→曝气不够→缺氧区扩大
+    F_over_M_est = ((BOD0 - BODe) * Q / 1000) / (V_total * MLVSS / 1000);
+    FM_factor = F_over_M_est > 0.15 ? 1 + (F_over_M_est - 0.15) * 2 : 1.0;
+    anoxRatio_auto = Math.min(0.6, anoxRatio_base * v_factor * H_factor * FM_factor);
+    if (anoxOverride > 0) { anoxRatio = Math.min(0.7, anoxOverride); anoxSource = 'manual'; }   // 手动最高 70%
+    else { anoxRatio = anoxRatio_auto; anoxSource = 'auto'; }
+    V_anox = anoxRatio * V_total;
+    NDN_cap = V_anox * SDNR_T * MLVSS / Q;
+    const next = Math.min(NOx_DN_req, NDN_cap);
+    if (Math.abs(next - NOx_DN) < 1e-6) break;
+    NOx_DN = next;
   }
+  const anoxShort = NOx_DN_req > NDN_cap + 1e-6;
+  const NO3_e = NOx_prod - NOx_DN, TN_pred = NH4e + orgNe + NO3_e;
+  const SRT_total = dX_SS > 0 ? MLSS * V_total / 1000 / dX_SS : NaN;
 
   // 缺氧区与好氧区按 anoxRatio 划分总池容
-  const V_anox = anoxRatio * V_total;
   const V_aer = V_total - V_anox;
   const SRT_aer = SRT * (1 - anoxRatio);   // 好氧泥龄 (硝化校核用)
   const HRT_total = V_total / Q * 24;
@@ -4499,8 +4675,8 @@ function calcOXI() {
   const Q_cycle = area * v * 3600; // m³/h 循环流量
   const t_cycle_min = length / v / 60; // min 单沟循环一圈时间
 
-  // 缺氧区容积校核: 所需 V_A = Q·NOx_DN/(SDNR_T·MLVSS), 与沟内缺氧区 anoxRatio·V_总 比较
-  const V_anox_req = Q * NOx_DN / (SDNR_T * MLVSS);
+  // 缺氧区容积校核: 所需 V_A = Q·NOx_DN,需/(SDNR_T·MLVSS), 与沟内缺氧区 anoxRatio·V_总 比较
+  const V_anox_req = Q * NOx_DN_req / (SDNR_T * MLVSS);
 
   const r = MLSS / Math.max(MLSSr - MLSS, 100);
 
@@ -4516,12 +4692,12 @@ function calcOXI() {
   const F_over_M = (Q * BOD0 / 1000) / (V_total * MLSS / 1000);
 
   return {
-    Q, Q_wan, T, SRT, SRT_min, SRT_rec, SRT_total, SRT_aer, Yt,
+    Q, Q_wan, T, SRT, SRT_min, SRT_rec, SRT_auto, SRT_isAuto, anoxGuess, SRT_total, SRT_aer, Yt,
     V_total, V_aer, HRT_total, anoxRatio, anoxRatio_base, anoxRatio_auto, anoxSource,
     v_factor, H_factor, FM_factor,
     area, length, total_length, n_channels, L_max, Q_cycle, t_cycle_min,
-    r, AOR, SOR, dX_SS, F_over_M, v, H, BH, V_anox_req, V_anox, NOx_DN, dn, Tn, orgNe,
-    BOD_TN: BOD0/Math.max(TN0,1), Yobs, BOD_rem
+    r, AOR, SOR, dX_SS, F_over_M, v, H, BH, B: BH * H, V_anox_req, V_anox, NOx_DN, NOx_DN_req, NDN_cap, anoxShort, NO3_e, TN_pred, TNe, tp, TPe, AlP, dn, Tn, orgNe,
+    BOD_TN: BOD0/Math.max(TN0,1), BOD_TP: BOD0/Math.max(TP0,0.1), Yobs, BOD_rem
   };
 }
 
@@ -4558,9 +4734,9 @@ function checkOXI(r) {
   else if (r.SRT_aer < r.SRT_rec - 1e-6) { checks.push({type:'bad', ic:'✗', text:`<b>好氧泥龄不足以稳定硝化</b>: 好氧泥龄 ${fx(r.SRT_aer, 1)}d (= 系统总泥龄 ${fx(r.SRT, 1)}d × (1 − 缺氧占比 ${(r.anoxRatio*100).toFixed(0)}%)) &lt; SF×SRT_min = ${get('SF_SRT')}×${r.SRT_min.toFixed(2)} = ${r.SRT_rec.toFixed(1)}d; 请延长泥龄或降低缺氧占比`}); score -= 15; }
   else { checks.push({type:'ok', ic:'✓', text:`<b>硝化泥龄满足</b>: 好氧泥龄 ${fx(r.SRT_aer, 1)}d (系统总泥龄 ${fx(r.SRT, 1)}d × (1 − ${(r.anoxRatio*100).toFixed(0)}%)) ≥ SF×SRT_min = ${r.SRT_rec.toFixed(1)}d`}); }
   // SRT 经验范围
-  if (r.SRT < 15 - 1e-6) { checks.push({type:'warn', ic:'⚠', text:`<b>SRT 偏短</b>: ${fx(r.SRT, 1)}d, 氧化沟建议 ≥ 20d`}); score -= 8; }
+  if (r.SRT < SRT_FLOOR_OXI - 1e-6) { checks.push({type:'warn', ic:'⚠', text:`<b>SRT 偏短</b>: 系统总泥龄 ${fx(r.SRT, 1)}d &lt; ${SRT_FLOOR_OXI}d (氧化沟常用 20–30 d)`}); score -= 8; }
   else if (r.SRT > 35) { checks.push({type:'info', ic:'ℹ', text:`<b>SRT 较长</b>: ${fx(r.SRT, 1)}d, 污泥矿化充分`}); }
-  else { checks.push({type:'ok', ic:'✓', text:`<b>SRT 合理</b>: ${fx(r.SRT, 1)}d`}); }
+  else { checks.push({type:'ok', ic:'✓', text:`<b>SRT 合理</b>: 系统总泥龄 ${fx(r.SRT, 1)}d (氧化沟常用 20–30 d)`}); }
 
   // 碳氮比
   if (r.BOD_TN < 4) { checks.push({type:'warn', ic:'⚠', text:`<b>碳氮比偏低</b>: BOD/TN=${r.BOD_TN.toFixed(2)}`}); score -= 10; }
@@ -4571,14 +4747,28 @@ function checkOXI(r) {
     checks.push({type:'info', ic:'ℹ', text:`<b>沟道总长 ${r.total_length.toFixed(0)} m</b>: 单沟周长宜 ≤ ${r.L_max.toFixed(0)} m (min(400 m, v×15 min)), 宜分 ${r.n_channels} 条沟道 (每条约 ${r.length.toFixed(0)} m)`});
   }
 
-  // 缺氧区容积校核 (参考, 不计分)
-  if (r.NOx_DN > 0 && isFinite(r.V_anox_req)) {
-    if (r.V_anox < r.V_anox_req) {
-      checks.push({type:'info', ic:'ℹ', text:`<b>缺氧区容积校核</b>: 反硝化所需 V_A = Q·NOx/(SDNR_T·MLVSS) ≈ ${r.V_anox_req.toFixed(0)} m³, 沟内缺氧区约 ${r.V_anox.toFixed(0)} m³ (anoxRatio × V_总), 偏小, 出水 TN 可能偏高; 可设前置缺氧区或提高缺氧占比`});
+  // 缺氧区容积校核: 不足时 N_DN 限为 V_缺氧·SDNR_T·MLVSS/Q, 未反硝化部分随出水排出 (不计氧回收与碳源)
+  if (r.NOx_DN_req > 0 && isFinite(r.V_anox_req)) {
+    if (r.TN_pred > r.TNe + 1e-6) {
+      checks.push({type:'bad', ic:'✗', text:`<b>TN 不达标</b>: 出水 TN 预测 ≈ ${r.TN_pred.toFixed(1)} mg/L &gt; 目标 ${r.TNe} mg/L; 缺氧区容积不足:`
+        + ` 反硝化所需 V_A ≈ ${r.V_anox_req.toFixed(0)} m³ &gt; 沟内缺氧区 ${r.V_anox.toFixed(0)} m³, N_DN 限为 V_缺氧·SDNR_T·MLVSS/Q ≈ ${r.NDN_cap.toFixed(1)} mg/L (需 ${r.NOx_DN_req.toFixed(1)}); 反硝化氧回收与碳源已按实际 N_DN 计。可设前置缺氧区或提高缺氧占比`});
+      score -= 15;
+    } else if (r.anoxShort) {
+      checks.push({type:'warn', ic:'⚠', text:`<b>缺氧区容积不足</b>: 反硝化所需 V_A = Q·NOx/(SDNR_T·MLVSS) ≈ ${r.V_anox_req.toFixed(0)} m³ &gt; 沟内缺氧区 ${r.V_anox.toFixed(0)} m³ (anoxRatio × V_总); N_DN 限为 V_缺氧·SDNR_T·MLVSS/Q ≈ ${r.NDN_cap.toFixed(1)} mg/L (需 ${r.NOx_DN_req.toFixed(1)}), 出水 TN 预测 ≈ ${r.TN_pred.toFixed(1)} mg/L${r.TN_pred > r.TNe + 1e-6 ? ` &gt; 目标 ${r.TNe}` : ''}; 反硝化氧回收与碳源已按实际 N_DN 计。可设前置缺氧区或提高缺氧占比`});
+      score -= 8;
     } else {
-      checks.push({type:'ok', ic:'✓', text:`<b>缺氧区容积校核</b>: 沟内缺氧区约 ${r.V_anox.toFixed(0)} m³ ≥ 反硝化所需 ${r.V_anox_req.toFixed(0)} m³`});
+      checks.push({type:'ok', ic:'✓', text:`<b>缺氧区容积校核</b>: 沟内缺氧区约 ${r.V_anox.toFixed(0)} m³ ≥ 反硝化所需 ${r.V_anox_req.toFixed(0)} m³; 出水 TN 预测 ≈ ${r.TN_pred.toFixed(1)} mg/L`});
     }
   }
+  // 沟道几何: 单沟周长不足 π × 沟宽 (闭合环形沟最小周长) 时几何不成立 (规模过小)
+  if (r.length < Math.PI * r.B) {
+    checks.push({type:'warn', ic:'⚠', text:`<b>沟道几何不成立</b>: 单沟周长 ${r.length.toFixed(1)} m &lt; π × 沟宽 ${r.B.toFixed(1)} m = ${(Math.PI * r.B).toFixed(1)} m (闭合环形沟最小周长), 规模过小; 请减小沟深/宽深比或改用其他工艺`});
+    score -= 10;
+  }
+  // BOD/TP 与除磷 (与厌氧-好氧面板同一阈值与模型)
+  if (r.BOD_TP < 15) { checks.push({type:'bad', ic:'✗', text:`<b>BOD/TP 不足</b>: ${r.BOD_TP.toFixed(1)} &lt; 15, 生物除磷效率低, 需化学除磷`}); score -= 20; }
+  else if (r.BOD_TP < 20) { checks.push({type:'warn', ic:'⚠', text:`<b>BOD/TP 临界</b>: ${r.BOD_TP.toFixed(1)} &lt; 20, 建议预留加药点`}); score -= 8; }
+  checks.push(tpCheck(r.tp, r.TPe, r.AlP));
 
   // 循环时间
   if (r.t_cycle_min > 15) { checks.push({type:'warn', ic:'⚠', text:`<b>循环时间偏长</b>: ${r.t_cycle_min.toFixed(1)} min, 沟过长或流速过低`}); score -= 5; }
@@ -4630,11 +4820,12 @@ function drawOXIFlow(r) {
     h += `<rect x="${cx+outerR-5-outerR*anoxR}" y="${cy-outerR*0.6+8}" width="${outerR*anoxR}" height="18" fill="#06b6d4" fill-opacity="0.3" rx="3"/>`;
     h += `<text x="${cx+outerR-5-outerR*anoxR/2}" y="${cy-outerR*0.6+22}" font-size="10" font-weight="500" fill="#0e7490" text-anchor="middle">缺氧区</text>`;
     // 转刷/曝气机
+    // 转刷/表曝机画在下侧沟道内 (中心岛与外壁之间), 标注放在沟外, 避免与中心岛重叠
     for (let i = 0; i < 3; i++) {
-      const bx = cx - outerR + 30 + i * 25;
-      h += `<rect x="${bx}" y="${cy-outerR*0.6+50}" width="10" height="20" fill="#f59e0b" stroke="${ink}" rx="2"/>`;
+      const bx = cx - 40 + i * 30;
+      h += `<rect x="${bx}" y="${cy+innerR*0.5+6}" width="10" height="${outerR*0.6-innerR*0.5-12}" fill="#f59e0b" stroke="${ink}" rx="2"/>`;
     }
-    h += `<text x="${cx-outerR+55}" y="${cy-outerR*0.6+85}" font-size="10" fill="${muted}" text-anchor="middle">转刷/表曝机</text>`;
+    h += `<text x="${cx}" y="${cy+outerR*0.6+16}" font-size="10" fill="${muted}" text-anchor="middle">转刷/表曝机</text>`;
   } else if (oxiSubtype === 'orbal') {
     // Orbal: 三同心环
     const cx = 350, cy = 150;
@@ -4668,7 +4859,7 @@ function drawOXIFlow(r) {
   h += `<text x="${infoX+15}" y="140" font-size="11" fill="${muted}">HRT = ${r.HRT_total.toFixed(1)} h</text>`;
   h += `<text x="${infoX+15}" y="160" font-size="11" fill="${muted}">流速 v = ${r.v} m/s</text>`;
   h += `<text x="${infoX+15}" y="180" font-size="11" fill="${muted}">沟深 H = ${r.H} m</text>`;
-  h += `<text x="${infoX+15}" y="200" font-size="11" fill="${muted}">循环流量 = ${r.Q_cycle.toFixed(0)} m³/h</text>`;
+  h += `<text x="${infoX+15}" y="200" font-size="11" fill="${muted}">单沟循环流量 = ${r.Q_cycle.toFixed(0)} m³/h</text>`;
   h += `<text x="${infoX+15}" y="220" font-size="11" fill="${muted}">循环时间 = ${r.t_cycle_min.toFixed(1)} min</text>`;
   h += `<text x="${infoX+15}" y="240" font-size="11" fill="#059669" font-weight="600">缺氧区占比 ≈ ${(r.anoxRatio*100).toFixed(0)}%</text>`;
 
@@ -4705,17 +4896,25 @@ function calcAndRenderOXI() {
   $('oxi_r_SRTaer').textContent = fx(r.SRT_aer, 1);
   $('oxi_r_Vaer').textContent = fx(r.V_aer, 0);
   $('oxi_r_Vanox').textContent = fx(r.V_anox, 0);
+  srtTip('oxi_SRT', r.SRT_isAuto ? `自动值: max(SF×SRT_min/(1−缺氧占比) = ${(r.SRT_rec/(1-r.anoxGuess)).toFixed(1)} d, ${SRT_FLOOR_OXI} d) → ${r.SRT} d` : '');
   $('oxi_r_SRTsafe').textContent = r.SRT_min < 100 ? r.SRT_rec.toFixed(1) : '—';
   $('oxi_r_SRTmin').textContent = r.SRT_min < 100 ? r.SRT_min.toFixed(2) : '>30';
   $('oxi_r_AOR').textContent = r.AOR.toFixed(0);
   $('oxi_r_SOR').textContent = fx(r.SOR, 0);
   $('oxi_r_dX').textContent = r.dX_SS.toFixed(0);
   $('oxi_r_FM').textContent = r.F_over_M.toFixed(3);
+  $('oxi_r_NDN').textContent = r.NOx_DN.toFixed(1);
+  $('oxi_r_TNpred').textContent = r.TN_pred.toFixed(1);
+  $('oxi_r_TPbio').textContent = r.tp.TPe_bio.toFixed(2);
+  $('oxi_r_PAC').textContent = r.tp.PAC_dose.toFixed(1);
+  $('oxi_r_PACkg').textContent = r.tp.PAC_kg.toFixed(0);
+  $('oxi_r_chemSludge').textContent = r.tp.chemSludge.toFixed(0);
+  $('oxi_r_TPe').textContent = r.tp.TPe_est.toFixed(2);
 
   $('oxi_checkList').innerHTML = chk.checks.map(c =>
     `<div class="check-item check-${c.type}"><span class="ic">${c.ic}</span><span>${c.text}</span></div>`).join('');
   $('oxi_scoreNum').textContent = chk.score;
-  const t = chk.score >= 85 ? ['🎉 设计优秀','指标均衡'] :
+  const t = chk.score >= 85 ? ['🎉 设计优秀','指标均衡，可作方案比选参考'] :
             chk.score >= 70 ? ['👍 设计合格','基本合理'] :
             chk.score >= 50 ? ['⚠ 设计有风险','需调整'] : ['✗ 设计不可行','需重评估'];
   $('oxi_scoreTitle').textContent = t[0];
@@ -4723,17 +4922,39 @@ function calcAndRenderOXI() {
   drawOXIFlow(r);
 }
 
-// ============ 恢复默认 ============
+// ============ 恢复默认 (只重置当前面板) ============
+// 当前面板内输入/下拉/复选框恢复 HTML 默认值, 再走与页面加载相同的预设路径 (城镇污水 + 默认亚型)
+const PANEL_RESET = {
+  aao:   () => setPreset('municipal'),
+  ao_an: () => setPresetAOAN('municipal'),
+  ao_p:  () => { aopUserN = false; setPresetAOP('municipal'); },
+  sbr:   () => { setSBRSubtype('sbr'); setPresetSBR('municipal'); },
+  oxi:   () => { setOXISubtype('carrousel'); setPresetOXI('municipal'); }
+};
+function resetPanel(proc) {
+  const panel = $(PANEL_OF[proc]);
+  if (!panel) return;
+  panel.querySelectorAll('input, select').forEach(el => {
+    if (el.type === 'checkbox' || el.type === 'radio') el.checked = el.defaultChecked;
+    else if (el.tagName === 'SELECT') [...el.options].forEach(o => o.selected = o.defaultSelected);
+    else el.value = el.defaultValue;
+    el.classList.remove('invalid');
+  });
+  PANEL_RESET[proc]();
+}
 function resetDefaults() {
-  if (confirm('确定重置所有参数为城镇污水默认值吗?')) {
-    // 先把所有输入/下拉/复选框恢复为 HTML 默认值, 避免浏览器在刷新后自动恢复表单内容
-    document.querySelectorAll('input, select').forEach(el => {
-      if (el.type === 'checkbox' || el.type === 'radio') el.checked = el.defaultChecked;
-      else if (el.tagName === 'SELECT') [...el.options].forEach(o => o.selected = o.defaultSelected);
-      else el.value = el.defaultValue;
-    });
-    location.reload();
-  }
+  if (!PANEL_RESET[currentProcess]) return;
+  if (confirm('确定将当前工艺面板的参数恢复为城镇污水默认值吗? (其他工艺面板不受影响)')) resetPanel(currentProcess);
+}
+
+// ============ 工艺页签横向滑动提示 ============
+function updateTabsFade() {
+  const w = document.querySelector('.process-tabs-wrap');
+  if (!w) return;
+  const more = w.scrollWidth > w.clientWidth + 2;
+  w.classList.toggle('fade-l', more && w.scrollLeft > 2);
+  w.classList.toggle('fade-r', more && w.scrollLeft + w.clientWidth < w.scrollWidth - 2);
+  $('tabsHint').classList.toggle('show', more);
 }
 
 // ============ 事件绑定 ============
@@ -4744,14 +4965,14 @@ document.querySelectorAll('input, select').forEach(el => {
   el.addEventListener('change', calc);
 });
 
-// 初始化: 页面加载 (含"恢复默认"后的重新加载) 与点击"城镇污水"预设走同一路径,
-// 各面板 SRT 均经 fillSRT 推算 (含规范下限), 三条路径结果一致
-setPreset('municipal');
-setPresetAOAN('municipal');
-setPresetAOP('municipal');
-setPresetSBR('municipal');
-setPresetOXI('municipal');
+document.querySelector('.process-tabs-wrap').addEventListener('scroll', updateTabsFade, { passive: true });
+window.addEventListener('resize', updateTabsFade);
+
+// 初始化: 页面加载、点击"城镇污水"预设、"恢复默认" 三条路径走同一 resetPanel → 预设函数,
+// 脱氮面板泥龄留空 = 自动值 (按 T_min 实时计算), 三条路径结果一致
+Object.keys(PANEL_RESET).forEach(resetPanel);
 setProcess('aao');
+updateTabsFade();
 </script>
 
 </body>

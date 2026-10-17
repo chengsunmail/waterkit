@@ -3,12 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MBBR / IFAS 工程设计平台 | 水处理工具箱 · WaterKit</title>
+<title>MBBR 工程设计平台 · 纯 MBBR 段组合 | 水处理工具箱 · WaterKit</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230891b2'/%3E%3Ctext x='16' y='22.5' font-size='18' font-weight='700' text-anchor='middle' fill='white' font-family='Arial,sans-serif'%3EW%3C/text%3E%3C/svg%3E">
-<meta name="description" content="MBBR / IFAS 工程设计平台：按表面负荷（按进入负荷、10 ℃ 基准温度修正）计算纯 MBBR 池容与 7 种段组合，含需氧量、曝气器与风机选型、产泥与药剂，另有 IFAS 混合工艺、填料选型与案例库（循环水养殖 RAS 见 iRAS）。">
+<meta name="description" content="纯 MBBR 工程设计平台：按表面负荷（按进入负荷、10 ℃ 基准温度修正）计算纯 MBBR 池容与 7 种段组合，含需氧量、曝气器与风机选型、产泥与药剂，另有填料选型与案例库；IFAS 泥膜复合工艺见独立工具「IFAS 工程设计」（循环水养殖 RAS 见 iRAS）。">
 <meta name="keywords" content="纯MBBR,pure MBBR,移动床生物膜,生物膜反应器,SALR,填料选型,AnoxKaldnes,Kaldnes,城镇污水提标,渗滤液,水产养殖,工业废水,WaterKit,登登科技">
 <meta name="author" content="海南登登科技咨询有限公司">
 <link rel="canonical" href="https://waterkit.cn/mbbr-design.html">
+<script>if (location.hash === '#ifas') location.replace('ifas-design.html');  // 旧锚点：IFAS 已独立为单独工具</script>
 <style>
 :root {
   --brand: #0891b2;
@@ -44,35 +45,25 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ========== 导航栏 ========== */
-.navbar {
+/* ========== 统一顶部导航（与 mbr-design 等页一致） ========== */
+.topbar {
   position: sticky; top: 0; z-index: 100;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: saturate(180%) blur(12px);
-  border-bottom: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border);
 }
-.nav-inner {
-  max-width: 1280px; margin: 0 auto;
-  padding: 14px 24px;
-  display: flex; align-items: center; justify-content: space-between;
-}
-.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-.logo-mark {
-  width: 32px; height: 32px;
-  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
-  border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  color: white; font-weight: 700; font-size: 14px;
-}
-.logo-text { color: var(--ink); font-weight: 700; font-size: 17px; letter-spacing: -0.02em; }
-.logo-sub { color: var(--text-muted); font-size: 12px; margin-left: 2px; }
-.nav-links { display: flex; align-items: center; gap: 24px; }
-.nav-links a {
-  color: var(--text-muted); text-decoration: none;
-  font-size: 14px; font-weight: 500;
-  transition: color 0.2s;
-}
+.topbar-inner { max-width: 1280px; margin: 0 auto; padding: 14px 32px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.nav-links { display: flex; gap: 24px; font-size: 14px; align-items: center; }
+.nav-links a { color: var(--text); text-decoration: none; transition: color 0.15s; font-weight: 500; }
 .nav-links a:hover { color: var(--brand); }
+.nav-links a.back::before { content: "←"; margin-right: 4px; color: var(--brand); }
+@media (max-width: 640px) {
+  .nav-links { gap: 16px; font-size: 13px; }
+  .nav-links a:not(.back) { display: none; }
+  .topbar-inner { padding: 12px 20px; }
+  .topbar .brand-name { font-size: 15px; }
+  .topbar .brand-sub { display: none; }
+}
 
 /* ========== Hero 区 ========== */
 .hero {
@@ -153,6 +144,24 @@ body {
 .tab-btn.active { color: var(--brand); border-bottom-color: var(--brand); }
 .tab-btn.disabled { color: var(--text-faint); cursor: not-allowed; opacity: 0.7; }
 .tab-btn .tab-sub { font-size: 11px; font-weight: 500; opacity: 0.7; }
+/* 外链式 Tab（IFAS 已独立为单独工具） */
+.tab-link {
+  padding: 14px 20px;
+  font-size: 14px; font-weight: 600;
+  color: var(--brand); text-decoration: none;
+  border-bottom: 3px solid transparent;
+  white-space: nowrap;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.tab-link:hover { color: var(--brand-dark); background: var(--brand-light); }
+.tab-link .tab-sub { font-size: 11px; font-weight: 500; opacity: 0.7; }
+.ifas-moved {
+  margin: 0 0 16px; padding: 10px 14px;
+  background: var(--brand-light); border: 1px solid var(--brand-border); border-radius: 8px;
+  font-size: 13px; font-weight: 600;
+}
+.ifas-moved a { color: var(--brand-dark); text-decoration: none; }
+.ifas-moved a:hover { text-decoration: underline; }
 .tab-btn .tab-coming {
   display: inline-block;
   font-size: 10px; font-weight: 500;
@@ -398,24 +407,6 @@ body {
 .check-warn { background: #fef3c7; color: #78350f; }
 .check-bad  { background: #fef2f2; color: #991b1b; }
 .check-info { background: #eff6ff; color: #1e40af; }
-
-/* 评分 */
-.score-ring {
-  display: flex; align-items: center; gap: 20px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 20px 24px;
-  margin-top: 16px;
-}
-.score-num {
-  font-size: 44px; font-weight: 800;
-  color: var(--brand);
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-.score-label { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-top: 4px; }
-.score-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
 
 /* 按钮 */
 .buttons { display: flex; gap: 10px; margin: 24px 0 16px; flex-wrap: wrap; }
@@ -1468,6 +1459,26 @@ body {
 }
 .ccg-card .ccg-desc { font-size: 12px; color: var(--text); line-height: 1.5; }
 
+/* ===== 手机端：结果行标签列不被长数值挤成一字一行；流程/布置 SVG 可横向滚动 ===== */
+.svg-scroll-hint { display: none; font-size: 11px; color: var(--text-faint); text-align: right; margin: -4px 0 6px; }
+@media (max-width: 600px) {
+  .result-row { flex-wrap: wrap; row-gap: 2px; }
+  .result-row > .result-label { flex: 1 1 9em; min-width: 9em; }
+  .result-row > span:last-child:not(.result-label) { flex: 0 1 auto; margin-left: auto; max-width: 100%; text-align: right; }
+  .flow-diagram svg { min-width: 760px; }
+  .svg-scroll-hint { display: block; }
+}
+/* ===== 打印：隐藏导航、Tab 栏、按钮与页脚，只打印当前 Tab 内容 ===== */
+@media print {
+  .topbar, .beta-bar, .tab-nav-wrap, .site-footer, .buttons, .btn, .svg-scroll-hint, .wk-toast { display: none !important; }
+  body { background: #fff; }
+  .hero { padding: 0 0 12px; background: none; border: none; }
+  .main-wrap { padding: 0; max-width: none; }
+  .result-group, .check-item, .note, .flow-diagram { break-inside: avoid; }
+  .flow-diagram { overflow: visible; }
+  .flow-diagram svg { min-width: 0 !important; }
+  a { color: inherit; text-decoration: none; }
+}
 </style>
 </head>
 <body>
@@ -1486,20 +1497,22 @@ body {
 </svg>
 
 <!-- ========== 顶部导航 ========== -->
-<nav class="navbar">
-  <div class="nav-inner">
-    <a class="logo" href="index.html">
-      <div class="logo-mark">W</div>
-      <span class="logo-text">WaterKit<span class="logo-sub">· 水处理工具站</span></span>
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="brand">
+      <div class="brand-mark">W</div>
+      <div>
+        <div class="brand-name">水处理工具箱</div>
+        <div class="brand-sub">WaterKit · by 登登科技</div>
+      </div>
     </a>
-    <div class="nav-links">
-      <a href="index.html">全部工具</a>
-      <a href="activated-sludge-process-calculator.html">活性污泥工艺</a>
-      <a href="mbr-design.html">MBR 平台</a>
-      <a href="https://dengdengtech.cn" target="_blank" rel="noopener">登登科技 ↗</a>
-    </div>
+    <nav class="nav-links">
+      <a href="index.html" class="back">返回首页</a>
+      <a href="index.html#cat-process">工艺计算</a>
+      <a href="https://dengdengtech.cn" target="_blank" rel="noopener">登登科技</a>
+    </nav>
   </div>
-</nav>
+</header>
 <div class="beta-bar" role="note"><div class="beta-inner">🚧 <b>Beta · 开发中</b>：本平台仍在持续校核与迭代，计算结果仅供方案估算参考，工程设计请以正式设计文件为准。发现问题欢迎 <a href="https://github.com/chengsunmail/waterkit/issues" target="_blank" rel="noopener">反馈 Issue</a>。</div></div>
 
 <!-- ========== Hero ========== -->
@@ -1513,6 +1526,7 @@ body {
     <p class="hero-sub">
       移动床生物膜反应器(MBBR)的工程设计平台。涵盖生物膜微观动力学、填料选型、曝气系统、段组合、典型案例、挂膜启动、工艺发展史全流程。
       依据 Metcalf&Eddy / Ødegaard / HJ 576,覆盖城镇污水提标、垃圾渗滤液、水产养殖尾水、工业废水等场景（循环水养殖 RAS 见 <a href="https://iras.cn/" target="_blank" rel="noopener">iRAS</a>）。
+      本页为纯 MBBR（纯生物膜、无污泥回流）；IFAS 泥膜复合工艺见独立工具 <a href="ifas-design.html">IFAS 工程设计</a>。
     </p>
     <div class="hero-meta">
       <span>📘 <b>温度修正 θ</b> BOD 1.07 / 硝化 1.09</span>
@@ -1534,9 +1548,9 @@ body {
       <button class="tab-btn active" data-tab="stages" onclick="switchTab('stages')">
         MBBR 工艺设计<span class="tab-sub">纯生物膜·无回流</span>
       </button>
-      <button class="tab-btn" data-tab="ifas" onclick="switchTab('ifas')">
-        IFAS 混合工艺<span class="tab-sub">活性污泥+填料·含回流</span>
-      </button>
+      <a class="tab-link" href="ifas-design.html" title="IFAS（泥膜复合）已独立为单独工具">
+        IFAS → 独立工具<span class="tab-sub">泥膜复合·含回流 ↗</span>
+      </a>
       <button class="tab-btn" data-tab="ras" onclick="switchTab('ras')">
         RAS 循环水养殖 ↗<span class="tab-sub">见 iRAS</span>
       </button>
@@ -1558,6 +1572,8 @@ body {
 
   <!-- ===== Tab 4: 段组合 ===== -->
   <div class="tab-panel active" id="panel-stages">
+
+    <div class="ifas-moved"><a href="ifas-design.html">IFAS（泥膜复合）已独立为单独工具 →</a></div>
 
     <!-- ① 进水 & 出水参数（独立输入） -->
     <div class="section-title" style="margin-top:8px;"><span class="num">1</span>进水 & 出水参数</div>
@@ -1819,7 +1835,7 @@ body {
       <div class="grid">
         <div class="field"><label for="st_MLR">内回流比 MLR <span class="unit">%(相对进水 Q)</span></label>
           <input type="number" id="st_MLR" value="200" step="25" min="0" max="500" onchange="calcStages()">
-          <div class="helper">常 200-400%；仅靠前置反硝化达 70% 脱氮需 MLR &gt; 250%。预缺氧进入负荷 = 回流 NO₃-N + 回流 DO × 0.35</div></div>
+          <div class="helper">常 200-400%；按本页 TN 模型（前置去除 = 0.85·R/(1+R)），仅靠前置反硝化达 70% 脱氮需 MLR ≈ 470%，超出常用范围时应配后缺氧。预缺氧进入负荷 = 回流 NO₃-N + 回流 DO × 0.35</div></div>
         <div class="field"><label for="st_pumpEff">回流泵效率 <span class="unit">%</span></label>
           <input type="number" id="st_pumpEff" value="65" step="5" onchange="calcStages()">
           <div class="helper">潜水泵 60-70</div></div>
@@ -1891,16 +1907,16 @@ body {
     <!-- 曝气器选型 -->
     <div class="section-title"><span class="num">8</span>曝气器选型与风机 <span class="sub">基于上方AOR/SOR计算</span></div>
     <div class="aerator-tabs">
-      <button class="aerator-tab active" data-aer="coarse" onclick="setAeratorType('coarse','a')">
+      <button class="aerator-tab active" data-aer="coarse" onclick="setAeratorType('coarse')">
         <b>粗孔旋混</b><span>专为 MBBR 优化 · 抗堵</span>
       </button>
-      <button class="aerator-tab" data-aer="disc" onclick="setAeratorType('disc','a')">
+      <button class="aerator-tab" data-aer="disc" onclick="setAeratorType('disc')">
         <b>盘式微孔</b><span>氧传质最高 · 易堵塞</span>
       </button>
-      <button class="aerator-tab" data-aer="tube" onclick="setAeratorType('tube','a')">
+      <button class="aerator-tab" data-aer="tube" onclick="setAeratorType('tube')">
         <b>管式曝气</b><span>大气量 · 安装方便</span>
       </button>
-      <button class="aerator-tab" data-aer="jet" onclick="setAeratorType('jet','a')">
+      <button class="aerator-tab" data-aer="jet" onclick="setAeratorType('jet')">
         <b>射流曝气</b><span>小规模/深池 · 无堵塞</span>
       </button>
     </div>
@@ -1979,7 +1995,7 @@ body {
         <div class="result-row"><span class="result-label">布置间距(建议)</span>
           <span><span class="result-value" id="ar_actSpacing">—</span><span class="result-unit">m</span></span></div>
         <div class="result-row"><span class="result-label">曝气器投资</span>
-          <span><span class="result-value" id="ar_cost">—</span><span class="result-unit">元</span></span></div>
+          <span><span class="result-value" id="ar_cost">—</span><span class="result-unit">万元</span></span></div>
       </div>
 
       <!-- 风机选型 -->
@@ -2023,6 +2039,7 @@ body {
       <!-- 布置示意图 -->
       <div class="result-group">
         <div class="result-group-title"><span class="ic">🗺️</span> 曝气器布置示意</div>
+        <div class="svg-scroll-hint">← 布置图可左右滑动 →</div>
         <div class="flow-diagram">
           <svg id="aerLayoutSvg" width="100%" height="280" viewBox="0 0 900 280" xmlns="http://www.w3.org/2000/svg"></svg>
         </div>
@@ -2047,6 +2064,7 @@ body {
       <h2>🎯 工艺选择与计算结果</h2>
 
       <!-- 流程 SVG -->
+      <div class="svg-scroll-hint">← 流程图可左右滑动 →</div>
       <div class="flow-diagram">
         <svg id="stageFlowSvg" width="100%" height="240" viewBox="0 0 1100 240" xmlns="http://www.w3.org/2000/svg"></svg>
       </div>
@@ -2074,10 +2092,14 @@ body {
       <!-- 去除率预测 -->
       <div class="result-group">
         <div class="result-group-title"><span class="ic">📊</span> 去除效果预测</div>
-        <div class="result-row"><span class="result-label">BOD 去除率</span>
+        <div class="result-row"><span class="result-label">BOD 去除率 <span class="sub" id="st_r_BODrm_basis">(填料面积满足时出水按目标值)</span></span>
           <span><span class="result-value" id="st_r_BODrm">—</span><span class="result-unit">%</span></span></div>
-        <div class="result-row"><span class="result-label">NH₄-N 去除率</span>
+        <div class="result-row"><span class="result-label">预计 BOD₅ 出水</span>
+          <span><span class="result-value" id="st_r_BODout">—</span><span class="result-unit">mg/L</span></span></div>
+        <div class="result-row"><span class="result-label">NH₄-N 去除率 <span class="sub" id="st_r_NH4rm_basis">(填料面积满足时出水按目标值)</span></span>
           <span><span class="result-value" id="st_r_NH4rm">—</span><span class="result-unit">%</span></span></div>
+        <div class="result-row"><span class="result-label">预计 NH₄-N 出水</span>
+          <span><span class="result-value" id="st_r_NH4out">—</span><span class="result-unit">mg/L</span></span></div>
         <div class="result-row highlight-row"><span class="result-label"><b>TN 去除率</b></span>
           <span><span class="result-value big" id="st_r_TNrm">—</span><span class="result-unit">%</span></span></div>
         <div class="result-row highlight-row"><span class="result-label"><b>TP 去除率</b></span>
@@ -2198,593 +2220,6 @@ body {
     </div>
   </div>
 
-  <!-- ===== Tab 8: 混合工艺 IFAS ===== -->
-  <div class="tab-panel" id="panel-ifas">
-
-    <div class="carrier-intro">
-      <h3>🔗 混合工艺 IFAS 设计</h3>
-      <p>IFAS（Integrated Fixed-film Activated Sludge）= 活性污泥 + MBBR 填料。<b>有活性污泥回流（RAS）</b>是与纯 MBBR 的核心区别。步骤编排与 MBBR 工艺设计 Tab 完全对应，方便对比。填料硝化速率与纯 MBBR 同一口径：经验参考值（以 10 ℃ 为基准、按温度修正，按进入负荷校核），国内项目请结合实测或厂家数据复核。</p>
-      <div class="mini-spec">
-        <span>📘 依据：Metcalf&amp;Eddy / HJ 2010</span>
-        <span>🎯 双相协同：悬浮 + 附着</span>
-        <span>🔄 含 RAS + MLR 回流计算</span>
-      </div>
-    </div>
-
-    <!-- 步骤1：进水 & 出水参数 -->
-    <div class="section-title" style="margin-top:8px;"><span class="num">1</span>进水 &amp; 出水参数</div>
-    <div class="water-preset">
-      <button class="preset-tab active" data-preset-ifas="municipal" onclick="setPresetIFAS('municipal')">城镇污水</button>
-      <button class="preset-tab" data-preset-ifas="industrial" onclick="setPresetIFAS('industrial')">工业废水</button>
-      <button class="preset-tab" data-preset-ifas="upgrade" onclick="setPresetIFAS('upgrade')">提标改造</button>
-      <button class="preset-tab" type="button" onclick="resetIfasDefaults()" title="恢复本 Tab 全部输入（含高级参数、容积比、曝气与风机参数）为页面初始默认值">↺ 恢复默认</button>
-    </div>
-    <div class="grid">
-      <div class="field"><label for="ifas_Q">Q <span class="unit">万 m³/d</span></label>
-        <input type="number" id="ifas_Q" value="3" step="0.5" oninput="calcAndRenderIFAS()"></div>
-      <div class="field"><label for="ifas_T">T <span class="unit">°C</span></label>
-        <input type="number" id="ifas_T" value="20" step="1" oninput="calcAndRenderIFAS()">
-        <div class="helper">设计水温：BOD/SALR、需氧与 SOR 按此计</div></div>
-      <div class="field"><label for="ifas_Tmin">最低设计水温 T_min <span class="unit">°C</span></label>
-        <input type="number" id="ifas_Tmin" value="" step="1" placeholder="留空 = min(T, 12)" oninput="calcAndRenderIFAS()">
-        <div class="helper">填料硝化速率（以 10 ℃ 为基准修正）与悬浮相硝化泥龄 SRT_min 按此温度；留空取 min(T, 12 ℃)</div></div>
-      <div class="field"><label for="ifas_Kz">总变化系数 Kz</label>
-        <input type="number" id="ifas_Kz" value="" step="0.05" placeholder="自动" oninput="calcAndRenderIFAS()">
-        <div class="helper">二沉池按最高时流量 Q·Kz/24 设计/校核；留空按 GB 50014 总变化系数表（平均日流量 L/s）插值</div></div>
-      <div class="field"><label for="ifas_BOD0">BOD₀ <span class="unit">mg/L</span></label>
-        <input type="number" id="ifas_BOD0" value="180" step="5" oninput="calcAndRenderIFAS()"></div>
-      <div class="field"><label for="ifas_NH40">NH₄-N₀ <span class="unit">mg/L</span></label>
-        <input type="number" id="ifas_NH40" value="35" step="1" oninput="calcAndRenderIFAS()"></div>
-      <div class="field"><label for="ifas_TN0">TN₀ <span class="unit">mg/L</span></label>
-        <input type="number" id="ifas_TN0" value="45" step="1" oninput="calcAndRenderIFAS()">
-        <div class="helper">本页无 TKN 输入，以 TN₀ 代 TKN₀（进水 NOx 可忽略时）</div></div>
-      <div class="field"><label for="ifas_TP0">TP₀ <span class="unit">mg/L</span></label>
-        <input type="number" id="ifas_TP0" value="5" step="0.2" oninput="calcAndRenderIFAS()"></div>
-      <div class="field"><label for="ifas_SS0">进水 SS₀ <span class="unit">mg/L</span></label>
-        <input type="number" id="ifas_SS0" value="200" step="10" oninput="calcAndRenderIFAS()">
-        <div class="helper">用于惰性 SS 产泥 f·Q·(SS₀−SSₑ)；城镇原水约 200</div></div>
-      <div class="field"><label for="ifas_Alk">碱度 Alk <span class="unit">mg/L</span></label>
-        <input type="number" id="ifas_Alk" value="220" step="10" oninput="calcAndRenderIFAS()">
-        <div class="helper">硝化消耗 7.14 mg/mg NH₄</div></div>
-    </div>
-    <div class="grid">
-      <div class="field"><label for="ifas_standard">排放标准</label>
-        <select id="ifas_standard" onchange="applyStandardIFAS()">
-          <option value="1A">一级 A (GB 18918)</option>
-          <option value="grade4">准 IV 类（地方标准）</option>
-          <option value="grade3">地表 III 类</option>
-          <option value="custom">自定义</option>
-        </select>
-        <div class="helper">准 IV 类为地方标准（TN 10 等），限值按项目所在地调整</div></div>
-      <div class="field"><label for="ifas_NH4e">出水 NH₄-N <span class="unit">mg/L</span></label>
-        <input type="number" id="ifas_NH4e" value="5" step="0.5" oninput="calcAndRenderIFAS()"></div>
-      <div class="field"><label for="ifas_TNe">出水 TN <span class="unit">mg/L</span></label>
-        <input type="number" id="ifas_TNe" value="15" step="0.5" oninput="calcAndRenderIFAS()"></div>
-      <div class="field"><label for="ifas_TPe">出水 TP <span class="unit">mg/L</span></label>
-        <input type="number" id="ifas_TPe" value="0.5" step="0.1" oninput="calcAndRenderIFAS()"></div>
-      <div class="field"><label for="ifas_BODe">出水 BOD <span class="unit">mg/L</span></label>
-        <input type="number" id="ifas_BODe" value="10" step="0.5" oninput="calcAndRenderIFAS()"></div>
-      <div class="field"><label for="ifas_SSe">出水 SSₑ <span class="unit">mg/L</span></label>
-        <input type="number" id="ifas_SSe" value="10" step="1" oninput="calcAndRenderIFAS()"></div>
-    </div>
-
-    <!-- 步骤2：工艺推荐 -->
-    <div class="section-title"><span class="num">2</span>工艺推荐 <span class="sub">根据进出水自动分析</span></div>
-    <div id="ifas_recommend_box" style="margin-bottom:16px;"></div>
-
-    <!-- 步骤3：工艺模式 & 段配置 -->
-    <div class="section-title"><span class="num">3</span>工艺模式 &amp; 段配置方案</div>
-
-    <!-- 新建/改造选择 -->
-    <div class="stage-configs" style="margin-bottom:12px;">
-      <button class="stage-config active" data-ifas-mode="new" onclick="setIFASMode('new')">
-        <div class="sc-num">新</div>
-        <div class="sc-title">新建 IFAS</div>
-        <div class="sc-sub">全新设计 · 活性污泥+填料</div>
-        <div class="sc-flow">进水 → 好氧IFAS → 二沉池 · RAS回流</div>
-      </button>
-      <button class="stage-config" data-ifas-mode="retrofit" onclick="setIFASMode('retrofit')">
-        <div class="sc-num">改</div>
-        <div class="sc-title">改造 IFAS</div>
-        <div class="sc-sub">原池投加填料 · 提升能力</div>
-        <div class="sc-flow">现有活性污泥池 → 投填料 → 处理能力↑30-60%</div>
-      </button>
-    </div>
-
-    <!-- 工艺段配置选择 -->
-    <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin:4px 0 8px;">工艺段配置（选择后自动初始化容积分配比）</div>
-    <div class="stage-configs">
-      <button class="stage-config" data-ifas-config="nitrif_only" onclick="setIFASConfig('nitrif_only')">
-        <div class="sc-num">①</div>
-        <div class="sc-title">纯好氧 IFAS</div>
-        <div class="sc-sub">仅 BOD 去除 + 硝化 · 无脱氮</div>
-        <div class="sc-flow">好氧IFAS(100%) → 二沉池</div>
-      </button>
-      <button class="stage-config" data-ifas-config="ao" onclick="setIFASConfig('ao')">
-        <div class="sc-num">②</div>
-        <div class="sc-title">预缺氧 + 好氧 A/O</div>
-        <div class="sc-sub">含 MLR 内回流 · 免费反硝化 · 主流</div>
-        <div class="sc-flow">预缺氧(25%) → 好氧IFAS(75%) → 二沉池 · MLR 200-400%</div>
-      </button>
-      <button class="stage-config" data-ifas-config="post_anox" onclick="setIFASConfig('post_anox')">
-        <div class="sc-num">③</div>
-        <div class="sc-title">好氧 IFAS + 后缺氧</div>
-        <div class="sc-sub">后缺氧脱氮 · 需外加碳源</div>
-        <div class="sc-flow">好氧IFAS(75%) → 后缺氧(25%) → 二沉池</div>
-      </button>
-      <button class="stage-config active" data-ifas-config="full_bnr" onclick="setIFASConfig('full_bnr')">
-        <div class="sc-num">④</div>
-        <div class="sc-title">完整 BNR</div>
-        <div class="sc-sub">双重脱氮 + 化除磷 · 最高标准</div>
-        <div class="sc-flow">预缺氧(25%) → 好氧IFAS(55%) → 后缺氧(20%) → 二沉池 · MLR</div>
-      </button>
-    </div>
-
-    <div class="auto-calc-notice" style="margin-top:8px;">
-      <div class="notice-head"><span class="notice-ic">ℹ️</span>
-        <span id="ifas_config_desc">完整BNR：预缺氧+好氧IFAS+后缺氧+化除磷，双重脱氮+化除磷，适合TN/TP均严格的场景。</span>
-      </div>
-    </div>
-
-    <!-- 步骤4：工艺设计参数 -->
-    <div class="section-title"><span class="num">4</span><span id="ifas_paramTitle">工艺设计参数</span></div>
-    <div id="ifas_newParams">
-      <div class="grid">
-        <div class="field"><label for="ifas_MLSS">MLSS(悬浮) <span class="unit">mg/L</span></label>
-          <input type="number" id="ifas_MLSS" value="3500" step="100" oninput="calcAndRenderIFAS()">
-          <div class="helper">总悬浮固体（含进水惰性 SS、化学污泥），D1 口径；IFAS 常 2500-4000</div></div>
-        <div class="field"><label for="ifas_VSS_SS">MLVSS/MLSS</label>
-          <input type="number" id="ifas_VSS_SS" value="0.72" step="0.01" oninput="calcAndRenderIFAS()"></div>
-        <div class="field"><label for="ifas_SRT">泥龄 SRT <span class="unit">d</span></label>
-          <input type="number" id="ifas_SRT" value="5" step="0.5" oninput="calcAndRenderIFAS()">
-          <div class="helper">悬浮相最小泥龄（全池）：SRT = 水体×MLSS ÷ ΔX（ΔX 含惰性 SS、化学与碳源污泥，D1 口径）。好氧泥龄（扣缺氧区）低于 SF·SRT_min 时硝化全部由填料承担——IFAS 正是借填料在短泥龄下硝化</div></div>
-        <div class="field"><label for="ifas_V_input">总池容 V <span class="unit">m³（留0自动估算）</span></label>
-          <input type="number" id="ifas_V_input" value="0" step="500" oninput="calcAndRenderIFAS()" placeholder="自动估算"></div>
-        <div class="field"><label for="ifas_fillRatio">填料填充率 f <span class="unit">%</span></label>
-          <input type="number" id="ifas_fillRatio" value="40" step="5" oninput="calcAndRenderIFAS()">
-          <div class="helper">IFAS 常 20-40%，上限 50%</div></div>
-        <div class="field"><label for="ifas_specArea">填料比表面积 a <span class="unit">m²/m³</span></label>
-          <input type="number" id="ifas_specArea" value="800" step="50" oninput="calcAndRenderIFAS()">
-          <div class="helper">K3 约 500，K5 约 800（IFAS 常用高比表面积填料）</div></div>
-        <div class="field"><label for="ifas_biofilm">填料表面生物量 <span class="unit">g VSS/m²</span></label>
-          <input type="number" id="ifas_biofilm" value="15" step="1" oninput="calcAndRenderIFAS()">
-          <div class="helper">文献多为 5-15 g/m²（部分以 TS 计）；取值偏高会高估附着相贡献</div></div>
-        <div class="field"><label for="ifas_SALR">SALR₂₀ <span class="unit">g BOD/m²·d</span></label>
-          <input type="number" id="ifas_SALR" value="7" step="0.5" oninput="calcAndRenderIFAS()"></div>
-        <div class="field"><label for="ifas_nitClass">填料硝化速率·前处理类别</label>
-          <select id="ifas_nitClass" oninput="calcAndRenderIFAS()">
-            <option value="auto">按构型自动（有预缺氧→b，无→a）</option>
-            <option value="a">a：无初沉、无前置反硝化（0.50）</option>
-            <option value="b">b：有初沉或前置反硝化（0.60）</option>
-            <option value="c">c：有初沉且前置反硝化（0.65）</option>
-            <option value="d">d：化学预沉淀（0.75）</option>
-          </select>
-          <div class="helper">与纯 MBBR 同一函数：r = r_类别（10 ℃）× θ^(min(T_min,20)−10) × min(DO,5)/5 × min(1, NH₄ₑ/2)，按进入 NH₄-N 负荷校核</div></div>
-        <div class="field"><label for="ifas_rNit">自定义填料硝化速率 <span class="unit">g NH₄-N/m²·d（10 ℃）</span></label>
-          <input type="number" id="ifas_rNit" value="" step="0.05" placeholder="留空 = 按类别" oninput="calcAndRenderIFAS()">
-          <div class="helper">有实测/厂家数据时填写（10 ℃ 基准），留空按类别</div></div>
-        <div class="field"><label for="ifas_settleQ">二沉池表面负荷 q <span class="unit">m³/m²·h</span></label>
-          <input type="number" id="ifas_settleQ" value="1.0" step="0.1" oninput="calcAndRenderIFAS()">
-          <div class="helper">GB 50014 活性污泥二沉池 0.6-1.5；A = Q·Kz/24 ÷ q（最高时流量）</div></div>
-        <div class="field"><label for="ifas_settleHRT">后置沉淀最小 HRT <span class="unit">h</span></label>
-          <input type="number" id="ifas_settleHRT" value="2.0" step="0.5" oninput="calcAndRenderIFAS()">
-          <div class="helper">V = max(A×3.5 m, Q_max,h×HRT)；按最高时流量 1.5-4h</div></div>
-        <div class="field"><label for="ifas_poolH">好氧池有效水深 H <span class="unit">m</span></label>
-          <input type="number" id="ifas_poolH" value="5.0" step="0.5" oninput="calcAndRenderIFAS()">
-          <div class="helper">影响鼓风机静压；IFAS 常 4-6 m</div></div>
-      </div>
-    </div>
-    <div id="ifas_retrofitParams" style="display:none;">
-      <div class="grid">
-        <div class="field"><label for="ifas_Vexisting">原有池容 V <span class="unit">m³</span></label>
-          <input type="number" id="ifas_Vexisting" value="16000" step="500" oninput="calcAndRenderIFAS()"></div>
-        <div class="field"><label for="ifas_MLSSexisting">原有 MLSS <span class="unit">mg/L</span></label>
-          <input type="number" id="ifas_MLSSexisting" value="3500" step="100" oninput="calcAndRenderIFAS()">
-          <div class="helper">总悬浮固体（含惰性），D1 口径</div></div>
-        <div class="field"><label for="ifas_VSS_SS2">改造后 MLVSS/MLSS</label>
-          <input type="number" id="ifas_VSS_SS2" value="0.72" step="0.01" oninput="calcAndRenderIFAS()"></div>
-        <div class="field"><label for="ifas_MLSS_new">改造后目标 MLSS <span class="unit">mg/L</span></label>
-          <input type="number" id="ifas_MLSS_new" value="4000" step="100" oninput="calcAndRenderIFAS()">
-          <div class="helper">改造后悬浮相按此 MLSS 计算；改造前能力按原有 MLSS</div></div>
-        <div class="field"><label for="ifas_SRT_r">悬浮相最小泥龄 SRT <span class="unit">d</span></label>
-          <input type="number" id="ifas_SRT_r" value="5" step="0.5" oninput="calcAndRenderIFAS()">
-          <div class="helper">改造前后同一口径：水体×MLSS = SRT×ΔX（含惰性 SS）反算能力；改造前另需好氧泥龄 ≥ SF·SRT_min 才能硝化，改造后不足部分由填料硝化</div></div>
-        <div class="field"><label for="ifas_Asettle_r">原有二沉池面积 <span class="unit">m²</span></label>
-          <input type="number" id="ifas_Asettle_r" value="2400" step="100" oninput="calcAndRenderIFAS()">
-          <div class="helper">二沉池能力 = A × q × 24 / Kz（改造前后相同）</div></div>
-        <div class="field"><label for="ifas_fillRatio_r">填料填充率 f <span class="unit">%</span></label>
-          <input type="number" id="ifas_fillRatio_r" value="40" step="5" oninput="calcAndRenderIFAS()">
-          <div class="helper">IFAS 常 20-40%，上限 50%</div></div>
-        <div class="field"><label for="ifas_specArea_r">填料比表面积 a <span class="unit">m²/m³</span></label>
-          <input type="number" id="ifas_specArea_r" value="800" step="50" oninput="calcAndRenderIFAS()"></div>
-        <div class="field"><label for="ifas_biofilm_r">填料表面生物量 <span class="unit">g VSS/m²</span></label>
-          <input type="number" id="ifas_biofilm_r" value="12" step="1" oninput="calcAndRenderIFAS()"></div>
-        <div class="field"><label for="ifas_SALR_r">SALR₂₀ <span class="unit">g BOD/m²·d</span></label>
-          <input type="number" id="ifas_SALR_r" value="7" step="0.5" oninput="calcAndRenderIFAS()"></div>
-        <div class="field"><label for="ifas_nitClass_r">填料硝化速率·前处理类别</label>
-          <select id="ifas_nitClass_r" oninput="calcAndRenderIFAS()">
-            <option value="auto">按构型自动（有预缺氧→b，无→a）</option>
-            <option value="a">a：无初沉、无前置反硝化（0.50）</option>
-            <option value="b">b：有初沉或前置反硝化（0.60）</option>
-            <option value="c">c：有初沉且前置反硝化（0.65）</option>
-            <option value="d">d：化学预沉淀（0.75）</option>
-          </select>
-          <div class="helper">与纯 MBBR 同一函数：r = r_类别（10 ℃）× θ^(min(T_min,20)−10) × min(DO,5)/5 × min(1, NH₄ₑ/2)，按进入 NH₄-N 负荷校核</div></div>
-        <div class="field"><label for="ifas_rNit_r">自定义填料硝化速率 <span class="unit">g NH₄-N/m²·d（10 ℃）</span></label>
-          <input type="number" id="ifas_rNit_r" value="" step="0.05" placeholder="留空 = 按类别" oninput="calcAndRenderIFAS()">
-          <div class="helper">有实测/厂家数据时填写（10 ℃ 基准），留空按类别</div></div>
-        <div class="field"><label for="ifas_settleQ_r">二沉池允许表面负荷 q <span class="unit">m³/m²·h</span></label>
-          <input type="number" id="ifas_settleQ_r" value="1.3" step="0.1" oninput="calcAndRenderIFAS()">
-          <div class="helper">最高时流量下允许值，GB 50014 活性污泥二沉池 0.6-1.5；用于二沉池能力反算</div></div>
-        <div class="field"><label for="ifas_poolH_r">好氧池有效水深 H <span class="unit">m</span></label>
-          <input type="number" id="ifas_poolH_r" value="5.0" step="0.5" oninput="calcAndRenderIFAS()">
-          <div class="helper">影响鼓风机静压</div></div>
-      </div>
-    </div>
-
-    <!-- 步骤5：容积分配比 -->
-    <div class="section-title"><span class="num">5</span>容积分配比(%) <span class="sub">（由工艺构型自动初始化，可手动调整）</span></div>
-    <div class="grid" id="ifas_volRatioGrid">
-      <div class="field" id="ifas_volPreAnox_field"><label for="ifas_r_preAnox_pct">预缺氧段 %</label>
-        <input type="number" id="ifas_r_preAnox_pct" value="0" step="5" oninput="calcAndRenderIFAS()"></div>
-      <div class="field"><label for="ifas_r_aer_pct">好氧 IFAS 段 %</label>
-        <input type="number" id="ifas_r_aer_pct" value="100" step="5" oninput="calcAndRenderIFAS()"></div>
-      <div class="field" id="ifas_volPostAnox_field"><label for="ifas_r_postAnox_pct">后缺氧段 %</label>
-        <input type="number" id="ifas_r_postAnox_pct" value="0" step="5" oninput="calcAndRenderIFAS()"></div>
-    </div>
-    <div id="ifas_volSumWarn"></div>
-
-    <!-- 步骤6：回流参数（RAS + MLR）-->
-    <div id="ifas_recircSection">
-      <div class="section-title"><span class="num">6</span>回流参数 <span class="sub">IFAS 有活性污泥，RAS 必须设置</span></div>
-      <div class="auto-calc-notice">
-        <div class="notice-head"><span class="notice-ic">🔄</span>
-          <span><b>IFAS 与纯 MBBR 的核心区别：</b>RAS 维持 MLSS；A/O 工艺另有 MLR 内回流将硝化液送回缺氧段实现免费反硝化。</span>
-        </div>
-      </div>
-      <div class="grid">
-        <div class="field"><label for="ifas_RAS">RAS 回流比 <span class="unit">%（相对Q）</span></label>
-          <input type="number" id="ifas_RAS" value="100" step="25" oninput="calcAndRenderIFAS()">
-          <div class="helper">典型 50-150%</div></div>
-        <div class="field" id="ifas_MLR_field"><label for="ifas_MLR">MLR 内回流比 <span class="unit">%（相对Q）</span></label>
-          <input type="number" id="ifas_MLR" value="300" step="50" oninput="calcAndRenderIFAS()">
-          <div class="helper">A/O：200-400%；预缺氧 NOx 去除率 η = (MLR+R)/(1+MLR+R)×0.85（R 为 RAS 回流比，0.85 为经验折减），且不超过进水 BOD 可支持的反硝化量</div></div>
-        <div class="field"><label for="ifas_RAS_H">RAS 泵扬程 <span class="unit">m</span></label>
-          <input type="number" id="ifas_RAS_H" value="3" step="0.5" oninput="calcAndRenderIFAS()"></div>
-        <div class="field"><label for="ifas_MLR_H">MLR 泵扬程 <span class="unit">m</span></label>
-          <input type="number" id="ifas_MLR_H" value="2" step="0.5" oninput="calcAndRenderIFAS()"></div>
-        <div class="field"><label for="ifas_pumpEff">泵效率 <span class="unit">%</span></label>
-          <input type="number" id="ifas_pumpEff" value="65" step="5" oninput="calcAndRenderIFAS()"></div>
-      </div>
-    </div>
-
-    <!-- 步骤7：外加药剂参数 -->
-    <div class="section-title"><span class="num">7</span>外加药剂参数</div>
-    <div class="grid">
-      <div class="field"><label for="ifas_carbonSrc">后缺氧碳源类型</label>
-        <select id="ifas_carbonSrc" onchange="calcAndRenderIFAS()">
-          <option value="methanol">甲醇（COD系数 1.5，最经济）</option>
-          <option value="acetate">乙酸钠（无水 COD系数 0.78 × 有效含量，启动快）</option>
-          <option value="glucose">葡萄糖（COD系数 1.07）</option>
-        </select></div>
-      <div class="field"><label for="ifas_acetatePurity">乙酸钠有效含量 <span class="unit">%</span></label>
-        <input type="number" id="ifas_acetatePurity" value="58" step="1" oninput="calcAndRenderIFAS()">
-        <div class="helper">固体三水乙酸钠约 58%（折合 0.45 gCOD/g 商品）；液体按标称含量；仅选乙酸钠时生效</div></div>
-      <div class="field"><label for="ifas_carbonPrice">碳源价格 <span class="unit">元/kg</span></label>
-        <input type="number" id="ifas_carbonPrice" value="5" step="0.5" oninput="calcAndRenderIFAS()"></div>
-      <div class="field"><label for="ifas_PAC">PAC 投加量 <span class="unit">mg/L</span></label>
-        <input type="number" id="ifas_PAC" value="" step="5" placeholder="留空自动" oninput="calcAndRenderIFAS()">
-        <div class="helper">液体 PAC（Al₂O₃ 10%，Al 5.29%）；留空按化学计量 Al/P=2（摩尔比）自动计算，生物除磷按 15%（经验值）</div></div>
-      <div class="field"><label for="ifas_PACprice">PAC 价格 <span class="unit">元/kg</span></label>
-        <input type="number" id="ifas_PACprice" value="0.7" step="0.1" oninput="calcAndRenderIFAS()">
-        <div class="helper">液体 PAC（10% Al₂O₃）参考价</div></div>
-      <div class="field"><label for="ifas_alkDose">NaHCO₃补碱 <span class="unit">mg/L（留0自动计算）</span></label>
-        <input type="number" id="ifas_alkDose" value="0" step="10" oninput="calcAndRenderIFAS()"></div>
-      <div class="field"><label for="ifas_alkPrice">NaHCO₃ 价格 <span class="unit">元/kg</span></label>
-        <input type="number" id="ifas_alkPrice" value="2.5" step="0.5" oninput="calcAndRenderIFAS()"></div>
-      <div class="field"><label for="ifas_sludge_mc">脱水后泥饼含水率 <span class="unit">%</span></label>
-        <input type="number" id="ifas_sludge_mc" value="80" step="1" oninput="calcAndRenderIFAS()">
-        <div class="helper">板框 75-80%，离心 78-82%</div></div>
-      <div class="field"><label for="ifas_sludge_price">污泥处置费用 <span class="unit">元/t（湿）</span></label>
-        <input type="number" id="ifas_sludge_price" value="300" step="50" oninput="calcAndRenderIFAS()">
-        <div class="helper">卫生填埋 200-400</div></div>
-    </div>
-
-    <!-- 步骤8-11：曝气器选型与风机（与MBBR一致） -->
-    <div class="section-title"><span class="num">8</span>曝气器选型与风机 <span class="sub">基于IFAS双相需氧量计算</span></div>
-    <div class="aerator-tabs">
-      <button class="aerator-tab active" data-aer="coarse" onclick="setAeratorType('coarse','ifa')">
-        <b>粗孔旋混</b><span>专为 MBBR 优化 · 抗堵</span>
-      </button>
-      <button class="aerator-tab" data-aer="disc" onclick="setAeratorType('disc','ifa')">
-        <b>盘式微孔</b><span>氧传质最高 · 易堵塞</span>
-      </button>
-      <button class="aerator-tab" data-aer="tube" onclick="setAeratorType('tube','ifa')">
-        <b>管式曝气</b><span>大气量 · 安装方便</span>
-      </button>
-      <button class="aerator-tab" data-aer="jet" onclick="setAeratorType('jet','ifa')">
-        <b>射流曝气</b><span>小规模/深池 · 无堵塞</span>
-      </button>
-    </div>
-
-    <!-- 曝气器特性参数 -->
-    <div class="section-title"><span class="num">9</span>曝气器性能参数</div>
-    <div class="grid">
-      <div class="field"><label for="ifa_perDevice">单个曝气器额定气量 <span class="unit">Nm³/h</span></label>
-        <input type="number" id="ifa_perDevice" value="7" step="1" onchange="calcAndRenderIFAS()">
-        <div class="helper" id="ifa_perDevice_help">粗孔单件 5-15</div></div>
-      <div class="field"><label for="ifa_OTE">氧传质效率 OTE <span class="unit">%/m</span></label>
-        <input type="number" id="ifa_OTE" value="3" step="0.5" onchange="calcAndRenderIFAS()">
-        <div class="helper" id="ifa_OTE_help">粗孔 2-4 %/m 水深</div>
-        <div class="helper">IFAS 口径：OTE 为曝气器标准条件（清水）值，经 α/β/θ 由 SOR 推气量；与纯 MBBR 的 SOFK（现场条件值、按 AOR 推气量）口径不同，同等需氧下 IFAS 算出的气量会偏高</div></div>
-      <div class="field"><label for="ifa_spacing">曝气器布置间距 <span class="unit">m</span></label>
-        <input type="number" id="ifa_spacing" value="0.8" step="0.1" onchange="calcAndRenderIFAS()">
-        <div class="helper">粗孔 0.6-1.0 常用</div></div>
-      <div class="field"><label for="ifa_price">单价 <span class="unit">元/个</span></label>
-        <input type="number" id="ifa_price" value="180" step="10" onchange="calcAndRenderIFAS()">
-        <div class="helper" id="ifa_price_help">粗孔 150-300 元</div></div>
-    </div>
-
-    <!-- 风机选型参数 -->
-    <div class="section-title"><span class="num">10</span>风机参数</div>
-    <div class="grid">
-      <div class="field"><label for="ifa_blowerType">风机类型</label>
-        <select id="ifa_blowerType" onchange="calcAndRenderIFAS()">
-          <option value="roots">罗茨风机(常规)</option>
-          <option value="multistage">多级离心风机(低噪音)</option>
-          <option value="magnetic">磁悬浮风机(节能最优)</option>
-        </select></div>
-      <div class="field"><label for="ifa_dp_aer">曝气池阻力 <span class="unit">kPa</span></label>
-        <input type="number" id="ifa_dp_aer" value="3" step="0.5" onchange="calcAndRenderIFAS()">
-        <div class="helper">微孔 3-5, 粗孔 2-3</div></div>
-      <div class="field"><label for="ifa_dp_pipe">管路阻力 <span class="unit">kPa</span></label>
-        <input type="number" id="ifa_dp_pipe" value="3" step="0.5" onchange="calcAndRenderIFAS()"></div>
-      <div class="field"><label for="ifa_efficiency">风机效率 <span class="unit">%</span></label>
-        <input type="number" id="ifa_efficiency" value="62" step="1" onchange="calcAndRenderIFAS()">
-        <div class="helper">罗茨 55-70, 磁悬浮 75-85</div></div>
-      <div class="field"><label for="ifa_backupFactor">备用系数</label>
-        <input type="number" id="ifa_backupFactor" value="1.2" step="0.05" onchange="calcAndRenderIFAS()">
-        <div class="helper">1.2 = 2 用 1 备</div></div>
-    </div>
-
-    <!-- AOR→SOR 修正系数 -->
-    <div class="section-title"><span class="num">11</span>α · β · θ 修正系数 <span class="sub">用于 AOR → SOR 转换校核</span></div>
-    <div class="auto-calc-notice">
-      <div class="notice-head"><span class="notice-ic">ℹ️</span>
-        <span>以下修正系数用于将实际需氧量 AOR 换算为标准状态需氧量 SOR，并反推气量；SOR、气量、曝气器与风机统一使用这一组 β、θ、DO（DO 同时用于填料硝化速率的 DO 修正）。
-        水温 T 自动跟随上方进水水温 T；α 取高级参数中的 α（默认 0.65）。</span>
-      </div>
-    </div>
-    <div class="grid">
-      <div class="field"><label for="ifa_beta">β（水质饱和度修正）</label>
-        <input type="number" id="ifa_beta" value="0.95" step="0.01" onchange="calcAndRenderIFAS()">
-        <div class="helper">含盐低时 0.95-1.0</div></div>
-      <div class="field"><label for="ifa_theta">θ（传质温度系数）</label>
-        <input type="number" id="ifa_theta" value="1.024" step="0.001" onchange="calcAndRenderIFAS()">
-        <div class="helper">鼓风曝气 1.016-1.025</div></div>
-      <div class="field"><label for="ifa_DO">DO 设计值 <span class="unit">mg/L</span></label>
-        <input type="number" id="ifa_DO" value="3.0" step="0.5" onchange="calcAndRenderIFAS()">
-        <div class="helper">IFAS 好氧段常 3-4 mg/L；填料硝化速率按 min(DO, 5)/5 线性修正，设计 DO 上限 5</div></div>
-      <div class="field"><label for="ifa_T">水温 T <span class="unit">°C</span></label>
-        <input type="number" id="ifa_T" value="20" step="1" onchange="calcAndRenderIFAS()">
-        <div class="helper">自动跟随上方进水温度 T</div></div>
-    </div>
-
-
-    <!-- 高级参数（折叠，对应MBBR的高级参数区） -->
-    <div class="advanced-toggle" onclick="toggleIFASAdv()">
-      <span class="chev" id="ifasChev">▸</span>
-      <span>高级参数（θ温度修正 / 动力学 / 生物膜）</span>
-    </div>
-    <div class="advanced-params" id="ifasAdv">
-      <div style="background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:8px;">
-        <div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:10px;">🌡️ 温度修正</div>
-        <div class="grid">
-          <div class="field"><label for="ifas_theta">θ（SALR / 填料硝化温度系数）</label>
-            <input type="number" id="ifas_theta" value="1.09" step="0.01" oninput="calcAndRenderIFAS()">
-            <div class="helper">SALR 按 θ^(T−20)；填料硝化按 θ^(min(T_min,20)−10)（θ_nit = 1.09）</div></div>
-        </div>
-      </div>
-      <div style="background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:8px;">
-        <div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:10px;">💨 曝气修正系数</div>
-        <div class="grid">
-          <div class="field"><label for="ifas_alpha">α（污水修正）</label>
-            <input type="number" id="ifas_alpha" value="0.65" step="0.05" oninput="calcAndRenderIFAS()">
-            <div class="helper">IFAS 含悬浮污泥，α 比纯 MBBR 低；同时用于 §11 SOR 换算</div></div>
-          <div class="helper" style="grid-column:1/-1;">β、θ_O₂、DO 设计值统一在 §11 设置</div>
-        </div>
-      </div>
-      <div style="background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:14px;">
-        <div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:10px;">🧬 生物动力学</div>
-        <div class="grid">
-          <div class="field"><label for="ifas_Y">Y（悬浮相）</label>
-            <input type="number" id="ifas_Y" value="0.60" step="0.05" oninput="calcAndRenderIFAS()"></div>
-          <div class="field"><label for="ifas_Kd">Kd（悬浮相）<span class="unit">d⁻¹</span></label>
-            <input type="number" id="ifas_Kd" value="0.06" step="0.01" oninput="calcAndRenderIFAS()"></div>
-          <div class="field"><label for="ifas_Y_bio">Y_bio（附着相表观产率）<span class="unit">kgVSS/kgBOD</span></label>
-            <input type="number" id="ifas_Y_bio" value="0.25" step="0.05" oninput="calcAndRenderIFAS()">
-            <div class="helper">表观（净）产率，已含生物膜内源衰减：脱落量 = Y_bio × 附着相去除 BOD，不再另扣衰减；MBBR 生物膜常 0.2-0.3</div></div>
-          <div class="field"><label for="ifas_SDNR">SDNR₂₀ <span class="unit">g N/g VSS·d</span></label>
-            <input type="number" id="ifas_SDNR" value="0.08" step="0.01" oninput="calcAndRenderIFAS()">
-            <div class="helper">温度修正 θ=1.08（依据 GB 50014：Kde(T)=Kde(20)·1.08^(T−20)）</div></div>
-          <div class="field"><label for="ifas_fSS">惰性 SS 系数 f</label>
-            <input type="number" id="ifas_fSS" value="0.5" step="0.05" oninput="calcAndRenderIFAS()">
-            <div class="helper">进水 SS 中不可生物降解部分，GB 50014 取 0.5-0.7</div></div>
-          <div class="field"><label for="ifas_solidFrac">填料实体率</label>
-            <input type="number" id="ifas_solidFrac" value="0.13" step="0.01" oninput="calcAndRenderIFAS()">
-            <div class="helper">填料实体体积 / 堆积体积，K 型约 0.10-0.15；水体 = V − V_fill × 实体率</div></div>
-          <div class="field"><label for="ifas_mu_max">μ_max（硝化菌，20 ℃）<span class="unit">d⁻¹</span></label>
-            <input type="number" id="ifas_mu_max" value="0.75" step="0.05" oninput="calcAndRenderIFAS()">
-            <div class="helper">SRT_min = 1/[μ_max(T_min)·NH₄/(K_N+NH₄) − Kd]，θ=1.103、K_N=1.0·1.05^(T−20)（与活性污泥工具同口径）</div></div>
-          <div class="field"><label for="ifas_SF">硝化安全系数 SF</label>
-            <input type="number" id="ifas_SF" value="2.0" step="0.1" oninput="calcAndRenderIFAS()">
-            <div class="helper">悬浮相泥龄 ≥ SF·SRT_min 才计悬浮相硝化，否则硝化全部由填料承担；常用 1.5-3</div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 结果区 -->
-    <div class="results" style="margin-top:20px;">
-      <h2>🎯 <span id="ifas_titleSub">IFAS 新建</span> 设计结果</h2>
-      <div class="flow-diagram">
-        <svg id="ifasFlowSvg" width="100%" height="260" viewBox="0 0 1000 260" xmlns="http://www.w3.org/2000/svg"></svg>
-      </div>
-      <div class="result-group">
-        <div class="result-group-title"><span class="ic">📐</span> 各段池容</div>
-        <div class="result-row highlight-row"><span class="result-label"><b>总池容 V</b></span>
-          <span><span class="result-value big" id="ifas_r_V">—</span><span class="result-unit">m³</span></span></div>
-        <div class="result-row highlight-row"><span class="result-label"><b>HRT</b></span>
-          <span><span class="result-value big" id="ifas_r_HRT">—</span><span class="result-unit">h</span></span></div>
-        <div class="result-row"><span class="result-label">池容控制因素 <span class="sub">(SRT 质量平衡 / 填料 SALR / 硝化)</span></span>
-          <span><span class="result-value" id="ifas_r_Vctrl" style="font-size:12px;">—</span></span></div>
-        <div class="result-row" id="ifas_row_preAnox"><span class="result-label">预缺氧段</span>
-          <span><span class="result-value" id="ifas_r_V_preAnox">—</span><span class="result-unit">m³</span></span></div>
-        <div class="result-row"><span class="result-label">好氧 IFAS 段</span>
-          <span><span class="result-value" id="ifas_r_V_aer">—</span><span class="result-unit">m³</span></span></div>
-        <div class="result-row" id="ifas_row_postAnox"><span class="result-label">后缺氧段</span>
-          <span><span class="result-value" id="ifas_r_V_postAnox">—</span><span class="result-unit">m³</span></span></div>
-        <div class="result-row"><span class="result-label">填料体积 V_fill</span>
-          <span><span class="result-value" id="ifas_r_VfillMat">—</span><span class="result-unit">m³</span></span></div>
-        <div class="result-row"><span class="result-label">填料有效面积 A_total</span>
-          <span><span class="result-value" id="ifas_r_Atotal">—</span><span class="result-unit">m²</span></span></div>
-        <div class="result-row"><span class="result-label">后置沉淀池 V</span>
-          <span><span class="result-value" id="ifas_r_Vsettle">—</span><span class="result-unit">m³</span></span></div>
-        <div class="result-row"><span class="result-label">沉淀池表面负荷 <span class="sub">(最高时 Q·Kz/24，Kz = <span id="ifas_r_Kz">—</span>)</span></span>
-          <span><span class="result-value" id="ifas_r_surfLoad">—</span><span class="result-unit">m/h</span></span></div>
-        <div class="result-row"><span class="result-label">沉淀池面积 / HRT <span class="sub">(最高时)</span></span>
-          <span><span class="result-value" id="ifas_r_settleAH">—</span><span class="result-unit">m² / h</span></span></div>
-      </div>
-      <div class="result-group">
-        <div class="result-group-title"><span class="ic">🧬</span> 双相生物量</div>
-        <div class="result-row"><span class="result-label">附着相生物量 X_bio</span>
-          <span><span class="result-value" id="ifas_r_Xbio">—</span><span class="result-unit">kg VSS</span></span></div>
-        <div class="result-row"><span class="result-label">悬浮相生物量 X_susp</span>
-          <span><span class="result-value" id="ifas_r_Xsusp">—</span><span class="result-unit">kg VSS</span></span></div>
-        <div class="result-row"><span class="result-label">悬浮相泥龄 SRT（水体×MLSS ÷ ΔX，含惰性）/ 好氧泥龄 / 硝化安全泥龄 SF·SRT_min(T_min)</span>
-          <span><span class="result-value" id="ifas_r_SRTact">—</span><span class="result-unit">d / d / d</span></span></div>
-        <div class="result-row highlight-row"><span class="result-label"><b>等效 MLSS</b> <span class="sub">((悬浮相固体 + 生物膜) ÷ 池容)</span></span>
-          <span><span class="result-value big" id="ifas_r_MLSSeq">—</span><span class="result-unit">mg/L</span></span></div>
-        <div class="result-row"><span class="result-label">附着相 BOD 去除贡献 <span class="sub">(按生物量比)</span></span>
-          <span><span class="result-value" id="ifas_r_bioContribBOD">—</span><span class="result-unit">%</span></span></div>
-        <div class="result-row"><span class="result-label">附着相硝化贡献 <span class="sub">(悬浮相泥龄不足时 100%)</span></span>
-          <span><span class="result-value" id="ifas_r_bioContribN">—</span><span class="result-unit">%</span></span></div>
-        <div class="result-row"><span class="result-label">悬浮相产泥 ΔX_susp <span class="sub">(Y·BOD_susp/(1+Kd·SRT))</span></span>
-          <span><span class="result-value" id="ifas_r_dX_susp">—</span><span class="result-unit">kg VSS/d</span></span></div>
-        <div class="result-row"><span class="result-label">生物膜脱落量 ΔX_bio <span class="sub">(Y_bio 表观产率 × 附着相 BOD)</span></span>
-          <span><span class="result-value" id="ifas_r_dX_bio">—</span><span class="result-unit">kg VSS/d</span></span></div>
-        <div class="result-row"><span class="result-label">生物产泥 ΔX_VSS（悬浮 + 附着）</span>
-          <span><span class="result-value" id="ifas_r_dX">—</span><span class="result-unit">kg VSS/d</span></span></div>
-        <div class="result-row"><span class="result-label">进水惰性 SS 产泥 f·Q·(SS₀−SSₑ)</span>
-          <span><span class="result-value" id="ifas_r_dX_inert">—</span><span class="result-unit">kg/d</span></span></div>
-        <div class="result-row"><span class="result-label">化学污泥 <span class="sub">(AlPO₄ 122/31 + 余 Al(OH)₃ 78/27)</span></span>
-          <span><span class="result-value" id="ifas_r_dX_chem">—</span><span class="result-unit">kg/d</span></span></div>
-        <div class="result-row"><span class="result-label">外加碳源产泥 <span class="sub">(Y≈0.3 kgVSS/kgCOD，经验值)</span></span>
-          <span><span class="result-value" id="ifas_r_dX_carbon">—</span><span class="result-unit">kg/d</span></span></div>
-        <div class="result-row highlight-row"><span class="result-label"><b>剩余污泥干量 ΔX</b> <span class="sub">(ΔX_VSS + f·Q·ΔSS + 化学 + 碳源)</span></span>
-          <span><span class="result-value big" id="ifas_r_dX_total">—</span><span class="result-unit">kg DS/d</span></span></div>
-        <div class="result-row"><span class="result-label">污泥产率（吨水）</span>
-          <span><span class="result-value" id="ifas_r_sludge_yield">—</span><span class="result-unit">kg DS/m³</span></span></div>
-        <div class="result-row highlight-row"><span class="result-label"><b>脱水后泥饼量</b></span>
-          <span><span class="result-value big" id="ifas_r_sludge_wet">—</span><span class="result-unit">t/d</span></span></div>
-        <div class="result-row"><span class="result-label">污泥处置年费用</span>
-          <span><span class="result-value" id="ifas_r_sludge_cost">—</span><span class="result-unit">万元/年</span></span></div>
-      </div>
-      <div class="result-group">
-        <div class="result-group-title"><span class="ic">📊</span> 去除效果预测</div>
-        <div class="result-row"><span class="result-label">BOD 去除率</span>
-          <span><span class="result-value" id="ifas_r_BODrm">—</span><span class="result-unit">%</span></span></div>
-        <div class="result-row"><span class="result-label">NH₄-N 去除率</span>
-          <span><span class="result-value" id="ifas_r_NH4rm">—</span><span class="result-unit">%</span></span></div>
-        <div class="result-row"><span class="result-label">被硝化氮 N_nit <span class="sub">(ΔTKN − 0.12·ΔX_VSS；ΔTKN = TN₀ − NH₄ₑ − 1.5，无 TKN 输入以 TN₀ 代)</span></span>
-          <span><span class="result-value" id="ifas_r_Nnit">—</span><span class="result-unit">kg N/d</span></span></div>
-        <div class="result-row"><span class="result-label">预缺氧 / 后缺氧脱氮量</span>
-          <span><span class="result-value" id="ifas_r_NDN">—</span><span class="result-unit">kg N/d</span></span></div>
-        <div class="result-row highlight-row"><span class="result-label"><b>TN 去除率</b></span>
-          <span><span class="result-value big" id="ifas_r_TNrm">—</span><span class="result-unit">%</span></span></div>
-        <div class="result-row"><span class="result-label">预计 TN 出水 <span class="sub">(NH₄ₑ + 有机氮ₑ 1.5 + NOx·(1−η))</span></span>
-          <span><span class="result-value" id="ifas_r_TNout">—</span><span class="result-unit">mg/L</span></span></div>
-        <div class="result-row"><span class="result-label">预缺氧 NOx 去除率 η = (MLR+R)/(1+MLR+R)×0.85 <span class="sub">(另受进水 BOD 约束)</span></span>
-          <span><span class="result-value" id="ifas_r_MLR_limit">—</span><span class="result-unit">%</span></span></div>
-        <div class="result-row"><span class="result-label">碱度剩余（硝化消耗 − 反硝化回收后）</span>
-          <span><span class="result-value" id="ifas_r_alkRem">—</span><span class="result-unit">mg/L</span></span></div>
-        <div class="result-row"><span class="result-label">预计 TP 出水 <span class="sub">(生物 15% + PAC 化学除磷)</span></span>
-          <span><span class="result-value" id="ifas_r_TPout">—</span><span class="result-unit">mg/L</span></span></div>
-      </div>
-      <div class="result-group">
-        <div class="result-group-title"><span class="ic">💨</span> 需氧量与曝气</div>
-        <div class="result-row highlight-row"><span class="result-label"><b>AOR 实际需氧量</b> <span class="sub">(1.47·ΔBOD − 1.42·ΔX_VSS + 4.57·(ΔTKN − 0.12·ΔX_VSS) − 2.86·N_DN；N_DN 仅计预缺氧利用进水碳源的脱氮)</span></span>
-          <span><span class="result-value big" id="ifas_r_AOR">—</span><span class="result-unit">kg O₂/d</span></span></div>
-        <div class="result-row"><span class="result-label">SOR 标准需氧量 <span class="sub">(含扩散器水深 Csm 修正)</span></span>
-          <span><span class="result-value" id="ifas_r_SOR">—</span><span class="result-unit">kg O₂/d</span></span></div>
-        <div class="result-row"><span class="result-label">氧转移效率 EE <span class="sub">(OTE × 淹没深度)</span></span>
-          <span><span class="result-value" id="ifas_r_ifaSOR">—</span><span class="result-unit">%</span></span></div>
-        <div class="result-row highlight-row"><span class="result-label"><b>曝气器供氧气量</b></span>
-          <span><span class="result-value big" id="ifas_r_ifaAir">—</span><span class="result-unit">Nm³/h</span></span></div>
-        <div class="result-row"><span class="result-label">曝气器数量 / 投资 / 风机轴功率</span>
-          <span><span class="result-value" id="ifas_r_ifaCount">—</span><span class="result-unit">个 / 万元 / kW</span></span></div>
-        <div class="result-row"><span class="result-label">填料 BOD 负荷 SALR <span class="sub">(附着相承担的 BOD ÷ A)</span></span>
-          <span><span class="result-value" id="ifas_r_SALRcheck">—</span><span class="result-unit">g/m²·d</span></span></div>
-        <div class="result-row"><span class="result-label">填料硝化进入负荷 / 设计速率 r_nit <span class="sub">(进入 NH₄-N 负荷 ÷ A；r 按 T_min、DO、NH₄ₑ 修正)</span></span>
-          <span><span class="result-value" id="ifas_r_SNRcheck">—</span><span class="result-unit">g N/m²·d</span></span></div>
-        <div class="result-row"><span class="result-label">温度修正系数 SALR θ^(T−20) / 硝化 θ^(min(T_min,20)−10)</span>
-          <span><span class="result-value" id="ifas_r_SALRfactor">—</span><span class="result-unit">×</span></span></div>
-      </div>
-      <div class="result-group">
-        <div class="result-group-title"><span class="ic">🔄</span> 回流系统</div>
-        <div class="result-row highlight-row"><span class="result-label"><b>RAS 回流量</b></span>
-          <span><span class="result-value big" id="ifas_r_RAS_Q">—</span><span class="result-unit">m³/h</span></span></div>
-        <div class="result-row" id="ifas_row_MLR_result"><span class="result-label"><b>MLR 内回流量</b></span>
-          <span><span class="result-value big" id="ifas_r_MLR_Q">—</span><span class="result-unit">m³/h</span></span></div>
-        <div class="result-row"><span class="result-label">RAS 泵功率</span>
-          <span><span class="result-value" id="ifas_r_RAS_P">—</span><span class="result-unit">kW</span></span></div>
-        <div class="result-row"><span class="result-label">MLR 泵功率</span>
-          <span><span class="result-value" id="ifas_r_MLR_P">—</span><span class="result-unit">kW</span></span></div>
-        <div class="result-row"><span class="result-label">回流泵电耗</span>
-          <span><span class="result-value" id="ifas_r_pumpPower">—</span><span class="result-unit">kWh/m³</span></span></div>
-      </div>
-      <div class="result-group" id="ifas_retrofitResult" style="display:none;">
-        <div class="result-group-title"><span class="ic">📈</span> 改造提升效果</div>
-        <div class="result-row"><span class="result-label">改造前处理能力</span>
-          <span><span class="result-value" id="ifas_r_capBefore">—</span><span class="result-unit">万m³/d</span></span></div>
-        <div class="result-row highlight-row"><span class="result-label"><b>改造后处理能力</b></span>
-          <span><span class="result-value big" id="ifas_r_capAfter">—</span><span class="result-unit">万m³/d</span></span></div>
-        <div class="result-row"><span class="result-label">能力控制因素 <span class="sub">(同一模型反算：悬浮相 SRT 质量平衡 / 填料 SALR / 硝化 / 二沉池 A×q)</span></span>
-          <span><span class="result-value" id="ifas_r_capCtrl" style="font-size:12px;">—</span></span></div>
-        <div class="result-row"><span class="result-label">提升幅度</span>
-          <span><span class="result-value" id="ifas_r_capBoost">—</span><span class="result-unit">%</span></span></div>
-      </div>
-      <div class="result-group">
-        <div class="result-group-title"><span class="ic">💊</span> 药剂消耗与成本</div>
-        <div class="result-row" id="ifas_row_carbon2"><span class="result-label">后缺氧去除 N / 需碳 <span class="sub">(按需投加至 TN 目标，≤ SDNR×MLVSS×V_post；C/N=4 g COD/g N)</span></span>
-          <span><span class="result-value" id="ifas_r_carbonNeed">—</span><span class="result-unit">kg N/d / kg COD/d</span></span></div>
-        <div class="result-row" id="ifas_row_carbon"><span class="result-label">后缺氧碳源投加量</span>
-          <span><span class="result-value" id="ifas_r_carbonDose">—</span><span class="result-unit">kg/d</span></span></div>
-        <div class="result-row"><span class="result-label">PAC 投加量</span>
-          <span><span class="result-value" id="ifas_r_PACDose">—</span><span class="result-unit">kg/d</span></span></div>
-        <div class="result-row"><span class="result-label">碱度补充量（NaHCO₃）</span>
-          <span><span class="result-value" id="ifas_r_alkDoseOut">—</span><span class="result-unit">kg/d</span></span></div>
-        <div class="result-row highlight-row"><span class="result-label"><b>药剂年总费用</b></span>
-          <span><span class="result-value big" id="ifas_r_chemCost">—</span><span class="result-unit">万元/年</span></span></div>
-      </div>
-      <div class="result-group">
-        <div class="result-group-title"><span class="ic">🔎</span> 设计校核</div>
-        <div class="check-list" id="ifasCheckList"></div>
-        <div class="score-ring">
-          <div><div class="score-num" id="ifas_scoreNum">—</div><div style="font-size:12px;color:var(--text-muted);">/ 100</div></div>
-          <div><div class="score-title" id="ifas_scoreTitle">综合评分</div>
-            <div style="font-size:12px;color:var(--text-muted);" id="ifas_scoreDesc">—</div></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="note">
-      ℹ️ <b>IFAS 步骤与 MBBR 工艺设计对应：</b>1.进水出水 → 2.工艺推荐 → 3.工艺模式&段配置 → 4.工艺设计参数 → 5.容积分配 → 6.回流（RAS+MLR，IFAS独有）→ 7.药剂 → 8-11.曝气器&风机&α·β·θ 修正。
-    </div>
-  </div>
-
-
-    <!-- ===== 案例库 ===== -->
-
   <!-- ===== RAS 循环水养殖：已迁移至 iRAS ===== -->
   <div class="tab-panel" id="panel-ras">
     <div class="carrier-intro">
@@ -2831,7 +2266,7 @@ body {
     <div class="case-grid" id="caseGrid"></div>
 
     <div class="note" style="margin-top:20px;">
-      ℹ️ <strong>案例套用说明：</strong>点击"套用参数"按钮后，进水水质、SALR、填充率等设计参数自动写入工艺设计 Tab，并根据案例推荐的工艺构型自动切换段组合方案，你可以在工艺设计 Tab 中进一步调整以匹配具体项目需求。
+      ℹ️ <strong>案例套用说明：</strong>点击"套用参数"按钮后，进水水质、面积负荷（r_BOD / r_nit）、填充率等设计参数自动写入工艺设计 Tab，并根据案例推荐的工艺构型自动切换段组合方案，你可以在工艺设计 Tab 中进一步调整以匹配具体项目需求。
     </div>
   </div>
 
@@ -2945,7 +2380,7 @@ body {
         <div style="font-weight:700;color:#059669;margin-bottom:10px;">💨 曝气控制</div>
         <ul style="font-size:12px;line-height:1.9;padding-left:18px;color:#374151;margin:0;">
           <li>初期曝气量 40-60% 设计值（降低剪切力）</li>
-          <li>DO 控制 2-4 mg/L（过高抑制异养菌，过低影响硝化）</li>
+          <li>DO 控制 2-4 mg/L（气量过大剪切力强、填料剧烈翻滚，不利初期挂膜；过低影响硝化）</li>
           <li>填料流化但不剧烈翻滚（"轻柔沸腾"状态）</li>
           <li>切忌停曝超过 2h（厌氧会损伤生物膜）</li>
         </ul>
@@ -3064,9 +2499,9 @@ body {
       ℹ️ <strong>填料选型建议：</strong>
       (1) 硝化控制场景用 <b>K3 / K5 / BiofilmChip M</b>；
       (2) BOD 去除为主用 <b>K1 / 国产球形</b>；
-      (3) 水产养殖/温和工况用 <b>K1 Micro / AnoxKaldnes Z</b>；
-      (4) 投资敏感项目可用国产填料（性能略低 10-15% 但价格 1/2-1/3）；
-      (5) 追求极致性能且预算充足可选 <b>BWT-X / BWT-15</b> 进口方案。
+      (3) 水产养殖循环水/温和工况用 <b>K1</b> 等小尺寸保护型填料（卡片中的 K1 Micro 为英国 Evolution Aqua 的观赏鱼池滤材，不作工程推荐）；
+      (4) 投资敏感项目可用国产填料（性能略低 10-15%，价格约为进口 Kaldnes 的 1/3-1/5）；
+      (5) 需要进口品质而预算有限时，可选价格低于 Kaldnes 的 <b>BWT-X / BWT-15</b>。
     </div>
 
     <div class="note" style="background:#fef3c7;border-left-color:#f59e0b;margin-top:14px;">
@@ -3132,15 +2567,15 @@ body {
         <div><span>🔬 1975</span> 在 NTH 获博士学位</div>
         <div><span>💼 1970-1973</span> 挪威水研究所</div>
         <div><span>🏫 1977</span> 回到 NTH 水力与环境工程系</div>
-        <div><span>⭐ 1985</span> 晋升教授,正式开始 MBBR 研究</div>
-        <div><span>📍 1980s 早期</span> NTNU 安装首个 MBBR 中试装置</div>
-        <div><span>🏭 1985</span> 挪威首座全规模 MBBR 污水厂投运</div>
-        <div><span>📜 1991</span> 全球专利获批(US 5,458,779 / EP 0575314)</div>
+        <div><span>⭐ 1985</span> 晋升 NTH 水力与环境工程系教授</div>
+        <div><span>📍 1980s 后期</span> 与 Kaldnes 合作开发 MBBR,完成中试</div>
+        <div><span>🏭 1989</span> Kaldnes 在挪威投运首座 MBBR 装置</div>
+        <div><span>📜 1990-1995</span> 核心专利:1990 年挪威优先权,US 5,458,779(1992 年美国申请、1995 年授权)/ EP 0575314</div>
       </div>
       <div style="margin-top:14px;padding-top:14px;border-top:1px solid #bfdbfe;font-size:13px;color:var(--text);line-height:1.6;">
         <b>发明地点:</b> 挪威科技大学 (NTNU) · 特隆赫姆 (Trondheim)。
         NTNU 是挪威理工教育的最高学府,位于挪威中部城市特隆赫姆。Ødegaard 教授的研究团队在这里完成了 MBBR 的核心原型。
-        1985 年挪威投运首座全规模 MBBR 厂标志着工艺的工业化开端,该厂至今仍在运行。
+        MBBR 于 1980 年代后期在 NTH(今 NTNU)研发,1989 年首座装置在挪威投运,标志着工艺的工业化开端。
       </div>
     </div>
 
@@ -3155,27 +2590,27 @@ body {
       <div class="tl-node tl-left">
         <div class="tl-dot"></div>
         <div class="tl-content">
-          <div class="tl-year">1980s 早期</div>
-          <div class="tl-title">NTNU 首个 MBBR 中试装置</div>
-          <div class="tl-desc">Ødegaard 团队在挪威科技大学完成核心原型验证</div>
+          <div class="tl-year">⭐ 1985</div>
+          <div class="tl-title">Ødegaard 晋升 NTH 教授</div>
+          <div class="tl-desc">任职挪威工学院(今 NTNU)水力与环境工程系</div>
         </div>
       </div>
 
       <div class="tl-node tl-right">
-        <div class="tl-dot tl-key"></div>
-        <div class="tl-content tl-highlight">
-          <div class="tl-year">⭐ 1985</div>
-          <div class="tl-title">挪威首座全规模 MBBR 污水厂投运</div>
-          <div class="tl-desc">MBBR 工业化开端 · Ødegaard 晋升 NTNU 教授</div>
-        </div>
-      </div>
-
-      <div class="tl-node tl-left">
         <div class="tl-dot"></div>
         <div class="tl-content">
           <div class="tl-year">1986</div>
           <div class="tl-title">瑞典 Anox AB 公司成立</div>
           <div class="tl-desc">位于瑞典 Lund,后成为 MBBR 合作伙伴</div>
+        </div>
+      </div>
+
+      <div class="tl-node tl-left">
+        <div class="tl-dot tl-key"></div>
+        <div class="tl-content tl-highlight">
+          <div class="tl-year">1980s 后期</div>
+          <div class="tl-title">MBBR 研发与中试</div>
+          <div class="tl-desc">Ødegaard 团队与 Kaldnes 合作完成核心原型与中试验证</div>
         </div>
       </div>
 
@@ -3191,18 +2626,18 @@ body {
       <div class="tl-node tl-left">
         <div class="tl-dot"></div>
         <div class="tl-content">
-          <div class="tl-year">1990</div>
-          <div class="tl-title">首个商业化 MBBR 装置交付</div>
-          <div class="tl-desc">挪威 Lardnal 污水厂 · 首次完整商业运营</div>
+          <div class="tl-year">⭐ 1989</div>
+          <div class="tl-title">首座 MBBR 装置投运</div>
+          <div class="tl-desc">Kaldnes 在挪威交付首座 MBBR · 工业化开端</div>
         </div>
       </div>
 
       <div class="tl-node tl-right">
         <div class="tl-dot tl-key"></div>
         <div class="tl-content tl-highlight">
-          <div class="tl-year">⭐ 1991</div>
-          <div class="tl-title">MBBR 全球专利获批</div>
-          <div class="tl-desc">US 5,458,779 / EP 0575314 · 奠定 20 年保护期</div>
+          <div class="tl-year">⭐ 1990-1995</div>
+          <div class="tl-title">MBBR 核心专利</div>
+          <div class="tl-desc">1990 年挪威优先权 · US 5,458,779(1992 年美国申请、1995 年授权)/ EP 0575314</div>
         </div>
       </div>
 
@@ -3218,9 +2653,9 @@ body {
       <div class="tl-node tl-right">
         <div class="tl-dot tl-key"></div>
         <div class="tl-content tl-highlight">
-          <div class="tl-year">🏆 2001</div>
+          <div class="tl-year">🏆 2002</div>
           <div class="tl-title">斯德哥尔摩工业水奖</div>
-          <div class="tl-desc">Kaldnes 获水处理行业最高荣誉之一 · 被誉为"挪威水处理行业最大的环境成就"</div>
+          <div class="tl-desc">Kaldnes Miljøteknologi 以 MBBR(Moving Bed Process)获奖</div>
         </div>
       </div>
 
@@ -3306,17 +2741,17 @@ body {
     <div class="commerce-grid">
       <div class="commerce-card era-1">
         <div class="ce-head">
-          <span class="ce-era">第 1 期 · 1989-2001</span>
+          <span class="ce-era">第 1 期 · 1989-2002</span>
           <span class="ce-title">🇳🇴 挪威原创时期</span>
         </div>
         <div class="ce-body">
           1989 年 Kaldnes Miljøteknologi AS 成立于挪威 Tønsberg,专注于 <b>Kaldnes 品牌填料</b>(K1、K3、K5 等)的研发和销售。
           Ødegaard 教授担任核心技术顾问,全力推动专利化和工程化。
           <ul>
-            <li>1990 年首个商业项目交付 · 挪威 Lardnal 污水厂</li>
-            <li>1991 年全球专利获批,确立行业地位</li>
+            <li>1989 年首座 MBBR 装置在挪威投运</li>
+            <li>1990 年代前期核心专利陆续申请与授权(US 5,458,779 于 1995 年授权)</li>
             <li>1994 年挪威利勒哈默尔冬奥村落地 · 国际声誉建立</li>
-            <li>2001 年获 <b>斯德哥尔摩工业水奖</b>,被誉为"挪威水处理行业最大的环境成就"</li>
+            <li>2002 年获 <b>斯德哥尔摩工业水奖</b>(Stockholm Industry Water Award)</li>
           </ul>
         </div>
       </div>
@@ -3364,7 +2799,7 @@ body {
           <ul>
             <li>推出 <b>BWT-X</b>(保护比表面积 650 m²/m³)、<b>BWT-15</b>(828 m²/m³)等第二代填料</li>
             <li>主打专利工艺 <b>CFIC®</b>(连续流间歇清洗)</li>
-            <li>价格与国产高端持平(到岸约¥7-12千/m³),是 Veolia 体系之外的挪威原装选项</li>
+            <li>价格介于国产高端与 Kaldnes 之间(到岸约 ¥8-15 千/m³),是 Veolia 体系之外的挪威原装选项</li>
             <li>与 Krüger Kaldnes 形成良性竞争,共同维持挪威 MBBR 技术领先地位</li>
           </ul>
         </div>
@@ -3376,10 +2811,10 @@ body {
           <span class="ce-title">🇨🇳 国产崛起时期</span>
         </div>
         <div class="ce-body">
-          MBBR 专利 2005 年前后陆续在中国到期(20 年保护期),国产填料厂家开始大规模涌现。
+          随着 MBBR 在国内推广,国产填料厂家开始大规模涌现。
           <ul>
             <li>早期以仿制 K1/K3 为主,产品形式扩展到轮状、球形、圆柱等多种</li>
-            <li>价格为进口填料的 <b>1/2 至 1/3</b></li>
+            <li>价格约为进口 Kaldnes 填料的 <b>1/3 至 1/5</b></li>
             <li>2018 年前后头部国产厂家质量已接近 Kaldnes 水准</li>
             <li>2020 年后国产填料占据国内市场主导地位(成本优势)</li>
             <li>与进口填料形成"低端国产 / 高端进口"的市场格局</li>
@@ -3413,7 +2848,7 @@ body {
         <div class="cp-title">📈 扩展时期</div>
         <div class="cp-body">
           <ul>
-            <li>2005 年前后 MBBR 专利在中国到期,国产填料出现</li>
+            <li>国产填料开始出现</li>
             <li>早期国产填料主要仿制 K1/K3,品种单一</li>
             <li>2006 年左右开始用于<b>城镇污水厂一级 A 提标改造</b></li>
             <li>渗滤液、制药、食品等工业场景大规模普及</li>
@@ -3427,7 +2862,7 @@ body {
         <div class="cp-title">🔥 成熟时期</div>
         <div class="cp-body">
           <ul>
-            <li>2015 年 GB 18918-2002 修订推动污水厂提标改造潮</li>
+            <li>2015 年《水十条》推动污水厂提标改造潮</li>
             <li>MBBR 成为提标主流工艺之一(与 AAO、SBR 并列)</li>
             <li>国产填料工艺成熟,头部厂家质量接近进口水平</li>
             <li>工程案例积累到数百项,设计参数经验丰富</li>
@@ -3455,13 +2890,13 @@ body {
       <div class="china-current-grid">
         <div class="ccg-card">
           <div class="ccg-label">国产高端填料</div>
-          <div class="ccg-value">¥2-5 千/m³</div>
+          <div class="ccg-value">¥3-6 千/m³</div>
           <div class="ccg-desc">质量稳定,工艺成熟。头部厂家产品质量已接近 Kaldnes 水准,市场占有率主导。</div>
         </div>
         <div class="ccg-card">
           <div class="ccg-label">进口 BWT 填料</div>
-          <div class="ccg-value">¥7-12 千/m³</div>
-          <div class="ccg-desc">挪威 Biowater Technology 的 BWT-X / BWT-15,到岸价与国产高端接近。</div>
+          <div class="ccg-value">¥8-15 千/m³</div>
+          <div class="ccg-desc">挪威 Biowater Technology 的 BWT-X(约 8-12)/ BWT-15(约 10-15),到岸价介于国产高端与 Kaldnes 之间。</div>
         </div>
         <div class="ccg-card">
           <div class="ccg-label">进口 Kaldnes 填料</div>
@@ -3528,6 +2963,7 @@ body {
           <li><a href="dosing-calculator.html">加药量</a></li>
           <li><a href="activated-sludge-process-calculator.html">活性污泥工艺</a></li>
           <li><a href="mbbr-design.html">MBBR 工程设计</a></li>
+          <li><a href="ifas-design.html">IFAS 工程设计</a></li>
           <li><a href="mbr-design.html">MBR 工程设计</a></li>
           <li><a href="pump-selection-calculator.html">水泵选型</a></li>
           <li><a href="blower-selection-calculator.html">鼓风机选型</a></li>
@@ -3569,6 +3005,8 @@ body {
 const $ = id => document.getElementById(id);
 
 // ============ Tab 4 段组合：独立进水参数 ============
+// 千分位格式（结果显示统一用 zh-CN 千分位，d 位小数）
+const wkN = (v, d = 0) => isFinite(v) ? Number(v).toLocaleString('zh-CN', { minimumFractionDigits: d, maximumFractionDigits: d }) : '—';
 const ST_PRESETS = {
   municipal:  { Q:1,    T:20, BOD0:180,  NH40:35,   TN0:45,   TP0:5,  BODe:10, NH4e:5,   TNe:15, TPe:0.5 },
   leachate:   { Q:0.05, T:20, BOD0:3000, NH40:1800,  TN0:2000, TP0:15, BODe:30, NH4e:25,  TNe:40, TPe:1.0 },
@@ -3611,7 +3049,7 @@ const BF = {
   fill_max: 0.67                                     // 填充率上限
 };
 const BF_O2_PER_NM3 = 0.23 * 1.293 * 1000;           // g O₂/Nm³ 空气（297.4）
-// 硝化设计速率（纯 MBBR 与 IFAS 填料共用）：r = r_类别 × θ^(min(T,T_cap)−10) × min(DO,DO_max)/DO_ref × min(1, NH₄_reactor/ramp)
+// 硝化设计速率（纯 MBBR 与 IFAS 工具 ifas-design.html 共用，BF 及本函数两页须一致，regress.js 做 BF-SYNC 检查）：r = r_类别 × θ^(min(T,T_cap)−10) × min(DO,DO_max)/DO_ref × min(1, NH₄_reactor/ramp)
 function bfNitRate({ cls, custom, T, DO, NH4out, theta }) {
   const r10 = custom > 0 ? custom : (BF.r_nit[cls] ?? BF.r_nit.a);
   const th = theta > 0 ? theta : BF.theta_nit;
@@ -3657,34 +3095,54 @@ function renderStRecommend() {
   const NH4e = g('st_NH4e'), TNe = g('st_TNe'), TPe = g('st_TPe');
   const BOD_N = NH40 > 0 ? BOD0 / NH40 : 999;
   // 需反硝化：进水 TN 已知且要求去除率 >30%（仅靠同化/硝化无法达到）
-  const needDN = TN0 > 0 && (TN0 - TNe) / TN0 > 0.3, strictDN = TNe <= 10, strictTP = TPe <= 0.5;
+  // 需反硝化：进水 TN 高于出水目标即需要缺氧段（无缺氧段的 ①②③外方案 TN 去除按 0 计）
+  const needDN = TN0 > 0 && TN0 > TNe + 1e-9, strictDN = TNe <= 10, strictTP = TPe <= 0.5;
   const highNH4 = NH40 > 300;
+  // 与页面 TN 模型一致：A/O（④）前置反硝化最多去除 0.85·R/(1+R)·min(1, BOD/N÷4)，所需去除率超过时不推荐 ④
+  const MLRv = parseFloat($('st_MLR')?.value);
+  const R = MLRv >= 0 ? MLRv / 100 : 2;
+  const fBN = Math.min(1, BOD_N / 4);
+  const needPct = TN0 > 0 ? Math.max(0, (TN0 - TNe) / TN0 * 100) : 0;
+  const preMax = 0.85 * R / (1 + R) * 100 * fBN;
+  const xR = needPct / 100 / (0.85 * fBN);
+  const R_need = xR < 1 ? xR / (1 - xR) : Infinity;
+  const needChemP = TP0 * (1 - 0.15) > TPe + 1e-9;   // 生物同化约 15%，其余需化学除磷
   const recs = [];
+  let tnCfg, tnReason;
   if (highNH4) {
-    recs.push({ config:7, tag:'推荐', color:'#7c3aed',
-      title:'⑦ 短程硝化 + Anammox',
-      reason:`进水 NH₄=${NH40} mg/L（高氨氮），自养脱氮省 100% 外加碳源 + 60% 曝气` });
+    tnCfg = 7;
+    tnReason = `进水 NH₄=${NH40} mg/L（高氨氮），自养脱氮省 100% 外加碳源 + 60% 曝气${needPct > 85 ? `；PN/A 约去除 85% TN，所需 ${needPct.toFixed(0)}% 需后接反硝化/深度处理` : ''}`;
   } else if (!needDN) {
-    recs.push({ config:2, tag:'推荐', color:'#16a34a',
-      title:'② 前高负荷 + 后低负荷双好氧',
-      reason:'出水 TN 无严格要求，双好氧抗冲击 + 出水稳定，国内最常见' });
-  } else if (!strictDN && BOD_N >= 4) {
-    recs.push({ config:4, tag:'推荐', color:'#0891b2',
-      title:'④ 预缺氧 + 硝化（A/O 含 MLR）',
-      reason:`BOD/N=${BOD_N.toFixed(1)}≥4，进水碳源充足，A/O 内回流免费反硝化，省碳源` });
-    if (strictTP) recs.push({ config:6, tag:'需除磷', color:'#d97706',
-      title:'⑥ 完整 BNR + 化除磷',
-      reason:`出水 TP=${TPe} ≤ 0.5 mg/L，需配 PAC 化学除磷` });
-  } else if (strictDN && BOD_N >= 4) {
-    recs.push({ config:5, tag:'推荐', color:'#0891b2',
-      title:'⑤ 预缺氧 + 硝化 + 后缺氧',
-      reason:`出水 TN≤${TNe} mg/L 要求严格，前 MLR + 后缺氧双重脱氮` });
-    if (strictTP) recs.push({ config:6, tag:'需除磷', color:'#d97706',
-      title:'⑥ 完整 BNR + 化除磷', reason:`出水 TP=${TPe} ≤ 0.5，需 PAC 除磷` });
+    tnCfg = 2;
+    tnReason = '进水 TN 已不高于出水目标，无需反硝化；双好氧抗冲击 + 出水稳定，国内最常见';
+  } else if (!strictDN && BOD_N >= 4 && needPct <= preMax + 1e-9) {
+    tnCfg = 4;
+    tnReason = `BOD/N=${BOD_N.toFixed(1)}≥4，进水碳源充足；所需 TN 去除 ${needPct.toFixed(0)}% ≤ A/O 在 MLR ${(R * 100).toFixed(0)}% 时约 ${preMax.toFixed(0)}%，内回流免费反硝化，省碳源`;
+  } else if (BOD_N >= 4) {
+    tnCfg = 5;
+    tnReason = strictDN
+      ? `出水 TN≤${TNe} mg/L 要求严格，前 MLR + 后缺氧双重脱氮`
+      : `所需 TN 去除 ${needPct.toFixed(0)}% &gt; A/O 在 MLR ${(R * 100).toFixed(0)}% 时约 ${preMax.toFixed(0)}%（若用 ④ 需 MLR ${isFinite(R_need) ? `≥ ${Math.ceil(R_need * 100)}%${R_need > 4 ? '，超出常用上限 400%' : ''}` : '无解'}），加后缺氧按需投碳补足`;
   } else {
-    recs.push({ config:5, tag:'推荐', color:'#d97706',
-      title:'⑤ 预缺氧 + 硝化 + 后缺氧',
-      reason:`BOD/N=${BOD_N.toFixed(1)}<4，进水碳源不足，后缺氧需外加碳源` });
+    tnCfg = 5;
+    tnReason = `BOD/N=${BOD_N.toFixed(1)}<4，进水碳源不足，后缺氧需外加碳源`;
+  }
+  // 化学除磷去除率上限 95%（生物 15% + 化学 80%）：所需 TP 去除超过时需深度除磷
+  const tpNeedPct = TP0 > 0 ? (TP0 - TPe) / TP0 * 100 : 0;
+  const tpDeep = TP0 > TPe && tpNeedPct > 95 + 1e-9;
+  const tpDeepTxt = tpDeep ? `；所需 TP 去除 ${tpNeedPct.toFixed(1)}% 超过化学除磷上限 95%，TP 需深度除磷（如滤池 / 精密过滤）` : '';
+  if (needPct > 92 && (tnCfg === 5)) tnReason += `；所需 ${needPct.toFixed(0)}% 超出本页预缺氧 + 后缺氧去除上限 92%，需深度处理`;
+  const TITLES = { 2:'② 前高负荷 + 后低负荷双好氧', 4:'④ 预缺氧 + 硝化（A/O 含 MLR）', 5:'⑤ 预缺氧 + 硝化 + 后缺氧', 6:'⑥ 完整 BNR + 化除磷', 7:'⑦ 短程硝化 + Anammox' };
+  const COLORS = { 2:'#16a34a', 4:'#0891b2', 5: BOD_N >= 4 ? '#0891b2' : '#d97706', 6:'#0891b2', 7:'#7c3aed' };
+  if (needChemP && (tnCfg === 4 || tnCfg === 5)) {
+    // 需化学除磷：直接推荐含化除磷段的 ⑥，套用后 TN/TP 均按模型达标
+    recs.push({ config:6, tag:'推荐', color:'#0891b2', title: TITLES[6],
+      reason: `${tnReason}；出水 TP=${TPe} mg/L 需 PAC 化学除磷，故选含化除磷段的 ⑥${tnCfg === 4 ? '（后缺氧仅作 TN 保障，按需投碳）' : ''}${tpDeepTxt}` });
+    recs.push({ config:tnCfg, tag:'仅脱氮', color:'#64748b', title: TITLES[tnCfg],
+      reason: `不含化除磷段，需另设除磷单元，否则 TP 不达标` });
+  } else {
+    recs.push({ config:tnCfg, tag:'推荐', color: COLORS[tnCfg], title: TITLES[tnCfg],
+      reason: tnReason + (needChemP ? `；出水 TP=${TPe} mg/L 需另设化学除磷单元（本方案不含化除磷段）` : '') + tpDeepTxt });
   }
   box.innerHTML = recs.map(r => `
     <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:white;
@@ -3721,7 +3179,6 @@ function switchTab(tab) {
   // 曝气已合并进stages，随calcStages自动触发
   if (tab === 'cases') renderCases();
   if (tab === 'stages') calcStages();
-  if (tab === 'ifas' && typeof calcAndRenderIFAS === 'function') calcAndRenderIFAS();
 }
 
 
@@ -3776,22 +3233,22 @@ const CARRIER_DB = [
     desc: '薄片型，标称 1200 m²/m³，适合高氨氮渗滤液等特殊工况，实际有效面积约 400-600，填充率不能高。'
   },
   {
-    id: 'k1_micro', sofkType: 'pipe', name: 'K1 Micro', origin: '挪威 (Veolia/Krüger)', shape: '小型圆柱',
-    specArea: 1200, density: 0.95, fillRange: '20-50%', biofilm: 10, airDemand: '8-12', lifespan: 10,
-    priceRange: '20-30', features: ['aquaculture', 'nitrification'],
-    desc: '超小尺寸，适合水产养殖循环水（RAS）低流速工况，流化所需气量很小。'
+    id: 'k1_micro', sofkType: 'pipe', name: 'K1 Micro', origin: 'Evolution Aqua（英国）', shape: '小型圆柱（约 Ø7 × 9 mm）',
+    specArea: 950, density: 0.95, fillRange: '20-50%', biofilm: 10, airDemand: '8-12', lifespan: 10,
+    priceRange: '20-30', features: ['aquaculture'], noEngRec: true,
+    desc: '观赏鱼池 / 小型养殖滤材（英国 Evolution Aqua，与 Veolia 的 Kaldnes K1 不是同一产品）。厂家公开保护比表面积 950 m²/m³（总表面积 1400），多用于珠滤、鱼池过滤器和水族箱；缺少污水工程业绩，不作工程选型推荐。'
   },
   {
-    id: 'anox_z', sofkType: 'coin', sofkNote: 'Z 型为薄鞍形片、外表面覆定高格栅（Veolia 产品页），按片状取值', name: 'AnoxKaldnes Z', origin: '瑞典 (Veolia)', shape: '螺旋型',
+    id: 'anox_z', sofkType: 'coin', sofkNote: 'Z 型为鞍形格栅片：外表面覆定高格栅，生物膜厚度不超过格栅高度（Veolia 产品页），按片状取值', name: 'AnoxKaldnes Z', origin: '瑞典 (Veolia)', shape: '鞍形格栅片',
     specArea: 600, density: 0.95, fillRange: '30-65%', biofilm: 12, airDemand: '10-15', lifespan: 10,
     priceRange: '12-20', features: ['nitrification', 'bod'],
-    desc: '螺旋状结构，流化均匀，适合中等负荷场景，比 K3 稍便宜。'
+    desc: '格栅高度限定生物膜厚度，适合易长厚膜的工况（Z-200 / Z-400 分别对应约 200 / 400 μm 膜厚上限）。'
   },
   {
     id: 'domestic_cylinder', sofkType: 'pipe', name: '国产圆柱填料', origin: '中国（多家）', shape: '圆柱型',
     specArea: 500, density: 0.94, fillRange: '30-65%', biofilm: 10, airDemand: '10-15', lifespan: 5,
     priceRange: '2-5', features: ['bod', 'economic'],
-    desc: '仿 K1/K3 的国产圆柱填料，价格约进口 1/3-1/5，质量参差，头部厂家已接近进口水平，适合一般 BOD 去除项目。'
+    desc: '仿 K1/K3 的国产圆柱填料，价格约为进口 Kaldnes 的 1/3-1/5，质量参差，头部厂家已接近进口水平，适合一般 BOD 去除项目。'
   },
   {
     id: 'domestic_sphere', sofkType: 'pipe', sofkNote: '空心球内有格栅，经验分类无对应类型，暂按管状取值，请以厂家数据复核', name: '国产球形填料', origin: '中国（多家）', shape: '球形',
@@ -3803,7 +3260,7 @@ const CARRIER_DB = [
     id: 'domestic_high', sofkType: 'pipe', name: '国产高性能填料', origin: '中国（头部厂家）', shape: '保护轮状',
     specArea: 650, density: 0.95, fillRange: '30-65%', biofilm: 13, airDemand: '12-18', lifespan: 7,
     priceRange: '3-6', features: ['nitrification', 'bod', 'economic'],
-    desc: '国产高端填料，保护比表面积 650 m²/m³，头部厂家品质已接近 Kaldnes，价格约 ¥3-6 千/m³，综合性价比高。'
+    desc: '国产高端填料，保护比表面积 650 m²/m³，头部厂家品质已接近 Kaldnes，价格约 ¥3-6 千/m³（约为进口 Kaldnes 的 1/3-1/5），综合性价比高。'
   },
 ];
 
@@ -3825,7 +3282,7 @@ function renderCarriers() {
           <span class="carrier-name">${c.name}</span>
           <span class="carrier-origin">${c.origin}</span>
         </div>
-        <span class="carrier-shape">${c.shape}</span>
+        <span class="carrier-shape">${c.shape}</span>${c.noEngRec ? ' <span class="carrier-shape" style="background:#fef3c7;color:#92400e;">不作工程推荐</span>' : ''}
         <div class="carrier-specs">
           <span class="k">比表面积</span><span class="v">${c.specArea} m²/m³</span>
           <span class="k">密度</span><span class="v">${c.density} g/cm³</span>
@@ -3941,7 +3398,7 @@ function getRecommendedCarrier() {
 
   // 规则按优先级(越特殊越先):
   // 1. 渗滤液/极高NH4(>500) → BiofilmChip M；300-500 → K5（短程硝化+Anammox）
-  // 2. 水产养殖场景(低BOD+低NH4+中小规模) → K1 Micro
+  // 2. 水产养殖场景(低BOD+低NH4+中小规模) → K1（K1 Micro 为观赏鱼池滤材，排除出工程推荐）
   // 3. 硝化 + 一级A严格(NH4e<2) → K3
   // 4. 仅BOD + 中大规模 → K1
   // 5. 仅BOD + 预算敏感小规模 → 国产圆柱
@@ -3959,8 +3416,8 @@ function getRecommendedCarrier() {
     based = `基于: 300 < NH₄=${NH40} ≤ 500 mg/L(高氨氮侧流)`;
   } else if (BOD0 < 50 && NH40 < 10 && Q_wan < 0.5) {
     // 水产养殖典型特征:BOD低,NH4低,规模中小
-    recId = 'k1_micro';
-    reason = `低 BOD(${BOD0} mg/L)+低 NH₄(${NH40} mg/L)+中小规模场景(水产养殖/小型污水),可考虑 <b>K1 Micro</b>。小尺寸填料在有限池体内提供更多比表面积,稳定硝化是核心需求。`;
+    recId = 'k1';
+    reason = `低 BOD(${BOD0} mg/L)+低 NH₄(${NH40} mg/L)+中小规模场景(水产养殖/小型污水),可考虑 <b>Kaldnes K1</b> 等小尺寸保护型填料,稳定硝化是核心需求。(K1 Micro 为观赏鱼池滤材,不作工程推荐)`;
     based = `基于: BOD=${BOD0}, NH₄=${NH40}, Q=${Q_wan}万m³/d(水产/小型特征)`;
   } else if (mode === 'bod_only' && Q_wan >= 0.3) {
     // 仅BOD + 中大规模
@@ -3979,7 +3436,7 @@ function getRecommendedCarrier() {
   } else if (mode === 'bnr') {
     // 完整脱氮 → 需要多段,主段推荐 K3
     recId = 'k3';
-    reason = `完整脱氮工艺(BOD+硝化+反硝化),硝化段可选 <b>Kaldnes K3</b>。注意纯 MBBR 反硝化能力有限,建议配合前置缺氧段(见 Tab 4 段组合)。`;
+    reason = `完整脱氮工艺(BOD+硝化+反硝化),硝化段可选 <b>Kaldnes K3</b>。注意纯 MBBR 反硝化能力有限,建议配合前置缺氧段(见「MBBR 工艺设计」Tab 的段组合方案 ④/⑤/⑥)。`;
     based = `基于: 工艺=完整脱氮(NH₄出=${NH4e} ≤ 5, TN ${TN0r}→${TNer} mg/L)`;
   } else {
     recId = 'k3';
@@ -4099,25 +3556,21 @@ function wkBlowerPower(Q_Nm3h, dp_kPa, eff) {
   return eff > 0 ? p1 * Q1 / (0.283 * eff) * (Math.pow((p1 + dp_kPa) / p1, 0.283) - 1) : 0;
 }
 
-// scope: 'a' = 纯 MBBR 工艺Tab（a_* 输入），'ifa' = IFAS Tab（ifa_* 输入）
-function setAeratorType(type, scope = 'a') {
-  const pre = scope === 'ifa' ? 'ifa' : 'a';
-  if (pre === 'a') currentAerator = type;
-  const panel = $(pre + '_OTE')?.closest('.tab-panel') || document;
+// 曝气器类型切换（纯 MBBR 工艺 Tab，a_* 输入）
+function setAeratorType(type) {
+  currentAerator = type;
+  const panel = $('a_OTE')?.closest('.tab-panel') || document;
   panel.querySelectorAll('.aerator-tab').forEach(t => t.classList.toggle('active', t.dataset.aer === type));
 
   const p = AERATOR_DB[type];
-  $(pre + '_perDevice').value = p.perDevice;
+  $('a_perDevice').value = p.perDevice;
   // 纯 MBBR：OTE 由填料 SOFK 推导，只读，不随曝气器类型改变
-  if (pre === 'ifa') $(pre + '_OTE').value = p.OTE;
-  $(pre + '_spacing').value = p.spacing;
-  $(pre + '_price').value = p.price;
-  $(pre + '_dp_aer').value = p.dp;
-  $(pre + '_perDevice_help').textContent = p.helper.perDevice;
-  if (pre === 'ifa') $(pre + '_OTE_help').textContent = p.helper.OTE;
-  $(pre + '_price_help').textContent = p.helper.price;
-  if (pre === 'ifa') calcAndRenderIFAS();
-  else calcStages();  // OTE 变化 → EE → 供氧气量，calcStages 结束后会触发 calcAeration
+  $('a_spacing').value = p.spacing;
+  $('a_price').value = p.price;
+  $('a_dp_aer').value = p.dp;
+  $('a_perDevice_help').textContent = p.helper.perDevice;
+  $('a_price_help').textContent = p.helper.price;
+  calcStages();  // OTE 变化 → EE → 供氧气量，calcStages 结束后会触发 calcAeration
 }
 
 // 风机类型：典型效率与上限（%）。切换类型时把效率输入改为典型值；计算按 min(输入, 上限)
@@ -4144,6 +3597,14 @@ function calcAeration() {
   if (badA.length || badA2.length) {
     document.querySelectorAll('[id^="ar_"]').forEach(el => { el.textContent = '—'; });
     $('aerCheckList').innerHTML = `<div class="check-item check-bad"><span class="ic">✗</span><span><b>输入无效</b>：请输入${[...badA.map(x=>'大于 0 的'+x), ...badA2.map(x=>'不小于 0 的'+x)].join('、')}</span></div>`;
+    return;
+  }
+  // 池深 H ≤ 曝气器安装高度：淹没深度为 0，气量/电耗无意义，统一显示"—"（✗ 只在工艺校核中出现一次）
+  if (stCalcResult.hBad) {
+    document.querySelectorAll('[id^="ar_"]').forEach(el => { el.textContent = '—'; });
+    ['st_r_airPower', 'st_r_totalPower'].forEach(id => { if ($(id)) $(id).textContent = '—'; });
+    $('aerCheckList').innerHTML = `<div class="check-item check-info"><span class="ic">ℹ</span><span>未计算曝气系统：池深 H ≤ 曝气器安装高度 ${AERATOR_MOUNT_H} m，淹没深度为 0（见下方工艺校核）</span></div>`;
+    if ($('aerLayoutSvg')) $('aerLayoutSvg').innerHTML = '';
     return;
   }
   const H     = gNum('st_poolH', 5);  // 好氧池有效水深（从工艺计算Tab读取）
@@ -4222,39 +3683,39 @@ function calcAeration() {
   // 推荐型号(按风机类型和流量)
   let model = '';
   if (blowerType === 'roots') {
-    model = `罗茨风机 ${blowerQ.toFixed(0)}Nm³/h · ${Nmotor_single}kW`;
+    model = `罗茨风机 ${wkN(blowerQ)} Nm³/h · ${Nmotor_single}kW`;
   } else if (blowerType === 'multistage') {
-    model = `多级离心 ${blowerQ.toFixed(0)}Nm³/h · ${Nmotor_single}kW`;
+    model = `多级离心 ${wkN(blowerQ)} Nm³/h · ${Nmotor_single}kW`;
   } else {
-    model = `磁悬浮 ${blowerQ.toFixed(0)}Nm³/h · ${Nmotor_single}kW`;
+    model = `磁悬浮 ${wkN(blowerQ)} Nm³/h · ${Nmotor_single}kW`;
   }
 
   // 渲染结果
-  $('ar_SOR_in').textContent = SOR_in.toFixed(0);
-  $('ar_airO2').textContent = airO2.toFixed(0);
-  $('ar_airMix').textContent = airMix.toFixed(0);
-  $('ar_airDesign').textContent = airDesign.toFixed(0);
-  if ($('ar_airInstalled')) $('ar_airInstalled').textContent = airTotalDesign.toFixed(0);
+  $('ar_SOR_in').textContent = wkN(SOR_in);
+  $('ar_airO2').textContent = wkN(airO2);
+  $('ar_airMix').textContent = wkN(airMix);
+  $('ar_airDesign').textContent = wkN(airDesign);
+  if ($('ar_airInstalled')) $('ar_airInstalled').textContent = wkN(airTotalDesign);
   $('ar_control').textContent = control;
 
-  $('ar_count').textContent = count;
-  if ($('ar_countCtrl')) $('ar_countCtrl').textContent = `${countCtrl}（按气量 ${countByAir} 个 / 按间距 ${countBySpacingReq} 个）`;
+  $('ar_count').textContent = wkN(count);
+  if ($('ar_countCtrl')) $('ar_countCtrl').textContent = `${countCtrl}（按气量 ${wkN(countByAir)} 个 / 按间距 ${wkN(countBySpacingReq)} 个）`;
   if ($('ar_perDeviceAct')) $('ar_perDeviceAct').textContent = perDeviceAct.toFixed(2);
   $('ar_density').textContent = density.toFixed(2);
   $('ar_actSpacing').textContent = actSpacing.toFixed(2);
-  $('ar_cost').textContent = cost.toLocaleString('zh-CN');
+  $('ar_cost').textContent = wkN(cost / 10000, cost < 100000 ? 2 : 1);   // 万元
 
   $('ar_dp').textContent = dp_total.toFixed(1);
   $('ar_dp_water').textContent = dp_water.toFixed(1);
   $('ar_dp_sys').textContent = dp_sys.toFixed(1);
-  $('ar_blowerQ').textContent = blowerQ.toFixed(0);
+  $('ar_blowerQ').textContent = wkN(blowerQ);
   $('ar_blowerCount').textContent = `${blowerCount}(${working}用${blowerCount-working}备)`;
   $('ar_blowerModel').textContent = model;
 
   $('ar_Ns').textContent = Ns_total.toFixed(1);
   if ($('ar_effUsed')) $('ar_effUsed').textContent = (actEfficiency * 100).toFixed(0) + '%';
-  $('ar_Nmotor').textContent = Nmotor_total;
-  $('ar_daily_kwh').textContent = daily_kwh.toFixed(0);
+  $('ar_Nmotor').textContent = wkN(Nmotor_total);
+  $('ar_daily_kwh').textContent = wkN(daily_kwh);
   $('ar_kwh_per_m3').textContent = kwh_per_m3.toFixed(2);
   // 工艺结果区的"曝气吨水电耗"直接引用本处风机计算结果（两处同一口径）
   if ($('st_r_airPower')) $('st_r_airPower').textContent = kwh_per_m3.toFixed(2);
@@ -4292,18 +3753,18 @@ function calcAeration() {
     const countBySpacing = Math.ceil(Apool / (spacing * spacing));
     checks.push({type:'warn', ic:'⚠', text:`<b>间距超过最大布置间距</b>: 均布间距 ${actSpacing.toFixed(2)} m &gt; ${spacing} m（输入值），搅拌不均易出死角；按间距需 ≥ ${countBySpacing} 个曝气器（单个气量相应减小）`});
   } else {
-    checks.push({type:'ok', ic:'✓', text:`<b>布置间距合理</b>: ${actSpacing.toFixed(2)} m ≤ 最大间距 ${spacing} m（数量 = max(按气量 ${countByAir}, 按间距 ${countBySpacingReq}) = ${count} 个，${countCtrl}，单个实际气量 ${perDeviceAct.toFixed(2)} Nm³/h）`});
+    checks.push({type:'ok', ic:'✓', text:`<b>布置间距合理</b>: ${actSpacing.toFixed(2)} m ≤ 最大间距 ${spacing} m（数量 = max(按气量 ${wkN(countByAir)}, 按间距 ${wkN(countBySpacingReq)}) = ${wkN(count)} 个，${countCtrl}，单个实际气量 ${perDeviceAct.toFixed(2)} Nm³/h）`});
   }
 
   // 4. 风机效率（提示中写明实际采用的效率）
   if (effCapped) {
-    checks.push({type:'info', ic:'ℹ', text:`<b>风机效率按类型上限计</b>: 输入 ${(efficiency*100).toFixed(0)}% 超过该类型上限 ${bEff.max}%，按 ${bEff.max}% 计算`});
+    checks.push({type:'info', ic:'ℹ', text:`<b>风机效率按类型上限计</b>: 输入 ${wkN((efficiency*100))}% 超过该类型上限 ${bEff.max}%，按 ${bEff.max}% 计算`});
   }
   if (blowerType === 'roots' && Ns_total > 100) {
     const saving = 1 - actEfficiency / (BLOWER_EFF.magnetic.typ / 100);
-    checks.push({type:'info', ic:'ℹ', text:`<b>建议比较磁悬浮</b>: 当前罗茨按效率 ${(actEfficiency*100).toFixed(0)}% 计，轴功率 ${Ns_total.toFixed(0)} kW；按磁悬浮典型效率 ${BLOWER_EFF.magnetic.typ}% 计约省 ${(saving*100).toFixed(0)}%（切换风机类型即可复算）`});
+    checks.push({type:'info', ic:'ℹ', text:`<b>建议比较磁悬浮</b>: 当前罗茨按效率 ${wkN((actEfficiency*100))}% 计，轴功率 ${wkN(Ns_total)} kW；按磁悬浮典型效率 ${BLOWER_EFF.magnetic.typ}% 计约省 ${wkN((saving*100))}%（切换风机类型即可复算）`});
   } else if (blowerType === 'magnetic') {
-    checks.push({type:'ok', ic:'✓', text:`<b>节能风机选择</b>: 磁悬浮，按效率 ${(actEfficiency*100).toFixed(0)}% 计算，长期运行成本最低`});
+    checks.push({type:'ok', ic:'✓', text:`<b>节能风机选择</b>: 磁悬浮，按效率 ${wkN((actEfficiency*100))}% 计算，长期运行成本最低`});
   }
 
   // 5. 吨水电耗
@@ -4354,13 +3815,15 @@ function drawAerLayout(r) {
   h += `<rect x="${cx}" y="${cy}" width="${rectW}" height="${rectH}" fill="#ecfeff" stroke="${brand}" stroke-width="2" rx="3"/>`;
 
   // 曝气器布置(格网式)
-  const cols = Math.round(Math.sqrt(r.count * poolL / poolW));
-  const rows = Math.ceil(r.count / cols);
+  // 示意图最多画 2,000 个点（池容极大时避免生成过多节点卡死页面），超出时按比例示意
+  const nDraw = Math.min(r.count, 2000);
+  const cols = Math.max(1, Math.round(Math.sqrt(nDraw * poolL / poolW)));
+  const rows = Math.ceil(nDraw / cols);
   const dx = rectW / (cols + 1);
   const dy = rectH / (rows + 1);
   let drawn = 0;
-  for (let i = 1; i <= rows && drawn < r.count; i++) {
-    for (let j = 1; j <= cols && drawn < r.count; j++) {
+  for (let i = 1; i <= rows && drawn < nDraw; i++) {
+    for (let j = 1; j <= cols && drawn < nDraw; j++) {
       const px = cx + j * dx;
       const py = cy + i * dy;
       h += `<circle cx="${px}" cy="${py}" r="4" fill="#f59e0b" stroke="#d97706" stroke-width="1"/>`;
@@ -4378,10 +3841,10 @@ function drawAerLayout(r) {
   const infoX = 780;
   h += `<rect x="${infoX}" y="${poolY}" width="110" height="180" fill="${ink}" fill-opacity="0.05" stroke="${muted}" stroke-width="1" rx="6"/>`;
   h += `<text x="${infoX+10}" y="${poolY+22}" font-size="11" fill="${ink}" font-weight="600">布置参数</text>`;
-  h += `<text x="${infoX+10}" y="${poolY+44}" font-size="10" fill="${muted}">数量: ${r.count}个</text>`;
+  h += `<text x="${infoX+10}" y="${poolY+44}" font-size="10" fill="${muted}">数量: ${wkN(r.count)}个${nDraw < r.count ? '（示意）' : ''}</text>`;
   h += `<text x="${infoX+10}" y="${poolY+62}" font-size="10" fill="${muted}">间距: ${r.spacing.toFixed(2)}m</text>`;
   h += `<text x="${infoX+10}" y="${poolY+80}" font-size="10" fill="${muted}">排列: ${rows}行×${cols}列</text>`;
-  h += `<text x="${infoX+10}" y="${poolY+98}" font-size="10" fill="${muted}">气量: ${r.airDesign.toFixed(0)}</text>`;
+  h += `<text x="${infoX+10}" y="${poolY+98}" font-size="10" fill="${muted}">气量: ${wkN(r.airDesign)}</text>`;
   h += `<text x="${infoX+10}" y="${poolY+116}" font-size="10" fill="${muted}">   Nm³/h</text>`;
 
   // 图例
@@ -4398,7 +3861,7 @@ function copyAeration() {
 曝气器类型: ${AERATOR_DB[currentAerator].name}
 设计气量: ${$('ar_airDesign').textContent} Nm³/h(${$('ar_control').textContent})
 装机气量(含备用): ${$('ar_airInstalled').textContent} Nm³/h
-曝气器数量: ${$('ar_count').textContent} 个（单个实际气量 ${$('ar_perDeviceAct')?.textContent} Nm³/h）· 间距 ${$('ar_actSpacing').textContent} m · 投资 ${$('ar_cost').textContent} 元
+曝气器数量: ${$('ar_count').textContent} 个（单个实际气量 ${$('ar_perDeviceAct')?.textContent} Nm³/h）· 间距 ${$('ar_actSpacing').textContent} m · 投资 ${$('ar_cost').textContent} 万元
 风机: ${$('ar_blowerModel').textContent} × ${$('ar_blowerCount').textContent}
 风机总压: ${$('ar_dp').textContent} kPa
 轴功率: ${$('ar_Ns').textContent} kW（效率 ${$('ar_effUsed')?.textContent}）· 电机配备 ${$('ar_Nmotor').textContent} kW
@@ -4434,8 +3897,8 @@ const CASE_DB = [
       carrier: 'K3', fillVol: '约 16,400 m³', airCap: '约 63,600 Nm³/h',
       stageConfig: 6, stageLabel: '⑥ 完整 BNR + 化除磷'
     },
-    outcome: '冬季(10℃)NH₄-N 稳定 ≤ 5 mg/L,TN 约 12-15 mg/L,TP 需配化学除磷,故按方案 ⑥ 设计。'+'<br><i>按本工具当前模型复算（按进入负荷定面积，T_min 取案例设计水温；供氧气量 = AOR ÷ (SOFK × 淹没深度)）：10 ℃ 下 r_nit 0.48 g/m²·d，纯 MBBR 总池容约 41,700 m³（HRT 约 20 h）、填料约 16,400 m³、设计气量约 63,600 Nm³/h（搅拌控制，供氧所需仅约 13,100 Nm³/h），曝气吨水电耗约 0.67 kWh/m³（套用后提示偏高；含缺氧段搅拌约 0.85）；预计出水 TN 14.0（按需投碳控制值）、TP 0.5 mg/L；经验校核需氧约 12,100 kg O₂/d，与 GB 式基本一致。低温下纯 MBBR 池容与搅拌能耗偏大，原工程为原池投加填料（实为 IFAS 改造），请用 IFAS Tab 改造模式复核。</i>',
-    invest: '主材约 480 万(填料 200 万 + 筛网 80 万 + 风机系统 200 万)'
+    outcome: '冬季(10℃)NH₄-N 稳定 ≤ 5 mg/L,TN 约 12-15 mg/L,TP 需配化学除磷,故按方案 ⑥ 设计。'+'<br><i>按本工具当前模型复算（按进入负荷定面积，T_min 取案例设计水温；供氧气量 = AOR ÷ (SOFK × 淹没深度)）：10 ℃ 下 r_nit 0.48 g/m²·d，纯 MBBR 总池容约 41,700 m³（HRT 约 20 h）、填料约 16,400 m³、设计气量约 63,600 Nm³/h（搅拌控制，供氧所需仅约 13,100 Nm³/h），曝气吨水电耗约 0.67 kWh/m³（套用后提示偏高；含缺氧段搅拌约 0.85）；预计出水 TN 14.0（按需投碳控制值）、TP 0.5 mg/L；经验校核需氧约 12,100 kg O₂/d，与 GB 式基本一致。低温下纯 MBBR 池容与搅拌能耗偏大，原工程为原池投加填料（实为 IFAS 改造），请用 <a href="ifas-design.html">IFAS 工程设计</a>工具的改造模式复核。</i>',
+    invest: '主材约 480 万元(填料 200 万元 + 筛网 80 万元 + 风机系统 200 万元)'
   },
   {
     id: 'city_retrofit_small',
@@ -4451,7 +3914,7 @@ const CASE_DB = [
       stageConfig: 6, stageLabel: '⑥ 完整 BNR + 化除磷'
     },
     outcome: '处理能力从 1.5 → 2.0 万 m³/d,出水 NH₄ 稳定 ≤ 3 mg/L。出水 TN ≤ 15、TP ≤ 0.5 需脱氮 + 化学除磷,故按方案 ⑥ 设计。'+'<br><i>按本工具当前模型复算（按进入负荷定面积，T_min 取案例设计水温；供氧气量 = AOR ÷ (SOFK × 淹没深度)）：总池容约 6,200 m³（HRT 约 7.4 h）、填料约 2,900 m³、设计气量约 9,000 Nm³/h（搅拌控制，供氧所需约 4,800），曝气吨水电耗约 0.23 kWh/m³（含缺氧段搅拌约 0.30）；预计出水 TN 14.0（按需投碳控制值）、TP 0.5 mg/L。</i>',
-    invest: '总投资约 220 万,运行能耗 0.28 kWh/m³'
+    invest: '总投资约 220 万元,运行能耗 0.28 kWh/m³'
   },
   {
     id: 'landfill',
@@ -4468,7 +3931,7 @@ const CASE_DB = [
       note: '多级串联(本级仅硝化段，TN 由后续反硝化段、TP 由后续物化段去除，套用后 TN/TP 校核提示不达标属预期)；原按 BiofilmChip M 填充率 60%，超出该填料 15-35% 范围，改按 K5（25-60%）填充率 50%、硝化 DO 3 mg/L；碱度需外补 NaHCO₃ 约 1.5 t/d（7.14 × 1,700 mg/L 硝化耗碱 − 进水 3,500 mg/L）'
     },
     outcome: 'NH₄ 去除率 94%(从 1800 → 100 mg/L), COD 降 50%,属于低负荷高精度硝化。'+'<br><i>按本工具当前模型复算（按进入负荷定面积，T_min 取案例设计水温；供氧气量 = AOR ÷ (SOFK × 淹没深度)）：K5、填充率 50%、DO 3、自定义 r_nit 0.15（原 SNR₂₀ 0.35 按 θ 折算至 10 ℃）：总池容约 2,160 m³（HRT 约 22 d）、填料约 1,080 m³、设计气量约 5,400 Nm³/h，曝气吨水电耗约 28 kWh/m³。电耗高的原因：① 高氨氮本身——需氧约 9.9 kg O₂/m³（供氧所需约 1,070 Nm³/h）；② 渗滤液抑制下硝化速率低，且按进入负荷定面积，池容大，搅拌气量（12.5 Nm³/m²·h）为供氧所需的 5 倍。可加深池体、经中试提高硝化速率或按填料厂家最小流化风量复核。本级不脱氮，出水 TN ≈ 进水。</i>',
-    invest: '单级投资约 380 万, 全流程(含物化+深度)约 1600 万'
+    invest: '单级投资约 380 万元, 全流程(含物化+深度)约 1,600 万元'
   },
   {
     id: 'pharma',
@@ -4484,8 +3947,8 @@ const CASE_DB = [
       stageConfig: 2, stageLabel: '② 前高+后低双好氧', alpha: 0.5,
       note: '抗冲击设计,α=0.5(低于城镇)'
     },
-    outcome: 'COD 去除 87%, 生物膜对冲击负荷恢复时间 &lt;6 h。'+'<br><i>按本工具当前模型复算（按进入负荷定面积，T_min 取案例设计水温；供氧气量 = AOR ÷ (SOFK × 淹没深度)）：自定义 r_BOD 2.0、r_nit 0.21（原 SALR₂₀ 4、SNR₂₀ 0.5 按 θ 折算至 10 ℃）：总池容约 1,660 m³（高/低负荷段按面积需求自动分配为 50% / 50%）、填料约 910 m³、设计气量约 4,100 Nm³/h（搅拌控制，供氧所需约 1,300），曝气吨水电耗约 1.4 kWh/m³（套用后提示偏高），NH₄ 去除约 97%；方案 ② 无缺氧段、无化学除磷，出水 TN ≤ 30、TP ≤ 1.5 需另设缺氧段和除磷（套用后 TN/TP 校核提示不达标）。</i>',
-    invest: '主材约 180 万,运行能耗 0.55 kWh/m³'
+    outcome: 'COD 去除 87%, 生物膜对冲击负荷恢复时间 &lt;6 h。'+'<br><i>按本工具当前模型复算（按进入负荷定面积，T_min 取案例设计水温；供氧气量 = AOR ÷ (SOFK × 淹没深度)）：自定义 r_BOD 2.0、r_nit 0.21（原 SALR₂₀ 4、SNR₂₀ 0.5 按 θ 折算至 10 ℃）：总池容约 1,660 m³（高/低负荷段按面积需求自动分配为 50% / 50%）、填料约 910 m³、设计气量约 4,100 Nm³/h（搅拌控制，供氧所需约 1,300），曝气吨水电耗约 1.4 kWh/m³（套用后提示偏高），填料面积满足，NH₄ 出水按目标 15 mg/L（去除约 75%）；方案 ② 无缺氧段、无化学除磷，出水 TN ≤ 30、TP ≤ 1.5 需另设缺氧段和除磷（套用后 TN/TP 校核提示不达标）。</i>',
+    invest: '主材约 180 万元,运行能耗 0.55 kWh/m³'
   },
   {
     id: 'aquaculture_outflow',
@@ -4501,15 +3964,15 @@ const CASE_DB = [
       stageConfig: 6, stageLabel: '⑥ 完整 BNR + 化除磷',
       note: '尾水需执行《淡水池塘养殖水排放要求》,TN/TP 控制是关键；低浓度尾水所需填料面积小，填充率取 35% 使好氧段 HRT ≥ 2 h（不改水质）'
     },
-    outcome: 'COD 去除 75%,配 PAC 投加除磷,TP 稳定 ≤ 0.5 mg/L。'+'<br><i>按本工具当前模型复算（按进入负荷定面积，T_min 取案例设计水温；供氧气量 = AOR ÷ (SOFK × 淹没深度)）：填充率 35%：总池容约 180 m³（好氧段 HRT 约 2.2 h）、填料约 59 m³、设计气量约 230 Nm³/h（搅拌控制），曝气吨水电耗约 0.12 kWh/m³（含缺氧段搅拌约 0.17）；NH₄ 去除约 95%、TN 去除约 65%（出水 TN 7.0 mg/L，按需投碳控制值）、出水 TP 0.5 mg/L。</i>',
-    invest: '主体设备约 150-200 万(含段组合+化除磷)'
+    outcome: 'COD 去除 75%,配 PAC 投加除磷,TP 稳定 ≤ 0.5 mg/L。'+'<br><i>按本工具当前模型复算（按进入负荷定面积，T_min 取案例设计水温；供氧气量 = AOR ÷ (SOFK × 淹没深度)）：填充率 35%：总池容约 180 m³（好氧段 HRT 约 2.2 h）、填料约 59 m³、设计气量约 230 Nm³/h（搅拌控制），曝气吨水电耗约 0.12 kWh/m³（含缺氧段搅拌约 0.17）；NH₄ 出水按目标 2 mg/L（去除约 87%）、TN 去除约 65%（出水 TN 7.0 mg/L，按需投碳控制值）、出水 TP 0.5 mg/L。</i>',
+    invest: '主体设备约 150-200 万元(含段组合+化除磷)'
   },
   {
     id: 'food_industry',
     category: 'industrial',
     tag: '工业废水',
     title: '食品加工废水(高BOD·易降解)',
-    sub: '3000m³/d · BOD 400 · 无氮磷脱除',
+    sub: '3000m³/d · BOD 700 · 无氮磷脱除',
     influent: { Q: 0.3, T: 25, COD0: 1200, BOD0: 700, NH40: 20, TN0: 25, TP0: 8, Alk: 180 },
     effluent: { CODe: 80, BODe: 15, NH4e: 15, TNe: 20, TPe: 5 },
     design: {
@@ -4518,8 +3981,8 @@ const CASE_DB = [
       stageConfig: 1, stageLabel: '① 单级 MBBR (BOD 去除)',
       note: 'BOD 去除为主,不求硝化；高负荷段生物膜更新快，生物膜泥龄按 5 d 计'
     },
-    outcome: '处理成本低,易降解水质适合高负荷设计。'+'<br><i>按本工具当前模型复算（按进入负荷定面积，T_min 取案例设计水温；供氧气量 = AOR ÷ (SOFK × 淹没深度)）：总池容约 1,010 m³、填料约 550 m³、设计气量约 2,500 Nm³/h（搅拌控制，供氧所需约 1,750），曝气吨水电耗约 0.44 kWh/m³，剩余污泥约 1,160 kg DS/d（泥龄 5 d）；BOD 去除按经验 92%。按进入负荷定面积，部分硝化（NH₄ 20 → 15 mg/L）也按进入 NH₄ 负荷计入面积。本案例不脱氮除磷，出水 TN ≤ 20、TP ≤ 5 需另设缺氧段/化学除磷（套用后 TN/TP 校核提示不达标）。</i>',
-    invest: '含预处理约 350 万'
+    outcome: '处理成本低,易降解水质适合高负荷设计。'+'<br><i>按本工具当前模型复算（按进入负荷定面积，T_min 取案例设计水温；供氧气量 = AOR ÷ (SOFK × 淹没深度)）：总池容约 1,010 m³、填料约 550 m³、设计气量约 2,500 Nm³/h（搅拌控制，供氧所需约 1,750），曝气吨水电耗约 0.44 kWh/m³，剩余污泥约 1,160 kg DS/d（泥龄 5 d）；填料面积满足，BOD₅ 出水按目标 15 mg/L（去除约 98%）。按进入负荷定面积，部分硝化（NH₄ 20 → 15 mg/L）也按进入 NH₄ 负荷计入面积。本案例不脱氮除磷，出水 TN ≤ 20、TP ≤ 5 需另设缺氧段/化学除磷（套用后 TN/TP 校核提示不达标）。</i>',
+    invest: '含预处理约 350 万元'
   },
   {
     id: 'salt_water',
@@ -4535,8 +3998,8 @@ const CASE_DB = [
       stageConfig: 2, stageLabel: '② 前高+后低双好氧', alpha: 0.5,
       note: 'α=0.5 · 盐度 25‰（饱和溶解氧按盐度修正）· 耐盐菌驯化 3-6 个月'
     },
-    outcome: '启动驯化后 COD 去除 88%, NH₄ 去除 65%(高盐抑制，工具未计盐度抑制)。填料挂膜稳定,不受盐冲击。'+'<br><i>按本工具当前模型复算（按进入负荷定面积，T_min 取案例设计水温；供氧气量 = AOR ÷ (SOFK × 淹没深度)）：α=0.5、盐度 25‰，自定义 r_BOD 2.5、r_nit 0.17（原 SALR₂₀ 5、SNR₂₀ 0.4 按 θ 折算至 10 ℃）：总池容约 930 m³（高/低负荷段 64% / 36%）、填料约 560 m³、设计气量约 2,300 Nm³/h（搅拌控制，供氧所需约 870），曝气吨水电耗约 1.5 kWh/m³——BOD 1,100 mg/L 需氧约 1.0 kg O₂/m³，属高浓度废水的正常量级（套用后按城镇污水基准提示偏高）。工具未计盐度对硝化的抑制，模型 NH₄ 去除 97% 高于实际约 65%。方案 ② 不脱氮、无化学除磷，出水 TN ≤ 30、TP ≤ 2 需另设缺氧段和除磷（套用后 TN/TP 校核提示不达标）。</i>',
-    invest: '含驯化费用约 280 万'
+    outcome: '启动驯化后 COD 去除 88%, NH₄ 去除 65%(高盐抑制，工具未计盐度抑制)。填料挂膜稳定,不受盐冲击。'+'<br><i>按本工具当前模型复算（按进入负荷定面积，T_min 取案例设计水温；供氧气量 = AOR ÷ (SOFK × 淹没深度)）：α=0.5、盐度 25‰，自定义 r_BOD 2.5、r_nit 0.17（原 SALR₂₀ 5、SNR₂₀ 0.4 按 θ 折算至 10 ℃）：总池容约 930 m³（高/低负荷段 64% / 36%）、填料约 560 m³、设计气量约 2,300 Nm³/h（搅拌控制，供氧所需约 870），曝气吨水电耗约 1.5 kWh/m³——BOD 1,100 mg/L 需氧约 1.0 kg O₂/m³，属高浓度废水的正常量级（套用后按城镇污水基准提示偏高）。工具未计盐度对硝化的抑制，模型按出水目标 15 mg/L 计 NH₄ 去除约 63%（填料面积满足），与实际约 65% 接近只因目标值相近，盐度抑制需中试确认。方案 ② 不脱氮、无化学除磷，出水 TN ≤ 30、TP ≤ 2 需另设缺氧段和除磷（套用后 TN/TP 校核提示不达标）。</i>',
+    invest: '含驯化费用约 280 万元'
   },
   {
     id: 'small_village',
@@ -4553,7 +4016,7 @@ const CASE_DB = [
       note: '国产填料经济型, 全自动运行；出水 TN ≤ 20、TP ≤ 1 需脱氮 + 化学除磷，按方案 ⑥'
     },
     outcome: '一体化设备总占地 40 m²。全年出水稳定达一级B,NH₄ ≤ 8 mg/L。'+'<br><i>按本工具当前模型复算（按进入负荷定面积，T_min 取案例设计水温；供氧气量 = AOR ÷ (SOFK × 淹没深度)）：总池容约 19 m³、填料约 8 m³、设计气量约 30 Nm³/h（搅拌控制），曝气吨水电耗约 0.32 kWh/m³（含缺氧段搅拌约 0.40）；预计出水 TN 16.5、TP 1.0 mg/L。</i>',
-    invest: '整套设备约 18-25 万(含集成钢结构)'
+    invest: '整套设备约 18-25 万元(含集成钢结构)'
   },
   {
     id: 'anammox',
@@ -4569,8 +4032,8 @@ const CASE_DB = [
       stageConfig: 7, stageLabel: '⑦ 短程硝化 + Anammox',
       note: '短程硝化 + 厌氧氨氧化 · 控制 AOB(氨氧化菌) + Anammox 菌群共生 · DO 0.3-0.5 mg/L · 启动 6-12 个月'
     },
-    outcome: 'NH₄ 去除率 95%、TN 去除率 80%+。相比常规硝化-反硝化<b>节省外加碳源 100%、节省曝气能耗 60%</b>。适用于污泥脱水液、食品发酵废水、渗滤液侧流等高氨氮场景。'+'<br><i>按本工具当前模型复算（按进入负荷定面积，T_min 取案例设计水温；供氧气量 = AOR ÷ (SOFK × 淹没深度)）：K5（800 m²/m³）、填充率 50%，方案 ⑦ 按一段式 PN/A 面积负荷 1.2 g N/m²·d（参考值，30 ℃ 基准，不套全程硝化速率式）按进入 NH₄-N 240 kg/d 定面积：总池容约 500 m³（容积负荷约 0.48 kg N/m³·d）、填料约 250 m³、设计气量约 1,250 Nm³/h（曝气兼搅拌，搅拌控制，供氧所需约 490），曝气吨水电耗约 3.3 kWh/m³（约 2.9 kWh/kg N 去除，Anammox 段不另计机械搅拌）；NH₄ 去除约 93%、TN 去除约 85%（出水 TN 195 mg/L）。池容与电耗应按厂家 PN/A 面积负荷复核；“省曝气 60%”按需氧量（1.9 对 4.57 kg O₂/kg N）比较成立。本案例无化学除磷，TP 校核提示不达标属预期。</i>',
-    invest: '主体设备约 250 万(含菌种驯化/启动投资占 30%)'
+    outcome: 'NH₄ 去除率 95%、TN 去除率 80%+。相比常规硝化-反硝化<b>节省外加碳源 100%、节省曝气能耗 60%</b>。适用于污泥脱水液、食品发酵废水、渗滤液侧流等高氨氮场景。'+'<br><i>按本工具当前模型复算（按进入负荷定面积，T_min 取案例设计水温；供氧气量 = AOR ÷ (SOFK × 淹没深度)）：K5（800 m²/m³）、填充率 50%，方案 ⑦ 按一段式 PN/A 面积负荷 1.2 g N/m²·d（参考值，30 ℃ 基准，不套全程硝化速率式）按进入 NH₄-N 240 kg/d 定面积：总池容约 500 m³（容积负荷约 0.48 kg N/m³·d）、填料约 250 m³、设计气量约 1,250 Nm³/h（曝气兼搅拌，搅拌控制，供氧所需约 490），曝气吨水电耗约 3.3 kWh/m³（约 2.9 kWh/kg N 去除，Anammox 段不另计机械搅拌）；NH₄ 出水按目标 60 mg/L（去除约 95%）、TN 去除约 85%（出水 TN 195 mg/L）。池容与电耗应按厂家 PN/A 面积负荷复核；“省曝气 60%”按需氧量（1.9 对 4.57 kg O₂/kg N）比较成立。本案例无化学除磷，TP 校核提示不达标属预期。</i>',
+    invest: '主体设备约 250 万元(含菌种驯化/启动投资占 30%)'
   }
 ];
 
@@ -4704,9 +4167,9 @@ function applyCase(id) {
 // 段类型定义
 const STAGE_DEFS = {
   preAnox:    { name: '预缺氧',       color: '#06b6d4', icon: '🔵', desc: '利用进水 BOD 反硝化,无需外加碳源' },
-  nitrif_hi:  { name: '高负荷MBBR',   color: '#059669', icon: '💪', desc: 'SALR 8-12,大吃 BOD + 粗过 NH₄,吸收冲击负荷' },
+  nitrif_hi:  { name: '高负荷MBBR',   color: '#059669', icon: '💪', desc: '承担 BOD 去除（A_BOD = 进入 BOD₅ ÷ r_BOD 5 g/m²·d × θ 修正），吸收冲击负荷' },
   nitrif:     { name: '硝化',         color: '#22c55e', icon: '🟢', desc: 'BOD 去除 + 硝化, 主反应段' },
-  nitrif_lo:  { name: '低负荷MBBR',   color: '#16a34a', icon: '🌿', desc: 'SALR 3-5,精细硝化 + 出水保障' },
+  nitrif_lo:  { name: '低负荷MBBR',   color: '#16a34a', icon: '🌿', desc: '承担硝化（A_nit = 进入 NH₄-N ÷ 硝化设计速率 r_nit），精细硝化 + 出水保障' },
   partNitrif: { name: '短程硝化',     color: '#f59e0b', icon: '⚡', desc: 'DO 0.3-0.5 控制,NH₄ → NO₂,不让 NOB 起势' },
   anammox:    { name: '厌氧氨氧化',   color: '#7c3aed', icon: '🧬', desc: 'Anammox 菌 · NH₄ + NO₂ → N₂ · 无需碳源' },
   postAnox:   { name: '后缺氧',       color: '#8b5cf6', icon: '🟣', desc: '出水 TN 控制, 需外加碳源' },
@@ -4818,7 +4281,10 @@ function wkCheckNonNeg(list) {
 // 校验失败：结果区数值置"—"，在校核框给出提示
 function wkShowInvalid(panelId, checkIds, msg) {
   document.querySelectorAll('#' + panelId + ' .results .result-value').forEach(el => { el.textContent = '—'; });
-  checkIds.forEach(cid => { const el = $(cid); if (el) el.innerHTML = `<div class="check-item check-bad"><span class="ic">✗</span><span>${msg}</span></div>`; });
+  // ✗ 只在第一个校核框出现一次，其余校核框给 ℹ 指引，避免同一问题重复报 ✗
+  checkIds.forEach((cid, i) => { const el = $(cid); if (el) el.innerHTML = i === 0
+    ? `<div class="check-item check-bad"><span class="ic">✗</span><span>${msg}</span></div>`
+    : `<div class="check-item check-info"><span class="ic">ℹ</span><span>未计算：输入无效，详见下方「工艺配置合理性」校核</span></div>`; });
 }
 // 非阻塞提示（替代 alert）
 function wkToast(msg, ms = 2600) {
@@ -5026,25 +4492,25 @@ function calcStages() {
   // 输入框为空 → 采用 V_auto；用户手填 → 采用用户值。V_auto 只写 placeholder，不回写 value
   const V_total = V_input > 0 ? V_input : V_auto;
   if ($('st_V_total')) $('st_V_total').placeholder = `自动：${Math.round(V_auto)} m³`;
-  if ($('st_r_Vtotal')) $('st_r_Vtotal').textContent = Math.round(V_total);
+  if ($('st_r_Vtotal')) $('st_r_Vtotal').textContent = wkN(V_total);
   if ($('st_r_Vsrc')) $('st_r_Vsrc').textContent = V_input > 0 ? '（用户输入）' : `（自动估算 · ${ctrlG ? ctrlG.name + '控制' : '—'}）`;
   const fmtA = a => Math.round(a).toLocaleString('zh-CN');
   if ($('st_r_A_pre')) $('st_r_A_pre').textContent = hasPre ? (preDNzero ? '—' : fmtA(A_pre)) : '—';
   if ($('st_r_A_pre_basis')) $('st_r_A_pre_basis').textContent = hasPre
-    ? `(进入 ${L_pre.toFixed(0)} kg NO₃-Neq/d（回流 NO₃ ${NO3_rec.toFixed(0)} + DO 当量 ${O2eq_rec.toFixed(0)}）÷ r_preDN ${r_pre.toFixed(3)}（${r_pre10.toFixed(2)} × θ_den × fCN ${fCN.toFixed(2)}，C/N ${isFinite(CN_pre) ? CN_pre.toFixed(1) : '∞'}）)`
+    ? `(进入 ${wkN(L_pre)} kg NO₃-Neq/d（回流 NO₃ ${wkN(NO3_rec)} + DO 当量 ${wkN(O2eq_rec)}）÷ r_preDN ${r_pre.toFixed(3)}（${r_pre10.toFixed(2)} × θ_den × fCN ${fCN.toFixed(2)}，C/N ${isFinite(CN_pre) ? CN_pre.toFixed(1) : '—'}）)`
     : '(本方案无预缺氧段)';
-  if ($('st_r_A_BOD')) $('st_r_A_BOD').textContent = fmtA(A_BOD);
+  if ($('st_r_A_BOD')) $('st_r_A_BOD').textContent = isAnammoxPath ? '—' : fmtA(A_BOD);
   if ($('st_r_A_BOD_basis')) $('st_r_A_BOD_basis').textContent = isAnammoxPath ? '(PN/A 路径不单列 BOD 段面积)'
-    : `(进入 ${BOD_in_aer.toFixed(0)} kg BOD₅/d${rem_pre_eq > 0 ? `（进水 ${BOD_load.toFixed(0)} − 3 g sBOD₅/g NO₃-Neq × 前置反硝化 ${rem_pre_eq.toFixed(0)}）` : ''} ÷ r_BOD ${r_BOD_T.toFixed(2)} g/m²·d)`;
+    : `(进入 ${wkN(BOD_in_aer)} kg BOD₅/d${rem_pre_eq > 0 ? `（进水 ${wkN(BOD_load)} − 3 g sBOD₅/g NO₃-Neq × 前置反硝化 ${wkN(rem_pre_eq)}）` : ''} ÷ r_BOD ${r_BOD_T.toFixed(2)} g/m²·d)`;
   if ($('st_r_A_nit')) $('st_r_A_nit').textContent = nitRateZero ? '—' : fmtA(A_nit);
   if ($('st_r_A_post')) $('st_r_A_post').textContent = hasPost ? fmtA(A_post) : '—';
   if ($('st_r_A_post_basis')) $('st_r_A_post_basis').textContent = hasPost
-    ? `(进入 ${L_post.toFixed(0)} kg NO₃-N/d（= TN₀·(1−前置去除 ${preTNpct.toFixed(0)}%) − NH₄ₑ − 有机氮 1.5，与 TN 模型同口径）÷ r_postDN ${r_post.toFixed(2)} g/m²·d（1.5 × θ_den^(min(T_min,20)−10)））` : '(本方案无后缺氧段)';
+    ? `(进入 ${wkN(L_post)} kg NO₃-N/d（= TN₀·(1−前置去除 ${wkN(preTNpct)}%) − NH₄ₑ − 有机氮 1.5，与 TN 模型同口径）÷ r_postDN ${r_post.toFixed(2)} g/m²·d（1.5 × θ_den^(min(T_min,20)−10)））` : '(本方案无后缺氧段)';
   if ($('st_r_DOfactor')) $('st_r_DOfactor').textContent = isAnammoxPath
     ? `PN/A 面积负荷 ${rPNA30} × 1.09^(T_min−30) = ${rPNA.toFixed(3)} g N/m²·d（参考值，不套全程硝化速率式）`
     : `${nit.r10.toFixed(3)}（${nit.cls === '自定义' ? '自定义' : '类别 ' + nit.cls}）× ${nit.fT.toFixed(3)} × ${nit.fDO.toFixed(3)} × ${nit.fNH4.toFixed(3)} = ${nit.r.toFixed(3)} g/m²·d`;
   const V_settle = Q * settleHRT / 24;
-  if ($('st_r_Vsettle')) $('st_r_Vsettle').textContent = Math.round(V_settle);
+  if ($('st_r_Vsettle')) $('st_r_Vsettle').textContent = wkN(V_settle);
   stCalcResult.V_total = V_total;
   stCalcResult.V_auto  = V_auto;
   stCalcResult.r_aer   = r_aer;
@@ -5091,24 +4557,32 @@ function calcStages() {
   const HRT_post   = V_post / Q * 24;
   const HRT_chm    = V_chm / Q * 24 * 60;
 
-  // =========== 去除率预测(基于段组合) ============
-  // BOD 去除:基本在硝化/高负荷段就做完了
-  const has_aerobic = V_aerobic_total > 0 || V_partN > 0;
-  const BOD_rm = has_aerobic ? 92 : 30;   // 经验值
-
-  // NH4 去除分情况:
-  // - 常规硝化段(含 nitrif_hi / nitrif / nitrif_lo):~95%
-  // - 前高+后低双池:高池 60% + 低池精处理到 95%
-  // - 短程硝化:~60-70% (被 Anammox 段再消耗)
-  // - Anammox 段:配合短程硝化后再 90%+
-  let NH4_rm = 30;   // 各路径 NH₄ 去除率 30/93/95/97% 均为经验值，无规范出处
-  if (V_nit_hi > 0 && V_nit_lo > 0) {
-    NH4_rm = 97;  // 双池串联,精度更高
-  } else if (V_aerobic_total > 0) {
-    NH4_rm = 95;
-  } else if (V_partN > 0 && V_anx > 0) {
-    NH4_rm = 93;  // 短程+Anammox
+  // =========== BOD / NH₄ 出水预测（按各段填料面积满足程度，不再写死去除率）============
+  // 填料面积按进入负荷定（A = 进入负荷 ÷ r），故池容提供的面积 A_prov 可承担的进入负荷比例 f = A_prov / A_需；
+  //   f ≥ 1 → 出水按目标值；f < 1 → 出水 ≈ max(目标, 进入浓度 × (1 − f))，并给 ⚠
+  //   合建好氧段：BOD 与硝化竞争同一表面，异养菌优先占用（先满足 A_BOD，余下面积给硝化）
+  const BOD_in_aer_mg = Q > 0 ? BOD_in_aer / Q * 1000 : 0;          // mg/L 进入好氧段 BOD₅（已扣前置反硝化消耗）
+  const A_aer_prov = V_aer_all * af;                                  // m² 好氧段（含短程硝化/PN/A）提供面积
+  let fBOD = 1, fNit = 1;
+  if (isAnammoxPath) {
+    fNit = A_pna > 0 ? Math.min(1, A_aer_prov / A_pna) : 1;
+  } else if (isSplitHL) {
+    fBOD = A_BOD > 0 ? Math.min(1, V_nit_hi * af / A_BOD) : 1;
+    fNit = A_nit > 0 ? Math.min(1, V_nit_lo * af / A_nit) : 1;
+  } else {
+    fBOD = A_BOD > 0 ? Math.min(1, A_aer_prov / A_BOD) : 1;
+    fNit = A_nit > 0 ? Math.min(1, Math.max(0, A_aer_prov - A_BOD) / A_nit) : 1;
   }
+  if (nitRateZero) fNit = 1;   // 速率为 0（NH₄ₑ=0 等）另有 ✗ 提示，此处不再重复折算
+  const BODe_eff = Math.max(0, BODe);
+  const BODout_est = BOD0 <= BODe_eff ? BOD0 : (isAnammoxPath ? BODe_eff : Math.max(BODe_eff, BOD_in_aer_mg * (1 - fBOD)));
+  const NH4out_est = NH40 <= NH4e ? NH40 : Math.max(NH4e, NH40 * (1 - fNit));
+  const BOD_rm = BOD0 > 0 ? (1 - BODout_est / BOD0) * 100 : 0;
+  const NH4_rm = NH40 > 0 ? (1 - NH4out_est / NH40) * 100 : 0;
+  const NH4_short = Math.max(0, NH4out_est - NH4e);                  // mg/L 未完成硝化的 NH₄-N（硝化面积不足时）
+  // 实际可反硝化的 NO₃-N 比例 φ = 实际硝化量 / 设计硝化量（面积满足时 φ = 1，默认工况不受影响）
+  const nitDesign_mg = Math.max(0, TN0 - NH4e - orgNe_st);
+  const phiNit = isAnammoxPath ? 1 : (nitDesign_mg > 0 ? Math.max(0, 1 - NH4_short / nitDesign_mg) : 1);
 
   // TN 去除
   let total_TN_rm = 0;
@@ -5120,13 +4594,13 @@ function calcStages() {
   const postRmPct = pre_pct => {
     if (!(V_post > 0) || !(TN0 > 0) || !(Q > 0)) return 0;
     const cap_area_mg = V_post * af * r_post / 1000 / Q * 1000;          // mg/L 填料能力
-    const cap_no3_mg = Math.max(0, TN0 * (1 - pre_pct / 100) - NH4e - orgNe_st - 1.0);   // mg/L 进入 NO₃-N − 残余 1
+    const cap_no3_mg = Math.max(0, TN0 * (1 - pre_pct / 100) - NH4e - NH4_short - orgNe_st - 1.0);   // mg/L 进入 NO₃-N − 残余 1（扣未硝化 NH₄）
     const need_mg = Math.max(0, TN0 * (1 - pre_pct / 100) - TN_target);
     return Math.min(cap_area_mg, cap_no3_mg, need_mg) / TN0 * 100;
   };
   if (V_anx > 0 && V_partN > 0) {
     // Anammox 路径:自养脱氮,总 TN 去除 80-85%
-    total_TN_rm = Math.min(85, 70 + r_anammox * 0.3);   // 经验值（70 + 0.3×容积比，上限 85%）
+    total_TN_rm = Math.min(85, 70 + r_anammox * 0.3) * fNit;   // 经验值（70 + 0.3×容积比，上限 85%）；PN/A 面积不足时按满足比例 f 折减
   } else if (V_pre > 0) {
     // 含预缺氧方案: 基于 MLR 计算(经典 MLE/A2O 理论)
     // 理论极限: η_N = MLR / (1 + MLR)
@@ -5138,7 +4612,7 @@ function calcStages() {
     // BOD/N 比不足校核: 前端反硝化需 BOD/N ≥ 4
     const BOD_N_ratio = BOD0 / Math.max(NH40, 1);
     const BOD_factor = BOD_N_ratio >= 4 ? 1 : BOD_N_ratio / 4;  // 不足则打折
-    const preAnox_TN_rm_actual = preAnox_TN_rm * BOD_factor;
+    const preAnox_TN_rm_actual = preAnox_TN_rm * BOD_factor * phiNit;   // 硝化不足时可回流的 NO₃ 按 φ 折减
     // 后缺氧段额外贡献(若有)：按需投碳至 TN 目标，受填料能力与进入 NO₃-N 限制
     const postAnox_TN_rm = postRmPct(preAnox_TN_rm_actual);
     total_TN_rm = Math.min(92, preAnox_TN_rm_actual + postAnox_TN_rm);
@@ -5151,6 +4625,7 @@ function calcStages() {
     postAnox_part_rm = total_TN_rm;
   }
   TNout_est = TN0 * (1 - total_TN_rm / 100);
+  // 硝化面积不足：未硝化的 NH₄-N 已通过 φ（预缺氧）与后缺氧 NO₃ 上限扣除，留在出水 TN 中，不再另加
 
   // TP 去除(仅化除磷段)
   // 化学除磷按化学计量：PAC(mg/L) = ΔTP_chem × (Al/P 摩尔比) × 27/31 ÷ Al 质量分数
@@ -5165,7 +4640,7 @@ function calcStages() {
   const PAC_input = gNum('st_PAC', NaN);
   const PAC_auto = !(PAC_input >= 0);
   const PAC_dose = PAC_auto ? PAC_need : PAC_input;  // mg/L
-  if ($('st_PAC')) $('st_PAC').placeholder = `自动：${PAC_need.toFixed(0)} mg/L`;
+  if ($('st_PAC')) $('st_PAC').placeholder = `自动：${wkN(PAC_need)} mg/L`;
   const TP_removed_chem = V_chm > 0 ? PAC_dose / PAC_per_TP : 0;          // mg/L
   const TP_chem_rm = TP0 > 0 ? Math.min(95 - TP_bio_rm, TP_removed_chem / TP0 * 100) : 0;
   const total_TP_rm = TP0 > 0 ? TP_bio_rm + TP_chem_rm : 0;      // TP₀ = 0 时无需除磷
@@ -5240,10 +4715,17 @@ function calcStages() {
 
   $('st_r_BODrm').textContent = BOD_rm.toFixed(0);
   $('st_r_NH4rm').textContent = NH4_rm.toFixed(0);
+  if ($('st_r_BODout')) $('st_r_BODout').textContent = BODout_est.toFixed(1);
+  if ($('st_r_NH4out')) $('st_r_NH4out').textContent = NH4out_est.toFixed(1);
+  const fTxt = (f, what) => f >= 1 - 1e-9 ? `(${what}填料面积满足进入负荷，出水按目标值)` : `(${what}填料面积仅为所需的 ${wkN((f * 100))}%，按不足比例估算)`;
+  if ($('st_r_BODrm_basis')) $('st_r_BODrm_basis').textContent = isAnammoxPath ? '(PN/A 路径不单列 BOD 面积，出水按目标值)' : BOD0 <= BODe_eff ? '(进水 BOD₅ ≤ 出水目标)' : fTxt(fBOD, 'BOD ');
+  if ($('st_r_NH4rm_basis')) $('st_r_NH4rm_basis').textContent = NH40 <= NH4e ? '(进水 NH₄-N ≤ 出水目标)' : fTxt(fNit, isAnammoxPath ? 'PN/A ' : '硝化');
   $('st_r_TNrm').textContent = total_TN_rm.toFixed(0);
   $('st_r_TPrm').textContent = total_TP_rm.toFixed(0);
   $('st_r_TNout').textContent = TNout_est.toFixed(1);
-  if ($('st_r_TNout_label')) $('st_r_TNout_label').textContent = postAnox_part_rm > 0 ? `预计 TN 出水（按需投碳控制值 = TNe ${TNe} − 余量 ${TNmargin}）` : '预计 TN 出水';
+  // 仅当后缺氧按需投碳确实把出水控制在控制值时才标"按需投碳控制值"；触及去除率上限/填料能力/硝化不足时为预测值
+  const TNatTarget = postAnox_part_rm > 0 && Math.abs(TNout_est - TN_target) < 0.05;
+  if ($('st_r_TNout_label')) $('st_r_TNout_label').textContent = TNatTarget ? `预计 TN 出水（按需投碳控制值 = TNe ${TNe} − 余量 ${TNmargin}）` : '预计 TN 出水';
   $('st_r_TPout').textContent = TPout_est.toFixed(2);
 
   // =========== 污泥产量计算（纯 MBBR：生物膜剥落 + 进水惰性 SS）===========
@@ -5277,13 +4759,14 @@ function calcStages() {
   // 站内口径：ΔTKN = TKN₀ − NH₄ₑ − 出水有机氮（1.5 mg/L）；本页无 TKN 输入，以 TN₀ 代 TKN₀
   const orgNe = 1.5;
   const dTKN_kg = Math.max(0, TN0 - NH4e - orgNe) * Q / 1000;
-  const N_nit_kg = Math.max(0, dTKN_kg - 0.12 * dX_total_vss);   // 被硝化的氮 = ΔTKN − 0.12·ΔX_VSS
+  const N_nit_kg = Math.max(0, dTKN_kg - 0.12 * dX_total_vss - NH4_short * Q / 1000);   // 被硝化的氮 = ΔTKN − 0.12·ΔX_VSS − 面积不足未硝化部分
   // 碳化需氧（GB 50014）：O_BOD = 1.47·ΔBOD − 1.42·ΔX_VSS，ΔX_VSS 取上方生物膜产泥量 dX_total_vss
   const O_BOD = Math.max(0, 1.47 * BOD_rem_kg - 1.42 * dX_total_vss);  // kg O₂/d
   // 硝化需氧：常规全程硝化 4.57 kg O₂/kg N；短程硝化+Anammox（PN/A）路径仅约 57% NH₄ 被氧化为 NO₂⁻，
   //   按去除 NH₄ 计 1.9 kg O₂/kg N（经验值，PN/A 文献约 1.7–1.9），且自养脱氮无反硝化回收（O_DN = 0）
   // 全程硝化按 GB 式 4.57·(ΔTKN − 0.12·ΔX_VSS)；PN/A 仍按去除 NH₄ 计 1.9（经验值）
-  const O_N   = isAnammoxPath ? NH4_rem_kg * 1.9 : 4.57 * N_nit_kg;   // kg O₂/d
+  const NH4_rem_act_kg = Math.max(0, NH40 - NH4out_est) * Q / 1000;   // 实际去除 NH₄（PN/A 面积不足时按 f 折减）
+  const O_N   = isAnammoxPath ? NH4_rem_act_kg * 1.9 : 4.57 * N_nit_kg;   // kg O₂/d
   // 反硝化回收 2.86·N_DN：只计预缺氧（MLR）利用进水碳源的脱氮；后缺氧外加碳源脱氮不计入氧回收。
   //   N_DN = 预缺氧脱氮量 − 0.12·ΔX_VSS（同化氮），且不超过可生物降解 BOD 能支持的量 ΔBOD/[2.86/(1−1.42·Y_obs)]
   const Y_obs = BOD_rem_kg > 0 ? dX_total_vss / BOD_rem_kg : 0;
@@ -5316,40 +4799,41 @@ function calcStages() {
   const mix_kwh_m3 = Q > 0 ? mixPower_kW * 24 / Q : 0;
   stCalcResult.mix_kwh_m3 = mix_kwh_m3;
   if ($('st_r_mixPower')) $('st_r_mixPower').textContent = mixPower_kW.toFixed(1);
-  if ($('st_r_mixBasis')) $('st_r_mixBasis').textContent = `(${mixPowerD} W/m³ × 缺氧段 ${Math.round(V_mix)} m³ · ${mix_kwh_m3.toFixed(3)} kWh/m³)`;
+  if ($('st_r_mixBasis')) $('st_r_mixBasis').textContent = `(${mixPowerD} W/m³ × 缺氧段 ${wkN(V_mix)} m³ · ${mix_kwh_m3.toFixed(3)} kWh/m³)`;
   // 曝气吨水电耗：不在此处估算，由 calcAeration（风机绝热功率）写入 st_r_airPower，两处同一结果
 
   const setR = (id, val) => { if ($(id)) $(id).textContent = val; };
   // 供 calcAeration 读取未取整值（避免按显示值反解气量强度产生舍入误差）
   stCalcResult.AOR = AOR; stCalcResult.SOR = isFinite(SOR) ? SOR : 0; stCalcResult.airFlow = airFlow_st; stCalcResult.airMin = airMin_st;
-  setR('st_r_AOR', AOR.toFixed(0));
-  setR('st_r_O_BOD', O_BOD.toFixed(0));
-  setR('st_r_O_N', O_N.toFixed(0));
-  setR('st_r_O_DN', O_DN.toFixed(0));
-  setR('st_r_O_N_basis', isAnammoxPath ? '（PN/A：1.9 kg O₂/kg NH₄-N，经验值，文献约 1.7–1.9）' : `（GB 式 4.57·(ΔTKN − 0.12·ΔX_VSS)，ΔTKN = TN₀ − NH₄ₑ − 1.5，无 TKN 输入以 TN₀ 代；被硝化 N ${N_nit_kg.toFixed(0)} kg/d）`);
-  setR('st_r_O_DN_basis', isAnammoxPath ? '（Anammox 自养脱氮，无反硝化回收，取 0）' : `（2.86·N_DN，N_DN = ${N_DN_kg.toFixed(0)} kg/d：仅预缺氧利用进水碳源的脱氮，扣同化氮；后缺氧外加碳源脱氮不计）`);
-  setR('st_r_SOR', isFinite(SOR) ? SOR.toFixed(0) : '—');
-  setR('st_r_airFlow', isFinite(SOR) ? airFlow_st.toFixed(0) : '—');
-  setR('st_r_airMin', airMin_st.toFixed(0));
-  setR('st_r_airDesign', airDesign_st.toFixed(0));
+  setR('st_r_AOR', wkN(AOR));
+  setR('st_r_O_BOD', wkN(O_BOD));
+  setR('st_r_O_N', wkN(O_N));
+  setR('st_r_O_DN', wkN(O_DN));
+  setR('st_r_O_N_basis', isAnammoxPath ? '（PN/A：1.9 kg O₂/kg NH₄-N，经验值，文献约 1.7–1.9）' : `（GB 式 4.57·(ΔTKN − 0.12·ΔX_VSS)，ΔTKN = TN₀ − NH₄ₑ − 1.5，无 TKN 输入以 TN₀ 代；被硝化 N ${wkN(N_nit_kg)} kg/d）`);
+  setR('st_r_O_DN_basis', isAnammoxPath ? '（Anammox 自养脱氮，无反硝化回收，取 0）' : `（2.86·N_DN，N_DN = ${wkN(N_DN_kg)} kg/d：仅预缺氧利用进水碳源的脱氮，扣同化氮；后缺氧外加碳源脱氮不计）`);
+  setR('st_r_SOR', isFinite(SOR) ? wkN(SOR) : '—');
+  setR('st_r_airFlow', isFinite(SOR) && hSub > 0 ? wkN(airFlow_st) : '—');
+  stCalcResult.hBad = !(hSub > 0);
+  setR('st_r_airMin', hSub > 0 ? wkN(airMin_st) : '—');
+  setR('st_r_airDesign', hSub > 0 ? wkN(airDesign_st) : '—');
   setR('st_r_airControl', airMin_st > airFlow_st ? '搅拌控制（池浅/低温时常见）' : '供氧控制（需氧量驱动）');
-  setR('st_r_airRatio', airRatio_st.toFixed(1));
-  setR('st_r_airIntensity', airIntens_st.toFixed(1));
+  setR('st_r_airRatio', hSub > 0 ? airRatio_st.toFixed(1) : '—');
+  setR('st_r_airIntensity', hSub > 0 ? airIntens_st.toFixed(1) : '—');
   // 经验校核值（与 GB 主结果并列，口径不同）：需氧 = 1.0 × 进入好氧段 BOD₅ + 4.3 × 硝化 N（峰值硝化 × 2）；产泥 = 1.15 × BOD₅ 去除 + 0.125 × 硝化 N + 6 × Al
   const O2_BF = BF.O2_per_BOD * BOD_in_aer + BF.O2_per_NH4N * N_nit_BF;
   const O2_BF_peak = BF.O2_per_BOD * BOD_in_aer + BF.O2_per_NH4N * BF.O2_peak_nit * N_nit_BF;
   const Al_kg = Al_dose_mgL * Q / 1000;
   const dX_BF = BF.Y_bod * BOD_rem + BF.Y_nit * N_nit_BF + BF.Y_chem_Al * Al_kg;
   stCalcResult.O2_BF = O2_BF; stCalcResult.dX_BF = dX_BF;
-  setR('st_r_O2BF', isAnammoxPath ? '—' : `${O2_BF.toFixed(0)}（峰值 ${O2_BF_peak.toFixed(0)}）`);
+  setR('st_r_O2BF', isAnammoxPath ? '—' : `${wkN(O2_BF)}（峰值 ${wkN(O2_BF_peak)}）`);
   setR('st_r_O2BF_basis', isAnammoxPath ? '（PN/A 路径不适用全程硝化需氧系数）'
-    : `(1.0 × 进入好氧段 BOD₅ ${BOD_in_aer.toFixed(0)} + 4.3 × 硝化 N ${N_nit_BF.toFixed(0)} kg/d，峰值硝化 × 2)`);
+    : `(1.0 × 进入好氧段 BOD₅ ${wkN(BOD_in_aer)} + 4.3 × 硝化 N ${wkN(N_nit_BF)} kg/d，峰值硝化 × 2)`);
 
-  $('st_r_carbonNeed').textContent = carbonNeed_kgCOD.toFixed(1);
+  $('st_r_carbonNeed').textContent = wkN(carbonNeed_kgCOD, 1);
   $('st_r_carbonType').textContent = carbonFactorT[carbonType];
-  $('st_r_carbonDose').textContent = carbonDose_kg.toFixed(1);
+  $('st_r_carbonDose').textContent = wkN(carbonDose_kg, 1);
   $('st_r_carbonCost').textContent = carbonCost_year.toFixed(1);
-  $('st_r_PACDose').textContent = PAC_kg_d.toFixed(1);
+  $('st_r_PACDose').textContent = wkN(PAC_kg_d, 1);
   $('st_r_PACCost').textContent = PAC_cost_year.toFixed(1);
   $('st_r_totalChemCost').textContent = totalChemCost.toFixed(1);
   $('st_r_chemPerTon').textContent = chemPerTon.toFixed(3);
@@ -5373,21 +4857,21 @@ function calcStages() {
     if (noteEl && isFinite(eff_SRT_st)) {
       if (eff_SRT_st < SRT_p * 0.5) {
         noteEl.style.color = '#d97706';
-        noteEl.textContent = `⚠ ${eff_SRT_st.toFixed(0)}d，明显短于泥龄输入 ${SRT_p} d：按 ${biofilmX} g VSS/m² 推算的生物膜量偏少，请核对填充率、biofilmX 或下调泥龄输入（产泥按泥龄输入计算）`;
+        noteEl.textContent = `⚠ ${wkN(eff_SRT_st)}d，明显短于泥龄输入 ${SRT_p} d：按 ${biofilmX} g VSS/m² 推算的生物膜量偏少，请核对填充率、biofilmX 或下调泥龄输入（产泥按泥龄输入计算）`;
       } else {
         noteEl.style.color = '#16a34a';
-        noteEl.textContent = `✓ ${eff_SRT_st.toFixed(0)}d ≥ 0.5 × 泥龄输入 ${SRT_p} d，生物膜量与泥龄输入大致自洽（产泥按泥龄输入计算）`;
+        noteEl.textContent = `✓ ${wkN(eff_SRT_st)}d ≥ 0.5 × 泥龄输入 ${SRT_p} d，生物膜量与泥龄输入大致自洽（产泥按泥龄输入计算）`;
       }
     }
   }
-  setRS('st_r_X_bio',       X_bio_kg_st.toFixed(0));
-  setRS('st_r_dX_bio',      dX_bio_vss.toFixed(1));
-  setRS('st_r_dX_assim',    dX_inert.toFixed(1));
-  setRS('st_r_dX_chem',     dX_chem.toFixed(1));
-  setRS('st_r_dX_carbon',   dX_carbon.toFixed(1));
-  setRS('st_r_dX',          dX_st.toFixed(1));
-  setRS('st_r_dXBF',        dX_BF.toFixed(0));
-  setRS('st_r_dXBF_basis',  `(1.15 × BOD₅ 去除 ${BOD_rem.toFixed(0)} + 0.125 × 硝化 N ${N_nit_BF.toFixed(0)}${Al_kg > 0 ? ` + 6 × Al ${Al_kg.toFixed(1)}` : ''} kg/d；不含外加碳源产泥)`);
+  setRS('st_r_X_bio',       wkN(X_bio_kg_st));
+  setRS('st_r_dX_bio',      wkN(dX_bio_vss, 1));
+  setRS('st_r_dX_assim',    wkN(dX_inert, 1));
+  setRS('st_r_dX_chem',     wkN(dX_chem, 1));
+  setRS('st_r_dX_carbon',   wkN(dX_carbon, 1));
+  setRS('st_r_dX',          wkN(dX_st, 1));
+  setRS('st_r_dXBF',        wkN(dX_BF));
+  setRS('st_r_dXBF_basis',  `(1.15 × BOD₅ 去除 ${wkN(BOD_rem)} + 0.125 × 硝化 N ${wkN(N_nit_BF)}${Al_kg > 0 ? ` + 6 × Al ${Al_kg.toFixed(1)}` : ''} kg/d；不含外加碳源产泥)`);
   setRS('st_r_sludge_yield',sludge_yield.toFixed(4));
   setRS('st_r_sludge_wet',  sludge_wet_td.toFixed(2));
   setRS('st_r_sludge_cost', sludge_cost_year.toFixed(1));
@@ -5402,7 +4886,7 @@ function calcStages() {
 
   // 填充率上限（MBBR ≤ 67%）
   if (fillRatio > BF.fill_max) {
-    checks.push({type:'bad', ic:'✗', text:`<b>填充率超限</b>: ${(fillRatio*100).toFixed(0)}% &gt; 67%（MBBR 上限），填料流化困难、易堆积，应降低填充率或增大池容`});
+    checks.push({type:'bad', ic:'✗', text:`<b>填充率超限</b>: ${wkN((fillRatio*100))}% &gt; 67%（MBBR 上限），填料流化困难、易堆积，应降低填充率或增大池容`});
   }
 
   if (TNmarginBad) {
@@ -5417,22 +4901,27 @@ function calcStages() {
   if (nitRateZero) {
     checks.push({type:'bad', ic:'✗', text:`<b>硝化设计速率为 0</b>: 出水 NH₄-N ${NH4e} mg/L 时 min(1, NH₄/2) = 0（或 DO = 0），无法定硝化面积，硝化面积未计入池容；请核对出水 NH₄ 目标与 DO`});
   } else if (isAnammoxPath) {
-    checks.push({type:'info', ic:'ℹ', text:`<b>PN/A 面积负荷</b>: ${rPNA30} g N/m²·d（30 ℃ 基准，θ 1.09 修正至 T_min ${Tmin} ℃ → ${rPNA.toFixed(3)}，不做 20 ℃ 封顶；参考值，以厂家数据为准）× 进入 NH₄-N ${(NH40 * Q / 1000).toFixed(0)} kg/d → A ${fmtA(A_pna)} m²，容积负荷约 ${(V_total > 0 ? NH40 * Q / 1000 / V_total : 0).toFixed(2)} kg N/m³·d；方案 ⑦ 按一段式 PN/A 处理，Anammox 段靠曝气搅拌、不计机械搅拌`});
+    checks.push({type:'info', ic:'ℹ', text:`<b>PN/A 面积负荷</b>: ${rPNA30} g N/m²·d（30 ℃ 基准，θ 1.09 修正至 T_min ${Tmin} ℃ → ${rPNA.toFixed(3)}，不做 20 ℃ 封顶；参考值，以厂家数据为准）× 进入 NH₄-N ${wkN((NH40 * Q / 1000))} kg/d → A ${fmtA(A_pna)} m²，容积负荷约 ${(V_total > 0 ? NH40 * Q / 1000 / V_total : 0).toFixed(2)} kg N/m³·d；方案 ⑦ 按一段式 PN/A 处理，Anammox 段靠曝气搅拌、不计机械搅拌`});
   } else if (NH4_in_kg > 0) {
     const doLow = DO_set_p < 3;
-    checks.push({type: doLow ? 'warn' : 'info', ic: doLow ? '⚠' : 'ℹ', text:`<b>硝化设计速率</b>: ${nit.cls === '自定义' ? '自定义' : '类别 ' + bfClsLabel(nit.cls)} ${nit.r10.toFixed(2)} × θ^(min(T_min,20)−10) ${nit.fT.toFixed(3)} × DO ${nit.fDO.toFixed(2)} × NH₄ ${nit.fNH4.toFixed(2)} = <b>${nit.r.toFixed(3)} g NH₄-N/m²·d</b>；进入负荷 ${NH4_in_kg.toFixed(0)} kg/d → A_nit ${fmtA(A_nit)} m²${DO_set_p > BF.DO_max_design ? `。DO ${DO_set_p} &gt; 5 mg/L，速率按 5 计（设计 DO 不得高于 5）` : ''}${doLow ? '。DO 偏低，生物膜硝化受氧扩散限制明显，速率按 DO/5 线性折减，建议好氧段 DO 3-5 mg/L' : ''}`});
+    checks.push({type: doLow ? 'warn' : 'info', ic: doLow ? '⚠' : 'ℹ', text:`<b>硝化设计速率</b>: ${nit.cls === '自定义' ? '自定义' : '类别 ' + bfClsLabel(nit.cls)} ${nit.r10.toFixed(2)} × θ^(min(T_min,20)−10) ${nit.fT.toFixed(3)} × DO ${nit.fDO.toFixed(2)} × NH₄ ${nit.fNH4.toFixed(2)} = <b>${nit.r.toFixed(3)} g NH₄-N/m²·d</b>；进入负荷 ${wkN(NH4_in_kg)} kg/d → A_nit ${fmtA(A_nit)} m²${DO_set_p > BF.DO_max_design ? `。DO ${DO_set_p} &gt; 5 mg/L，速率按 5 计（设计 DO 不得高于 5）` : ''}${doLow ? '。DO 偏低，生物膜硝化受氧扩散限制明显，速率按 DO/5 线性折减，建议好氧段 DO 3-5 mg/L' : ''}`});
   }
 
   // 前置反硝化
+  const TN_need_pct_pre = TN0 > 0 ? Math.max(0, (TN0 - TNe) / TN0 * 100) : 0;
   if (hasPre) {
     if (preDNzero) {
       checks.push({type:'bad', ic:'✗', text:`<b>预缺氧碳源不足</b>: C/N = ${CN_pre.toFixed(2)} ≤ 2 g BOD/g NO₃-Neq，前置反硝化速率为 0，预缺氧面积无法确定（未计入池容）；应降低 MLR 或改为后缺氧外加碳源`});
     } else {
       const cnOk = fCN >= 1 - 1e-9;
-      checks.push({type:'info', ic:'ℹ', text:`<b>前置反硝化</b>: 进入负荷 ${L_pre.toFixed(0)} kg NO₃-Neq/d（回流 NO₃-N ${NO3_rec.toFixed(0)} + 回流 DO ${DO_set_p} mg/L × 0.35 = ${O2eq_rec.toFixed(0)}），C/N ${CN_pre.toFixed(1)}${cnOk ? ' ≥ 4 全速率' : ` 介于 2-4，速率折减 fCN ${fCN.toFixed(2)}`}，r_preDN ${r_pre.toFixed(3)} g/m²·d${nPreDN > 1 ? `（${nPreDN} 格均值）` : ''} → A_pre ${fmtA(A_pre)} m²`});
+      checks.push({type:'info', ic:'ℹ', text:`<b>前置反硝化</b>: 进入负荷 ${wkN(L_pre)} kg NO₃-Neq/d（回流 NO₃-N ${wkN(NO3_rec)} + 回流 DO ${DO_set_p} mg/L × 0.35 = ${wkN(O2eq_rec)}），C/N ${isFinite(CN_pre) ? CN_pre.toFixed(1) : '—'}${!isFinite(CN_pre) ? '（无回流负荷）' : cnOk ? ' ≥ 4 全速率' : ` 介于 2-4，速率折减 fCN ${fCN.toFixed(2)}`}，r_preDN ${r_pre.toFixed(3)} g/m²·d${nPreDN > 1 ? `（${nPreDN} 格均值）` : ''} → A_pre ${fmtA(A_pre)} m²`});
     }
-    if (MLR_ratio < BF.R_min_preDN) {
-      checks.push({type:'info', ic:'ℹ', text:`<b>内回流比 R = ${MLR_ratio.toFixed(1)} &lt; 2.5</b>: 仅靠前置反硝化达到 70% 脱氮一般需 R &gt; 2.5；本方案另有后缺氧时可不提高`});
+    // 与本页 TN 模型一致：前置反硝化 TN 去除 = 0.85·R/(1+R)·min(1, BOD/N÷4) → 达到所需去除率 η 需 R = x/(1−x)，x = η/(0.85·f_BN)
+    const fBN_m = Math.min(1, (BOD0 / Math.max(NH40, 1)) / 4);
+    const needPreX = TN_need_pct_pre / 100 / (0.85 * fBN_m);
+    const R_need = needPreX < 1 ? needPreX / (1 - needPreX) : Infinity;
+    if (TN_need_pct_pre > 0 && MLR_ratio < R_need - 1e-6) {
+      checks.push({type:'info', ic:'ℹ', text:`<b>内回流比 R = ${MLR_ratio.toFixed(1)}</b>: 按本页 TN 模型（0.85·R/(1+R)${fBN_m < 1 ? ` × BOD/N 折减 ${fBN_m.toFixed(2)}` : ''}），仅靠前置反硝化达到所需 TN 去除 ${wkN(TN_need_pct_pre)}% 需 R ${isFinite(R_need) ? `≥ ${R_need.toFixed(1)}（MLR ≥ ${Math.ceil(R_need * 100)}%）` : '无解（超过前置反硝化上限 85%）'}；${hasPost ? '本方案另有后缺氧按需投碳补足，可不提高' : '可提高 MLR 或增设后缺氧（方案 ⑤/⑥）'}`});
     }
   }
 
@@ -5445,14 +4934,21 @@ function calcStages() {
     } else {
       checks.push({type:'ok', ic:'✓', text:`<b>各段填料面积满足进入负荷所需</b>: ${prov.filter(g => g.A > 0).map(g => `${g.name} ${fmtA(g.Aprov)} ≥ ${fmtA(g.A)} m²`).join('；')}`});
     }
+    // 面积不足对出水的影响（BOD / NH₄ 按不足比例估算）
+    if ((fBOD < 1 - 1e-6 && BODout_est > BODe_eff + 1e-6) || (fNit < 1 - 1e-6 && NH4out_est > NH4e + 1e-6)) {
+      const parts = [];
+      if (fBOD < 1 - 1e-6 && BODout_est > BODe_eff + 1e-6) parts.push(`BOD₅ 约 ${BODout_est.toFixed(1)} mg/L &gt; 目标 ${BODe}（BOD 面积满足 ${wkN((fBOD * 100))}%）`);
+      if (fNit < 1 - 1e-6 && NH4out_est > NH4e + 1e-6) parts.push(`NH₄-N 约 ${NH4out_est.toFixed(1)} mg/L &gt; 目标 ${NH4e}（${isAnammoxPath ? 'PN/A' : '硝化'}面积满足 ${wkN((fNit * 100))}%${!isSplitHL && !isAnammoxPath ? '，合建好氧段先扣 BOD 面积' : ''}）`);
+      checks.push({type:'warn', ic:'⚠', text:`<b>出水可能超标（填料面积不足）</b>: 预计 ${parts.join('；')}；未硝化的 NH₄-N 已计入 TN 出水。按不足比例粗估，仅作提示，应补足填料面积`});
+    }
     // 容积分配与面积需求一致性（选方案时已按面积需求自动分配）
     const sumReq = prov.reduce((a, g) => a + g.Vreq, 0), sumRg = prov.reduce((a, g) => a + g.r, 0);
     const mis = prov.filter(g => sumReq > 0 && Math.abs(g.r / sumRg - g.Vreq / sumReq) > 0.05 + 1e-6);
     const reallocLink = currentStageCount === 7 ? '' : `<a href="javascript:void(0)" onclick="stReallocRatios()">按需求重新分配</a>`;
     if (stRatioManual) {
-      checks.push({type:'info', ic:'ℹ', text:`<b>容积比为手动值</b>: 已保留用户输入，不再随 Q、T_min、MLR 等自动重新分配${mis.length ? `；与面积需求不一致：${prov.map(g => `${g.name} ${g.r.toFixed(0)}%（按面积宜 ${(g.Vreq / sumReq * sumRg).toFixed(0)}%）`).join('、')}${ctrlG && V_input <= 0 ? `，自动池容由${ctrlG.name}控制` : ''}` : ''}。${reallocLink}`});
+      checks.push({type:'info', ic:'ℹ', text:`<b>容积比为手动值</b>: 已保留用户输入，不再随 Q、T_min、MLR 等自动重新分配${mis.length ? `；与面积需求不一致：${prov.map(g => `${g.name} ${wkN(g.r)}%（按面积宜 ${wkN((g.Vreq / sumReq * sumRg))}%）`).join('、')}${ctrlG && V_input <= 0 ? `，自动池容由${ctrlG.name}控制` : ''}` : ''}。${reallocLink}`});
     } else if (mis.length && V_input <= 0 && ctrlG) {
-      checks.push({type:'info', ic:'ℹ', text:`<b>容积分配与面积需求不一致</b>: ${prov.map(g => `${g.name} ${g.r.toFixed(0)}%（按面积宜 ${(g.Vreq / sumReq * sumRg).toFixed(0)}%）`).join('、')}；自动池容由${ctrlG.name}控制，其余段面积有富余。${reallocLink}`});
+      checks.push({type:'info', ic:'ℹ', text:`<b>容积分配与面积需求不一致</b>: ${prov.map(g => `${g.name} ${wkN(g.r)}%（按面积宜 ${wkN((g.Vreq / sumReq * sumRg))}%）`).join('、')}；自动池容由${ctrlG.name}控制，其余段面积有富余。${reallocLink}`});
     }
   }
 
@@ -5463,9 +4959,9 @@ function calcStages() {
     const DN_cap = SDNR_T_st * X_anox_kg;                                          // kg N/d
     const DN_need = total_TN_rm / 100 * TN0 * Q / 1000;                             // kg N/d（按预测 TN 去除量）
     if (DN_cap >= DN_need) {
-      checks.push({type:'ok', ic:'✓', text:`<b>缺氧段反硝化能力</b>: SDNR_T ${SDNR_T_st.toFixed(3)} × 生物膜 ${X_anox_kg.toFixed(0)} kg VSS = ${DN_cap.toFixed(0)} kg N/d ≥ 预测脱氮量 ${DN_need.toFixed(0)} kg N/d`});
+      checks.push({type:'ok', ic:'✓', text:`<b>缺氧段反硝化能力</b>: SDNR_T ${SDNR_T_st.toFixed(3)} × 生物膜 ${wkN(X_anox_kg)} kg VSS = ${wkN(DN_cap)} kg N/d ≥ 预测脱氮量 ${wkN(DN_need)} kg N/d`});
     } else {
-      checks.push({type:'info', ic:'ℹ', text:`<b>缺氧段反硝化能力（GB SDNR 参考校核）偏低</b>: 后缺氧/预缺氧面积以面积负荷法为准；SDNR_T ${SDNR_T_st.toFixed(3)} × 生物膜 ${X_anox_kg.toFixed(0)} kg VSS = ${DN_cap.toFixed(0)} kg N/d &lt; 预测脱氮量 ${DN_need.toFixed(0)} kg N/d，建议增大缺氧段容积比/填充率，或下调 TN 去除预期`});
+      checks.push({type:'info', ic:'ℹ', text:`<b>缺氧段反硝化能力（GB SDNR 参考校核）偏低</b>: 后缺氧/预缺氧面积以面积负荷法为准；SDNR_T ${SDNR_T_st.toFixed(3)} × 生物膜 ${wkN(X_anox_kg)} kg VSS = ${wkN(DN_cap)} kg N/d &lt; 预测脱氮量 ${wkN(DN_need)} kg N/d，建议增大缺氧段容积比/填充率，或下调 TN 去除预期`});
     }
   }
 
@@ -5484,11 +4980,15 @@ function calcStages() {
     const sugg = isAnammoxPath ? '可增加 Anammox 段容积或后接反硝化/深度处理'
       : V_pre > 0 ? (V_post > 0 ? '可提高 MLR、增大预缺氧/后缺氧容积比或外加碳源强化后缺氧' : '可提高 MLR 或改用方案 ⑤/⑥（增加后缺氧）')
       : V_post > 0 ? '可增大后缺氧容积比或改用方案 ⑤/⑥（增加预缺氧 + MLR）' : '当前方案无缺氧段，需改用方案 ④/⑤/⑥';
-    checks.push({type: severe ? 'bad' : 'warn', ic: severe ? '✗' : '⚠', text:`<b>TN 不达标</b>: 预计出水 TN ${TNout_est.toFixed(1)} mg/L &gt; 目标 ${TNe} mg/L（当前去除 ${total_TN_rm.toFixed(0)}%，需 ${TN_need_pct.toFixed(0)}%），${sugg}`});
+    checks.push({type: severe ? 'bad' : 'warn', ic: severe ? '✗' : '⚠', text:`<b>TN 不达标</b>: 预计出水 TN ${TNout_est.toFixed(1)} mg/L &gt; 目标 ${TNe} mg/L（当前去除 ${wkN(total_TN_rm)}%，需 ${wkN(TN_need_pct)}%），${sugg}`});
   } else {
-    checks.push({type:'ok', ic:'✓', text:`<b>TN 去除达标</b>: ${total_TN_rm.toFixed(0)}%，出水约 ${TNout_est.toFixed(1)} mg/L ≤ ${TNe} mg/L`});
+    checks.push({type:'ok', ic:'✓', text:`<b>TN 去除达标</b>: ${wkN(total_TN_rm)}%，出水约 ${TNout_est.toFixed(1)} mg/L ≤ ${TNe} mg/L`});
   }
 
+  // 池深：曝气器安装高度 0.2 m，H ≤ 0.2 m 时无淹没深度，供氧气量无法计算
+  if (!(hSub > 0)) {
+    checks.push({type:'bad', ic:'✗', text:`<b>池深过浅</b>: 有效水深 H = ${poolH_EE} m ≤ 曝气器安装高度 ${AERATOR_MOUNT_H} m，淹没深度为 0，供氧气量（AOR ÷ SOFK × 淹没深度）无法计算，请输入实际池深（MBBR 常 4-6 m）`});
+  }
   // 氧传递推动力
   if (AOR > 0 && !isFinite(SOR)) {
     checks.push({type:'bad', ic:'✗', text:`<b>空气曝气无法达到设定 DO</b>: β·Csm − DO = ${sorR.drive.toFixed(2)} mg/L ≤ 0，SOR 无解，请降低 DO 设计值`});
@@ -5506,13 +5006,13 @@ function calcStages() {
     const pumpEnergy_kWh_d = pumpPower_kW * 24;
     const pumpEnergy_year = pumpEnergy_kWh_d * 365 * 0.8 / 10000;  // 万元/年(0.8元/kWh，与风机电价一致)
 
-    checks.push({type:'info', ic:'🔄', text:`<b>内回流 MLR=${MLR}%</b> · 理论 TN 去除极限 ${MLR_theoretic.toFixed(0)}% · 实际约 ${(MLR_theoretic * 0.85).toFixed(0)}%`});
-    checks.push({type:'info', ic:'💡', text:`<b>回流泵功率</b>: Q回流=${(Q_recircle/24).toFixed(0)} m³/h · 功率 ${pumpPower_kW.toFixed(1)} kW · 电费约 ${pumpEnergy_year.toFixed(1)} 万元/年`});
+    checks.push({type:'info', ic:'🔄', text:`<b>内回流 MLR=${MLR}%</b> · 理论 TN 去除极限 ${wkN(MLR_theoretic)}% · 实际约 ${wkN((MLR_theoretic * 0.85))}%`});
+    checks.push({type:'info', ic:'💡', text:`<b>回流泵功率</b>: Q回流=${wkN((Q_recircle/24))} m³/h · 功率 ${pumpPower_kW.toFixed(1)} kW · 电费约 ${pumpEnergy_year.toFixed(1)} 万元/年`});
 
     // BOD/N 比校核
     const BOD_N_ratio = BOD0 / Math.max(NH40, 1);
     if (BOD_N_ratio < 4) {
-      checks.push({type:'warn', ic:'⚠', text:`<b>BOD/N 比偏低</b>: ${BOD_N_ratio.toFixed(1)}(&lt;4),预缺氧反硝化碳源不足,实际 TN 去除打折至 ${(BOD_N_ratio/4*100).toFixed(0)}%`});
+      checks.push({type:'warn', ic:'⚠', text:`<b>BOD/N 比偏低</b>: ${BOD_N_ratio.toFixed(1)}(&lt;4),预缺氧反硝化碳源不足,实际 TN 去除打折至 ${wkN((BOD_N_ratio/4*100))}%`});
     } else {
       checks.push({type:'ok', ic:'✓', text:`<b>BOD/N 比充足</b>: ${BOD_N_ratio.toFixed(1)}(≥4),前端反硝化碳源足够`});
     }
@@ -5529,11 +5029,11 @@ function calcStages() {
   if (TP0 <= TPe + 1e-6) {
     checks.push({type:'ok', ic:'✓', text:`<b>TP 无需去除</b>: 进水 TP ${TP0} mg/L ≤ 出水目标 ${TPe} mg/L`});
   } else if (TPout_est <= TPe + 1e-6) {
-    checks.push({type:'ok', ic:'✓', text:`<b>TP 去除达标</b>: ${total_TP_rm.toFixed(0)}%,出水约 ${TPout_est.toFixed(2)} mg/L ≤ ${TPe} mg/L`});
+    checks.push({type:'ok', ic:'✓', text:`<b>TP 去除达标</b>: ${wkN(total_TP_rm)}%,出水约 ${TPout_est.toFixed(2)} mg/L ≤ ${TPe} mg/L`});
   } else if (V_chm === 0) {
     checks.push({type:'bad', ic:'✗', text:`<b>TP 不达标（无化除磷段）</b>: 仅生物同化约 ${TP_bio_rm}%，预计出水 TP ${TPout_est.toFixed(2)} mg/L &gt; 目标 ${TPe} mg/L，需配化学除磷（改选方案 ⑥ 或另设除磷单元）`});
   } else {
-    checks.push({type:'warn', ic:'⚠', text:`<b>TP 可能不达标</b>: 当前 PAC ${PAC_dose.toFixed(0)} mg/L 只能除 ${total_TP_rm.toFixed(0)}%（预计出水 ${TPout_est.toFixed(2)} &gt; ${TPe} mg/L）,建议按化学计量（Al/P=${AlP_molar}）增加到 ${PAC_need.toFixed(0)}+ mg/L${TPe < TP0 * 0.05 ? '；化学除磷去除率上限按 95% 计，更严目标需深度除磷' : ''}`});
+    checks.push({type:'warn', ic:'⚠', text:`<b>TP 可能不达标</b>: 当前 PAC ${wkN(PAC_dose)} mg/L 只能除 ${wkN(total_TP_rm)}%（预计出水 ${TPout_est.toFixed(2)} &gt; ${TPe} mg/L）,建议按化学计量（Al/P=${AlP_molar}）增加到 ${wkN(PAC_need)}+ mg/L${TPe < TP0 * 0.05 ? '；化学除磷去除率上限按 95% 计，更严目标需深度除磷' : ''}`});
   }
 
   // 碳源成本
@@ -5544,7 +5044,7 @@ function calcStages() {
   // 硝化段过小(考虑所有好氧段，含短程硝化)
   const V_aerobic = V_aer_all;
   if (currentStageCount > 1 && !isAnammoxPath && V_aerobic / V_total < 0.4) {
-    checks.push({type:'warn', ic:'⚠', text:`<b>好氧MBBR 容积偏小</b>: 仅占 ${(V_aerobic/V_total*100).toFixed(0)}% &lt; 40%,NH₄ 去除可能不足`});
+    checks.push({type:'warn', ic:'⚠', text:`<b>好氧MBBR 容积偏小</b>: 仅占 ${wkN((V_aerobic/V_total*100))}% &lt; 40%,NH₄ 去除可能不足`});
   }
 
   // 硝化段 HRT (综合所有好氧段)
@@ -5562,9 +5062,9 @@ function calcStages() {
     } else if (V_partN > 0 && V_anx > 0) {
       const partN_ratio = V_partN / (V_partN + V_anx);
       if (partN_ratio < 0.3 || partN_ratio > 0.5) {
-        checks.push({type:'info', ic:'ℹ', text:`<b>短程硝化:Anammox 容积比</b> = ${(partN_ratio*100).toFixed(0)}%:${(100-partN_ratio*100).toFixed(0)}%,建议 40:60`});
+        checks.push({type:'info', ic:'ℹ', text:`<b>短程硝化:Anammox 容积比</b> = ${wkN((partN_ratio*100))}%:${wkN((100-partN_ratio*100))}%,建议 40:60`});
       } else {
-        checks.push({type:'ok', ic:'✓', text:`<b>短程硝化-Anammox 配比合理</b>: ${(partN_ratio*100).toFixed(0)}%:${(100-partN_ratio*100).toFixed(0)}%`});
+        checks.push({type:'ok', ic:'✓', text:`<b>短程硝化-Anammox 配比合理</b>: ${wkN((partN_ratio*100))}%:${wkN((100-partN_ratio*100))}%`});
       }
     }
     // Anammox 适用提醒
@@ -5585,11 +5085,11 @@ function calcStages() {
   // 化除磷段 HRT
   if (V_chm > 0) {
     if (HRT_chm < 15) {
-      checks.push({type:'warn', ic:'⚠', text:`<b>化除磷段 HRT 偏短</b>: ${HRT_chm.toFixed(0)} min,建议 15-30 min`});
+      checks.push({type:'warn', ic:'⚠', text:`<b>化除磷段 HRT 偏短</b>: ${wkN(HRT_chm)} min,建议 15-30 min`});
     } else if (HRT_chm > 45) {
-      checks.push({type:'info', ic:'ℹ', text:`<b>化除磷段 HRT 较长</b>: ${HRT_chm.toFixed(0)} min,可减小占比`});
+      checks.push({type:'info', ic:'ℹ', text:`<b>化除磷段 HRT 较长</b>: ${wkN(HRT_chm)} min,可减小占比`});
     } else {
-      checks.push({type:'ok', ic:'✓', text:`<b>化除磷段 HRT 合理</b>: ${HRT_chm.toFixed(0)} min`});
+      checks.push({type:'ok', ic:'✓', text:`<b>化除磷段 HRT 合理</b>: ${wkN(HRT_chm)} min`});
     }
   }
 
@@ -5617,20 +5117,20 @@ function calcStages() {
 
   // ── 经验校核值与 GB 主结果对比（口径不同，差异 > 30% 时提示）──
   if (!isAnammoxPath && AOR > 0 && O2_BF > 0 && Math.abs(O2_BF - AOR) / AOR > 0.3) {
-    checks.push({type:'info', ic:'ℹ', text:`<b>需氧量口径差异</b>: 经验校核 ${O2_BF.toFixed(0)} kg O₂/d 与 GB 式 AOR ${AOR.toFixed(0)} 相差 ${((O2_BF / AOR - 1) * 100).toFixed(0)}%。经验校核按进入好氧段 BOD₅ × 1.0 + 硝化 N × 4.3 的经验系数，GB 式按去除量扣除产泥与反硝化回收，主结果仍按 GB 式`});
+    checks.push({type:'info', ic:'ℹ', text:`<b>需氧量口径差异</b>: 经验校核 ${wkN(O2_BF)} kg O₂/d 与 GB 式 AOR ${wkN(AOR)} 相差 ${wkN(((O2_BF / AOR - 1) * 100))}%。经验校核按进入好氧段 BOD₅ × 1.0 + 硝化 N × 4.3 的经验系数，GB 式按去除量扣除产泥与反硝化回收，主结果仍按 GB 式`});
   }
   if (dX_st > 0 && dX_BF > 0 && Math.abs(dX_BF - dX_st) / dX_st > 0.3) {
-    checks.push({type:'info', ic:'ℹ', text:`<b>产泥量口径差异</b>: 经验校核 ${dX_BF.toFixed(0)} kg TS/d 与站内口径 ${dX_st.toFixed(0)} kg DS/d 相差 ${((dX_BF / dX_st - 1) * 100).toFixed(0)}%。经验校核的 Y_bod 1.15 g TS/g BOD₅ 对应无初沉原水（已含进水悬浮物），化学污泥按 6 g TS/g Al；站内口径按 Y·ΔBOD/(1+Kd·SRT) + 惰性 SS + 化学/碳源污泥分项计，主结果仍按站内口径`});
+    checks.push({type:'info', ic:'ℹ', text:`<b>产泥量口径差异</b>: 经验校核 ${wkN(dX_BF)} kg TS/d 与站内口径 ${wkN(dX_st)} kg DS/d 相差 ${wkN(((dX_BF / dX_st - 1) * 100))}%。经验校核的 Y_bod 1.15 g TS/g BOD₅ 对应无初沉原水（已含进水悬浮物），化学污泥按 6 g TS/g Al；站内口径按 Y·ΔBOD/(1+Kd·SRT) + 惰性 SS + 化学/碳源污泥分项计，主结果仍按站内口径`});
   }
 
   // ── 生物膜量与泥龄输入自洽校核 ──────────────────────────────────
   if (isFinite(eff_SRT_st) && eff_SRT_st > 0) {
     if (eff_SRT_st < SRT_p * 0.5) {
       checks.push({type:'warn', ic:'⚠', text:
-        `<b>生物膜量与泥龄输入不自洽</b>: X_bio/ΔX_VSS = ${eff_SRT_st.toFixed(0)} d &lt; 0.5 × 泥龄输入 ${SRT_p} d，按 ${biofilmX} g VSS/m² 推算的生物膜量偏少，请核对填充率/biofilmX（文献常用 10-30 g VSS/m²）或下调泥龄输入`});
+        `<b>生物膜量与泥龄输入不自洽</b>: X_bio/ΔX_VSS = ${wkN(eff_SRT_st)} d &lt; 0.5 × 泥龄输入 ${SRT_p} d，按 ${biofilmX} g VSS/m² 推算的生物膜量偏少，请核对填充率/biofilmX（文献常用 10-30 g VSS/m²）或下调泥龄输入`});
     } else {
       checks.push({type:'ok', ic:'✓', text:
-        `<b>生物产泥</b>: ΔX_VSS = Y·ΔBOD/(1+Kd_T·SRT) = ${dX_bio_vss.toFixed(0)} kg VSS/d（Kd_T ${Kd_T.toFixed(3)} d⁻¹、泥龄 ${SRT_p} d，Y_obs ${Y_obs.toFixed(2)}）；生物膜量推算泥龄 ${eff_SRT_st.toFixed(0)} d，与输入大致自洽`});
+        `<b>生物产泥</b>: ΔX_VSS = Y·ΔBOD/(1+Kd_T·SRT) = ${wkN(dX_bio_vss)} kg VSS/d（Kd_T ${Kd_T.toFixed(3)} d⁻¹、泥龄 ${SRT_p} d，Y_obs ${Y_obs.toFixed(2)}）；生物膜量推算泥龄 ${wkN(eff_SRT_st)} d，与输入大致自洽`});
     }
   }
 
@@ -5657,8 +5157,8 @@ function renderStageDetail(data) {
     if (!s.hasVol) return;
     const def = STAGE_DEFS[s.key];
     const pctOfTotal = data.stages.reduce((a,b) => a + (b.hasVol ? b.V : 0), 0);
-    const myPct = s.V / pctOfTotal * 100;
-    html += `<div class="vol-bar-seg" style="flex:${myPct};background:${def.color}">${def.name} ${myPct.toFixed(0)}%</div>`;
+    const myPct = pctOfTotal > 0 ? s.V / pctOfTotal * 100 : 0;   // 总池容为 0（如无需处理的负荷）时不出现 NaN
+    html += `<div class="vol-bar-seg" style="flex:${pctOfTotal > 0 ? myPct : 1};background:${def.color}">${def.name} ${pctOfTotal > 0 ? myPct.toFixed(0) + '%' : '—'}</div>`;
   });
   html += `</div>`;
 
@@ -5672,7 +5172,7 @@ function renderStageDetail(data) {
       <div class="stage-detail-card" style="background:${def.color}14;border-left-color:${def.color}">
         <div class="sd-name" style="color:${def.color}">${def.icon} ${def.name}段</div>
         <div class="sd-metrics">
-          <span>池容 V</span><b>${s.V.toFixed(0)} m³</b>
+          <span>池容 V</span><b>${wkN(s.V)} m³</b>
           <span>HRT</span><b>${hrtText}</b>
           ${data.Areq && data.Areq[s.key] > 0 ? `<span>填料面积 提供/所需</span><b>${Math.round(s.V * data.af).toLocaleString('zh-CN')} / ${Math.round(data.Areq[s.key]).toLocaleString('zh-CN')} m²</b>` : ''}
         </div>
@@ -5727,7 +5227,7 @@ function drawStageFlow(r) {
     h += `<text x="${x + w/2}" y="${y + H/2 - 8}" font-size="18" text-anchor="middle">${def.icon}</text>`;
     h += `<text x="${x + w/2}" y="${y + H/2 + 10}" font-size="13" font-weight="700" fill="${def.color}" text-anchor="middle">${def.name}</text>`;
     const hrtText = s.isMin ? `${s.HRT.toFixed(0)} min` : `${s.HRT.toFixed(1)} h`;
-    h += `<text x="${x + w/2}" y="${y + H/2 + 26}" font-size="10" fill="${muted}" text-anchor="middle">V=${s.V.toFixed(0)}m³ · ${hrtText}</text>`;
+    h += `<text x="${x + w/2}" y="${y + H/2 + 26}" font-size="10" fill="${muted}" text-anchor="middle">V=${wkN(s.V)} m³ · ${hrtText}</text>`;
 
     // 段间箭头
     if (i < stages.length - 1) {
@@ -5762,13 +5262,13 @@ function drawStageFlow(r) {
   }
 
   // MLR 混合液回流箭头(含预缺氧方案 4/5/6)
-  if (r.showMLR && stagePositions.preAnox && stagePositions.nitrif) {
+  const mlrEndKey = ['nitrif_lo', 'nitrif', 'nitrif_hi'].find(k => stagePositions[k]);
+  if (r.showMLR && stagePositions.preAnox && mlrEndKey) {
     const preaX = stagePositions.preAnox.mid;
-    // 回流起点:最后一个硝化/好氧段末端
-    const endKey = stagePositions.nitrif_lo ? 'nitrif_lo' : 'nitrif';
-    const endPos = stagePositions[endKey];
-    const srcX = endPos.x + endPos.w/2;
-    const mlrY = y + H + 30;  // 在矩形下方
+    // 回流起点:最后一个好氧段的末端(出口端)
+    const endPos = stagePositions[mlrEndKey];
+    const srcX = endPos.x + endPos.w - 14;
+    const mlrY = y + H + 22;  // 在矩形下方
     const mlrColor = '#3b82f6';
     // 下行线(从硝化段底部下来)
     h += `<path d="M ${srcX} ${y + H} L ${srcX} ${mlrY}" stroke="${mlrColor}" stroke-width="2" stroke-dasharray="4,2"/>`;
@@ -5778,12 +5278,12 @@ function drawStageFlow(r) {
     h += `<path d="M ${preaX} ${mlrY} L ${preaX} ${y + H + 2}" stroke="${mlrColor}" stroke-width="2" stroke-dasharray="4,2" marker-end="url(#gArrow)"/>`;
     // 标签
     const labelX = (srcX + preaX) / 2;
-    h += `<rect x="${labelX - 55}" y="${mlrY + 5}" width="110" height="22" fill="white" stroke="${mlrColor}" stroke-width="1" rx="3"/>`;
-    h += `<text x="${labelX}" y="${mlrY + 20}" font-size="11" fill="${mlrColor}" font-weight="700" text-anchor="middle">🔄 内回流 MLR=${r.MLR}%</text>`;
+    h += `<rect x="${labelX - 60}" y="${mlrY - 11}" width="120" height="22" fill="white" stroke="${mlrColor}" stroke-width="1" rx="3"/>`;
+    h += `<text x="${labelX}" y="${mlrY + 4}" font-size="11" fill="${mlrColor}" font-weight="700" text-anchor="middle">🔄 内回流 MLR=${r.MLR}%</text>`;
   }
 
   // 强调无回流
-  h += `<text x="${svgW/2}" y="${svgH - 20}" font-size="12" font-weight="700" fill="#dc2626" text-anchor="middle">⊗ 纯 MBBR 全流程无活性污泥回流 · 仅段间水流连接</text>`;
+  h += `<text x="${svgW/2}" y="${svgH - 8}" font-size="12" font-weight="700" fill="#dc2626" text-anchor="middle">⊗ 纯 MBBR 全流程无活性污泥回流 · 仅段间水流连接</text>`;
 
   $('stageFlowSvg').innerHTML = h;
   if (typeof calcAeration === "function") setTimeout(calcAeration, 50);
@@ -5794,7 +5294,7 @@ function copyStages() {
   const n = currentStageCount;
   const scName = document.querySelector(`.stage-config[data-stages="${n}"] .sc-title`)?.textContent.trim() || '';
   const segs = (stCalcResult.stages || []).filter(x => x.r > 0)
-    .map(x => `${STAGE_DEFS[x.key].name}: ${x.r.toFixed(1)}% · V=${x.V.toFixed(0)} m³ · HRT ${x.isMin ? x.HRT.toFixed(0) + ' min' : x.HRT.toFixed(1) + ' h'}`)
+    .map(x => `${STAGE_DEFS[x.key].name}: ${x.r.toFixed(1)}% · V=${wkN(x.V)} m³ · HRT ${x.isMin ? x.HRT.toFixed(0) + ' min' : x.HRT.toFixed(1) + ' h'}`)
     .join('\n');
   const txt = `纯 MBBR 方案 ${'①②③④⑤⑥⑦'[n-1] || n} ${scName}
 进水 Q=${$('st_Q').value} 万m³/d · T=${$('st_T').value}°C（最低设计水温 T_min=${$('st_Tmin').value}°C） · BOD₀=${$('st_BOD0').value} · NH₄₀=${$('st_NH40').value} · TN₀=${$('st_TN0').value} · TP₀=${$('st_TP0').value} mg/L
@@ -5808,7 +5308,7 @@ function copyStages() {
 ${segs}${stCalcResult.MLR != null ? `\n内回流 MLR = ${stCalcResult.MLR}%` : ''}
 
 ─── 去除效果 ───
-BOD 去除率: ${t('st_r_BODrm')}% · NH₄ 去除率: ${t('st_r_NH4rm')}%
+BOD 去除率: ${t('st_r_BODrm')}%（出水约 ${t('st_r_BODout')} mg/L）· NH₄ 去除率: ${t('st_r_NH4rm')}%（出水约 ${t('st_r_NH4out')} mg/L）
 TN 去除率:  ${t('st_r_TNrm')}%(出水 ${t('st_r_TNout')} mg/L)
 TP 去除率:  ${t('st_r_TPrm')}%(出水 ${t('st_r_TPout')} mg/L)
 
@@ -5857,864 +5357,6 @@ function resetStDefaults() {
   wkToast('已恢复纯 MBBR Tab 全部输入为默认值');
 }
 
-// ============ IFAS 混合工艺 ============
-const PRESETS_IFAS = {
-  municipal: { Q:3, T:20, BOD0:180, TN0:45, NH40:35, TP0:5, Alk:220,
-    BODe:10, NH4e:5, TNe:15, TPe:0.5, SS0:200, SSe:10 },
-  industrial: { Q:1, T:25, BOD0:350, TN0:80, NH40:60, TP0:10, Alk:200,
-    BODe:15, NH4e:10, TNe:25, TPe:1.5, SS0:250, SSe:20 },
-  upgrade: { Q:5, T:15, BOD0:160, TN0:45, NH40:35, TP0:5, Alk:200,
-    BODe:10, NH4e:5, TNe:15, TPe:0.5, SS0:200, SSe:10 },
-};
-
-// 准 IV 类为地方标准，限值按项目所在地调整
-const STANDARDS_IFAS = {
-  '1A':    { BODe:10, NH4e:5,   TNe:15, TPe:0.5,  SSe:10 },
-  'grade4':{ BODe:6,  NH4e:1.5, TNe:10, TPe:0.3,  SSe:10 },
-  'grade3':{ BODe:4,  NH4e:1.0, TNe:5,  TPe:0.05, SSe:10 },
-};
-
-let ifasMode = 'new';
-let ifasConfig = 'nitrif_only';
-
-const IFAS_CONFIG_DESC = {
-  'ao':         '预缺氧+好氧IFAS（A/O含MLR）：进水先进缺氧段利用BOD免费反硝化，MLR将硝化液回流缺氧段，无需外加碳源，是最常见的IFAS工艺。',
-  'nitrif_only':'纯好氧IFAS：仅BOD去除和硝化，无缺氧段，不脱氮。适合出水TN无严格要求的场景。',
-  'post_anox':  '好氧IFAS+后缺氧：好氧段硝化后接后缺氧段，需外加碳源（甲醇/乙酸钠）反硝化，脱氮效果好但运营成本高。',
-  'full_bnr':   '完整BNR：预缺氧+好氧IFAS+后缺氧+化除磷，双重脱氮+化除磷，适合TN/TP均严格的场景。',
-};
-
-function setPresetIFAS(key) {
-  document.querySelectorAll('[data-preset-ifas]').forEach(b =>
-    b.classList.toggle('active', b.dataset.presetIfas === key));
-  const p = PRESETS_IFAS[key]; if (!p) return;
-  const set = (id, v) => { const el = $('ifas_' + id); if (el) el.value = v; };
-  Object.entries(p).forEach(([k, v]) => set(k, v));
-  calcAndRenderIFAS();
-}
-
-function setIFASMode(mode) {
-  ifasMode = mode;
-  document.querySelectorAll('[data-ifas-mode]').forEach(b =>
-    b.classList.toggle('active', b.dataset.ifasMode === mode));
-  $('ifas_newParams').style.display    = mode === 'new'      ? '' : 'none';
-  $('ifas_retrofitParams').style.display = mode === 'retrofit' ? '' : 'none';
-  $('ifas_retrofitResult').style.display = mode === 'retrofit' ? '' : 'none';
-  $('ifas_titleSub').textContent = mode === 'new' ? 'IFAS 新建' : 'IFAS 改造';
-  $('ifas_paramTitle').textContent = mode === 'new' ? '新建·工艺设计参数' : '改造·现有池参数';
-  calcAndRenderIFAS();
-}
-
-function setIFASConfig(cfg) {
-  ifasConfig = cfg;
-  document.querySelectorAll('[data-ifas-config]').forEach(b =>
-    b.classList.toggle('active', b.dataset.ifasConfig === cfg));
-  if ($('ifas_config_desc')) $('ifas_config_desc').textContent = IFAS_CONFIG_DESC[cfg] || '';
-
-  // 自动初始化容积分配比
-  const IFAS_VOL = {
-    nitrif_only: { pre:0,  aer:100, post:0  },
-    ao:          { pre:25, aer:75,  post:0  },
-    post_anox:   { pre:0,  aer:75,  post:25 },
-    full_bnr:    { pre:25, aer:55,  post:20 },
-  };
-  const vol = IFAS_VOL[cfg] || { pre:0, aer:100, post:0 };
-  if ($('ifas_r_preAnox_pct'))  $('ifas_r_preAnox_pct').value  = vol.pre;
-  if ($('ifas_r_aer_pct'))      $('ifas_r_aer_pct').value      = vol.aer;
-  if ($('ifas_r_postAnox_pct')) $('ifas_r_postAnox_pct').value = vol.post;
-
-  // MLR 输入只在 A/O 和 full_bnr 时显示
-  const hasMlr = cfg === 'ao' || cfg === 'full_bnr';
-  if ($('ifas_MLR_field'))      $('ifas_MLR_field').style.display      = hasMlr ? '' : 'none';
-  if ($('ifas_row_MLR_result')) $('ifas_row_MLR_result').style.display = hasMlr ? '' : 'none';
-  if ($('ifas_row_preAnox'))    $('ifas_row_preAnox').style.display    = hasMlr ? '' : 'none';
-  if ($('ifas_volPreAnox_field')) $('ifas_volPreAnox_field').style.display = hasMlr ? '' : 'none';
-
-  // 后缺氧行只在 post_anox/full_bnr 时显示
-  const hasPostAnox = cfg === 'post_anox' || cfg === 'full_bnr';
-  if ($('ifas_row_postAnox'))     $('ifas_row_postAnox').style.display     = hasPostAnox ? '' : 'none';
-  if ($('ifas_row_carbon'))       $('ifas_row_carbon').style.display       = hasPostAnox ? '' : 'none';
-  if ($('ifas_row_carbon2'))      $('ifas_row_carbon2').style.display      = hasPostAnox ? '' : 'none';
-  if ($('ifas_volPostAnox_field')) $('ifas_volPostAnox_field').style.display = hasPostAnox ? '' : 'none';
-
-  calcAndRenderIFAS();
-}
-
-function applyStandardIFAS() {
-  const std = $('ifas_standard')?.value;
-  const s = STANDARDS_IFAS[std]; if (!s) return;
-  const set = (id, v) => { const el = $('ifas_' + id); if (el) el.value = v; };
-  set('BODe', s.BODe); set('SSe', s.SSe);
-  set('NH4e', s.NH4e); set('TNe', s.TNe); set('TPe', s.TPe);
-  calcAndRenderIFAS();
-}
-
-// 恢复默认：页面加载时快照 IFAS Tab 全部输入（与纯 MBBR 同一做法）
-const IFAS_INIT_VALUES = {};
-const IFAS_DEFAULT_CONFIG = 'full_bnr';
-function snapshotIfasDefaults() {
-  document.querySelectorAll('#panel-ifas input, #panel-ifas select').forEach(el => {
-    if (!el.id) return;
-    IFAS_INIT_VALUES[el.id] = (el.type === 'checkbox' || el.type === 'radio') ? el.checked : el.value;
-  });
-}
-function resetIfasDefaults() {
-  Object.entries(IFAS_INIT_VALUES).forEach(([id, v]) => {
-    const el = $(id); if (!el) return;
-    if (el.type === 'checkbox' || el.type === 'radio') el.checked = v; else el.value = v;
-    el.classList.remove('invalid');
-  });
-  document.querySelectorAll('[data-preset-ifas]').forEach(b => b.classList.toggle('active', b.dataset.presetIfas === 'municipal'));
-  // 曝气器类型恢复为粗孔（仅切换按钮状态，数值已由快照恢复）
-  document.querySelectorAll('#panel-ifas .aerator-tab').forEach(t => t.classList.toggle('active', t.dataset.aer === 'coarse'));
-  const h = AERATOR_DB.coarse.helper;
-  if ($('ifa_perDevice_help')) { $('ifa_perDevice_help').textContent = h.perDevice; $('ifa_OTE_help').textContent = h.OTE; $('ifa_price_help').textContent = h.price; }
-  ifasMode = 'new';
-  document.querySelectorAll('[data-ifas-mode]').forEach(b => b.classList.toggle('active', b.dataset.ifasMode === 'new'));
-  $('ifas_newParams').style.display = ''; $('ifas_retrofitParams').style.display = 'none'; $('ifas_retrofitResult').style.display = 'none';
-  $('ifas_titleSub').textContent = 'IFAS 新建'; $('ifas_paramTitle').textContent = '新建·工艺设计参数';
-  setIFASConfig(IFAS_DEFAULT_CONFIG);   // 恢复默认构型与容积比并重算
-  wkToast('已恢复 IFAS Tab 全部输入为默认值');
-}
-
-function toggleIFASAdv() {
-  const p = $('ifasAdv'), chev = $('ifasChev');
-  const open = p.classList.toggle('open');
-  if (chev) chev.textContent = open ? '▾' : '▸';
-}
-
-// GB 50014 综合生活污水量总变化系数 Kz（按平均日流量 L/s 线性插值；≤5 L/s 取 2.7，≥1000 L/s 取 1.5）
-function wkKzGB(Q_m3d) {
-  const q = Q_m3d / 86.4;
-  const tb = [[5,2.7],[15,2.4],[40,2.1],[70,2.0],[100,1.9],[200,1.8],[500,1.6],[1000,1.5]];
-  if (!(q > tb[0][0])) return tb[0][1];
-  for (let i = 1; i < tb.length; i++) {
-    if (q <= tb[i][0]) { const [x0, y0] = tb[i-1], [x1, y1] = tb[i]; return y0 + (y1 - y0) * (q - x0) / (x1 - x0); }
-  }
-  return 1.5;
-}
-
-function calcIFAS() {
-  // 读数：空/非数字时取默认（不吞掉合法的 0）；必填项已在 calcAndRenderIFAS 中校验
-  const gd = (id, d) => { const v = parseFloat($('ifas_' + id)?.value); return isNaN(v) ? d : v; };
-  const get = id => gd(id, 0);
-  const ga = (id, d) => { const v = parseFloat($('ifa_' + id)?.value); return isNaN(v) ? d : v; };
-  const Q_wan = get('Q'), Q = Q_wan * 10000, T = get('T');
-  const BOD0 = get('BOD0'), BODe = get('BODe');
-  const TN0 = get('TN0'), NH40 = get('NH40'), NH4e = get('NH4e'), TNe = get('TNe');
-  const TP0 = get('TP0'), TPe = get('TPe'), Alk0 = get('Alk');
-  // 最低设计水温（硝化校核）：留空取 min(T, 12 ℃)
-  const TminIn = parseFloat($('ifas_Tmin')?.value);
-  const Tmin = isNaN(TminIn) ? Math.min(T, 12) : TminIn;
-  // 总变化系数：留空按 GB 50014 表插值（能力反算时随流量变化）
-  const KzIn = parseFloat($('ifas_Kz')?.value);
-  const KzAuto = isNaN(KzIn);
-  const KzOf = q => KzAuto ? wkKzGB(q) : KzIn;
-  if ($('ifas_Kz')) $('ifas_Kz').placeholder = `自动：${wkKzGB(Q).toFixed(2)}`;
-  // 新建读 ifas_xxx，改造读 ifas_xxx_r（同一计算链路）
-  const isRetro = ifasMode === 'retrofit';
-  const sfx = isRetro ? '_r' : '';
-  const getP = (id, d = 0) => gd(id + sfx, d);
-  const fillRatio = getP('fillRatio') / 100;
-  const specArea = getP('specArea'), biofilm = getP('biofilm');
-  const SALR_20 = getP('SALR');
-  const nitClsSelI = $('ifas_nitClass' + sfx)?.value || 'auto';
-  const SRT_in = getP('SRT', 6);                  // 悬浮相设计（最小）泥龄（全池，D1 口径）
-  const settleQ = getP('settleQ', 1.0);           // 新建：设计表面负荷；改造：允许表面负荷（最高时）
-  const settleHRT = gd('settleHRT', 2.0);         // 新建：最小沉淀 HRT h
-
-  // 高级参数
-  const theta    = gd('theta', 1.09);
-  const alpha    = gd('alpha', 0.65);
-  const Y        = gd('Y', 0.60);
-  const Kd       = gd('Kd', 0.06);
-  const Y_bio    = gd('Y_bio', 0.25);
-  const SDNR20   = gd('SDNR', 0.08);
-  const solidFrac = gd('solidFrac', 0.13);       // 填料实体率（实体体积/堆积体积）
-  const mu_max20 = gd('mu_max', 0.75);
-  const SF       = gd('SF', 2.0);
-  const RAS_r    = get('RAS') / 100;
-  const MLR_r    = get('MLR') / 100;
-  const RAS_H    = gd('RAS_H', 3);
-  const MLR_H    = gd('MLR_H', 2);
-  const pumpEff  = gd('pumpEff', 65) / 100;
-  const SS0 = gd('SS0', 200), SSe = gd('SSe', 10), fSS = gd('fSS', 0.5);
-  // 曝气修正（§11 唯一一组）：β、θ_O₂、DO；DO 同时用于填料硝化 DO 修正
-  const beta     = ga('beta', 0.95);
-  const theta_o2 = ga('theta', 1.024);
-  const DO_set   = ga('DO', 2.0);
-
-  // 温度修正
-  const SALR_T_factor = Math.pow(theta, T - 20);
-  const SNR_Tmin_factor = Math.pow(theta, Math.min(Tmin, BF.T_rate_cap) - 10);   // 填料硝化：10 ℃ 基准
-  const SALR = SALR_20 * SALR_T_factor;            // BOD：设计水温
-  // 填料硝化速率：与纯 MBBR 同一函数（类别速率 × θ^(min(T_min,20)−10) × min(DO,5)/5 × min(1, NH₄ₑ/2)）
-  const hasPreI = ifasConfig === 'ao' || ifasConfig === 'full_bnr';
-  const nitI = bfNitRate({ cls: nitClsSelI === 'auto' ? (hasPreI ? 'b' : 'a') : nitClsSelI, custom: getP('rNit', NaN),
-                           T: Tmin, DO: DO_set, NH4out: NH4e, theta });
-  const SNR = nitI.r10 * nitI.fT;                   // 类别速率 × 温度修正（T_min）
-  const DO_factor = nitI.fDO * nitI.fNH4;           // DO 与低 NH₄ 修正
-  const SNR_DO = nitI.r;                            // 设计速率 g NH₄-N/m²·d
-  const SDNR = SDNR20 * Math.pow(1.08, T - 20);    // 反硝化 θ=1.08（GB 50014）
-  const Kd_T = Kd * Math.pow(1.04, T - 20);        // Kd 温度修正 1.04^(T−20)
-  // 悬浮相硝化最小泥龄（按 T_min；与活性污泥工具同口径：θ=1.103，K_N=1.0·1.05^(T−20)，衰减取 Kd·1.04^(T−20)）
-  const mu_Tmin = mu_max20 * Math.pow(1.103, Tmin - 20);
-  const Kn_Tmin = 1.0 * Math.pow(1.05, Tmin - 20);
-  const NH4_use = Math.max(NH4e, 0.5);
-  const mu_net = mu_Tmin * NH4_use / (Kn_Tmin + NH4_use) - Kd * Math.pow(1.04, Tmin - 20);
-  const SRT_min = mu_net > 0 ? 1 / mu_net : Infinity;
-  const SRT_safe = SF * SRT_min;
-
-  // ===== 容积分配（各构型不适用的段按 0；之和 ≠ 100% 时按比例归一并提示）=====
-  const hasPre = ifasConfig === 'ao' || ifasConfig === 'full_bnr';
-  const hasPost = ifasConfig === 'post_anox' || ifasConfig === 'full_bnr';
-  const rawPre = hasPre ? gd('r_preAnox_pct', 0) : 0;
-  const rawAer = gd('r_aer_pct', 100);
-  const rawPost = hasPost ? gd('r_postAnox_pct', 0) : 0;
-  const sumR = rawPre + rawAer + rawPost;
-  const volNormalized = Math.abs(sumR - 100) > 0.5;
-  const kNorm = sumR > 0 ? 100 / sumR : 1;
-  const r_pre = rawPre * kNorm / 100, r_aer = rawAer * kNorm / 100, r_post = rawPost * kNorm / 100;
-
-  const orgNe = 1.5;                                          // 出水有机氮 mg/L（站内口径）
-  const dBOD = Math.max(0, BOD0 - BODe);
-  const dTKN = Math.max(0, TN0 - NH4e - orgNe);               // mg/L；无 TKN 输入以 TN₀ 代 TKN₀
-  const BOD_rem = dBOD * Q / 1000;                            // kg/d
-  const R_in = MLR_r + RAS_r;
-  const eta_pre = hasPre ? R_in / (1 + R_in) * 0.85 : 0;      // 0.85 实际/理论，经验值
-  const c_n = 4;                                              // 后缺氧 C/N，g COD/g NO₃-N（理论 2.86，实际 4-6）
-  const Y_carbon = 0.3;                                       // 外加碳源产泥 kgVSS/kgCOD（经验值）
-
-  // PAC 化学除磷（液体 PAC，Al 5.29%；Al/P 摩尔比 2；生物除磷 15% 经验值）——化学污泥浓度与流量无关，先算
-  const TP_bio_rm = 0.15, AlP = 2, PAC_Al = 0.0529;
-  const PAC_per_TP = AlP * 27 / 31 / PAC_Al;                    // mg PAC / mg P
-  const dTP_chem_need = Math.max(0, TP0 * (1 - TP_bio_rm) - TPe);
-  const PAC_need = dTP_chem_need * PAC_per_TP;
-  const PAC_in = parseFloat($('ifas_PAC')?.value);
-  const PAC_auto = isNaN(PAC_in);
-  const PAC_dose = PAC_auto ? PAC_need : PAC_in;                // mg/L
-  if ($('ifas_PAC')) $('ifas_PAC').placeholder = `自动：${PAC_need.toFixed(0)} mg/L`;
-  const P_chem = Math.min(PAC_dose / PAC_per_TP, TP0 * (1 - TP_bio_rm));   // mg P/L
-  const TP_out = Math.max(0, TP0 * (1 - TP_bio_rm) - P_chem);
-  const Al_excess = Math.max(0, PAC_dose * PAC_Al / 27 - P_chem / 31);    // mmol/L
-  const chem_c = P_chem / 31 * 122 + Al_excess * 78;            // mg/L 化学污泥（AlPO₄ + Al(OH)₃）
-  const inert_c = fSS * Math.max(0, SS0 - SSe);                 // mg/L 进水惰性 SS
-
-  // ===== 双相模型（新建池容、改造能力反算共用）=====
-  //   D1 口径：悬浮相固体存量 = 水体 × MLSS（总固体，含惰性），泥龄 SRT = 存量 / 剩余污泥 ΔX_SS
-  //   ΔX_SS = Y·BOD_susp/(1+Kd·SRT) + 生物膜脱落 + f·Q·ΔSS + 化学污泥 + 外加碳源产泥（均经泥水分离后排出）
-  //   BOD 按活性生物量比（填料生物膜 : MLSS×VSS/SS）分配；硝化按好氧泥龄（扣缺氧区）与 SF·SRT_min(T_min) 判定：
-  //   满足时悬浮相可硝化（按生物量×比活性 1.4 分配），否则全部由填料承担，须进入 NH₄-N 负荷 ≤ A·r_nit（按进入负荷，T_min/DO/NH₄ 修正）
-  const model = (Qm, V, MLSS_m, VSSf, media) => {
-    const V_aer = V * r_aer, V_post = V * r_post;
-    const V_fill = media ? V_aer * fillRatio : 0;
-    const A = V_fill * specArea;
-    const X_bio = A * biofilm / 1000;                         // kg VSS 生物膜
-    const V_water = V - V_fill * solidFrac;                   // 水体 = 池容 − 填料实体体积
-    const M_susp = V_water * MLSS_m / 1000;                   // kg SS 悬浮相固体存量（D1：X = MLSS）
-    const X_susp = M_susp * VSSf;                             // kg VSS
-    const BODr = dBOD * Qm / 1000;
-    const bio_BOD = X_bio + X_susp > 0 ? X_bio / (X_bio + X_susp) : 0;
-    const BOD_bio = BODr * bio_BOD, BOD_susp = BODr - BOD_bio;
-    // 生物膜脱落 = 表观产率 × 附着相 BOD（生物膜泥龄不受控，表观产率已含衰减；不再按固定 g/m² 存量扣衰减，避免脱落量被截为 0）
-    const dX_bio = Y_bio * BOD_bio;
-    const dX_inert = inert_c * Qm / 1000, dX_chem = chem_c * Qm / 1000;
-    let dX_carbon = 0, SRT_act = 0, dX_susp = 0, dX_VSS = 0, N_nit = 0, N_pre = 0, N_post = 0, N_pre_Clim = false, post_cap = 0;
-    for (let it = 0; it < 30; it++) {
-      // 解 M = S·[Y·Bs/(1+Kd·S) + C]（S 单调）：C·Kd·S² + (Y·Bs + C − M·Kd)·S − M = 0
-      const C = dX_bio + dX_inert + dX_chem + dX_carbon;
-      const qa = C * Kd_T, qb = Y * BOD_susp + C - M_susp * Kd_T;
-      SRT_act = M_susp <= 0 ? 0 : qa > 0 ? (-qb + Math.sqrt(qb * qb + 4 * qa * M_susp)) / (2 * qa) : (qb > 0 ? M_susp / qb : Infinity);
-      dX_susp = isFinite(SRT_act) ? Y * BOD_susp / (1 + Kd_T * SRT_act) : 0;
-      dX_VSS = dX_susp + dX_bio;
-      N_nit = Math.max(0, dTKN * Qm / 1000 - 0.12 * dX_VSS);
-      // 脱氮：预缺氧 η·NOx（≤ 进水 BOD 可支持量）；后缺氧外加碳源按需投加至 TN 目标（≤ SDNR·MLVSS·V_post，残余 NOx ≥ 1 mg/L）
-      const Yobs_all = BODr > 0 ? dX_VSS / BODr : 0;
-      const N_pre_C = BODr / (2.86 / Math.max(0.2, 1 - 1.42 * Yobs_all));
-      N_pre = Math.min(eta_pre * N_nit, N_pre_C);
-      N_pre_Clim = eta_pre * N_nit > N_pre_C + 1e-9;
-      post_cap = hasPost ? SDNR * MLSS_m * VSSf * V_post / 1000 : 0;
-      const TN_bp = NH4e + orgNe + Math.max(0, N_nit - N_pre) * 1000 / Math.max(Qm, 1e-9);
-      const need = TNe > 0 ? Math.max(0, TN_bp - TNe) * Qm / 1000 : Infinity;
-      N_post = hasPost ? Math.min(post_cap, need, Math.max(0, N_nit - N_pre - 1.0 * Qm / 1000)) : 0;
-      const dXc_new = Y_carbon * c_n * N_post;
-      if (Math.abs(dXc_new - dX_carbon) < 1e-9 * Math.max(1, dXc_new)) { dX_carbon = dXc_new; break; }
-      dX_carbon = dXc_new;
-    }
-    const dX_total = dX_VSS + dX_inert + dX_chem + dX_carbon; // kg/d 剩余污泥（D1）
-    const SRT_aer = V_water > 0 ? SRT_act * Math.max(0, V_aer - V_fill * solidFrac) / V_water : 0;   // 好氧泥龄
-    const susp_nit_ok = SRT_aer >= SRT_safe * (1 - 1e-9);
-    const bio_N = A > 0 ? (susp_nit_ok ? 1.4 * X_bio / (1.4 * X_bio + X_susp) : 1) : 0;
-    // 按进入负荷：填料硝化负荷 = 进入 NH₄-N 负荷（× 填料分担比例）÷ A
-    const L_NH4 = NH40 > NH4e ? NH40 * Qm / 1000 : 0;
-    const SNR_bio = A > 0 ? L_NH4 * bio_N * 1000 / A : 0;
-    const SNR_all = A > 0 ? L_NH4 * 1000 / A : Infinity;      // 全部硝化计在填料上
-    const SALR_bio = A > 0 ? BOD_bio * 1000 / A : 0;
-    const nit_ok = N_nit <= 1e-9 || L_NH4 <= 0 || susp_nit_ok || (A > 0 && SNR_DO > 0 && SNR_bio <= SNR_DO * (1 + 1e-6));
-    return { V_aer, V_post, V_fill, A, X_bio, V_water, M_susp, X_susp, BODr, bio_BOD, BOD_bio, BOD_susp,
-             SRT_act, SRT_aer, dX_susp, dX_bio, dX_VSS, dX_inert, dX_chem, dX_carbon, dX_total,
-             N_nit, N_pre, N_post, N_pre_Clim, post_cap, susp_nit_ok, bio_N, SNR_bio, SNR_all, SALR_bio, nit_ok };
-  };
-  // 单调判据的最小池容（二分）
-  const minV = (feas) => {
-    let lo = 0, hi = 1000;
-    while (!feas(hi)) { lo = hi; hi *= 2; if (hi > 1e8) return Infinity; }
-    for (let i = 0; i < 60; i++) { const mid = (lo + hi) / 2; if (feas(mid)) hi = mid; else lo = mid; }
-    return hi;
-  };
-
-  // ===== 池容 =====
-  let V = 0, MLSS = 0, VSS_SS = 0, MLVSS = 0, V_auto = 0;
-  let V_by_SRT = 0, V_by_SALR = 0, V_by_SNR = 0, V_by_SRTsafe = 0, V_ctrl = '';
-  if (!isRetro) {
-    MLSS   = gd('MLSS', 3500);
-    VSS_SS = gd('VSS_SS', 0.72);
-    MLVSS  = MLSS * VSS_SS;
-    const mm = v => model(Q, v, MLSS, VSS_SS, true);
-    V_by_SRT     = minV(v => mm(v).SRT_act >= SRT_in * (1 - 1e-9));                 // 悬浮相设计泥龄
-    V_by_SALR    = minV(v => mm(v).SALR_bio <= SALR * (1 + 1e-9));                  // 填料 BOD 负荷
-    V_by_SNR     = SNR_DO > 0 ? minV(v => mm(v).SNR_all <= SNR_DO * (1 + 1e-9)) : Infinity;   // 填料单独硝化
-    V_by_SRTsafe = isFinite(SRT_safe) ? minV(v => mm(v).SRT_aer >= SRT_safe * (1 - 1e-9)) : Infinity;   // 悬浮相好氧泥龄硝化
-    const V_nit = Math.min(V_by_SNR, V_by_SRTsafe);
-    const cands = [[V_by_SRT, '悬浮相 SRT 质量平衡'], [V_by_SALR, '填料 SALR'],
-                   [V_nit, V_by_SNR <= V_by_SRTsafe ? '硝化（填料 r_nit）' : '硝化（悬浮相好氧泥龄 SF·SRT_min）']].filter(c => isFinite(c[0]));
-    V_auto = cands.length ? Math.max(...cands.map(c => c[0])) : 0;
-    V_ctrl = (cands.find(c => c[0] === V_auto) || [0, '—'])[1];
-    const V_input = get('V_input');
-    V = V_input > 0 ? V_input : V_auto;
-    if (V_input > 0) V_ctrl = '用户输入';
-    if ($('ifas_V_input')) $('ifas_V_input').placeholder = `自动：${Math.round(V_auto)} m³`;
-  } else {
-    V      = gd('Vexisting', 12000);
-    MLSS   = gd('MLSS_new', gd('MLSSexisting', 3500));   // 改造后悬浮相按目标 MLSS；改造前能力按原有 MLSS
-    VSS_SS = gd('VSS_SS2', 0.72);
-    MLVSS  = MLSS * VSS_SS;
-    V_ctrl = '原有池容';
-  }
-
-  const m = model(Q, V, MLSS, VSS_SS, true);
-  const V_preAnox = V * r_pre, V_aer = m.V_aer, V_postAnox = m.V_post;
-  const V_fill = m.V_fill, A_total = m.A, X_bio_kg = m.X_bio, X_susp_kg = m.X_susp;
-  const MLSS_eq = V > 0 ? (X_bio_kg + m.M_susp) * 1000 / V : 0;   // 等效 MLSS（悬浮相总固体 + 生物膜）
-  const HRT = Q > 0 ? V / Q * 24 : 0;
-  const bio_contrib_BOD = m.bio_BOD, susp_contrib_BOD = 1 - m.bio_BOD, bio_contrib_N = m.bio_N;
-  const SALR_actual = m.SALR_bio, SNR_bio = m.SNR_bio;
-  const SNR_actual = A_total > 0 ? (NH40 > NH4e ? NH40 * Q / 1000 : 0) * 1000 / A_total : 0;
-  const dX_susp = m.dX_susp, dX_bio = m.dX_bio, dX_VSS = m.dX_VSS;
-  const eff_SRT_ifas = dX_bio > 0 ? X_bio_kg / dX_bio : 999;
-  const N_nit = m.N_nit, N_pre = m.N_pre, N_post_kg = m.N_post, N_pre_Climited = m.N_pre_Clim;
-  const NOx_e = Q > 0 ? Math.max(0, N_nit - N_pre - N_post_kg) * 1000 / Q : 0;
-  const TN_out = Math.min(TN0, NH4e + orgNe + NOx_e);
-  const total_TN_rm = TN0 > 0 ? Math.max(0, (TN0 - TN_out) / TN0 * 100) : 0;
-  const MLR_limit = eta_pre * 100;
-
-  const NH4_rm_pct = NH40 > 0 ? Math.min(Math.max(0, NH40 - NH4e) / NH40 * 100, 95) : 0;
-  const BOD_rm_pct = BOD0 > 0 ? dBOD / BOD0 * 100 : 0;
-
-  // 碱度：硝化消耗 7.14·N_nit，反硝化（预缺氧 + 后缺氧）回收 3.57
-  const alkUse = Q > 0 ? 7.14 * N_nit * 1000 / Q : 0;
-  const alkRecover = Q > 0 ? 3.57 * (N_pre + N_post_kg) * 1000 / Q : 0;
-  const alkRem = Alk0 - alkUse + alkRecover;
-
-  // ===== 需氧量（GB 50014）=====
-  // O₂ = 1.47·ΔBOD − 1.42·ΔX_VSS + 4.57·(ΔTKN − 0.12·ΔX_VSS) − 2.86·N_DN；N_DN 只计预缺氧（外加碳源脱氮不计氧回收）
-  const O_BOD = Math.max(0, 1.47 * BOD_rem - 1.42 * dX_VSS);
-  const O_N   = 4.57 * N_nit;
-  const O_DN  = 2.86 * N_pre;
-  const AOR   = Math.max(0, O_BOD + O_N - O_DN);
-
-  // ===== 二沉池（最高时流量 Q·Kz/24）=====
-  const poolH_ifas = getP('poolH', 5);
-  const settleDepth = 3.5;
-  const Kz = KzOf(Q);
-  const Q_h_peak = Q * Kz / 24;
-  const A_settle = isRetro ? gd('Asettle_r', 2400) : (settleQ > 0 ? Q_h_peak / settleQ : 0);
-  const Vsettle = isRetro ? A_settle * settleDepth : Math.max(A_settle * settleDepth, Q_h_peak * settleHRT);
-  const surfLoad = A_settle > 0 ? Q_h_peak / A_settle : 0;
-  const HRT_settle = Q_h_peak > 0 ? Vsettle / Q_h_peak : 0;
-
-  // ===== 曝气器（§8-11 ifa_* 输入）：EE = OTE × 淹没深度(H − 0.2 m) =====
-  const ifa_EE = calcAeratorEE(ga('OTE', 3), poolH_ifas);                    // %
-  if ($('ifa_T')) $('ifa_T').value = T;   // 校核区水温自动跟随 IFAS 进水温度
-  const ifa_SOR = wkSOR(AOR, { alpha, beta, DO: DO_set, T, theta: theta_o2, H: poolH_ifas, EA: ifa_EE / 100 }).SOR;
-  const SOR = ifa_SOR;
-  const ifa_air = isFinite(ifa_SOR) ? ifa_SOR / (ifa_EE / 100 * 0.23 * 1.293 * 24) : 0;  // Nm³/h
-
-  // ===== 回流计算 =====
-  const RAS_Q = Q * RAS_r / 24;   // m³/h
-  const MLR_Q = hasPre ? Q * MLR_r / 24 : 0;
-  const RAS_P = RAS_Q / 3600 * 1000 * 9.81 * RAS_H / pumpEff / 1000;
-  const MLR_P = MLR_Q > 0 ? MLR_Q / 3600 * 1000 * 9.81 * MLR_H / pumpEff / 1000 : 0;
-  const pumpPower_kwhm3 = Q > 0 ? (RAS_P + MLR_P) * 24 / Q : 0;
-
-  // ===== 药剂 =====
-  const acetatePurity = Math.min(100, gd('acetatePurity', 58)) / 100;
-  const carbonFactor = { methanol:1.5, acetate:0.78 * acetatePurity, glucose:1.07 };
-  const cSrc = $('ifas_carbonSrc')?.value || 'methanol';
-  const carbonNeed_kgCOD = N_post_kg * c_n;
-  const carbonDose = carbonNeed_kgCOD / (carbonFactor[cSrc] || 1.5);
-  const carbonPrice = gd('carbonPrice', 5);
-  const carbonCost = carbonDose * 365 * carbonPrice / 1e4;
-  const dX_carbon = m.dX_carbon, dX_chem = m.dX_chem, dX_inert = m.dX_inert;
-  const PAC_kg_d = PAC_dose * Q / 1000;                         // kg/d
-  const PACprice = gd('PACprice', 0.7);
-  const PACcost = PAC_kg_d * 365 * PACprice / 1e4;
-
-  // 碱度补充（NaHCO₃，提升 1 mg CaCO₃/L 需 1.68 mg/L）；自动补至 100 mg/L
-  const alkDeficit = Math.max(0, 100 - alkRem);
-  const alkDose_need = alkDeficit * 1.68 * Q / 1000;            // kg/d
-  const alkInput = get('alkDose');
-  const alkDoseOut = alkInput > 0 ? alkInput * Q / 1000 : alkDose_need;
-  const alkAdded = Q > 0 ? alkDoseOut * 1e3 / Q / 1.68 : 0;     // mg CaCO₃/L
-  const alkFinal = alkRem + alkAdded;
-  const alkPrice = gd('alkPrice', 2.5);
-  const alkCost = alkDoseOut * 365 * alkPrice / 1e4;
-
-  const totalChemCost = carbonCost + PACcost + alkCost;
-
-  // ===== 产泥：ΔX = ΔX_VSS + f·Q·(SS₀−SSₑ) + 化学污泥 + 外加碳源产泥（与悬浮相泥龄同一口径）=====
-  const dX_DS = m.dX_total;
-  const sludge_mc_ifas = gd('sludge_mc', 80) / 100;
-  const sludge_wet_ifas = dX_DS / (1 - sludge_mc_ifas) / 1000; // t/d
-  const sludge_yield_ifas = Q > 0 ? dX_DS / Q : 0;
-  const sludge_price_ifas = gd('sludge_price', 300);
-  const sludge_cost_ifas = sludge_wet_ifas * 365 * sludge_price_ifas / 10000;
-
-  // ===== 改造能力：同一模型按流量反算（二分法）=====
-  let cap_before = 0, cap_after = 0, cap_ctrl = '', capB_ctrl = '';
-  let Q_by_BOD = Infinity, Q_by_N = Infinity, Q_by_SALR = Infinity, Q_by_clar = Infinity, Qb_SRT = Infinity, Qb_N = Infinity;
-  if (isRetro) {
-    const maxQ = (feas) => {
-      if (!feas(1e-3)) return 0;
-      let lo = 1e-3, hi = Math.max(Q, 1000);
-      while (feas(hi)) { lo = hi; hi *= 2; if (hi > 1e9) return Infinity; }
-      for (let i = 0; i < 60; i++) { const mid = (lo + hi) / 2; if (feas(mid)) lo = mid; else hi = mid; }
-      return lo;
-    };
-    const MLSS_b = gd('MLSSexisting', 3500);
-    Q_by_clar = maxQ(q => q * KzOf(q) / 24 <= A_settle * settleQ * (1 + 1e-9));
-    // 改造后（填料 + 目标 MLSS）：悬浮相泥龄 ≥ SRT、填料 SALR、硝化（好氧泥龄 ≥ SF·SRT_min 或填料 SNR）
-    Q_by_BOD  = maxQ(q => model(q, V, MLSS, VSS_SS, true).SRT_act >= SRT_in * (1 - 1e-9));
-    Q_by_SALR = maxQ(q => model(q, V, MLSS, VSS_SS, true).SALR_bio <= SALR * (1 + 1e-6));
-    Q_by_N    = maxQ(q => model(q, V, MLSS, VSS_SS, true).nit_ok);
-    // 改造前（无填料 + 原有 MLSS）：同一口径，硝化只能靠悬浮相好氧泥龄 ≥ SF·SRT_min
-    Qb_SRT = maxQ(q => model(q, V, MLSS_b, VSS_SS, false).SRT_act >= SRT_in * (1 - 1e-9));
-    Qb_N   = maxQ(q => model(q, V, MLSS_b, VSS_SS, false).nit_ok);
-    const pick = list => list.reduce((a, b) => b[0] < a[0] ? b : a);
-    const aft = pick([[Q_by_BOD, '悬浮相 SRT'], [Q_by_SALR, '填料 SALR'], [Q_by_N, '硝化'], [Q_by_clar, '二沉池']]);
-    const bef = pick([[Qb_SRT, '悬浮相 SRT'], [Qb_N, '硝化（好氧泥龄 SF·SRT_min）'], [Q_by_clar, '二沉池']]);
-    cap_after = aft[0] / 1e4; cap_ctrl = aft[1] + '控制';
-    cap_before = bef[0] / 1e4; capB_ctrl = bef[1] + '控制';
-  }
-
-  // ===== 曝气器与风机（§8-11 ifa_* 输入）=====
-  const A_aer_ifas = V_aer / poolH_ifas;                                     // 好氧段池底面积 m²
-  const ifa_spacing_max = ga('spacing', 0);
-  const ifa_countByAir = Math.ceil(ifa_air / ga('perDevice', 8));
-  const ifa_countBySpacing = ifa_spacing_max > 0 && ifa_air > 0 ? Math.ceil(A_aer_ifas / (ifa_spacing_max * ifa_spacing_max)) : 0;
-  const ifa_count = Math.max(ifa_countByAir, ifa_countBySpacing);
-  const ifa_perDeviceAct = ifa_count > 0 ? ifa_air / ifa_count : 0;
-  const ifa_cost = ifa_count * ga('price', 0) / 1e4;
-  const ifa_spacing = ifa_count > 0 ? Math.sqrt(A_aer_ifas / ifa_count) : 0;
-  const ifa_dp = poolH_ifas * 9.8 + ga('dp_aer', 0) + ga('dp_pipe', 0);     // kPa
-  // 风机效率：输入值超过机型上限（BLOWER_EFF.max）时按上限计并在校核中提示
-  const bType = $('ifa_blowerType')?.value || 'roots';
-  const ifa_effIn = ga('efficiency', 62) / 100;
-  const ifa_effMax = ((BLOWER_EFF[bType] || BLOWER_EFF.roots).max) / 100;
-  const ifa_eff = Math.min(ifa_effIn, ifa_effMax);
-  const ifa_effClamped = ifa_effIn > ifa_effMax + 1e-9;
-  const ifa_Ns = wkBlowerPower(ifa_air, ifa_dp, ifa_eff);
-  const ifa_airInstalled = ifa_air * ga('backupFactor', 1.2);
-
-  return {
-    TNe, HRT_settle, A_settle, settleQ, Kz, isRetro, config: ifasConfig,
-    ifa_SOR, ifa_EE, ifa_air, ifa_count, ifa_countByAir, ifa_countBySpacing, ifa_perDeviceAct, ifa_cost, ifa_spacing, ifa_spacing_set: ga('spacing', 0), ifa_Ns, ifa_airInstalled, A_aer_ifas,
-    ifa_eff, ifa_effIn, ifa_effClamped, bType,
-    Q, Q_wan, T, Tmin, V, V_auto, V_ctrl, V_by_SRT, V_by_SALR, V_by_SNR, V_by_SRTsafe, HRT, V_fill, A_total, MLSS_eq, fillRatio,
-    V_preAnox, V_aer, V_postAnox, sumR, volNormalized,
-    X_bio_kg, X_susp_kg, M_susp: m.M_susp, bio_contrib_BOD, susp_contrib_BOD, bio_contrib_N,
-    SRT_in, SRT_act: m.SRT_act, SRT_aer: m.SRT_aer, SRT_min, SRT_safe, susp_nit_ok: m.susp_nit_ok, nit_ok: m.nit_ok, MLSS,
-    dX_VSS, dX_susp, dX_bio, dX_inert, dX_chem, dX_carbon, eff_SRT_ifas,
-    dX_DS, sludge_wet_ifas, sludge_yield_ifas, sludge_cost_ifas,
-    AOR, SOR, O_BOD, O_N, O_DN, BOD_rm_pct, NH4_rm_pct, total_TN_rm, TN_out, MLR_limit, N_nit, N_pre, N_post_kg, N_pre_Climited, NOx_e,
-    SALR_actual, SNR_actual, SNR_bio, SNR_DO, DO_factor, DO_set, nitI,
-    SALR, SNR, SALR_T_factor, SNR_Tmin_factor,
-    alkUse, alkRem, alkAdded, alkFinal, Vsettle, surfLoad,
-    RAS_Q, MLR_Q, RAS_P, MLR_P, pumpPower_kwhm3,
-    cap_before, cap_after, cap_ctrl, capB_ctrl, Q_by_BOD, Q_by_N, Q_by_SALR, Q_by_clar, Qb_SRT, Qb_N,
-    capBoost: cap_before > 0 && isFinite(cap_after) ? (cap_after - cap_before) / cap_before * 100 : 0,
-    carbonDose, carbonNeed_kgCOD, N_post_kg, PAC_kg_d, PAC_dose, PAC_auto, PAC_need, TP_out, alkDoseOut, totalChemCost,
-    TP0, TPe, BOD0, BODe, TN0, NH40, NH4e,
-  };
-}
-
-function checkIFAS(r) {
-  const checks = []; let score = 100;
-
-  // 容积比之和
-  if (r.volNormalized) {
-    checks.push({type:'bad', ic:'✗', text:`<b>容积比之和 ${r.sumR.toFixed(1)}% ≠ 100%</b>: 已按比例归一后计算，请修正输入`});
-    score -= 10;
-  }
-
-  // 悬浮相泥龄（质量平衡）
-  if (!isFinite(r.SRT_act)) {
-    checks.push({type:'warn', ic:'⚠', text:`<b>悬浮相 MLSS 无法维持</b>: 按 BOD 质量平衡，悬浮相分得的 BOD 不足以维持 MLSS ${r.MLSS} mg/L（任意泥龄下），应降低 MLSS 或池容`});
-    score -= 10;
-  } else if (r.SRT_act < r.SRT_in * (1 - 1e-6)) {
-    checks.push({type:'bad', ic:'✗', text:`<b>悬浮相泥龄不足</b>: 质量平衡泥龄 ${r.SRT_act.toFixed(1)} d &lt; 设计 SRT ${r.SRT_in} d，应增大池容/MLSS 或降低处理量`});
-    score -= 15;
-  } else if (r.SRT_act > r.SRT_in * (1 + 1e-3)) {
-    checks.push({type:'info', ic:'ℹ', text:`<b>悬浮相泥龄</b>: 在 MLSS ${r.MLSS} mg/L 下按质量平衡为 ${r.SRT_act.toFixed(1)} d（> 设计 SRT ${r.SRT_in} d；${r.isRetro ? '设计 Q 低于能力' : '池容由' + r.V_ctrl + '控制'}）`});
-  }
-
-  // SALR 校核（附着相承担的 BOD）
-  if (r.SALR_actual > r.SALR * (1 + 1e-6)) {
-    checks.push({type:'bad', ic:'✗', text:`<b>SALR 超限</b>: 填料 BOD 负荷 ${r.SALR_actual.toFixed(2)} > T°C 折算上限 ${r.SALR.toFixed(2)} g/m²·d`});
-    score -= 15;
-  } else {
-    checks.push({type:'ok', ic:'✓', text:`<b>SALR 合理</b>: 填料 BOD 负荷 ${r.SALR_actual.toFixed(2)} g/m²·d（附着相 ${(r.bio_contrib_BOD*100).toFixed(0)}%，限值 ${r.SALR.toFixed(2)}）`});
-  }
-
-  // 硝化校核（最低设计水温）
-  if (r.Tmin > r.T + 1e-9) {
-    checks.push({type:'warn', ic:'⚠', text:`<b>最低设计水温高于平均水温</b>: T_min ${r.Tmin} ℃ &gt; T ${r.T} ℃，填料硝化与悬浮相泥龄按 T_min 校核会偏不安全，请核对`});
-    score -= 5;
-  }
-  if (r.DO_set > BF.DO_max_design) {
-    checks.push({type:'info', ic:'ℹ', text:`<b>DO ${r.DO_set} mg/L &gt; 5</b>: 填料硝化速率按 5 mg/L 计（设计 DO 不得高于 5）`});
-  }
-  const srtTxt = `悬浮相好氧泥龄 ${isFinite(r.SRT_aer) ? r.SRT_aer.toFixed(1) : '∞'} d ${r.susp_nit_ok ? '≥' : '&lt;'} SF·SRT_min = ${isFinite(r.SRT_safe) ? r.SRT_safe.toFixed(1) : '∞'} d（T_min ${r.Tmin} ℃）`;
-  if (r.N_nit > 0) {
-    const capTxt = `设计速率 r_nit = ${r.nitI.r10.toFixed(2)}（${r.nitI.cls === '自定义' ? '自定义' : '类别 ' + r.nitI.cls}）× ${r.nitI.fT.toFixed(3)}（T_min ${r.Tmin} ℃）× DO ${r.nitI.fDO.toFixed(2)} × NH₄ ${r.nitI.fNH4.toFixed(2)} = ${r.SNR_DO.toFixed(3)} g N/m²·d`;
-    if (!r.nit_ok) {
-      checks.push({type:'bad', ic:'✗', text:`<b>硝化能力不足</b>: ${srtTxt}，硝化全部由填料承担：进入负荷 ${r.SNR_bio.toFixed(3)} g N/m²·d &gt; ${capTxt}；应增大填充率/池容、提高 DO 或延长悬浮相泥龄`});
-      score -= 15;
-    } else if (r.susp_nit_ok) {
-      checks.push({type:'ok', ic:'✓', text:`<b>硝化能力满足</b>: ${srtTxt}，悬浮相可稳定硝化；填料按生物量分担 ${(r.bio_contrib_N*100).toFixed(0)}%（进入负荷 ${r.SNR_bio.toFixed(3)} g N/m²·d，填料设计速率 ${r.SNR_DO.toFixed(3)}${r.SNR_bio > r.SNR_DO ? '，超出部分由悬浮相承担' : ''}）`});
-    } else {
-      checks.push({type:'ok', ic:'✓', text:`<b>硝化能力满足（填料承担）</b>: ${srtTxt}，填料硝化进入负荷 ${r.SNR_bio.toFixed(3)} ≤ ${capTxt}`});
-    }
-  }
-
-  // 二沉池表面负荷（最高时；GB 50014 活性污泥二沉池 0.6-1.5 m³/m²·h）
-  if (r.surfLoad > 1.5 + 1e-9) {
-    checks.push({type:'bad', ic:'✗', text:`<b>沉淀池表面负荷过高</b>: 最高时 ${r.surfLoad.toFixed(2)} m³/m²·h > 1.5（GB 50014 活性污泥二沉池 0.6-1.5，Kz = ${r.Kz.toFixed(2)}）`});
-    score -= 12;
-  } else if (r.surfLoad < 0.6 - 1e-9) {
-    checks.push({type:'info', ic:'ℹ', text:`<b>沉淀池表面负荷偏低</b>: 最高时 ${r.surfLoad.toFixed(2)} m³/m²·h < 0.6，面积偏保守`});
-  } else {
-    checks.push({type:'ok', ic:'✓', text:`<b>沉淀池表面负荷合理</b>: 最高时 ${r.surfLoad.toFixed(2)} m³/m²·h（0.6-1.5，Kz = ${r.Kz.toFixed(2)}）`});
-  }
-  // 二沉池 HRT（最高时 1.5-4 h）
-  if (r.HRT_settle < 1.5 - 1e-9) {
-    checks.push({type:'warn', ic:'⚠', text:`<b>沉淀池 HRT 偏短</b>: 最高时 ${r.HRT_settle.toFixed(1)} h < 1.5 h`});
-    score -= 6;
-  } else if (r.HRT_settle > 4 + 1e-9) {
-    checks.push({type:'warn', ic:'⚠', text:`<b>沉淀池 HRT 偏长</b>: 最高时 ${r.HRT_settle.toFixed(1)} h > 4 h，易反硝化浮泥`});
-    score -= 4;
-  } else {
-    checks.push({type:'ok', ic:'✓', text:`<b>沉淀池 HRT 合理</b>: 最高时 ${r.HRT_settle.toFixed(1)} h（1.5-4 h）`});
-  }
-
-  // TN：预测出水 TN = NH₄ₑ + 有机氮ₑ + NOx·(1−η)
-  const tnDetail = `NH₄ₑ ${r.NH4e} + 有机氮 1.5 + NOx ${r.NOx_e.toFixed(1)} mg/L${r.N_pre_Climited ? '；预缺氧脱氮受进水 BOD 限制' : ''}`;
-  if (r.TNe > 0 && r.TN_out > r.TNe * (1 + 1e-6)) {
-    checks.push({type:'warn', ic:'⚠', text:`<b>TN 去除不足</b>: 预计出水 TN ${r.TN_out.toFixed(1)} mg/L > 目标 ${r.TNe} mg/L（${tnDetail}），建议提高 MLR、增设后缺氧（完整 BNR）`});
-    score -= 10;
-  } else if (r.total_TN_rm > 0) {
-    checks.push({type:'ok', ic:'✓', text:`<b>TN 可达标</b>: 预计出水 TN ≈ ${r.TN_out.toFixed(1)} mg/L（去除 ${r.total_TN_rm.toFixed(0)}%；${tnDetail}）`});
-  }
-
-  // 曝气器布置间距（好氧段均布）
-  if (r.ifa_count > 0) {
-    if (r.ifa_spacing > r.ifa_spacing_set + 1e-9) {
-      checks.push({type:'warn', ic:'⚠', text:`<b>曝气器间距超过设定最大间距</b>: 均布间距 ${r.ifa_spacing.toFixed(2)} m &gt; ${r.ifa_spacing_set} m（输入值），搅拌不均易出死角；按间距需 ≥ ${Math.ceil(r.A_aer_ifas / (r.ifa_spacing_set * r.ifa_spacing_set))} 个曝气器（单个气量相应减小）`});
-      score -= 4;
-    } else {
-      checks.push({type:'ok', ic:'✓', text:`<b>曝气器布置</b>: ${r.ifa_count} 个（${r.ifa_countBySpacing > r.ifa_countByAir ? '最大间距控制' : '单个额定气量控制'}：按气量 ${r.ifa_countByAir} 个 / 按间距 ${r.ifa_countBySpacing} 个），单个实际气量 ${r.ifa_perDeviceAct.toFixed(2)} Nm³/h，实际间距 ${r.ifa_spacing.toFixed(2)} m（设定最大 ${r.ifa_spacing_set} m），装机气量 ${r.ifa_airInstalled.toFixed(0)} Nm³/h`});
-    }
-  }
-  if (r.ifa_effClamped) {
-    checks.push({type:'info', ic:'ℹ', text:`<b>风机效率按机型上限计</b>: 输入 ${(r.ifa_effIn*100).toFixed(0)}% 超过该机型上限 ${(r.ifa_eff*100).toFixed(0)}%，轴功率按 ${(r.ifa_eff*100).toFixed(0)}% 计`});
-  }
-
-  // 改造能力：同一模型反算
-  if (r.isRetro && isFinite(r.cap_after)) {
-    const detail = `改造前 ${r.cap_before.toFixed(2)}（${r.capB_ctrl}）→ 改造后 ${r.cap_after.toFixed(2)} 万m³/d（${r.cap_ctrl}）`;
-    if (r.cap_after < r.Q_wan * (1 - 1e-6)) {
-      checks.push({type:'warn', ic:'⚠', text:`<b>改造后能力不足</b>: ${detail} &lt; 设计 Q ${r.Q_wan} 万m³/d，应提高填充率/目标 MLSS、扩大二沉池或降低处理量`});
-      score -= 10;
-    } else {
-      checks.push({type:'ok', ic:'✓', text:`<b>改造后能力满足</b>: ${detail} ≥ 设计 Q ${r.Q_wan} 万m³/d`});
-    }
-  }
-
-  // 碱度（按补碱后剩余碱度校核）
-  const alkTxt = r.alkAdded > 0.05
-    ? `硝化后 ${r.alkRem.toFixed(0)} mg/L，补 NaHCO₃ ${(r.alkAdded * 1.68).toFixed(1)} mg/L 后 ${r.alkFinal.toFixed(0)} mg/L`
-    : `剩余 ${r.alkFinal.toFixed(0)} mg/L`;
-  if (r.alkFinal < 50 - 1e-6) {
-    checks.push({type:'bad', ic:'✗', text:`<b>碱度不足</b>: ${alkTxt} < 50，硝化受抑，需补碱`});
-    score -= 12;
-  } else if (r.alkFinal < 100 - 1e-6) {
-    checks.push({type:'warn', ic:'⚠', text:`<b>碱度偏低</b>: ${alkTxt}，建议关注 pH 变化`});
-    score -= 5;
-  } else {
-    checks.push({type:'ok', ic:'✓', text:`<b>碱度充足</b>: ${alkTxt}`});
-  }
-
-  // TP（生物 15% + PAC 化学除磷）
-  if (r.TPe > 0 && r.TP_out > r.TPe * (1 + 1e-6)) {
-    checks.push({type:'warn', ic:'⚠', text:`<b>TP 去除不足</b>: PAC ${r.PAC_dose.toFixed(0)} mg/L，预计出水 TP ${r.TP_out.toFixed(2)} mg/L > 目标 ${r.TPe}；按化学计量需 PAC ≈ ${r.PAC_need.toFixed(0)} mg/L（液体 PAC）`});
-    score -= 8;
-  } else if (r.TP0 > 0) {
-    checks.push({type:'ok', ic:'✓', text:`<b>TP 可达标</b>: IFAS 生物除磷有限（按 15%），PAC ${r.PAC_dose.toFixed(0)} mg/L${r.PAC_auto ? '（自动）' : ''} 化学除磷，预计出水 TP ${r.TP_out.toFixed(2)} mg/L`});
-  }
-
-  // 填充率
-  if (r.fillRatio > 0.5 + 1e-9) {
-    checks.push({type:'warn', ic:'⚠', text:`<b>IFAS 填充率超限</b>: 好氧段填充率 ${(r.fillRatio*100).toFixed(0)}% &gt; 50%（IFAS 上限），常用 20-40% 以维持悬浮污泥流态`});
-    score -= 8;
-  }
-
-  // HRT（参考范围按构型：仅硝化/BOD 去除 4-8 h；含脱氮的一级 A IFAS 约 8-14 h）
-  const hrtRef = r.config === 'nitrif_only' ? 'IFAS 仅硝化/BOD 去除 HRT 常 4-8 h' : 'IFAS 一级 A（含脱氮）HRT 常约 8-14 h';
-  if (r.HRT < 3 - 1e-9) {
-    checks.push({type:'warn', ic:'⚠', text:`<b>HRT 偏短</b>: ${r.HRT.toFixed(1)} h < 3h，${hrtRef}`});
-    score -= 8;
-  } else {
-    checks.push({type:'ok', ic:'✓', text:`<b>HRT</b>: ${r.HRT.toFixed(1)} h（${hrtRef}）`});
-  }
-
-  score = Math.max(0, Math.min(100, Math.round(score)));
-  return { checks, score };
-}
-
-function drawIFASFlow(r) {
-  const ink = '#0f172a', muted = '#64748b', brand = '#0891b2';
-  const poolY = 50, H = 150;
-  let h = `<!-- 使用全局 gArrow -->`;
-  h += `<text x="500" y="22" font-size="13" font-weight="600" fill="${ink}" text-anchor="middle">IFAS 工艺流程 (${r.Q_wan} 万 m³/d · ${ifasConfig === 'ao' ? 'A/O含MLR' : ifasConfig === 'nitrif_only' ? '纯好氧' : ifasConfig === 'post_anox' ? '好氧+后缺氧' : '完整BNR'})</text>`;
-  const arrow = (x1,x2,y0) => `<path d="M ${x1} ${y0} L ${x2} ${y0}" stroke="${brand}" stroke-width="2" marker-end="url(#gArrow)"/>`;
-  const box = (x,w,label,sub,color) => `<rect x="${x}" y="${poolY}" width="${w}" height="${H}" fill="${color}" fill-opacity="0.12" stroke="${color}" stroke-width="2" rx="4"/>
-    <text x="${x+w/2}" y="${poolY+H/2}" font-size="12" font-weight="700" fill="${color}" text-anchor="middle">${label}</text>
-    <text x="${x+w/2}" y="${poolY+H/2+16}" font-size="10" fill="${muted}" text-anchor="middle">${sub}</text>`;
-
-  let x = 40;
-  h += `<path d="M 10 ${poolY+H/2} L ${x} ${poolY+H/2}" stroke="${brand}" stroke-width="2" marker-end="url(#gArrow)"/>`;
-  h += `<text x="10" y="${poolY+H/2-8}" font-size="11" fill="${ink}" font-weight="600">进水</text>`;
-
-  if (ifasConfig === 'ao' || ifasConfig === 'full_bnr') {
-    h += arrow(x, x+4, poolY+H/2);
-    h += box(x, 120, '预缺氧', `${r.V_preAnox.toFixed(0)}m³·MLR回流`, '#ea580c');
-    x += 124;
-  }
-  h += arrow(x, x+4, poolY+H/2);
-  h += box(x, 200, '好氧 IFAS', `${r.V_aer.toFixed(0)}m³·填料+悬浮`, '#16a34a');
-  x += 204;
-  if (ifasConfig === 'post_anox' || ifasConfig === 'full_bnr') {
-    h += arrow(x, x+4, poolY+H/2);
-    h += box(x, 120, '后缺氧', `${r.V_postAnox.toFixed(0)}m³·外加碳源`, '#7c3aed');
-    x += 124;
-  }
-  h += arrow(x, x+4, poolY+H/2);
-  const sX = x+4;
-  h += box(sX, 130, '二沉池', `${r.Vsettle.toFixed(0)}m³`, '#94a3b8');
-  h += `<path d="M ${sX+65} ${poolY+H+20} L ${sX+65} ${poolY+H+40} L 80 ${poolY+H+40} L 80 ${poolY+H+5}" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,3" fill="none"/>`;
-  h += `<path d="M 80 ${poolY+H+5} L 80 ${poolY+H+20}" stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#gArrow)"/>`;
-  h += `<text x="${(sX+65+80)/2}" y="${poolY+H+36}" font-size="10" fill="${muted}" text-anchor="middle">RAS 回流 ${r.RAS_Q.toFixed(0)}m³/h</text>`;
-  if ((ifasConfig === 'ao' || ifasConfig === 'full_bnr') && r.MLR_Q > 0) {
-    h += `<path d="M ${x-10} ${poolY+10} L ${x-10} ${poolY-15} L 200 ${poolY-15} L 200 ${poolY+5}" stroke="${brand}" stroke-width="1.5" stroke-dasharray="4,3" fill="none"/>`;
-    h += `<path d="M 200 ${poolY+5} L 200 ${poolY+10}" stroke="${brand}" stroke-width="1.5" fill="none" marker-end="url(#gArrow)"/>`;
-    h += `<text x="${(x-10+200)/2}" y="${poolY-18}" font-size="10" fill="${brand}" text-anchor="middle">MLR ${r.MLR_Q.toFixed(0)}m³/h</text>`;
-  }
-  h += arrow(sX+130, sX+170, poolY+30);
-  h += `<text x="${sX+135}" y="${poolY+20}" font-size="11" fill="${ink}" font-weight="600">出水</text>`;
-  const svg = $('ifasFlowSvg'); if (svg) svg.innerHTML = h;
-}
-
-
-function renderIFASRecommend() {
-  const box = $('ifas_recommend_box'); if (!box) return;
-  const g = id => parseFloat($('ifas_' + id)?.value) || 0;
-  const BOD0 = g('BOD0'), NH40 = g('NH40'), TN0 = g('TN0'), TNe = g('TNe'), TPe = g('TPe'), NH4e = g('NH4e');
-  // A/O 可达出水 TN 粗估：NOx 去除上限约 70%（MLR ≤ 400%，×0.85 折减），忽略同化
-  const TN_ao_est = NH4e + 1.5 + Math.max(0, TN0 - NH4e - 1.5) * 0.3;
-  const BOD_N = NH40 > 0 ? BOD0 / NH40 : 999;
-  const needDN = TNe < TN0 * 0.7, strictTP = TPe <= 0.5;
-
-  let rec, color, reason;
-  if (needDN && BOD_N >= 4 && TN_ao_est > TNe) {
-    rec = '④ 完整 BNR（A/O + 后缺氧外加碳源）'; color = '#7c3aed';
-    reason = `A/O 在 MLR ≤ 400% 时出水 TN 约 ${TN_ao_est.toFixed(1)} mg/L > 目标 ${TNe}，需后缺氧外加碳源补充脱氮（城镇一级 A 常规做法）`;
-  } else if (needDN && BOD_N >= 4) {
-    rec = '② 预缺氧+好氧 A/O（含MLR）'; color = '#0891b2';
-    reason = `BOD/N=${BOD_N.toFixed(1)}≥4，进水碳源充足，A/O 内回流免费反硝化，无需外碳，是 IFAS 最常见方案`;
-  } else if (needDN && BOD_N < 4) {
-    rec = '③ 好氧IFAS+后缺氧'; color = '#d97706';
-    reason = `BOD/N=${BOD_N.toFixed(1)}<4，碳源不足，后缺氧+外加碳源（甲醇/乙酸钠）强化反硝化`;
-  } else {
-    rec = '① 纯好氧 IFAS'; color = '#16a34a';
-    reason = `出水 TN 无严格要求，纯好氧 IFAS 最简单，仅去除 BOD 和硝化`;
-  }
-  const extra = strictTP ? '&nbsp;ℹ️ <b>TP 严格，需配 PAC 化学除磷</b>' : '';
-  box.innerHTML = `<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;
-    background:white;border:1px solid #e5e7eb;border-left:4px solid ${color};border-radius:8px;">
-    <div style="flex:0 0 auto;padding-top:2px;">
-      <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;
-        background:${color}22;color:${color};">推荐</span>
-    </div>
-    <div style="flex:1;">
-      <div style="font-size:14px;font-weight:700;color:#0f172a;margin-bottom:3px;">${rec}</div>
-      <div style="font-size:12px;color:#64748b;line-height:1.5;">${reason}${extra}</div>
-    </div>
-    <button onclick="setIFASConfig('${rec.startsWith('①') ? 'nitrif_only' : rec.startsWith('②') ? 'ao' : rec.startsWith('④') ? 'full_bnr' : 'post_anox'}')"
-      style="flex:0 0 auto;padding:6px 12px;background:${color};color:white;border:none;
-      border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap;">选此方案</button>
-  </div>`;
-}
-function calcAndRenderIFAS() {
-  renderIFASRecommend();
-  const sfxV = ifasMode === 'retrofit' ? '_r' : '';
-  const isNew = ifasMode === 'new';
-  const posList = [
-    ['ifas_Q','进水流量 Q'], ['ifas_BOD0','进水 BOD₀'], ['ifas_fillRatio' + sfxV,'填充率'], ['ifas_specArea' + sfxV,'比表面积'],
-    ['ifas_SALR' + sfxV,'SALR'], ['ifas_SRT' + sfxV,'SRT'],
-    ['ifas_poolH' + sfxV,'有效水深'], ['ifas_settleQ' + sfxV,'二沉池表面负荷'],
-    ['ifas_alpha','α'], ['ifas_theta','θ'], ['ifas_Y','Y'], ['ifas_mu_max','μ_max'], ['ifas_SF','硝化安全系数 SF'],
-    ['ifas_pumpEff','泵效率'], ['ifas_acetatePurity','乙酸钠有效含量'], ['ifas_r_aer_pct','好氧 IFAS 段 %'],
-    ['ifa_perDevice','单个曝气器气量'], ['ifa_OTE','OTE'], ['ifa_spacing','曝气器布置间距'], ['ifa_efficiency','风机效率'],
-    ['ifa_backupFactor','备用系数'], ['ifa_beta','§11 β'], ['ifa_theta','§11 θ']
-  ].concat(isNew ? [['ifas_MLSS','MLSS'], ['ifas_VSS_SS','MLVSS/MLSS'], ['ifas_settleHRT','沉淀最小 HRT']]
-                 : [['ifas_Vexisting','原有池容'], ['ifas_MLSSexisting','原有 MLSS'], ['ifas_MLSS_new','改造后目标 MLSS'], ['ifas_VSS_SS2','MLVSS/MLSS'], ['ifas_Asettle_r','原有二沉池面积']]);
-  const badI = wkCheckPositive(posList);
-  // 非负且必填（空值按无效，不静默按 0 / 默认值计算）
-  const nnReq = [
-    ['ifas_T','水温'], ['ifas_NH40','进水 NH₄'], ['ifas_TN0','进水 TN'], ['ifas_TP0','进水 TP'], ['ifas_Alk','碱度'],
-    ['ifas_BODe','出水 BOD'], ['ifas_NH4e','出水 NH₄'], ['ifas_TNe','出水 TN'], ['ifas_TPe','出水 TP'],
-    ['ifas_SS0','进水 SS₀'], ['ifas_SSe','出水 SSₑ'], ['ifas_fSS','惰性 SS 系数 f'],
-    ['ifas_biofilm' + sfxV,'填料表面生物量'], ['ifas_r_preAnox_pct','预缺氧段 %'], ['ifas_r_postAnox_pct','后缺氧段 %'],
-    ['ifas_RAS','RAS 回流比'], ['ifas_MLR','MLR'], ['ifas_RAS_H','RAS 泵扬程'], ['ifas_MLR_H','MLR 泵扬程'],
-    ['ifas_Kd','Kd'], ['ifas_Y_bio','Y_bio'], ['ifas_SDNR','SDNR₂₀'], ['ifas_solidFrac','填料实体率'],
-    ['ifas_carbonPrice','碳源价格'], ['ifas_PACprice','PAC 价格'], ['ifas_alkDose','补碱量'], ['ifas_alkPrice','NaHCO₃ 价格'],
-    ['ifas_sludge_price','污泥处置费用'], ['ifa_price','曝气器单价'], ['ifa_dp_aer','曝气池阻力'], ['ifa_dp_pipe','管路阻力'], ['ifa_DO','§11 DO']
-  ];
-  const badI2 = wkCheckNonNeg(nnReq.concat([['ifas_V_input','总池容'], ['ifas_PAC','PAC 投加量'], ['ifas_rNit' + sfxV,'自定义填料硝化速率'], ['ifas_Tmin','最低设计水温 T_min']]));
-  // 可留空的输入：填写时须有效（Kz > 0；填料实体率 < 1）
-  const kzEl = $('ifas_Kz'), kzBad = !!kzEl && kzEl.value.trim() !== '' && !(parseFloat(kzEl.value) > 0);
-  if (kzEl) kzEl.classList.toggle('invalid', kzBad);
-  if (kzBad) badI.push('总变化系数 Kz');
-  const sfEl = $('ifas_solidFrac'), sfBad = !!sfEl && parseFloat(sfEl.value) >= 1;
-  if (sfBad) sfEl.classList.add('invalid');
-  nnReq.forEach(([id, label]) => { const el = $(id); if (el && el.value.trim() === '') { el.classList.add('invalid'); if (!badI2.includes(label)) badI2.push(label); } });
-  const mcEl = $('ifas_sludge_mc'), mcV = parseFloat(mcEl?.value), mcBad = !!mcEl && (isNaN(mcV) || mcV < 0 || mcV >= 100);
-  if (mcEl) mcEl.classList.toggle('invalid', mcBad);
-  const tnEl = $('ifas_TN0'), nhEl = $('ifas_NH40');
-  const tnLtNH = parseFloat(tnEl?.value) < parseFloat(nhEl?.value);
-  if (tnLtNH) { tnEl.classList.add('invalid'); nhEl.classList.add('invalid'); }
-  if (badI.length || badI2.length || mcBad || tnLtNH || sfBad) {
-    const msgs = [...badI.map(x=>'大于 0 的'+x), ...badI2.map(x=>'不小于 0 的'+x)];
-    if (sfBad) msgs.push('小于 1 的填料实体率');
-    if (mcBad) msgs.push('0-100 之间的泥饼含水率');
-    if (tnLtNH) msgs.push('不小于进水 NH₄-N 的进水 TN');
-    wkShowInvalid('panel-ifas', ['ifasCheckList'], `<b>输入无效</b>：请输入${msgs.join('、')}`);
-    return;
-  }
-  const r = calcIFAS();
-  const set = (id, v) => { const el = $(id); if (el) el.textContent = typeof v === 'number' ? v.toFixed(v < 10 ? 1 : 0) : v; };
-  const setF = (id, v, dec=1) => { const el = $(id); if (el) el.textContent = (v == null || isNaN(v)) ? '—' : v.toFixed(dec); };
-
-  set('ifas_r_V', r.V);
-  setF('ifas_r_HRT', r.HRT, 2);
-  const fmtV = v => isFinite(v) ? Math.round(v) : '—';
-  if ($('ifas_r_Vctrl')) $('ifas_r_Vctrl').textContent = r.isRetro ? '原有池容（改造）'
-    : `${r.V_ctrl}；SRT ${fmtV(r.V_by_SRT)} / SALR ${fmtV(r.V_by_SALR)} / 硝化 min(填料 ${fmtV(r.V_by_SNR)}, 悬浮相 ${fmtV(r.V_by_SRTsafe)}) m³`;
-  if ($('ifas_r_Kz')) $('ifas_r_Kz').textContent = r.Kz.toFixed(2);
-  const vw = $('ifas_volSumWarn');
-  if (vw) vw.innerHTML = r.volNormalized
-    ? `<div class="vol-sum-err">✗ 容积比之和 = ${r.sumR.toFixed(1)}% ≠ 100%：已按比例归一后计算（各段 = 输入值 × 100/${r.sumR.toFixed(1)}）。请修正输入，或重新点选工艺段配置恢复默认配比</div>`
-    : `<div class="vol-sum-ok">✓ 容积比之和 = 100% (匹配)</div>`;
-  set('ifas_r_V_preAnox', r.V_preAnox);
-  set('ifas_r_V_aer', r.V_aer);
-  set('ifas_r_V_postAnox', r.V_postAnox);
-  set('ifas_r_VfillMat', r.V_fill);
-  set('ifas_r_Atotal', r.A_total);
-  set('ifas_r_Vsettle', r.Vsettle);
-  setF('ifas_r_surfLoad', r.surfLoad, 2);
-  if ($('ifas_r_settleAH')) $('ifas_r_settleAH').textContent = `${r.A_settle.toFixed(0)} / ${r.HRT_settle.toFixed(1)}`;
-
-  set('ifas_r_Xbio', r.X_bio_kg);
-  set('ifas_r_Xsusp', r.X_susp_kg);
-  if ($('ifas_r_SRTact')) $('ifas_r_SRTact').textContent = `${isFinite(r.SRT_act) ? r.SRT_act.toFixed(1) : '∞'} / ${isFinite(r.SRT_aer) ? r.SRT_aer.toFixed(1) : '∞'} / ${isFinite(r.SRT_safe) ? r.SRT_safe.toFixed(1) : '∞'}`;
-  set('ifas_r_MLSSeq', r.MLSS_eq);
-  setF('ifas_r_bioContribBOD', r.bio_contrib_BOD * 100, 0);
-  setF('ifas_r_bioContribN', r.bio_contrib_N * 100, 0);
-  setF('ifas_r_dX', r.dX_VSS, 1);   // ΔX_VSS（悬浮+附着）
-  if ($('ifas_r_dX_susp')) $('ifas_r_dX_susp').textContent = r.dX_susp.toFixed(1);
-  if ($('ifas_r_dX_bio'))  $('ifas_r_dX_bio').textContent  = r.dX_bio.toFixed(1);
-  if ($('ifas_r_dX_inert')) $('ifas_r_dX_inert').textContent = r.dX_inert.toFixed(1);
-  if ($('ifas_r_dX_chem')) $('ifas_r_dX_chem').textContent = r.dX_chem.toFixed(1);
-  if ($('ifas_r_dX_carbon')) $('ifas_r_dX_carbon').textContent = r.dX_carbon.toFixed(1);
-  setF('ifas_r_dX_total', r.dX_DS, 1);
-  if ($('ifas_r_SNRcheck')) $('ifas_r_SNRcheck').textContent = `${r.SNR_bio.toFixed(3)} / ${r.SNR_DO.toFixed(3)}`;
-  if ($('ifas_r_carbonNeed')) $('ifas_r_carbonNeed').textContent = `${r.N_post_kg.toFixed(1)} / ${r.carbonNeed_kgCOD.toFixed(1)}`;
-  if ($('ifas_r_sludge_yield')) $('ifas_r_sludge_yield').textContent = r.sludge_yield_ifas.toFixed(4);
-  if ($('ifas_r_sludge_wet'))   $('ifas_r_sludge_wet').textContent   = r.sludge_wet_ifas.toFixed(2);
-  if ($('ifas_r_sludge_cost'))  $('ifas_r_sludge_cost').textContent  = r.sludge_cost_ifas.toFixed(1);
-
-  setF('ifas_r_BODrm', r.BOD_rm_pct, 0);
-  setF('ifas_r_NH4rm', r.NH4_rm_pct, 0);
-  setF('ifas_r_Nnit', r.N_nit, 0);
-  if ($('ifas_r_NDN')) $('ifas_r_NDN').textContent = `${r.N_pre.toFixed(0)} / ${r.N_post_kg.toFixed(0)}`;
-  setF('ifas_r_TPout', r.TP_out, 2);
-  setF('ifas_r_TNrm', r.total_TN_rm, 0);
-  setF('ifas_r_TNout', r.TN_out, 1);
-  setF('ifas_r_MLR_limit', r.MLR_limit, 0);
-  set('ifas_r_alkRem', Math.round(r.alkRem));
-
-  set('ifas_r_AOR', r.AOR);
-  set('ifas_r_SOR', r.SOR);
-  if ($('ifas_r_ifaSOR'))   $('ifas_r_ifaSOR').textContent   = r.ifa_EE.toFixed(1);
-  setF('ifas_r_ifaAir', r.ifa_air, 0);
-  if ($('ifas_r_ifaCount')) $('ifas_r_ifaCount').textContent = `${r.ifa_count} / ${r.ifa_cost.toFixed(1)} / ${r.ifa_Ns.toFixed(1)}`;
-  setF('ifas_r_SALRcheck', r.SALR_actual, 2);
-  if ($('ifas_r_SALRfactor')) $('ifas_r_SALRfactor').textContent = `${r.SALR_T_factor.toFixed(3)} / ${r.SNR_Tmin_factor.toFixed(3)}`;
-
-  setF('ifas_r_RAS_Q', r.RAS_Q, 0);
-  setF('ifas_r_MLR_Q', r.MLR_Q, 0);
-  setF('ifas_r_RAS_P', r.RAS_P, 1);
-  setF('ifas_r_MLR_P', r.MLR_P, 1);
-  setF('ifas_r_pumpPower', r.pumpPower_kwhm3, 3);
-
-  const fq = v => isFinite(v) ? (v / 1e4).toFixed(2) : '—';
-  if ($('ifas_r_capBefore')) $('ifas_r_capBefore').textContent = isFinite(r.cap_before) ? r.cap_before.toFixed(2) : '—';
-  if ($('ifas_r_capAfter'))  $('ifas_r_capAfter').textContent  = isFinite(r.cap_after) ? r.cap_after.toFixed(2) : '—';
-  if ($('ifas_r_capCtrl'))   $('ifas_r_capCtrl').textContent   = r.cap_ctrl
-    ? `改造后${r.cap_ctrl}（SRT ${fq(r.Q_by_BOD)} / SALR ${fq(r.Q_by_SALR)} / 硝化 ${fq(r.Q_by_N)} / 二沉池 ${fq(r.Q_by_clar)}）；改造前${r.capB_ctrl}（SRT ${fq(r.Qb_SRT)} / 硝化 ${fq(r.Qb_N)} / 二沉池 ${fq(r.Q_by_clar)}）万m³/d；设计 Q = ${r.Q_wan}` : '—';
-  if ($('ifas_r_capBoost'))  $('ifas_r_capBoost').textContent  = r.capBoost.toFixed(0);
-
-  setF('ifas_r_carbonDose', r.carbonDose, 1);
-  setF('ifas_r_PACDose', r.PAC_kg_d, 1);
-  setF('ifas_r_alkDoseOut', r.alkDoseOut, 1);
-  setF('ifas_r_chemCost', r.totalChemCost, 1);
-
-  // 校核
-  const chk = checkIFAS(r);
-  const cl = $('ifasCheckList');
-  if (cl) cl.innerHTML = chk.checks.map(c =>
-    `<div class="check-item check-${c.type}"><span class="ic">${c.ic}</span><span>${c.text}</span></div>`).join('');
-  if ($('ifas_scoreNum')) $('ifas_scoreNum').textContent = chk.score;
-  const t = chk.score >= 85 ? ['✅ 设计优秀','各项指标均衡'] :
-            chk.score >= 70 ? ['👍 设计合格','基本合理'] :
-                              ['⚠ 设计有风险','需调整关键参数'];
-  if ($('ifas_scoreTitle')) $('ifas_scoreTitle').textContent = t[0];
-  if ($('ifas_scoreDesc'))  $('ifas_scoreDesc').textContent  = t[1];
-
-  drawIFASFlow(r);
-}
-
-
 // ============ 初始化(所有数据库声明之后) ============
 // 用户手改容积比 → 保留用户值（不再随输入自动重新分配）
 document.querySelectorAll('#volRatioGrid input').forEach(el => el.addEventListener('input', () => { stRatioManual = true; }));
@@ -6723,15 +5365,6 @@ renderCases();
 setStageConfig(ST_DEFAULT_CONFIG);
 calcStages();
 renderCarriers();
-// 初始化 IFAS Tab 状态
-snapshotIfasDefaults();   // 记录 IFAS Tab 初始输入（供"恢复默认"）
-setIFASMode('new');
-setIFASConfig(IFAS_DEFAULT_CONFIG);  // 默认完整 BNR：进水 TN 45 → 一级 A 15 需去除 67%，A/O 在 MLR ≤ 400% 时达不到，城镇一级 A 常规做法为 A/O + 后缺氧外加碳源 + 化学除磷
-// 绑定 IFAS Tab 内所有 input/select 触发计算
-document.querySelectorAll('#panel-ifas input, #panel-ifas select').forEach(el => {
-  el.addEventListener('input', () => calcAndRenderIFAS());
-  el.addEventListener('change', () => calcAndRenderIFAS());
-});
 </script>
 
 </body>

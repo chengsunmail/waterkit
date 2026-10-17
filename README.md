@@ -8,7 +8,7 @@
 
 ## ✨ 特点
 
-- **纯静态 · 即开即用** — 16 个工具页 + 首页,双击即可离线使用
+- **纯静态 · 即开即用** — 17 个工具页 + 首页,双击即可离线使用
 - **规范优先** — 每个工具都标注依据的国标、行业标准与公式出处
 - **实时联动** — 改任意输入结果立即重算,像 Excel 一样顺滑
 - **移动适配** — 工地、水厂、会议室、手机上都能用
@@ -34,7 +34,8 @@
 | [污泥产量](sludge-production-calculator.html) | 生物+化学+原生污泥 · 脱水前后体积 · 处置成本 |
 | [加药量](dosing-calculator.html) | PAC/PAM/次氯酸钠/碳源/除磷/pH 调节 六大类药剂 |
 | [活性污泥工艺](activated-sludge-process-calculator.html) | AAO / A/O / SBR / 氧化沟 池容 · 回流 · 需氧 · 剩余污泥(Beta) |
-| [MBBR / IFAS](mbbr-design.html) | 纯 MBBR 段组合 · IFAS · 填料选型(Beta)；循环水养殖 RAS 见 [iRAS](https://iras.cn) |
+| [MBBR](mbbr-design.html) | 纯 MBBR 段组合 · 填料选型 · 案例库(Beta)；循环水养殖 RAS 见 [iRAS](https://iras.cn) |
+| [IFAS](ifas-design.html) | 泥膜复合(活性污泥+填料) · 新建池容 / 改造能力反算 · RAS + MLR 回流(Beta) |
 | [MBR](mbr-design.html) | 池容 · 膜面积 · 清洗 · 能耗(Beta) |
 
 ### 设备选型 · Equipment

@@ -394,6 +394,10 @@
         <input type="number" id="Ne" value="1.5" step="0.1">
       </div>
       <div class="field">
+        <label for="ONe">出水有机氮 <span class="unit">mg/L</span></label>
+        <input type="number" id="ONe" value="1.5" step="0.1">
+      </div>
+      <div class="field">
         <label for="dNO3">反硝化脱氮量 ΔNO₃-N <span class="unit">mg/L</span></label>
         <input type="number" id="dNO3" value="0" step="1">
       </div>
@@ -406,7 +410,7 @@
         <input type="number" id="Y" value="0.6" step="0.05">
       </div>
       <div class="field">
-        <label for="Kd">污泥自身氧化率 Kd <span class="unit">d⁻¹</span></label>
+        <label for="Kd">污泥自身氧化率 Kd₂₀（20 ℃） <span class="unit">d⁻¹</span></label>
         <input type="number" id="Kd" value="0.05" step="0.01">
       </div>
       <div class="field">
@@ -511,11 +515,12 @@
       <h3>计算原理与公式</h3>
       <p><strong>① 去除 BOD 所需氧量</strong></p>
       <p>按污泥龄法，先求净剩余污泥产量 Px（kgVSS/d），再按 BOD₅ 的最终需氧量（1.47 kgO₂/kgBOD₅，即 BOD_u/BOD₅ ≈ 1/0.68）扣除排泥带走的氧当量（1.42 kgO₂/kgVSS）：</p>
-      <code>ΔXv = Px = Y · Q · (So − Se) / (1 + Kd · SRT) / 1000</code>
+      <code>ΔXv = Px = Y · Q · (So − Se) / (1 + Kd_T · SRT) / 1000</code>
+      <code>Kd_T = Kd₂₀ · 1.04^(T − 20)</code>
       <code>O₁ = 1.47 · Q · (So − Se) / 1000 − 1.42 · Px</code>
 
-      <p><strong>② 硝化所需氧量</strong>（每氧化1 kg NH₃-N约需 4.57 kg O₂，并扣除污泥同化氮 0.12 kgN/kgVSS）</p>
-      <code>O₂ = 4.57 · [Q · (TKNo − Ne) / 1000 − 0.12 · Px]</code>
+      <p><strong>② 硝化所需氧量</strong>（每氧化1 kg NH₃-N约需 4.57 kg O₂；被氧化的氮 = 进水 TKN − 出水 NH₃-N − 出水有机氮，并扣除污泥同化氮 0.12 kgN/kgVSS）</p>
+      <code>O₂ = 4.57 · [Q · (TKNo − Ne − ONe) / 1000 − 0.12 · Px]</code>
 
       <p><strong>③ 实际需氧量</strong>（反硝化每还原 1 kg NO₃-N 回收 2.86 kg O₂，仅对设有缺氧段的工艺填入 ΔNO₃-N）</p>
       <code>O₃ = 2.86 · Q · ΔNO₃-N / 1000</code>
@@ -574,6 +579,7 @@
           <li><a href="dosing-calculator.html">加药量</a></li>
           <li><a href="activated-sludge-process-calculator.html">活性污泥工艺</a></li>
           <li><a href="mbbr-design.html">MBBR 工程设计</a></li>
+          <li><a href="ifas-design.html">IFAS 工程设计</a></li>
           <li><a href="mbr-design.html">MBR 工程设计</a></li>
           <li><a href="pump-selection-calculator.html">水泵选型</a></li>
           <li><a href="blower-selection-calculator.html">鼓风机选型</a></li>
@@ -638,8 +644,8 @@
 
   const VALIDATE = [
     ['Q', '处理水量 Q', 'pos'], ['So', '进水 BOD₅', 'nn'], ['Se', '出水 BOD₅', 'nn'],
-    ['TKNo', '进水 TKN', 'nn'], ['Ne', '出水 NH₃-N', 'nn'], ['dNO3', '反硝化脱氮量', 'nn'],
-    ['Y', '污泥产率系数 Y', 'nn'], ['Kd', '污泥自身氧化率 Kd', 'nn'], ['SRT', '污泥龄 SRT', 'pos'],
+    ['TKNo', '进水 TKN', 'nn'], ['Ne', '出水 NH₃-N', 'nn'], ['ONe', '出水有机氮', 'nn'], ['dNO3', '反硝化脱氮量', 'nn'],
+    ['Y', '污泥产率系数 Y', 'nn'], ['Kd', '污泥自身氧化率 Kd₂₀', 'nn'], ['SRT', '污泥龄 SRT', 'pos'],
     ['sf', '安全系数', 'pos'], ['H', '曝气池水深 H', 'pos'], ['Hd', '扩散器安装深度', 'nn'],
     ['alpha', 'α', 'pos'], ['beta', 'β', 'pos'], ['Cw', '运行 DO', 'nn'],
     ['EA', '氧转移效率 EA', 'pos'], ['kh', '供气峰值系数', 'pos']
@@ -661,6 +667,13 @@
       $(id).classList.toggle('invalid', bad);
       if (bad) errs.push(rule === 'pos' ? `请输入大于 0 的${name}` : `${name}不能为负值`);
     });
+    {
+      const vTK = parseFloat($('TKNo').value), vNe = parseFloat($('Ne').value), vON = parseFloat($('ONe').value);
+      if (!isNaN(vTK) && !isNaN(vNe) && !isNaN(vON) && vNe >= 0 && vON >= 0 && vNe + vON > vTK) {
+        ['Ne','ONe'].forEach(id => $(id).classList.add('invalid'));
+        errs.push('出水 NH₃-N 与出水有机氮之和不应大于进水 TKN');
+      }
+    }
     if (num('EA') > 100) { $('EA').classList.add('invalid'); errs.push('氧转移效率 EA 不应超过 100%'); }
     // 水温、海拔：空/非数字或超出适用范围均按无效处理
     const vT = parseFloat($('T').value), vAlt = parseFloat($('alt').value);
@@ -678,9 +691,10 @@
     }
 
     const Q = num('Q'), So = num('So'), Se = num('Se');
-    const TKNo = num('TKNo'), Ne = num('Ne'), dNO3 = num('dNO3');
-    const Y = num('Y'), Kd = num('Kd'), SRT = num('SRT'), sf = num('sf');
+    const TKNo = num('TKNo'), Ne = num('Ne'), ONe = num('ONe'), dNO3 = num('dNO3');
+    const Y = num('Y'), Kd20 = num('Kd'), SRT = num('SRT'), sf = num('sf');
     const T = num('T'), alt = num('alt');
+    const Kd = Kd20 * Math.pow(1.04, T - 20);  // Kd_T = Kd₂₀·1.04^(T−20)
     const H = num('H'), Hd = num('Hd');
     const alpha = num('alpha'), beta = num('beta'), Cw = num('Cw'), EA = num('EA')/100;
     const kh = num('kh');
@@ -693,7 +707,7 @@
     const O1 = Math.max(1.47 * Q * (So - Se) / 1000 - 1.42 * Px, 0);
 
     // ② 硝化需氧量（扣除污泥同化氮 0.12 kgN/kgVSS）
-    const O2 = 4.57 * Math.max(Q * (TKNo - Ne) / 1000 - 0.12 * Px, 0);
+    const O2 = 4.57 * Math.max(Q * (TKNo - Ne - ONe) / 1000 - 0.12 * Px, 0);
 
     // ③ 反硝化回收氧量（2.86 kgO2/kgNO3-N），AOR
     const O3 = 2.86 * Q * dNO3 / 1000;
@@ -743,7 +757,8 @@
 ————————————————
 处理水量: ${num('Q')} m³/d
 进/出水BOD: ${num('So')}/${num('Se')} mg/L
-进水TKN/出水NH3-N: ${num('TKNo')}/${num('Ne')} mg/L
+进水TKN/出水NH3-N/出水有机氮: ${num('TKNo')}/${num('Ne')}/${num('ONe')} mg/L
+Kd₂₀: ${num('Kd')} d⁻¹  →  Kd_T: ${(num('Kd') * Math.pow(1.04, num('T') - 20)).toFixed(4)} d⁻¹
 反硝化脱氮量 ΔNO3-N: ${num('dNO3')} mg/L
 水温: ${num('T')} ℃  海拔: ${num('alt')} m
 池深 H / 扩散器深度 Hd: ${num('H')} / ${num('Hd')} m
@@ -773,7 +788,7 @@
   }
 
   function resetDefaults() {
-    const defaults = {Q:10000, So:200, Se:10, TKNo:40, Ne:1.5, dNO3:0,
+    const defaults = {Q:10000, So:200, Se:10, TKNo:40, Ne:1.5, ONe:1.5, dNO3:0,
       Y:0.6, Kd:0.05, SRT:15, sf:1.1,
       T:20, alt:0, H:5.0, Hd:4.8,
       alpha:0.82, beta:0.95, Cw:2.0, EA:25, kh:1.5};

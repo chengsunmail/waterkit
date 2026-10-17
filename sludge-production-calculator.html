@@ -458,8 +458,12 @@
         <input type="number" id="Y" value="0.6" step="0.05">
       </div>
       <div class="field">
-        <label for="Kd">内源呼吸率 Kd <span class="unit">d⁻¹</span></label>
+        <label for="Kd">内源呼吸率 Kd₂₀（20 ℃） <span class="unit">d⁻¹</span></label>
         <input type="number" id="Kd" value="0.05" step="0.01">
+      </div>
+      <div class="field">
+        <label for="Tw">设计水温 T（用于 Kd 温度修正） <span class="unit">℃</span></label>
+        <input type="number" id="Tw" value="20" step="1">
       </div>
       <div class="field">
         <label for="SRT">污泥龄 SRT <span class="unit">d</span></label>
@@ -633,10 +637,11 @@
 
       <h3>② 生物污泥（剩余活性污泥）</h3>
       <p><strong>方法一：产率系数法（Lawrence-McCarty 模型）</strong></p>
-      <code>ΔX_bio_VSS = Y · Q · ΔBOD / (1 + Kd · SRT) / 1000</code>
+      <code>ΔX_bio_VSS = Y · Q · ΔBOD / (1 + Kd_T · SRT) / 1000</code>
+      <code>Kd_T = Kd₂₀ · 1.04^(T − 20)</code>
       <code>ΔX_bio = ΔX_bio_VSS + f · Q · (SS₀ − SSₑ) / 1000</code>
       <p>后一项为进水中不可降解（惰性）固体在系统内的积累（GB 50014 剩余污泥量公式中的 f·Q·(SS₀−SSₑ) 项）：f 为进水 SS 中不可生物降解及惰性部分的比例，一般取 0.5-0.7，默认 0.5；SS₀ 为进入生物段的 SS（启用初沉时取初沉出水 SS = SS_o·(1−η_SS)，否则取进水 SS），SSₑ 为出水 SS。生物量项不再除以 VSS/SS：进水惰性及无机固体已由 f 项计入，再除以 VSS/SS 会重复计算（与 GB 50014 剩余污泥量公式口径一致）。</p>
-      <p>其中 ΔBOD 为进入生物段后的 BOD 去除量（若有初沉，需扣除初沉去除部分）。Y 典型值 0.4-0.8 kgVSS/kgBOD；Kd 典型值 0.04-0.08 d⁻¹。</p>
+      <p>其中 ΔBOD 为进入生物段后的 BOD 去除量（若有初沉，需扣除初沉去除部分）。Y 典型值 0.4-0.8 kgVSS/kgBOD；Kd₂₀（20 ℃ 值）典型值 0.04-0.08 d⁻¹，按设计水温 T 以 θ = 1.04 修正为 Kd_T（T 取 5–35 ℃）。</p>
 
       <p><strong>方法二：污泥负荷法（经验系数）</strong></p>
       <code>ΔX_bio = Fr · Q · ΔBOD / 1000</code>
@@ -717,6 +722,7 @@
           <li><a href="dosing-calculator.html">加药量</a></li>
           <li><a href="activated-sludge-process-calculator.html">活性污泥工艺</a></li>
           <li><a href="mbbr-design.html">MBBR 工程设计</a></li>
+          <li><a href="ifas-design.html">IFAS 工程设计</a></li>
           <li><a href="mbr-design.html">MBR 工程设计</a></li>
           <li><a href="pump-selection-calculator.html">水泵选型</a></li>
           <li><a href="blower-selection-calculator.html">鼓风机选型</a></li>
@@ -799,7 +805,7 @@
       ['w_thick', '浓缩后含水率', 'w'], ['w_dewater', '脱水后含水率', 'w'],
       ['rho', '浓缩污泥密度', 'pos'], ['rho_cake', '泥饼密度', 'pos'], ['price', '处置单价', 'nn']
     ];
-    if (methodSel === 'Y') rules.push(['Y', '污泥产率 Y', 'nn'], ['Kd', '内源呼吸率 Kd', 'nn'], ['SRT', '污泥龄 SRT', 'pos'], ['f_inert', '不可降解系数 f', 'nn']);
+    if (methodSel === 'Y') rules.push(['Y', '污泥产率 Y', 'nn'], ['Kd', '内源呼吸率 Kd₂₀', 'nn'], ['Tw', '设计水温 T', 'T'], ['SRT', '污泥龄 SRT', 'pos'], ['f_inert', '不可降解系数 f', 'nn']);
     else rules.push(['Fr', '污泥产率系数 Fr', 'nn']);
     if (usePS) rules.push(['eta_SS', '初沉 SS 去除率', 'nn'], ['eta_BOD', '初沉 BOD 去除率', 'nn'], ['w_ps', '初沉污泥含水率', 'w']);
     if (useChem) rules.push(['TPo', '进水 TP', 'nn'], ['TPe', '出水 TP', 'nn'], ['bioP', '生物除磷/同化量', 'nn'], ['mole_ratio', '投药比', 'nn']);
@@ -812,6 +818,7 @@
       else if (rule === 'pos' && v <= 0) msg = `请输入大于 0 的${name}`;
       else if (rule === 'nn' && v < 0) msg = `${name}不能为负值`;
       else if (rule === 'w' && (v < 0 || v >= 100)) msg = `${name}应在 0 ~ 100% 之间（不含 100%）`;
+      else if (rule === 'T' && (v < 5 || v > 35)) msg = `${name}应在 5 ~ 35 ℃ 之间`;
       if (msg) { $(id).classList.add('invalid'); errs.push(msg); }
     });
     if (errs.length) {
@@ -848,7 +855,8 @@
     const method = document.querySelector('input[name="method"]:checked').value;
     let X_bio = 0, X_inert = 0;
     if (method === 'Y') {
-      const Y = num('Y'), Kd = num('Kd'), SRT = num('SRT');
+      const Y = num('Y'), SRT = num('SRT');
+      const Kd = num('Kd') * Math.pow(1.04, num('Tw') - 20);  // Kd_T = Kd₂₀·1.04^(T−20)
       const X_VSS = Y * Q * dBOD_bio / (1 + Kd * SRT) / 1000;
       // 惰性固体：GB 50014 f·Q·(SS₀−SSₑ)/1000，SS₀ 为进入生物段的 SS
       X_inert = num('f_inert') * Q * Math.max(SS_bio_in - num('SSe'), 0) / 1000;
@@ -928,7 +936,7 @@
 
 【干污泥产量】
 初沉污泥 = ${$('r_ps').textContent} kgDS/d
-剩余生物污泥 = ${$('r_bio').textContent} kgDS/d${document.querySelector('input[name="method"]:checked').value === 'Y' ? '（含惰性固体 f=' + num('f_inert') + '）' : ''}
+剩余生物污泥 = ${$('r_bio').textContent} kgDS/d${document.querySelector('input[name="method"]:checked').value === 'Y' ? '（Y=' + num('Y') + '，Kd₂₀=' + num('Kd') + ' d⁻¹，T=' + num('Tw') + ' ℃ → Kd_T=' + (num('Kd') * Math.pow(1.04, num('Tw') - 20)).toFixed(4) + ' d⁻¹，SRT=' + num('SRT') + ' d；含惰性固体 f=' + num('f_inert') + '）' : ''}
 化学除磷污泥 = ${$('r_chem').textContent} kgDS/d${$('useChem').checked ? '（TP ' + num('TPo') + '→' + num('TPe') + ' mg/L，扣生物除磷/同化 ' + num('bioP') + ' mg/L）' : ''}
 干污泥总量 ΔX = ${$('r_total_dry').textContent} kgDS/d
 
@@ -956,7 +964,7 @@
 
   function resetDefaults() {
     const d = {Q:10000, SSo:200, SSe:10, BODo:200, BODe:10,
-      Y:0.6, Kd:0.05, SRT:15, f_inert:0.5, Fr:0.8,
+      Y:0.6, Kd:0.05, Tw:20, SRT:15, f_inert:0.5, Fr:0.8,
       eta_SS:55, eta_BOD:30, w_ps:97,
       TPo:4, TPe:0.3, bioP:1.5, mole_ratio:1.5,
       w_thick:97, w_dewater:80, rho:1.02, rho_cake:1.05, price:300};
