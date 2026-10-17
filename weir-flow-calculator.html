@@ -598,10 +598,10 @@
       </div>
 
       <!-- 上游渠宽 -->
-      <div class="field weir-rect weir-trap weir-broad">
+      <div class="field weir-rect weir-tri weir-trap weir-broad">
         <label for="B">上游渠宽 B <span class="unit">m</span></label>
         <input type="number" id="B" value="2.0" step="0.1">
-        <div class="helper">B ≥ b,B = b 时为无侧收缩</div>
+        <div class="helper">B ≥ b,B = b 时为无侧收缩;三角堰要求 B ≥ 3H
       </div>
     </div>
 
@@ -1118,9 +1118,9 @@
     const need = (id, name) => { if (!(num(id) > 0)) { $(id).classList.add('invalid'); bad.push(`请输入大于 0 的${name}`); } };
     if (mode === 'Q') need('H', '堰上水头 H'); else need('Q', '流量 Q');
     need('P', '堰高 P');
+    need('B', '上游渠宽 B');
     if (weir !== 'tri') {
       need('b', '堰宽 b');
-      need('B', '上游渠宽 B');
       if (num('b') > 0 && num('B') > 0 && num('B') < num('b')) {
         $('B').classList.add('invalid');
         bad.push('上游渠宽 B 不得小于堰宽 b（B = b 为无侧收缩）');
@@ -1162,7 +1162,7 @@
 
     // 行近流速
     const B = num('B'), P = num('P');
-    if (weir === 'rect' || weir === 'trap' || weir === 'broad') {
+    if (weir === 'rect' || weir === 'trap' || weir === 'broad' || weir === 'tri') {
       const area0 = B * (P + H_val);
       const v0 = area0 > 0 ? Q_val / area0 : 0;
       $('r_v0').textContent = v0.toFixed(3);
@@ -1211,6 +1211,14 @@
       if (th < 20 || th > 100) {
         if (ck1.className.indexOf('check-ok') >= 0) ck1.className = 'check-box check-warn';
         ck1.innerHTML += `<br>⚠ <b>顶角超出适用范围</b> · θ = ${th}° 不在 Kindsvater-Shen 拟合式适用范围 20°–100° 内,C_e、k_h 为外推值,结果仅供参考。`;
+      }
+      // 完全收缩三角堰的几何条件（ISO 1438 / 公式说明）: P ≥ 2H、上游渠宽 B ≥ 3H
+      const geo = [];
+      if (num('P') < 2 * H_val) geo.push(`P = ${num('P')} m &lt; 2H = ${(2 * H_val).toFixed(3)} m`);
+      if (num('B') < 3 * H_val) geo.push(`B = ${num('B')} m &lt; 3H = ${(3 * H_val).toFixed(3)} m`);
+      if (geo.length) {
+        if (ck1.className.indexOf('check-ok') >= 0) ck1.className = 'check-box check-warn';
+        ck1.innerHTML += `<br>⚠ <b>不满足完全收缩条件</b> · ${geo.join('; ')},行近流速影响不可忽略,${mode === 'Q' ? '按水头算出的流量偏小' : '按流量反算的水头偏高'},建议加高堰板或加宽堰槽。`;
       }
     }
 

@@ -685,7 +685,7 @@
       <p>例如 m=1.5 时,最佳 β ≈ 0.606,即 b/h ≈ 0.606。</p>
       <p><strong>圆形</strong>：充满度 h/D = 0.938 时流量最大（0.813 时流速最大）,为非满流效应;超过 0.938 后流量反而减小,满流退化为压力流。圆形断面时该栏显示充满度 h/D。</p>
       <p><strong>圆管设计充满度校核</strong>（GB 50014,污水管,仅作提示）：DN200–300 ≤ 0.55;DN350–450 ≤ 0.65;DN500–900 ≤ 0.70;≥ DN1000 ≤ 0.75。</p>
-      <p>梯形/矩形求正常水深与临界水深的二分搜索上界为 20 m,超出时页面给出提示。</p>
+      <p>梯形/矩形求正常水深与临界水深的二分搜索上界为 20 m,超出时页面给出提示;圆管临界水深上界为 0.999D,截断时同样提示。</p>
 
       <h3>⑥ 常用曼宁 n 值（GB 50014 / 水力学手册）</h3>
       <table>
@@ -915,7 +915,7 @@
   // 临界水深:α Q² B / (g A³) = 1
   function criticalDepth(Q_val) {
     let lo = 0.001, hi = (shape === 'circular') ? num('D') * 0.999 : H_UPPER;
-    if (shape !== 'circular') {
+    {   // 梯形/矩形上界 20 m;圆管上界 0.999D(接近满管时水面宽趋于 0,临界水深解截断于此)
       const gh = geom(hi);
       if (gh.A > 0 && Q_val * Q_val * gh.B / (g * Math.pow(gh.A, 3)) > 1) {
         hcOverBound = true;
@@ -1135,7 +1135,10 @@
       cb.innerHTML = `ℹ <b>满管</b> · h = D,水面宽 B = 0,弗劳德数与流态判定不适用;满管时按压力流考虑,建议改用管道水力计算器。`;
     }
     if (hcOverBound) {
-      cb.innerHTML += `<br>⚠ 临界水深超过求解上界 ${H_UPPER} m,h_c、i_c 及流态判定不可靠。`;
+      if (cb.className.indexOf('check-ok') >= 0) cb.className = 'check-box check-warn';
+      cb.innerHTML += shape === 'circular'
+        ? `<br>⚠ 临界水深已接近满管(h_c 截断于 0.999D = ${(num('D') * 0.999).toFixed(3)} m),h_c、i_c 及流态判定不可靠,建议加大管径。`
+        : `<br>⚠ 临界水深超过求解上界 ${H_UPPER} m,h_c、i_c 及流态判定不可靠。`;
     }
 
     // ============ 水力最佳断面 ============

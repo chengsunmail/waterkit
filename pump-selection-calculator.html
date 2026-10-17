@@ -531,16 +531,18 @@
       <h3>管路水头损失</h3>
       <div class="grid">
         <div class="field">
-          <label for="hf_s">吸水管沿程损失 <span class="unit">m</span></label>
+          <label for="hf_s">吸水管损失（沿程+局部） <span class="unit">m</span></label>
           <input type="number" id="hf_s" value="0.5" step="0.1">
+          <div class="helper">含进口、底阀、弯头、闸阀等吸水侧局部损失；同时用于 NPSHa</div>
         </div>
         <div class="field">
           <label for="hf_d">压水管沿程损失 <span class="unit">m</span></label>
           <input type="number" id="hf_d" value="3.0" step="0.1">
         </div>
         <div class="field">
-          <label for="hj">局部损失总和 <span class="unit">m</span></label>
+          <label for="hj">压水管局部损失 <span class="unit">m</span></label>
           <input type="number" id="hj" value="1.5" step="0.1">
+          <div class="helper">止回阀、闸阀、弯头、出口等；吸水侧局部损失填入左侧吸水管损失</div>
         </div>
         <div class="field">
           <label for="H_margin">富余扬程（安全系数） <span class="unit">%</span></label>
@@ -762,7 +764,7 @@
       <code>H = Hg + Hp + hw + H_margin</code>
       <p>Hg = z₂ − z₁（出水液面高 − 吸水液面高，m）<br>
          Hp = (P₂ − P₁)/(ρ·g) × 1000（两侧表压差 kPa 换算成液柱，m）<br>
-         hw = Σhf + Σhj（沿程损失+局部损失）<br>
+         hw = hf_s + hf_d + hj（吸水管沿程+局部、压水管沿程、压水管局部）<br>
          H_margin：富余量，一般取总扬程的 5-15%。</p>
 
       <h3>② 功率计算</h3>
@@ -775,7 +777,7 @@
 
       <h3>③ NPSH 汽蚀校核</h3>
       <code>NPSHa = (Pa + P₁ − Pv)/(ρ·g) × 1000 − Hs − hf_s  [m]</code>
-      <p>Pa 大气压（按海拔），P₁ 吸水池液面表压（开口水池为 0），Pv 饱和蒸汽压（按水温），Hs 吸水几何高度（吸上为正），hf_s 吸水管水头损失。</p>
+      <p>Pa 大气压（按海拔），P₁ 吸水池液面表压（开口水池为 0），Pv 饱和蒸汽压（按水温），Hs 吸水几何高度（吸上为正），hf_s 吸水管总水头损失（沿程 + 进口、底阀、弯头等局部损失；底阀、滤网阻力大，漏计会高估 NPSHa）。</p>
       <code>NPSHa ≥ NPSHr + 安全余量（0.5~1.0 m）</code>
       <p><strong>最大允许吸水高度</strong>：</p>
       <code>Hs_max = (Pa + P₁ − Pv)/(ρ·g)·1000 − NPSHr − hf_s − 安全余量</code>
@@ -1036,7 +1038,7 @@
     const Hg = num('z_disch') - num('z_suck');
     const P1 = num('P1'), P2 = num('P2');
     const Hp = (P2 - P1) * 1000 / (rho * g);  // kPa换算成m液柱
-    const hw = num('hf_s') + num('hf_d') + num('hj');
+    const hw = num('hf_s') + num('hf_d') + num('hj');  // 吸水管(沿程+局部) + 压水管沿程 + 压水管局部
     const H_base = Hg + Hp + hw;
     const margin = num('H_margin') / 100;
     const H = H_base * (1 + margin);
@@ -1081,7 +1083,7 @@
     const Pa = Pa_by_alt(alt);
     const Pv = Pv_by_T(T);
     const Hs = num('Hs_geom');
-    const hf_s = num('hf_s');
+    const hf_s = num('hf_s');  // 吸水管总损失（沿程 + 局部）
     const NPSHr = num('NPSHr');
     const NPSH_safe = num('NPSH_safe');
     // 计入吸水池液面表压 P1（开口水池 P1 = 0）
@@ -1211,7 +1213,7 @@
 【扬程分解】
 几何扬程 Hg = ${$('r_Hg').textContent} m
 压力扬程 Hp = ${$('r_Hp').textContent} m
-水头损失 hw = ${$('r_hw').textContent} m
+水头损失 hw = ${$('r_hw').textContent} m（吸水管 ${num('hf_s')} + 压水管沿程 ${num('hf_d')} + 压水管局部 ${num('hj')}）
 
 【功率${$('pw_title').textContent.replace('功率计算', '')}】
 有效功率 Pe = ${$('r_Pe').textContent} kW

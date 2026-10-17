@@ -509,19 +509,19 @@
       <div class="helper" id="d_J_helper">中空纤维: 12-30，平板: 16-50</div></div>
     <div class="field"><label for="d_peakFactor">峰值系数</label>
       <input type="number" id="d_peakFactor" value="1.3" step="0.1" oninput="calc()">
-      <div class="helper">应对峰值 1.3-1.8；峰值流量下通量不超过膜型上限</div></div>
+      <div class="helper">应对峰值 1.3-1.8；峰值流量下通量不超过 1.5×J(T_min)，且不超过膜型上限</div></div>
     <div class="field"><label for="d_Tmin">最低设计水温 T_min <span class="unit">°C</span></label>
       <input type="number" id="d_Tmin" value="12" step="1" oninput="calc()">
       <div class="helper">冬季校核水温，按此温度通量核算膜面积</div></div>
     <div class="field"><label for="d_runRatio">运行时间比 <span class="unit">%</span></label>
       <input type="number" id="d_runRatio" value="95" step="1" oninput="calc()">
-      <div class="helper">产水 95%, 5% 停机清洗</div></div>
+      <div class="helper">产水 95%，5% 停机（松弛/清洗）；反洗消耗的产水（HF 约 2-5%）未扣，需要时可下调</div></div>
     <div class="field"><label for="d_moduleArea">单组件膜面积 <span class="unit">m²</span></label>
       <input type="number" id="d_moduleArea" value="25" step="1" oninput="calc()">
       <div class="helper" id="d_mod_helper">三菱 25m², ZeeWeed 500D 约 31.6-40.9m²</div></div>
     <div class="field"><label for="d_TMP">设计 TMP <span class="unit">kPa</span></label>
       <input type="number" id="d_TMP" value="25" step="5" oninput="calc()">
-      <div class="helper">正常 10-35, 报警 >40</div></div>
+      <div class="helper">正常 10-35；>35-40 安排 CIP</div></div>
   </div>
 
   <div class="advanced-toggle" onclick="toggleAdv()">
@@ -543,7 +543,7 @@
       <div class="field"><label for="d_beta">β</label><input type="number" id="d_beta" value="0.95" step="0.01" oninput="calc()"></div>
       <div class="field"><label for="d_SADm">膜曝气强度 SADm <span class="unit">m³空气/m²膜·h</span></label>
         <input type="number" id="d_SADm" value="0.20" step="0.02" oninput="calc()">
-        <div class="helper">HF 0.15-0.30，FS 0.10-0.20（与 Tab 4 同口径计能耗）</div></div>
+        <div class="helper">HF 0.15-0.30；FS 持续曝气，常用 0.30-0.75，通常高于 HF（以厂家为准；与 Tab 4 同口径计能耗）</div></div>
       <div class="field"><label for="d_cleanCycle">化学清洗周期 <span class="unit">月</span></label>
         <input type="number" id="d_cleanCycle" value="4" step="1" oninput="calc()">
         <div class="helper">HF 约 3-4, FS 约 6</div></div>
@@ -587,7 +587,7 @@
         <span><span class="result-value" id="d_r_VAX">—</span><span class="result-unit">m³</span></span></div>
       <div class="result-row"><span class="result-label">好氧/膜段 V_O</span>
         <span><span class="result-value" id="d_r_VO">—</span><span class="result-unit">m³</span></span></div>
-      <div class="result-row"><span class="result-label">较传统活性污泥省池容（按 MLSS 3500 折算，理论值）</span>
+      <div class="result-row"><span class="result-label">较传统活性污泥省池容（按 MLSS 3500 折算，传统池容另 ×1.15 计二沉池，理论值）</span>
         <span><span class="result-value" id="d_r_saveV">—</span><span class="result-unit">%</span></span></div>
       <div class="result-row"><span class="result-label">硝化最小泥龄 SRT_min / SF×SRT_min</span>
         <span><span class="result-value" id="d_r_SRTmin">—</span><span class="result-unit">d</span></span></div>
@@ -613,7 +613,7 @@
         <span><span class="result-value" id="d_r_modules">—</span><span class="result-unit">个</span></span></div>
       <div class="result-row"><span class="result-label">峰值流量运行通量</span>
         <span><span class="result-value" id="d_r_Jpeak">—</span><span class="result-unit">LMH</span></span></div>
-      <div class="result-row"><span class="result-label">通量上限（按膜型）</span>
+      <div class="result-row"><span class="result-label">峰值允许通量 min(膜型上限, 1.5×J(T_min))</span>
         <span><span class="result-value" id="d_r_Jlim">—</span><span class="result-unit">LMH</span></span></div>
       <div class="result-row"><span class="result-label">温度修正系数 1.03^(T-20) / 1.03^(T_min-20)</span>
         <span><span class="result-value" id="d_r_Tfactor">—</span><span class="result-unit">×</span></span></div>
@@ -763,7 +763,7 @@
       <tr>
         <td class="td-label">能耗 (膜曝气)</td>
         <td class="td-hf">0.2-0.35 kWh/m³</td>
-        <td class="td-fs">0.15-0.28 kWh/m³ <span class="tag-good">稍低</span></td>
+        <td class="td-fs">0.3-0.6 kWh/m³ <span class="tag-warn">通常较高</span>（持续曝气）</td>
       </tr>
       <tr>
         <td class="td-label">膜组件装填密度</td>
@@ -963,7 +963,7 @@
     <div class="dt-row">
       <div class="dt-condition">⚡ <b>极低能耗</b>优先（运营成本敏感）</div>
       <div class="dt-arrow">→</div>
-      <div class="dt-result dt-fs">平板式 FS<br><small>Kubota 重力出水 · 碧水源 H-MBR 低气水比</small></div>
+      <div class="dt-result dt-hf">中空纤维 HF（脉冲/间歇曝气）<br><small>膜曝气能耗通常低于平板；平板的优势是抗污堵、免反洗，Kubota 可重力出水省产水泵</small></div>
     </div>
   </div>
 
@@ -1053,7 +1053,7 @@
     </div>
     <div class="clean-card clean-cip">
       <div class="clean-head">🔬 恢复性化学清洗 (CIP)</div>
-      <div class="clean-trigger">触发：TMP &gt;35 kPa 或定期（离线大清洗）</div>
+      <div class="clean-trigger">触发：TMP &gt;35-40 kPa 或定期（离线大清洗）</div>
       <div class="clean-params">
         <b>标准流程：碱洗 → 水洗 → 酸洗</b><br><br>
         <b>碱洗（去生物污染）</b><br>
@@ -1076,8 +1076,8 @@
     <div style="font-size:13px;font-weight:600;margin-bottom:8px;">跨膜压差 TMP 典型区间（浸没式 MBR）</div>
     <div class="tmp-bar-wrap">
       <div class="tmp-seg tmp-normal">正常运行<br>0-25 kPa</div>
-      <div class="tmp-seg tmp-op">警戒区间<br>25-40 kPa</div>
-      <div class="tmp-seg tmp-alert">需 CIP<br>&gt;40 kPa</div>
+      <div class="tmp-seg tmp-op">警戒区间<br>25-35 kPa</div>
+      <div class="tmp-seg tmp-alert">需 CIP<br>&gt;35-40 kPa</div>
     </div>
     <div class="tmp-labels">
       <span>0 kPa</span><span>10</span><span>20</span><span>30</span><span>40</span><span>50+ kPa</span>
@@ -1160,7 +1160,7 @@
     <h3>⚡ MBR 能耗分析</h3>
     <p>MBR 吨水能耗通常为 0.6-1.2 kWh/m³，高于传统活性污泥（0.3-0.5 kWh/m³）约 0.3-0.6 kWh/m³。
     主要增量来自膜曝气（控制膜污染）和产水泵（TMP 驱动产水）。合理设计可将总能耗控制在 0.8 kWh/m³ 以内。
-    <br><b>注意：</b>下方计算器只统计生化 + 膜段（生物曝气、膜曝气、产水泵、内回流、膜池回流、仪控照明），不含进水提升、格栅/预处理、厌氧/缺氧搅拌、污泥脱水处置，与上述全厂范围比较时需另加约 0.1-0.3 kWh/m³。</p>
+    <br><b>注意：</b>下方计算器只统计生化 + 膜段（生物曝气、膜曝气、产水泵、内回流、膜池回流、仪控照明），不含进水提升、格栅/预处理、厌氧/缺氧搅拌、污泥脱水处置，与上述全厂范围比较时需另加约 0.1-0.3 kWh/m³。膜吹扫空气的供氧没有抵扣生物曝气量，生物曝气能耗偏保守；膜池回流宜回好氧区，避免把高 DO 带入缺氧区。</p>
     <div class="mini-spec">
       <span>📐 依据：Metcalf&Eddy MBR 能耗章节</span>
       <span>🏭 典型范围：0.6-1.2 kWh/m³</span>
@@ -1182,7 +1182,7 @@
       <div class="helper">来自 Tab 1 主设计</div></div>
     <div class="field"><label for="e_SADm">SADm <span class="unit">m³空气/m²膜·h</span></label>
       <input type="number" id="e_SADm" value="0.20" step="0.02" oninput="calcEnergy()">
-      <div class="helper">HF: 0.15-0.30, FS: 0.10-0.20；不同步时切换膜类型会带入该膜型默认值</div></div>
+      <div class="helper">HF 0.15-0.30；FS 0.30-0.75；不同步时切换膜类型会带入该膜型默认值；生物曝气出口压力按 Tab 1 高级参数 H_d 计</div></div>
     <div class="field"><label for="e_TMP">设计 TMP <span class="unit">kPa</span></label>
       <input type="number" id="e_TMP" value="25" step="5" oninput="calcEnergy()"></div>
     <div class="field"><label for="e_pumpEff">产水泵效率 <span class="unit">%</span></label>
@@ -1657,7 +1657,7 @@ function applyMemType() {
     $('d_J_helper').textContent = '平板式 (HJ 2010): 16-50 LMH';
     $('d_mod_helper').textContent = 'Kubota SP 系列 10m²/模块, 碧水源 H-MBR 2.3/5m²';
     $('d_cleanCycle').value = 6;
-    $('d_SADm').value = 0.15;
+    $('d_SADm').value = 0.40;
   }
   calc();
 }
@@ -1670,6 +1670,7 @@ function toggleAdv() {
 
 // ============ 主设计计算 ============
 const FLUX_LIMIT = { hf: 30, fs: 50 };          // 与页面「HJ 2010-2011 范围」文字一致
+const PEAK_FLUX_RATIO = 1.5;                     // 短时峰值允许通量 = 1.5 × 冬季设计通量 J(T_min)，且不超过膜型上限
 const MEM_NAME = { hf: '中空纤维膜', fs: '平板膜' };
 const RESULT_IDS_D = ['d_r_V','d_r_HRT','d_r_VAN','d_r_VAX','d_r_VO','d_r_saveV','d_r_SRTmin','d_r_VAXreq','d_r_Am','d_r_ctrl','d_r_JT','d_r_Javg','d_r_modules','d_r_Jpeak','d_r_Jlim','d_r_Tfactor','d_r_AOR','d_r_SOR','d_r_bioAir','d_r_dX','d_r_MLSS_ratio','d_r_Pchem','d_r_PAC','d_r_PACmg','d_r_chemSl','d_r_chemShare','d_r_Ndn','d_r_Cext','d_r_eBio','d_r_eMem','d_r_ePump','d_r_eRecirc','d_r_eMemRecirc','d_r_eTotal'];
 
@@ -1732,14 +1733,15 @@ function calcSORstd(AOR, T, alpha, beta, Hd, CL, EA) {
   return den > 0 ? AOR * Cs20 / den : NaN;
 }
 // 吨水能耗（Tab 1 与 Tab 4 共用）：鼓风机绝热压缩功率 P = p1·q/(0.283·η)·[(p2/p1)^0.283 − 1]
-// 生物池出口表压取 60 kPa（≈ 9.81×5.5 m 水深 + 管路/扩散器损失），膜池取 50 kPa；回流泵 H = 2 m、η = 0.65；其他（仪控/照明）0.05
+// 生物池出口表压 = 9.81×H_d + 6 kPa（管路/扩散器损失；H_d 5.5 m 时约 60 kPa），膜池取 50 kPa；回流泵 H = 2 m、η = 0.65；其他（仪控/照明）0.05
 const E_OTHER = 0.05;
 function blowerKW(air_m3h, pOut_kPa, eff) {
   return 101.325e3 * (air_m3h / 3600) / (0.283 * eff) * (Math.pow((101.325 + pOut_kPa) / 101.325, 0.283) - 1) / 1000;
 }
 // 统计范围：生化 + 膜段（生物曝气、膜曝气、产水泵、内回流、膜池回流、仪控照明），不含进水提升、格栅、厌氧/缺氧搅拌、污泥处理
-function energyBreakdown({ Q, bioAir, Am, SADm, TMP, pumpEff, blowerEff, recirc, memRecirc }) {
-  const eBio = blowerKW(bioAir, 60, blowerEff) * 24 / Q;
+function energyBreakdown({ Q, bioAir, Am, SADm, TMP, pumpEff, blowerEff, recirc, memRecirc, Hd }) {
+  const pBio = 9.81 * (Hd > 0 ? Hd : 5.5) + 6;                  // kPa
+  const eBio = blowerKW(bioAir, pBio, blowerEff) * 24 / Q;
   const eMem = blowerKW(SADm * Am, 50, blowerEff) * 24 / Q;
   const ePump = TMP * 1000 / (pumpEff * 3.6e6);                 // kWh/m³
   const eRecirc = recirc * 1000 * 9.81 * 2 / (0.65 * 3.6e6);    // kWh/m³（好氧→缺氧内回流）
@@ -1868,10 +1870,11 @@ function calc() {
   const J_T = J20 * T_factor;        // 平均水温下允许通量
   const J_Tmin = J20 * Tmin_factor;  // 最低设计水温下允许通量
   const J_lim = FLUX_LIMIT[memType] || 30;
+  const J_pkAllow = Math.min(J_lim, PEAK_FLUX_RATIO * J_Tmin);   // 峰值允许通量
   // 总膜面积取两种工况较大值（LMH → m/d：J/1000·24），向上取整为整 m²（各 Tab 统一）：
-  //   ① 冬季低温：A_win = Q / (J(T_min)·r·24/1000)       ② 峰值流量：A_pk = PF·Q / (J_lim·r·24/1000)
+  //   ① 冬季低温：A_win = Q / (J(T_min)·r·24/1000)       ② 峰值流量：A_pk = PF·Q / (J_pk·r·24/1000)，J_pk = min(J_lim, 1.5·J(T_min))
   const A_win = Q / (J_Tmin / 1000 * runRatio * 24);
-  const A_pk = Q * peakFactor / (J_lim / 1000 * runRatio * 24);
+  const A_pk = Q * peakFactor / (J_pkAllow / 1000 * runRatio * 24);
   const A_m = Math.ceil(Math.max(A_win, A_pk) - 1e-6); // m²
   const ctrlCase = A_win >= A_pk ? `冬季低温 T_min=${Tmin}°C` : `峰值流量 ×${peakFactor}`;
   const J_avg = Q / (A_m * runRatio * 24 / 1000);   // 平均流量下运行通量
@@ -1898,7 +1901,7 @@ function calc() {
 
   // === 能耗 ===
   // 与 Tab 4 同一函数：生物曝气量 G、膜曝气 SADm×A_m 均按鼓风机绝热压缩功率计
-  const E = energyBreakdown({ Q, bioAir, Am: A_m, SADm, TMP, pumpEff: PUMP_EFF_D, blowerEff, recirc, memRecirc });
+  const E = energyBreakdown({ Q, bioAir, Am: A_m, SADm, TMP, pumpEff: PUMP_EFF_D, blowerEff, recirc, memRecirc, Hd });
   const eBio = E.eBio, eMem_val = E.eMem, ePump = E.ePump, eRecirc = E.eRecirc, eMemRecirc = E.eMemRecirc, eTotal = E.eTotal;
 
   // === 渲染结果 ===
@@ -1917,7 +1920,7 @@ function calc() {
   $('d_r_Javg').textContent = J_avg.toFixed(1);
   $('d_r_modules').textContent = modules;
   $('d_r_Jpeak').textContent = J_peak.toFixed(1);
-  $('d_r_Jlim').textContent = J_lim;
+  $('d_r_Jlim').textContent = (+J_pkAllow.toFixed(1)) + (J_pkAllow < J_lim ? '' : '（膜型上限）');
   $('d_r_Tfactor').textContent = `${T_factor.toFixed(3)} / ${Tmin_factor.toFixed(3)}`;
   $('d_r_AOR').textContent = AOR.toFixed(0);
   $('d_r_SOR').textContent = SOR.toFixed(0);
@@ -1948,7 +1951,7 @@ function calc() {
   drawFlow(bioConfig, { Q_wan, V_total, V_AN, A_m, modules });
 
   // 校核
-  const checks = checkDesign({ J_T, J20, T, Tmin, A_m, V_total, HRT_total, MLSS, SRT, SRT_O, AOR, dX, eBio, eMem_val, ePump, eRecirc, eMemRecirc, eTotal, Tmin_factor, memType, J_peak, J_lim, SF, SRT_min, SRT_req, V_AX, V_AX_req, BOD0, TN0, T_nit, N_ext, COD_ext, N_DN_max });
+  const checks = checkDesign({ J_pkAllow, J_T, J20, T, Tmin, A_m, V_total, HRT_total, MLSS, SRT, SRT_O, AOR, dX, eBio, eMem_val, ePump, eRecirc, eMemRecirc, eTotal, Tmin_factor, memType, J_peak, J_lim, SF, SRT_min, SRT_req, V_AX, V_AX_req, BOD0, TN0, T_nit, N_ext, COD_ext, N_DN_max });
   $('d_checkList').innerHTML = checks.items.map(c => `<div class="check-item check-${c.type}"><span class="ic">${c.ic}</span><span>${c.text}</span></div>`).join('');
   const scoreNum = checks.score;
   $('d_scoreNum').textContent = scoreNum;
@@ -1957,12 +1960,13 @@ function calc() {
   $('d_scoreDesc').textContent = sd;
 }
 
-function checkDesign({ J_T, J20, T, Tmin, A_m, V_total, HRT_total, MLSS, SRT, SRT_O, AOR, dX, eBio, eMem_val, ePump, eRecirc, eMemRecirc, eTotal, Tmin_factor, memType, J_peak, J_lim, SF, SRT_min, SRT_req, V_AX, V_AX_req, BOD0, TN0, T_nit, N_ext, COD_ext, N_DN_max }) {
+function checkDesign({ J_pkAllow, J_T, J20, T, Tmin, A_m, V_total, HRT_total, MLSS, SRT, SRT_O, AOR, dX, eBio, eMem_val, ePump, eRecirc, eMemRecirc, eTotal, Tmin_factor, memType, J_peak, J_lim, SF, SRT_min, SRT_req, V_AX, V_AX_req, BOD0, TN0, T_nit, N_ext, COD_ext, N_DN_max }) {
   const items = []; let score = 100;
   const memName = MEM_NAME[memType] || '中空纤维膜';
   if (J_T < 12) { items.push({type:'warn',ic:'⚠',text:`<b>通量偏低</b>: 当前 T=${T}°C 下通量 ${J_T.toFixed(1)} LMH < 12，膜面积偏大，可适当提高 J₂₀ 设计值`}); score -= 10; }
-  if (J_T > J_lim) { items.push({type:'bad',ic:'✗',text:`<b>通量超限</b>: ${J_T.toFixed(1)} LMH 超过 HJ 2010 ${memName}上限 ${J_lim} LMH，有超临界通量风险`}); score -= 20; }
-  else if (J_peak > J_lim * 1.0001) { items.push({type:'warn',ic:'⚠',text:`<b>峰值通量超限</b>: 峰值流量运行通量 ${J_peak.toFixed(1)} LMH > ${memName}上限 ${J_lim} LMH，峰值期需增加膜面积或设调节池`}); score -= 8; }
+  if (J20 > J_lim) { items.push({type:'bad',ic:'✗',text:`<b>设计通量超限</b>: J₂₀ = ${J20} LMH 超过 HJ 2010 ${memName}上限 ${J_lim} LMH，有超临界通量风险`}); score -= 20; }
+  // 膜面积已按峰值允许通量取大值，下面这条按构造不会触发，仅作防御
+  else if (J_peak > J_pkAllow * 1.0001) { items.push({type:'warn',ic:'⚠',text:`<b>峰值通量超限</b>: 峰值流量运行通量 ${J_peak.toFixed(1)} LMH > 峰值允许通量 ${J_pkAllow.toFixed(1)} LMH（min(${memName}上限 ${J_lim}, 1.5×J(T_min))），峰值期需增加膜面积或设调节池`}); score -= 8; }
   if (Tmin_factor < 0.75) { items.push({type:'warn',ic:'⚠',text:`<b>低温影响显著</b>: T_min=${Tmin}°C 下通量修正系数 ${Tmin_factor.toFixed(2)}，冬季膜面积较 20°C 增加 ${((1/Tmin_factor-1)*100).toFixed(0)}%`}); score -= 10; }
   if (MLSS < 8000) { items.push({type:'warn',ic:'⚠',text:`<b>MLSS 偏低</b>: ${MLSS} mg/L < 8000，未充分发挥 MBR 浓缩优势`}); score -= 8; }
   if (MLSS > 12000) { items.push({type:'warn',ic:'⚠',text:`<b>MLSS 偏高</b>: ${MLSS} mg/L > 12000，膜污染速率加快，需强化清洗`}); score -= 8; }
@@ -1985,7 +1989,7 @@ function checkDesign({ J_T, J20, T, Tmin, A_m, V_total, HRT_total, MLSS, SRT, SR
     items.push({type:'warn',ic:'⚠',text:`<b>生化 + 膜段能耗偏高</b>: ${eTotal.toFixed(2)} kWh/m³ > 1.2，最大项为${nm} ${val.toFixed(2)} kWh/m³（${(val / eTotal * 100).toFixed(0)}%），建议${tip}`}); score -= 8;
   }
   if (eTotal < 0.6) { items.push({type:'ok',ic:'✓',text:`<b>生化 + 膜段能耗较低</b>: ${eTotal.toFixed(2)} kWh/m³（不含提升、搅拌、污泥处理；全厂通常再加 0.1-0.3 kWh/m³）`}); }
-  if (items.length === 0 || items.every(i => i.type === 'ok' || i.type === 'info')) { items.push({type:'ok',ic:'✓',text:'<b>设计参数合理</b>: 通量、MLSS、SRT、HRT 均在 HJ 2010 推荐范围内'}); }
+  if (items.length === 0 || items.every(i => i.type === 'ok' || i.type === 'info')) { items.push({type:'ok',ic:'✓',text:'<b>设计参数合理</b>: 通量、MLSS、SRT、HRT 均在工程常规范围内'}); }
   return { items, score: Math.max(10, score) };
 }
 
@@ -2089,10 +2093,10 @@ function calcChem() {
   const ceb_citric_year = hasCEB ? Am_est * 0.002 * acidPpm / 1000 * acidFreq * days / 7 : 0;
 
   // CIP 次数/年
-  const cip_times = Math.round(12 / cipCycle);
-  // CIP 用药: 约 10kg NaOCl / 1000 m² / 次
+  const cip_times = 12 / cipCycle;   // 年均次数，不取整（周期 >12 个月时 <1 次/年）
+  // CIP 用药（每次药液约 5-10 L/m² 膜）：NaOCl 1000-2000 ppm → 约 10 kg/1000 m²；柠檬酸 3000-5000 ppm → 约 30 kg/1000 m²
   const cip_naocl_once = Am_est / 1000 * 10;
-  const cip_citric_once = Am_est / 1000 * 8;
+  const cip_citric_once = Am_est / 1000 * 30;
   const cip_naocl_year = cip_naocl_once * cip_times;
   const cip_citric_year = cip_citric_once * cip_times;
 
@@ -2102,7 +2106,7 @@ function calcChem() {
 
   if ($('c_r_naocl_ceb')) $('c_r_naocl_ceb').textContent = ceb_naocl_year.toFixed(0);
   if ($('c_r_citric_ceb')) $('c_r_citric_ceb').textContent = ceb_citric_year.toFixed(0);
-  if ($('c_r_cip_times')) $('c_r_cip_times').textContent = cip_times;
+  if ($('c_r_cip_times')) $('c_r_cip_times').textContent = +cip_times.toFixed(1);
   if ($('c_r_naocl_cip')) $('c_r_naocl_cip').textContent = cip_naocl_year.toFixed(0);
   if ($('c_r_citric_cip')) $('c_r_citric_cip').textContent = cip_citric_year.toFixed(0);
   if ($('c_r_cost')) $('c_r_cost').textContent = (cost_year / 1e4).toFixed(2);
@@ -2131,10 +2135,10 @@ function calcEnergy() {
   const memRecirc = v('e_memRecirc') / 100;
   const price = v('e_price');
 
-  // 与 Tab 1 同一函数 energyBreakdown：生物曝气（出口表压 60 kPa）、膜曝气 SADm×A_m（50 kPa）按鼓风机绝热压缩功率，
+  // 与 Tab 1 同一函数 energyBreakdown：生物曝气（出口表压 9.81×H_d + 6 kPa，H_d 取 Tab 1 高级参数）、膜曝气 SADm×A_m（50 kPa）按鼓风机绝热压缩功率，
   // 产水泵 TMP/η，内回流与膜池回流泵 ρgH·R/η（H = 2 m、η = 0.65），其他 0.05 kWh/m³
   // 统计范围仅生化 + 膜段，不含进水提升、格栅、厌氧/缺氧搅拌、污泥处理
-  const { eBio, eMem, ePump, eRecirc, eMemRecirc, eTotal } = energyBreakdown({ Q, bioAir, Am, SADm, TMP, pumpEff, blowerEff, recirc, memRecirc });
+  const { eBio, eMem, ePump, eRecirc, eMemRecirc, eTotal } = energyBreakdown({ Q, bioAir, Am, SADm, TMP, pumpEff, blowerEff, recirc, memRecirc, Hd: parseFloat($('d_Hd').value) });
   // MBR 相对传统工艺的额外能耗 = 膜系统专有项（膜曝气 + 产水泵 + 膜池回流）；
   // 不再用 eTotal − 0.4（0.4 为传统全厂电耗，而 eTotal 只含生化 + 膜段，口径不一致）
   const eExtra = eMem + ePump + eMemRecirc;
@@ -2163,9 +2167,9 @@ function calcEnergy() {
   });
 }
 
-// Tab 4 不同步时切换膜类型：带入该膜型 SADm 默认值（HF 0.20 / FS 0.15，与 Tab 1 一致）
+// Tab 4 不同步时切换膜类型：带入该膜型 SADm 默认值（HF 0.20 / FS 0.40，与 Tab 1 一致）
 function onEnergyMemType() {
-  $('e_SADm').value = $('e_memType').value === 'fs' ? 0.15 : 0.20;
+  $('e_SADm').value = $('e_memType').value === 'fs' ? 0.40 : 0.20;
   calcEnergy();
 }
 
@@ -2211,7 +2215,7 @@ function copyDesignResult() {
 硝化 SRT_min / SF×SRT_min（GB 50014-2021 式 7.6.17，按最低设计水温 T_min，SF=${$('d_SF').value}）: ${r('d_r_SRTmin')} d
 反硝化氮量 内碳源/需外加碳源: ${r('d_r_Ndn')} kg N/d  外加碳源: ${r('d_r_Cext')} kg COD/d
 总膜面积: ${r('d_r_Am')} m²（控制工况: ${r('d_r_ctrl')}）  允许通量 J(T)/J(T_min): ${r('d_r_JT')} LMH
-运行通量 平均/峰值: ${r('d_r_Javg')} / ${r('d_r_Jpeak')} LMH（上限 ${r('d_r_Jlim')}）
+运行通量 平均/峰值: ${r('d_r_Javg')} / ${r('d_r_Jpeak')} LMH（峰值允许 ${r('d_r_Jlim')}）
 膜组件数: ${r('d_r_modules')} 个
 AOR: ${r('d_r_AOR')} kg O₂/d  SOR: ${r('d_r_SOR')} kg O₂/d  生物曝气量: ${r('d_r_bioAir')} m³/h  污泥: ${r('d_r_dX')} kg DS/d（含化学污泥 ${r('d_r_chemSl')}）
 PAC（扣同化磷与生物除磷）: ${r('d_r_PAC')} kg/d（${r('d_r_PACmg')} mg/L）

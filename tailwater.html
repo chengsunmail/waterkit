@@ -366,7 +366,7 @@
         <div class="field"><label for="receiving">受纳水体类别</label><select id="receiving"></select></div>
         <div class="field"><label for="gradeOverride">执行级别</label>
           <select id="gradeOverride"><option value="auto">按受纳水体自动判定</option><option value="1">指定一级（只能比自动判定更严）</option></select></div>
-        <label class="check" id="wrapExisting"><input type="checkbox" id="existingOutlet"> 现有排放口（标准实施前已有；标准不给限值，按一级参照）</label>
+        <label class="check" id="wrapExisting"><input type="checkbox" id="existingOutlet"> 现有排放口（标准实施前已有；标准不给限值，按一级或单一限值参照）</label>
         <label class="check" id="wrapKeyArea"><input type="checkbox" id="keyArea"> <span id="lblKeyArea"></span></label>
         <label class="check" id="wrapSpecial"><input type="checkbox" id="useSpecial"> <span id="lblSpecial"></span></label>
         <label class="check" id="wrapVariant"><input type="checkbox" id="useVariant"> <span id="lblVariant"></span></label>
@@ -577,17 +577,17 @@
       <p>工具把流失负荷分到日常和排干两种工况，不再按全周期平均，否则会低估排干期浓度。估算值会与国内实测范围（TN 2.0–10.1、TP 0.18–1.63 mg/L）对照，超出时给出提示。</p>
       <h4>5.2 处理设施规模</h4>
       <div class="formula">总面积 = max(面积比要求, 设计流量 ÷ 水力负荷上限, 设计流量 × 停留时间 ÷ (边坡系数 × 加权水深), 排干沉淀 ≥8 h 所需)</div>
-      <p>四项中最大的一项为“控制项”，在规模表中以“控制”标出。由水力负荷或停留时间控制时，说明排水量决定了规模，此时错开排干、延长排干历时最有效。</p>
+      <p>四项中最大的一项为“控制项”，在规模表中以“控制”标出。由水力负荷或停留时间控制时，说明排水量决定了规模：“广东草案”口径下设计流量是周期平均日排水量，应减少日换水量或排干次数；“排干峰值”口径下，错开排干、延长排干历时最有效。</p>
       <h4>5.3 去除效果</h4>
       <div class="formula">出水 = C* + (进水 − C*) × (1 − R × f)</div>
       <p>C* 为实测出水下限（生态处理难以低于此值），R 为去除率，f 为季节系数。排干期不计生态净化池对 TN 的贡献（扣 16.3 个百分点），因为短时大流量下生态池来不及发挥作用。</p>
 
       <h3 id="g6">6. 常见场景怎么填</h3>
       <table class="tw gtable"><thead><tr><th>场景</th><th>做法</th></tr></thead><tbody>
-        <tr><td>已有实测尾水数据</td><td>⑤选“本场实测”，填日常 TN、TP、SS、COD、氨氮；有排干期数据再填排干末段 SS、TN、TP。点“填入④”保存反推的流失比例。</td></tr>
+        <tr><td>已有实测尾水数据</td><td>⑤选“本场实测”，填日常 TN、TP、SS、COD、氨氮；有排干期数据再填排干末段 SS、TN、TP。点“填入④”保存反推的流失比例（填了排干末段实测时同时保存排干份额）。</td></tr>
         <tr><td>新建项目、无实测</td><td>用估算值，但务必把 SS、COD、氨氮改为同类养殖场的典型值；参考国内实测范围判断估算是否合理。</td></tr>
         <tr><td>比较不同品种或单产</td><td>先用一个有实测的方案校准流失比例（填入④），再切回“估算”，修改品种或单产。</td></tr>
-        <tr><td>处理面积太大</td><td>依次尝试：降低同时排干面积、延长排干历时、末 20% 排水单独静置、排干期间暂停其余池塘换水、改用“广东草案”流量口径。</td></tr>
+        <tr><td>处理面积太大</td><td>先看规模表的“控制”项和设计流量口径：“广东草案”口径下减少日换水量或排干次数；“排干峰值”口径下降低同时排干面积、延长排干历时、排干期间暂停其余池塘换水；排干沉淀停留控制时，末 20% 排水单独静置或错开排干。</td></tr>
         <tr><td>排干期 SS 超标</td><td>勾选“末 20% 单独收集静置”，或在排水口设置临时沉淀区；藻类形成的 SS 无法靠沉淀去除。</td></tr>
         <tr><td>TP 超标</td><td>扩大生态净化池、增设人工湿地，或在沉淀池化学除磷；从源头上选用低磷饲料、提高饲料利用率。</td></tr>
         <tr><td>冬季 TN 超标</td><td>生态处理冬季脱氮能力只有夏季的一半左右；延长停留时间，或在冬季减少排水、尽量安排在暖季排干。</td></tr>
@@ -728,6 +728,7 @@
  *       现有排放口按一级参照; 四川附录 A 重点区域; 天津第一类未规定; 河南 Ⅲ 类说明; 福建海水特别限值;
  *       新增特殊保护水域选项与 SC/T 9101/9103 兜底。氮磷负荷按 Briggs 拆分到日常与排干 (不再周期平均);
  *       排干 SS 按 Boyd 2000 末 20% 约 1000 mg/L; 排干 0 次不评价排干工况; 设计流量默认改为广东草案口径。
+ * 2026-10-17 审计修订: 单一限值标准 (上海) 在特殊保护水域同样判禁排; 实测反推输出排干份额 (drainSharePct) 供回填。
  *
  * 纯函数, 无 DOM 依赖; 浏览器挂 window.TailwaterCore, Node 下 module.exports。
  * 所有默认参数在 DEFAULTS / SPECIES / EXCHANGE_PRESETS 中集中定义, 并标注来源。
@@ -919,8 +920,8 @@
     r.autoGrade = r.grade; r.override = null; r.overrideRejected = null;
     if (override !== '1' && override !== '2') return r;
     var want = +override;
-    if (r.single) { r.overrideRejected = '本标准只有一套限值, 指定级别无效'; return r; }
     if (r.prohibited) { r.overrideRejected = '禁止排放的水域不能通过指定级别解除'; return r; }
+    if (r.single) { r.overrideRejected = '本标准只有一套限值, 指定级别无效'; return r; }
     if (r.reference && want === 1) return r;   // 已按一级参照
     if (want > r.grade) {
       r.overrideRejected = '自动判定为一级, 不能放宽为二级; 如环评或排污许可另有规定, 以批复文件为准';
@@ -936,6 +937,18 @@
     var r = { grade: null, prohibited: false, reference: false, single: false, special: false, note: '', existingNote: null };
     if (std.gradeRule === 'SINGLE') {
       r.single = true; r.grade = 0;
+      // 特殊保护水域 (法律法规禁止设排污口) 与是否分级无关, 单一限值标准同样不得设口
+      if (receiving === 'SPECIAL') {
+        var noteS = '法律法规禁止设置排污口的特殊保护水域 (饮用水水源保护区、自然保护区核心区等) 不得设置养殖尾水排放口';
+        if (o.existingOutlet) {
+          r.reference = true;
+          r.note = noteS + '。现有排放口: 标准未给限值, "按国家和地方相关法律法规执行"; 本工具按本标准单一限值作参照, 以当地生态环境部门认定为准';
+        } else {
+          r.prohibited = true; r.grade = null;
+          r.note = noteS + '; 如为标准实施前已有的排放口, 请勾选"现有排放口"';
+        }
+        return r;
+      }
       r.note = '本标准只有一套限值, 不分级';
       return r;
     }
@@ -1343,6 +1356,7 @@
     var bad = function (v) { return typeof v !== 'number' || !isFinite(v); };
     CHECKS.forEach(function (c) {
       var v = p[c[0]];
+      if (c[0] === 'drainDays' && p.drainsPerCycle === 0 && (bad(v) || v === 0)) return;   // 不排干时不校核排干历时
       if (bad(v)) { errors.push(c[1] + ': 未填写或不是数字'); return; }
       var lowOk = c[4] ? v >= c[2] : v > c[2];
       if (!lowOk || v > c[3]) errors.push(c[1] + ' = ' + v + ': 应' + (c[4] ? '≥ ' : '> ') + c[2] + (c[3] < Infinity ? ' 且 ≤ ' + c[3] : ''));
@@ -1419,12 +1433,13 @@
     /* 由实测浓度反推随排水流失比例 (% 饲料投入), v0.5 分两部分:
      *   日常换水部分 = (实测日常 − 本底) × 周期换水量          — 由日常实测唯一确定
      *   排干部分     = (排干末段 − 本底) × 周期排干水量       — 有排干实测才确定; 否则假设与日常相同
-     *   全周期比例 = 两部分之和; drainBasis 标明排干部分的依据 */
+     *   全周期比例 = 两部分之和; drainBasis 标明排干部分的依据
+     *   drainSharePct = 排干部分 ÷ 全周期 (%), 供"填入④"同时回填排干份额, 使估算能复现实测 */
     var part = function (c, bg, V, feed) { return Math.max(0, c - bg) * V / 1000 / feed * 100; };
     var implied = function (cR, cD, cEst, bg, feed) {
-      if (!(measured && isFinite(cR) && feed > 0 && mb.Vtot > 0)) return { routine: NaN, drain: NaN, total: NaN };
+      if (!(measured && isFinite(cR) && feed > 0 && mb.Vtot > 0)) return { routine: NaN, drain: NaN, total: NaN, drainSharePct: NaN };
       var r = part(cR, bg, mb.Vexch, feed), d = part(given(cD) ? cD : cEst, bg, mb.Vdrain, feed);
-      return { routine: r, drain: d, total: r + d };
+      return { routine: r, drain: d, total: r + d, drainSharePct: (r + d) > 0 ? d / (r + d) * 100 : NaN };
     };
     var iN = implied(p.measTN, p.drainTN, drainEst.TN, p.bgTN, mb.N.feed);
     var iP = implied(p.measTP, p.drainTP, drainEst.TP, p.bgTP, mb.P.feed);
@@ -1488,7 +1503,7 @@
 });
 </script>
 <script id="tailwater-tests">
-/* 单元测试 (44 项), 算例全部手算; 在页面地址后加 ?selftest=1 运行。
+/* 单元测试 (47 项), 算例全部手算; 在页面地址后加 ?selftest=1 运行。
  * 与计算核心放在同一文件中, 保证测试的就是页面实际使用的代码。 */
 function TailwaterTests(T, test, assert) {
   'use strict';
@@ -1794,6 +1809,19 @@ test('禁止排放时无限值', () => {
   assert.equal(r.limits, null);
   assert.equal(r.summary, null);
 });
+test('单一限值标准 (上海) 在特殊保护水域同样禁排; 现有排放口按单一限值参照', () => {
+  const sh = T.findStandard('SH');
+  const ban = T.resolveGrade(sh, 'SPECIAL', 'auto');
+  assert.equal(ban.prohibited, true); assert.equal(T.limitsFor(sh, ban), null);
+  const ovr = T.resolveGrade(sh, 'SPECIAL', '1');
+  assert.equal(ovr.prohibited, true); assert.ok(/禁止排放/.test(ovr.overrideRejected || ''));
+  const r = T.run(baseInput({ standardId: 'SH', receiving: 'SPECIAL', dailyPct: 1 }));
+  assert.equal(r.limits, null); assert.equal(r.summary, null); assert.equal(r.summaryDrain, null);
+  const ex = T.resolveGrade(sh, 'SPECIAL', 'auto', { existingOutlet: true });
+  assert.equal(ex.prohibited, false); assert.equal(ex.reference, true); assert.equal(ex.single, true);
+  assert.equal(T.limitsFor(sh, ex).TN, 5.0);
+  assert.equal(T.resolveGrade(sh, 'III', 'auto').prohibited, false);       // 非特殊保护水域不受影响
+});
 
 test('v0.3 实测原水: 日常取实测值, 排干按模型比例推算', () => {
   // dailyPct 1: Vexch 288000, Vdrain 120000; 模型 排干/日常 浓度比 = (0.35/120000)/(0.65/288000)
@@ -1819,6 +1847,18 @@ test('v0.3 由实测反推流失比例 (无换水: 排干实测即全部)', () =
   near(r.raw.impliedFP, 0.35 * 120000 / 1000 / 2400 * 100);   // 1.75%
   const back = T.massBalance(baseInput({ fN: r.raw.impliedFN, fP: r.raw.impliedFP, bgTN: 0.5, bgTP: 0.05 }));
   near(back.drain.TN, 4.0); near(back.drain.TP, 0.4);
+});
+test('审计修订: 填了排干末段实测时, 回填流失比例 + 排干份额可复现实测', () => {
+  // dailyPct 3: Vexch 864000, Vdrain 120000; 日常 3.13/0.37, 排干末段 TN 6、TP 0.5
+  const inp = { dailyPct: 3, rawMode: 'measured', measTN: 3.13, measTP: 0.37, drainTN: 6, drainTP: 0.5 };
+  const r = T.run(baseInput(inp));
+  const shN = r.raw.impliedN.drainSharePct;
+  near(shN, 6 * 120000 / (3.13 * 864000 + 6 * 120000) * 100);    // 约 21%
+  const back = T.massBalance(baseInput({ dailyPct: 3, fN: r.raw.impliedFN, fP: r.raw.impliedFP, drainLoadPct: shN }));
+  near(back.routine.TN, 3.13); near(back.drain.TN, 6);             // 氮按回填份额精确复现
+  // 未填排干实测时, 反推份额即当前设定份额 (回填不改变排干份额)
+  const s = T.run(baseInput({ dailyPct: 3, rawMode: 'measured', measTN: 3.13, measTP: 0.37 }));
+  near(s.raw.impliedN.drainSharePct, 35); near(s.raw.impliedP.drainSharePct, 35);
 });
 test('v0.3 估算值与国内实测范围对照', () => {
   assert.equal(T.fieldCheck('TN', 14.336), 'above');
@@ -1915,6 +1955,11 @@ test('v0.4 排干末段 TN、TP: 实测优先, 未填时按模型推算并标记
   near(b.complianceDrain.find(c => c.key === 'TN').cin, 6);
   near(b.complianceDrain.find(c => c.key === 'TP').cin, 1.2);
   near(b.compliance.find(c => c.key === 'TN').cin, 3);          // 日常工况不受影响
+});
+test('每周期排干 0 次时排干历时可填 0 或留空', () => {
+  assert.equal(T.run(baseInput({ drainsPerCycle: 0, dailyPct: 3, drainDays: 0 })).invalid, false);
+  assert.equal(T.run(baseInput({ drainsPerCycle: 0, dailyPct: 3, drainDays: NaN })).invalid, false);
+  assert.equal(T.run(baseInput({ drainsPerCycle: 1, dailyPct: 3, drainDays: 0 })).invalid, true);
 });
 test('v0.5 每周期排干 0 次: 无排干流量, 不做排干沉淀校核', () => {
   const p = baseInput({ drainsPerCycle: 0, dailyPct: 3 });
@@ -2093,6 +2138,7 @@ test('标准库与参数表完整性', () => {
     var o = {};
     NUM_FIELDS.concat(SEL_FIELDS).forEach(function (id) { o[id] = $(id).value; });
     CHK_FIELDS.forEach(function (id) { o[id] = $(id).checked; });
+    o.ratioTouched = ratioTouched;
     try { localStorage.setItem(STORE_KEY, JSON.stringify(o)); } catch (e) {}
   }
   function load() {
@@ -2104,6 +2150,7 @@ test('标准库与参数表完整性', () => {
     SEL_FIELDS.forEach(function (id) { if (o[id] != null) $(id).value = o[id]; });
     NUM_FIELDS.forEach(function (id) { if (o[id] != null) $(id).value = o[id]; });
     CHK_FIELDS.forEach(function (id) { $(id).checked = !!o[id]; });
+    ratioTouched = !!o.ratioTouched;   // 刷新后仍保留"面积比已手改"状态, 切换省份不覆盖
     if (!$('standardId').value) fillStandards();
     if (!$('season').value) $('season').value = 'mild';
     if (!$('rawMode').value) $('rawMode').value = 'estimate';
@@ -2193,14 +2240,17 @@ test('标准库与参数表完整性', () => {
     var sp = species();
     var season = T.SEASONS[inp.season] || T.SEASONS.mild;
     var h = [];
+    // 限值中有不考核的 TN/TP (如 SC/T 9103 考核无机氮、活性磷酸盐, 本工具未建模): "达标"只代表已评价的指标
+    var unjudged = L ? ['TN', 'TP'].filter(function (k) { return L[k] == null; }) : [];
 
     /* KPI */
     $('wrapExisting').hidden = !(gi.prohibited || gi.reference);
-    var gradeTxt = gi.prohibited ? '不得新建排放口' : (gi.single ? '单一限值' : (gi.reference ? '参照一级' : (gi.grade === 1 ? '一级' : '二级')) + (gi.special ? '（特别限值）' : ''));
+    var gradeTxt = gi.prohibited ? '不得新建排放口' : (gi.single ? '单一限值' + (gi.reference ? '（参照）' : '') : (gi.reference ? '参照一级' : (gi.grade === 1 ? '一级' : '二级')) + (gi.special ? '（特别限值）' : ''));
     var verdict = function (s) {
       if (!s) return gi.prohibited ? { cls: 'bad', txt: '不可排放', sub: gi.note } : { cls: '', txt: '无此工况', sub: '' };
       if (s.verdict === 'fail') return { cls: 'bad', txt: '超标 ' + s.fail + ' 项' + (s.edge ? '，临界 ' + s.edge + ' 项' : ''), sub: '模型预测：按去除率中值即超标' };
-      if (s.verdict === 'risk') return { cls: 'warn', txt: '有风险：' + s.edge + ' 项临界', sub: '模型预测：中值达标，去除率偏低时超标' };
+      if (s.verdict === 'risk') return { cls: 'warn', txt: '有风险：' + s.edge + ' 项临界', sub: '模型预测：中值达标，去除率偏低时超标' + (unjudged.length ? '；' + unjudged.join('、') + ' 未评价' : '') };
+      if (unjudged.length) return { cls: '', txt: '已评价项达标', sub: '仅评价 ' + s.n + ' 项；' + unjudged.join('、') + ' 不考核，标准另考核的指标本工具未建模，需另行核对' };
       return { cls: 'good', txt: '达标', sub: '模型预测：去除率取不利端仍达标，非实测保证' };
     };
     var v1 = verdict(r.summary), v2 = verdict(r.summaryDrain);
@@ -2219,6 +2269,7 @@ test('标准库与参数表完整性', () => {
     if (gi.prohibited) h.push('<div class="note bad"><span class="label">不得新建排放口</span>：' + esc(gi.note) + '。新建项目应改为循环利用、零排放，或另选受纳水体。</div>');
     else if (gi.reference) h.push('<div class="note warn"><span class="label">参照执行</span>：' + esc(gi.note) + '。</div>');
     else h.push('<div class="note"><span class="label">级别依据</span>：' + esc(gi.note) + '。</div>');
+    if (unjudged.length && !gi.prohibited) h.push('<div class="note warn"><span class="label">部分指标未评价</span>：' + esc(std.code) + ' 不考核 ' + unjudged.join('、') + '，而考核其他氮磷指标（' + esc(std.sourceNote || '见标准原文') + '）。页面的“达标”只针对已评价的 SS、COD 等项，不代表全部达标。</div>');
     if (r.scenario.phase2) h.push('<div class="note warn"><span class="label">未来情景</span>：TN 按 ' + esc(r.scenario.phase2From) + ' 起生效的第二阶段限值核算，不是现行限值；核算现行达标请取消勾选。</div>');
     if (gi.overrideRejected) h.push('<div class="note warn"><span class="label">指定级别未采用</span>：' + esc(gi.overrideRejected) + '。</div>');
     r.validation.warnings.forEach(function (m) { h.push('<div class="note warn"><span class="label">参数提示</span>：' + esc(m) + '</div>'); });
@@ -2267,6 +2318,7 @@ test('标准库与参数表完整性', () => {
 
     /* 氮磷收支 */
     var pct = function (x, tot) { return tot > 0 ? fmt(x / tot * 100, 1) + '%' : '—'; };
+    var shareN = raw.impliedN ? raw.impliedN.drainSharePct : NaN, shareP = raw.impliedP ? raw.impliedP.drainSharePct : NaN;
     h.push('<h2>氮磷收支（每养殖周期）</h2><div class="table-wrapper"><table class="tw"><thead><tr><th>去向</th><th>氮 kg</th><th>占饲料氮</th><th>磷 kg</th><th>占饲料磷</th></tr></thead><tbody>');
     h.push('<tr class="total"><td>饲料投入</td><td>' + fmt(mb.N.feed, 0) + '</td><td>100%</td><td>' + fmt(mb.P.feed, 0) + '</td><td>100%</td></tr>');
     h.push('<tr><td>产品留存</td><td>' + fmt(mb.N.harv, 0) + '</td><td>' + pct(mb.N.harv, mb.N.feed) + '</td><td>' + fmt(mb.P.harv, 0) + '</td><td>' + pct(mb.P.harv, mb.P.feed) + '</td></tr>');
@@ -2284,10 +2336,11 @@ test('标准库与参数表完整性', () => {
       (meas ? '<tr><td>实测日常尾水 TN / TP</td><td>' + fmt(raw.TN, 1) + ' / ' + fmt(raw.TP, 2) + ' mg/L（估算 ÷ 实测 = ' + fmt(mb.routine.TN / raw.TN, 1) + ' / ' + fmt(mb.routine.TP / raw.TP, 1) + '）</td></tr>' +
         '<tr><td>反推流失比例 · 日常换水部分</td><td>氮 ' + fmt(raw.impliedN.routine, 1) + '%、磷 ' + fmt(raw.impliedP.routine, 1) + '%（由日常实测确定）</td></tr>' +
         '<tr><td>反推流失比例 · 排干部分</td><td>氮 ' + fmt(raw.impliedN.drain, 1) + '%（' + (raw.drainBasis.TN === 'measured' ? '排干实测' : '<b>按模型比例推算</b>') + '）、磷 ' + fmt(raw.impliedP.drain, 1) + '%（' + (raw.drainBasis.TP === 'measured' ? '排干实测' : '<b>按模型比例推算</b>') + '）；排干水量占周期 ' + fmt(raw.drainShare * 100, 0) + '%</td></tr>' +
+        '<tr><td>反推排干份额</td><td>氮 ' + fmt(shareN, 1) + '%、磷 ' + fmt(shareP, 1) + '%（当前设定 ' + fmt(inp.drainLoadPct, 1) + '%；④只有一个排干份额，填了排干末段 TN 时“填入④”按氮取值）</td></tr>' +
         '<tr class="total"><td>反推流失比例 · 全周期</td><td>氮 ' + fmt(raw.impliedFN, 1) + '%、磷 ' + fmt(raw.impliedFP, 1) + '%（当前设定 ' + fmt(inp.fN, 1) + '% / ' + fmt(inp.fP, 1) + '%） <button class="btn" type="button" id="btnCalib" style="padding:2px 8px;font-size:12px">填入④</button></td></tr>' : '') +
       '</tbody></table></div>');
     h.push('<div class="src">尾水浓度 = 水源本底 + 随排水流失量 ÷ 周期排水量。随排水流失比例强烈依赖换水与排干方式，默认值来自文献中的两类池塘。' +
-      (meas ? '反推比例 = Σ(各工况实测 − 本底) × 该工况水量 ÷ 饲料氮（磷）投入，日常换水与排干分开计。' + ((raw.drainBasis.TN === 'assumed' || raw.drainBasis.TP === 'assumed') && raw.drainShare > 0 ? '<b>未填排干末段实测时，排干部分按模型比例推算，全周期比例不能由日常实测唯一确定</b>（排干水量占 ' + fmt(raw.drainShare * 100, 0) + '%，占比越大不确定性越大）。' : '') + '填入④后切回"估算"，可用本场校准过的比例推算换品种、改单产或改换水方式后的尾水浓度。' : '有实测数据时，在⑤选"本场实测"即可反推本场的流失比例。') + '</div>');
+      (meas ? '反推比例 = Σ(各工况实测 − 本底) × 该工况水量 ÷ 饲料氮（磷）投入，日常换水与排干分开计。' + ((raw.drainBasis.TN === 'scaled' || raw.drainBasis.TP === 'scaled') && raw.drainShare > 0 ? '<b>未填排干末段实测时，排干部分按模型比例推算，全周期比例不能由日常实测唯一确定</b>（排干水量占 ' + fmt(raw.drainShare * 100, 0) + '%，占比越大不确定性越大）。' : '') + '“填入④”回填流失比例；填了排干末段 TN 实测时同时回填排干份额（按氮），切回“估算”后可复现本场实测（磷的排干份额与氮不同时，磷只复现全周期总量），并用于推算换品种、改单产或改换水方式后的尾水浓度。' : '有实测数据时，在⑤选“本场实测”即可反推本场的流失比例。') + '</div>');
 
     /* 三池两坝 */
     var govTxt = { ratio: '面积比', hl: '水力负荷', hrt: '停留时间', settle: '排干沉淀停留' };
@@ -2315,11 +2368,24 @@ test('标准库与参数表完整性', () => {
     h.push('<tr><td>过滤坝</td><td>' + tr.dam.n + ' 道</td><td class="l">每道长 ≥' + tr.dam.L + ' m、宽 ≥' + tr.dam.W + ' m，过流断面 ≥' + tr.dam.section + ' m²，过流水深 ≥1.5 m（养殖面积' + (tr.bigFarm ? '大于' : '不超过') + ' 300 亩）</td></tr>');
     h.push('<tr><td>内循环泵</td><td>' + fmt(tr.recirc, 0) + ' m³/d</td><td class="l">≈ ' + fmt(tr.recirc / 24, 1) + ' m³/h，设计日流量的 ' + fmt(inp.recircPct, 0) + '%（区间 70–150%）；循环水量不计入上面的负荷校核</td></tr>');
     h.push('</tbody></table></div>');
-    if (tr.governing !== 'ratio' && tr.ratioControls) h.push('<div class="note warn"><span class="label">面积由' + govTxt[tr.governing] + '控制</span>：排干或换水流量决定了处理设施规模。错开各池塘的排干时间、延长排干历时，或先把排干水暂存在空闲池塘再匀速处理，可以把面积降到面积比要求的 ' + fmt(tr.aRatio, 0) + ' m²。</div>');
+    if (tr.governing !== 'ratio' && tr.ratioControls) {
+      if (tr.designFlowMode === 'draft' && tr.governing !== 'settle') {
+        // 广东草案口径: 设计流量 = 周期排水量 ÷ 周期天数 × b, 与排干时间安排无关
+        var qMax = Math.min(tr.aRatio * inp.maxHL, inp.minHRT > 0 ? tr.aRatio * tr.slopeA * tr.hW / inp.minHRT : Infinity);
+        var qEx = mb.Vexch / inp.days * inp.flowFactor, qDr = mb.Vdrain / inp.days * inp.flowFactor;
+        h.push('<div class="note"><span class="label">面积由' + govTxt[tr.governing] + '控制</span>：按广东草案口径，设计流量 ' + fmt(tr.qDesign, 0) + ' m³/d 是周期平均日排水量（日常换水约 ' + fmt(qEx, 0) + '、排干约 ' + fmt(qDr, 0) + ' m³/d，已乘变化系数），与排干时间安排无关。' +
+          '要把面积降到面积比要求的 ' + fmt(tr.aRatio, 0) + ' m²，设计流量需不超过约 ' + fmt(qMax, 0) + ' m³/d：应减少日换水量' + (qDr > 0 ? '或每周期排干次数' : '') + '；错开排干、延长排干历时只影响排干沉淀停留校核，不改变这一口径下的面积。</div>');
+      } else {
+        h.push('<div class="note warn"><span class="label">面积由' + govTxt[tr.governing] + '控制</span>：排干或换水流量决定了处理设施规模。错开各池塘的排干时间、延长排干历时，或先把排干水暂存在空闲池塘再匀速处理，可以把面积降到面积比要求的 ' + fmt(tr.aRatio, 0) + ' m²。</div>');
+      }
+    }
 
     $('results').innerHTML = h.join('');
     if ($('btnCalib')) $('btnCalib').addEventListener('click', function () {
-      $('fN').value = +raw.impliedFN.toFixed(1); $('fP').value = +raw.impliedFP.toFixed(1); render();
+      $('fN').value = +raw.impliedFN.toFixed(1); $('fP').value = +raw.impliedFP.toFixed(1);
+      // 同时回填排干份额 (按氮): 有排干末段实测时实测隐含的份额常与设定不同, 只回填流失比例无法复现实测
+      if (r.hasRoutine && r.hasDrain && inp.drainTN > 0 && isFinite(shareN)) $('drainLoadPct').value = +shareN.toFixed(1);
+      render();
     });
     $('metaLine').textContent = std.region + ' · ' + (sp.name || '') + ' · ' + fmt(inp.areaMu, 0) + ' 亩 · v' + T.VERSION;
     renderSources(std);
@@ -2347,7 +2413,7 @@ test('标准库与参数表完整性', () => {
   var GRADE_RULES = {
     JX: 'GB 3838 Ⅰ–Ⅲ 类执行一级 (4.2), Ⅳ–Ⅴ 类二级; 未明确功能水域执行二级, 县级以上政府可要求一级; 法律法规禁止设排污口的特殊保护水域 (饮用水源保护区等) 不得设置养殖尾水排放口。',
     GD_FW: 'GB 3838 Ⅰ、Ⅱ、Ⅲ 类为重点保护水域, 执行一级 (5.2.1.1), 正文无禁排条款; Ⅳ、Ⅴ 类及未明确功能水体执行二级; 水功能重要、容量小或未达标地区, 地级以上市政府可要求执行一级 (5.2.2.3)。',
-    SH: '单一限值, 不分级; 另考核氨氮 2.0 mg/L。',
+    SH: '单一限值, 不分级; 另考核氨氮 2.0 mg/L。法律法规禁止设排污口的特殊保护水域不得设置排放口。',
     JS_FW: '按受纳水体功能划分, 渔业水域等执行一级; 太湖一、二级保护区执行特别限值。具体以当地生态环境部门认定为准。',
     FJ_FW: 'Ⅰ–Ⅱ 类为特殊保护水域, 不得新建排放口, 现有排放口按法规执行; Ⅲ 类一级, Ⅳ–Ⅴ 类二级; 政府划定区域/时段执行表 3 特别排放限值。另规定基准排水量 (鳗鲡工厂化、高位池对虾 ≤3.0 新建 / 6.0 现有 m³/kg), 超出时实测浓度按比例折算 (4.4.2)。',
     HI_FW: 'Ⅰ、Ⅱ 类及 Ⅲ 类中的保护区、游泳区为特殊保护水域, 不得新建排放口, 已有排放口按法规执行; Ⅲ 类一级, Ⅳ–Ⅴ 类二级。',
@@ -2366,7 +2432,7 @@ test('标准库与参数表完整性', () => {
     TJ: '4.1 只规定第二类海域执行一级、第三、四类二级, 未规定第一类海域。尾水定义明确包含清塘水; 池塘每次排放前自测。循环水工厂化另有表 2 (SS 60/80、COD 15/20、TN 8.0/10.0、TP 0.8/1.0、氨氮 2.0/2.0), 本工具不涉及。',
     HE: '第一、二类海域一级, 第三、四类二级 (据官方解读)。不含网箱、筏式、吊笼、滩涂底播。',
     SCT9101: '推荐性行业标准, 无省标地区参照。一般按 Ⅲ 类一级、Ⅳ–Ⅴ 类二级引用; 另考核 BOD₅、铜、锌、硫化物、总余氯等, 本工具未建模。',
-    SCT9103: '推荐性行业标准, 无省标地区参照。考核无机氮、活性磷酸盐而非 TN、TP, 另有 BOD₅ 等, 本工具未建模。'
+    SCT9103: '推荐性行业标准, 无省标地区参照。考核无机氮、活性磷酸盐而非 TN、TP, 另有 BOD₅ 等, 本工具未建模; 设计计算页只评价 SS、COD。'
   };
   function limCell(v, d) { return v == null ? '—' : fmt(v, d); }
   function stdGradeRows(st) {
