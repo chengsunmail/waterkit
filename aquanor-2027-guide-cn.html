@@ -375,7 +375,7 @@
 <section id="s1">
   <div class="head"><span>01</span><h2>住宿:全程最紧的一环</h2></div>
   <p>特隆赫姆是个二十来万人的城市,全城酒店房间约 4,500–5,000 间。展会三天有约 2.5 万人次到访,其中不少是当天往返的本地人,但外地和外国观众加上参展商,仍然远远超出酒店的承载能力。</p>
-  <p><b>要准确理解这件事:不是全城没房,而是"市中心的酒店房"会被抽干。</b>主办方公布的数据能说明问题——2025 年展会期间,光 Airbnb 就有 2,400 多套房源,其中约三分之一始终没租出去。也就是说<b>住宿一直有,只是不在你默认会去找的地方</b>。</p>
+  <p><b>要准确理解这件事:不是全城没房,而是"市中心的酒店房"会被抽干。</b>主办方公布的数据能说明问题——2025 年展会期间,可供出租的民宿类房源约 2,500 套,出租率 66%,约三分之一始终没租出去。也就是说<b>住宿一直有,只是不在你默认会去找的地方</b>。</p>
 
   <table>
     <caption>2025 年 AQUA NOR 期间实际价格参考</caption>
@@ -479,9 +479,9 @@
 <section id="s4">
   <div class="head"><span>04</span><h2>展前:注册与约见</h2></div>
 
-  <h3>在线注册</h3>
-  <p>观众注册在 <b>aquanor.no</b> 的 Visitors 板块,临近展期开放。务必<b>提前在线注册</b>拿到电子入场凭证,现场排队登记会浪费掉宝贵的第一个上午。</p>
-  <div class="note warn"><b>注意时间差。</b>你在 5–6 月递交签证时,展会注册很可能还没开放,所以<b>别指望用注册确认当签证材料</b>。签证阶段应该用参展商的邀请函、主办方出具的参展证明,或者你与目标企业的会面确认邮件。注册开放后再补做即可,两件事互不依赖。</div>
+  <h3>门票与在线注册</h3>
+  <p>观众入场通常需要<b>购票</b>:2023 届观众票 <b>NOK 750</b>,当年 2 月 21 日在 <b>aquanor.no</b> 开售;2027 届的票价和开售时间需以官网公布为准。另一条路是<b>参展商邀请</b>:往届每家参展商有 50 个免费邀请名额,可以请你计划约见的企业给你发一个。无论买票还是用邀请,都务必<b>提前在线登记</b>拿到电子入场凭证,现场排队登记会浪费掉宝贵的第一个上午。</p>
+  <div class="note warn"><b>门票不等于签证材料。</b>往届门票在展前半年左右就开售,但门票或电子入场凭证只证明你能进场,<b>别指望用它当签证材料</b>。签证阶段应该用参展商的邀请函、主办方出具的参展证明,或者你与目标企业的会面确认邮件。两件事互不依赖。</div>
 
   <h3>约见:这才是真正决定成败的部分</h3>
   <p>700 家参展商、三天、每天七小时,总共大约 21 小时。指望到了现场边逛边聊,结果就是走马观花回来一堆宣传册。<b>真正有价值的会面必须提前约。</b></p>
@@ -629,6 +629,11 @@
         <p class="hint">挪威正常出差水平,自己做饭可降到 500。</p>
       </div>
       <div class="field">
+        <label>每人门票（NOK）</label>
+        <input id="ticket" type="number" value="750" min="0" step="50" inputmode="numeric">
+        <p class="hint">2023 届观众票 NOK 750,2027 届以官网为准;拿到参展商免费邀请填 0。</p>
+      </div>
+      <div class="field">
         <label>汇率：1 NOK = ? 人民币</label>
         <input id="fx" type="number" value="0.70" min="0" step="0.01" inputmode="decimal">
         <p class="hint">粗略默认值,出行前请核对当天汇率。</p>
@@ -664,7 +669,7 @@
     <label><em>T-2月</em><input type="checkbox"><span>英文一页纸公司简介已做好（PDF）</span></label>
     <label><em>T-2月</em><input type="checkbox"><span>机票已订，第一个申根转机点留足 2.5–3 小时</span></label>
     <label><em>T-1月</em><input type="checkbox"><span>Visa／Mastercard 已开通境外交易并告知发卡行行程</span></label>
-    <label><em>T-2周</em><input type="checkbox"><span>展会在线注册完成，电子入场凭证已保存</span></label>
+    <label><em>T-2周</em><input type="checkbox"><span>门票已购或参展商邀请已登记，电子入场凭证已保存</span></label>
     <label><em>T-2周</em><input type="checkbox"><span>约见已二次确认（对方休假回来后）</span></label>
     <label><em>T-2周</em><input type="checkbox"><span>国际漫游或欧洲 eSIM 已确认覆盖挪威</span></label>
     <label><em>T-1周</em><input type="checkbox"><span>防风防水外套、转换插头已准备（挪威 230V／50Hz，C 型与 F 型圆脚插座）</span></label>
@@ -674,7 +679,7 @@
 
 <footer class="guide-notes">
   <p><b>信息来源与时效。</b>展期、场馆、参展规模来自 Aqua Nor 官方网站；住宿容量与 2025 年实际均价来自主办方公布的住宿常见问题；签证与 EES 相关信息来自挪威签证申请中心与欧盟出入境系统公告。以上均为 2026 年 9 月的情况。</p>
-  <p><b>需要自行核实的部分。</b>2027 年官方酒店预订的具体开放日期、观众注册开放时间、参展商名录、以及峡湾参观的报名方式，都会在临近展期才公布，请以 aquanor.no 的通知为准。签证受理时长和预约名额随季节波动很大，务必留出余量。</p>
+  <p><b>需要自行核实的部分。</b>2027 年官方酒店预订的具体开放日期、观众票价与开售时间、参展商名录、以及峡湾参观的报名方式，都会在临近展期才公布，请以 aquanor.no 的通知为准。签证受理时长和预约名额随季节波动很大，务必留出余量。</p>
   <p><b>紧急情况。</b>中国在挪威设有驻奥斯陆大使馆，特隆赫姆没有中国领事机构。护照遗失、突发疾病或事故时，先联系保险公司的救援热线，同时通过大使馆网站查询领事保护值班电话。出发前把保单号、救援电话和大使馆联系方式存成离线截图。</p>
   <p><b>本指南不涉及。</b>参展商相关事项（展位预订、展品运输清关、搭建）不在范围内；如果你是去设展位而不是看展，需要另一份完全不同的准备清单。</p>
   <p>内容独立，不接受展商或供应商赞助，不做产品推荐。</p>
@@ -769,7 +774,7 @@
     : (days===0 ? '今天 <small>开展</small>' : '已结束');
 
   /* ---- 费用估算 ---- */
-  var ids=['pax','nights','lodge','air','daily','fx'],el={};
+  var ids=['pax','nights','lodge','air','daily','ticket','fx'],el={};
   ids.forEach(function(i){el[i]=document.getElementById(i);});
   var oNok=document.getElementById('o-nok'),oCny=document.getElementById('o-cny'),
       oPer=document.getElementById('o-per'),oNote=document.getElementById('o-note');
@@ -779,9 +784,9 @@
   function calc(){
     var pax=parseFloat(el.pax.value),nights=parseFloat(el.nights.value),
         air=parseFloat(el.air.value),daily=parseFloat(el.daily.value),
-        fx=parseFloat(el.fx.value),hotel=el.lodge.value==='hotel';
+        ticket=parseFloat(el.ticket.value),fx=parseFloat(el.fx.value),hotel=el.lodge.value==='hotel';
 
-    if(![pax,nights,air,daily,fx].every(function(v){return isFinite(v)&&v>=0;})||pax<1){
+    if(![pax,nights,air,daily,ticket,fx].every(function(v){return isFinite(v)&&v>=0;})||pax<1){
       oNok.textContent=oCny.textContent=oPer.textContent='—';
       oNote.textContent='请填写完整的人数、天数和费用。';
       return;
@@ -791,7 +796,7 @@
         rate=hotel?3700:1600,
         lodging=units*rate*nights,
         living=pax*daily*nights,
-        nok=lodging+living,
+        nok=lodging+living+pax*ticket,
         cny=nok*fx+air*pax;
 
     oNok.textContent='NOK '+fmt(nok);

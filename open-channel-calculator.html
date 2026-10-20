@@ -790,6 +790,10 @@
   const $ = id => document.getElementById(id);
   const num = id => parseFloat($(id).value) || 0;
   const g = 9.81;
+  // 流量 Q 按 4 位有效数字显示;回写输入框时另存精确值,输入框未被改动时切换模式沿用精确值,避免舍入漂移
+  const fmtQ = v => Math.abs(v) >= 1e4 ? v.toFixed(0) : v.toPrecision(4);
+  let qExact = null;
+  const numQ = () => (qExact && $('Q').value === qExact.s) ? qExact.v : num('Q');
 
   let shape = 'trapezoidal';  // trapezoidal / rectangular / circular
   let mode = 'Q';              // Q / h / i
@@ -1065,13 +1069,14 @@
     if (mode === 'Q') {
       h_val = num('h'); i_val = num('i');
       Q_val = Q_from_hi(h_val, i_val);
-      $('Q').value = Q_val.toFixed(3);
+      $('Q').value = fmtQ(Q_val);
+      qExact = {s: $('Q').value, v: Q_val};
     } else if (mode === 'h') {
-      Q_val = num('Q'); i_val = num('i');
+      Q_val = numQ(); i_val = num('i');
       h_val = h_from_Qi(Q_val, i_val);
-      $('h').value = h_val.toFixed(3);
+      $('h').value = +h_val.toPrecision(4);
     } else { // mode === 'i'
-      Q_val = num('Q'); h_val = num('h');
+      Q_val = numQ(); h_val = num('h');
       i_val = i_from_Qh(Q_val, h_val);
       $('i').value = i_val.toFixed(6);
     }
@@ -1080,7 +1085,7 @@
     const v_val = gm.A > 0 ? Q_val / gm.A : 0;
     const C_val = gm.R > 0 && n > 0 ? Math.pow(gm.R, 1/6) / n : 0;
 
-    $('r_Q').textContent = Q_val.toFixed(3);
+    $('r_Q').textContent = fmtQ(Q_val);
     $('r_v').textContent = v_val.toFixed(3);
     $('r_h').textContent = h_val.toFixed(3);
     $('r_A').textContent = gm.A.toFixed(3);
@@ -1110,11 +1115,11 @@
     if (hOverBound) {
       st.textContent = Fr < 0.95 ? '缓流' : (Fr > 1.05 ? '急流' : '临界流');
       cb.className = 'check-box check-bad';
-      cb.innerHTML = `✗ <b>超出计算范围</b> · 目标 Q = ${Q_val.toFixed(3)} m³/s 超过水深 ${H_UPPER} m 时的过流能力（求解上界）,结果按 h = ${H_UPPER} m 给出,不可用。请检查流量、底宽或底坡。`;
+      cb.innerHTML = `✗ <b>超出计算范围</b> · 目标 Q = ${fmtQ(Q_val)} m³/s 超过水深 ${H_UPPER} m 时的过流能力（求解上界）,结果按 h = ${H_UPPER} m 给出,不可用。请检查流量、底宽或底坡。`;
     } else if (circOverCapacity !== null) {
       st.textContent = Fr < 0.95 ? '缓流' : (Fr > 1.05 ? '急流' : '临界流');
       cb.className = 'check-box check-bad';
-      cb.innerHTML = `✗ <b>超过无压过流能力</b> · 目标 Q = ${Q_val.toFixed(3)} m³/s &gt; Q_max = ${circOverCapacity.toFixed(3)} m³/s（h/D = 0.938 时）,需加大管径或坡度。结果按 h = 0.938D 给出。`;
+      cb.innerHTML = `✗ <b>超过无压过流能力</b> · 目标 Q = ${fmtQ(Q_val)} m³/s &gt; Q_max = ${fmtQ(circOverCapacity)} m³/s（h/D = 0.938 时）,需加大管径或坡度。结果按 h = 0.938D 给出。`;
     } else if (Fr < 0.95) {
       st.textContent = '缓流';
       cb.className = 'check-box check-ok';

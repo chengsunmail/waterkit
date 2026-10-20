@@ -664,6 +664,7 @@
           <span class="result-label" id="lbl_Pm_std">推荐电机功率（标准规格）</span>
           <span><span class="result-value" id="r_Pm_std">—</span><span class="result-unit">kW</span></span>
         </div>
+        <div class="check-box" id="checkHead" style="display:none;"></div>
       </div>
 
       <div class="result-group">
@@ -1020,6 +1021,7 @@
     $('r_suggest_desc').textContent = '输入有误，请先修正标红的参数。';
     $('parallel_group').style.display = 'none';
     $('vfd_group').style.display = 'none';
+    $('checkHead').style.display = 'none';
     const cbox = $('checkNPSH');
     cbox.className = 'check-box check-bad';
     cbox.textContent = '✗ ' + errs.join('；');
@@ -1201,6 +1203,21 @@
     }
     const type_names = {centrifugal:'ISG立式离心泵', submerged:'WQ潜污泵', axial:'ZLB轴流泵', screw:'螺杆泵', dosing:'计量泵'};
     $('r_suggest_desc').textContent = `建议选型：${type_names[$('pump_type').value] || '离心泵'}。查厂家样本使工作点落在高效区（Q_opt 的 80-110%）。`;
+
+    // 系统扬程 ≤ 0（吸水液面高于出水液面等）：不输出负功率/负电费，不推荐电机
+    const hbox = $('checkHead');
+    if (H <= 0) {
+      ['r_Pe','r_Psh','r_Pm','r_Pm_std','r_ekwh','r_day_kwh','r_year_cost','r_unit_cost','r_Pm_each']
+        .forEach(id => { $(id).textContent = '—'; });
+      $('vfd_group').style.display = 'none';
+      hbox.style.display = 'block';
+      hbox.className = 'check-box check-warn';
+      hbox.textContent = '⚠ 系统扬程 ≤ 0：可自流，无需提升（或请核对液面标高）';
+      $('r_suggest').textContent = `Q = ${Q.toFixed(0)} m³/h, H = ${H.toFixed(1)} m, N = —`;
+      $('r_suggest_desc').textContent = '系统扬程 ≤ 0，可自流，无需配泵；请核对吸水/出水液面标高及压力输入。';
+    } else {
+      hbox.style.display = 'none';
+    }
   }
 
   function copyResults() {
@@ -1224,7 +1241,7 @@ ${$('lbl_Pm').textContent} = ${$('r_Pm').textContent} kW → 标准 ${$('r_Pm_st
 吨水能耗 = ${$('r_ekwh').textContent} kWh/m³
 日耗电 = ${$('r_day_kwh').textContent} kWh/d
 年电费 = ${$('r_year_cost').textContent} 万元
-吨水电耗成本 = ${$('r_unit_cost').textContent} 元/m³
+吨水电耗成本 = ${$('r_unit_cost').textContent} 元/m³${$('checkHead').style.display !== 'none' ? '\n' + $('checkHead').textContent : ''}
 
 【NPSH 校核】
 Pa = ${$('r_Pa').textContent} kPa, Pv = ${$('r_Pv').textContent} kPa

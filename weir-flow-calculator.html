@@ -693,7 +693,7 @@
       <p><strong>有侧收缩（B &gt; b）</strong>：采用 Francis 修正 或 ε 系数,工具中取：</p>
       <code>ε = 1 − 0.1·n·H/b（n 为收缩边数,两侧收缩取 n = 2;工具中 ε 下限取 0.5）</code>
       <p>注:ε 下限 0.5 为经验取值,以规范 / 手册原文为准。</p>
-      <p>上游渠宽 B 不得小于堰宽 b;B = b 时 ε = 1。</p>
+      <p>上游渠宽 B 不得小于堰宽 b;B = b 时 ε = 1。单侧间距 (B − b)/2 &lt; H 时收缩不充分,工具将收缩量按 (B − b)/(2H) 线性折减（B → b 时 ε 连续趋于 1）并提示,结果仅供参考。</p>
 
       <h3>② 三角堰（V形堰,Kindsvater-Shen 公式）</h3>
       <code>Q = (8/15) · C_e · tan(θ/2) · √(2g) · (H + k_h)^(5/2)   （SI 单位）</code>
@@ -710,7 +710,7 @@
 
       <h3>④ 宽顶堰</h3>
       <code>Q = m · ε · b · √(2g) · H₀^(3/2)</code>
-      <p>其中 H₀ = H + v₀²/(2g) 为包含行近流速头的全水头（v₀ = Q/[B·(P+H)],迭代中 Q 同样计入 m·ε,迭代 10 次求解,使 H₀ 与最终 Q 自洽）,ε 为侧收缩系数（ε = 1 − 0.2·H/b,下限 0.7,仅 B &gt; b 时计入;经验值,以规范 / 手册原文为准）,m 为流量系数,按"堰顶进口形式"取值:</p>
+      <p>其中 H₀ = H + v₀²/(2g) 为包含行近流速头的全水头（v₀ = Q/[B·(P+H)],迭代中 Q 同样计入 m·ε,迭代 10 次求解,使 H₀ 与最终 Q 自洽）,ε 为侧收缩系数（ε = 1 − 0.2·H/b,下限 0.7,仅 B &gt; b 时计入,单侧间距 (B − b)/2 &lt; H 时收缩量按 (B − b)/(2H) 线性折减;经验值,以规范 / 手册原文为准）,m 为流量系数,按"堰顶进口形式"取值:</p>
       <p><strong>别列津斯基（Березинский）经验公式</strong>（P 为上游堰高,m 随 P/H 连续变化）:</p>
       <code>直角进口:m = 0.32 + 0.01 · (3 − P/H) / (0.46 + 0.75 · P/H)   （P/H ≥ 3 时 m = 0.32）</code>
       <code>圆角进口（r/H ≥ 0.2）:m = 0.36 + 0.01 · (3 − P/H) / (1.2 + 1.5 · P/H)   （P/H ≥ 3 时 m = 0.36）</code>
@@ -725,9 +725,12 @@
       <code>σ = [1 − (h_s/H)ⁿ]^0.385    (矩形、梯形堰 n = 1.5;三角堰 n = 2.5)</code>
       <p><strong>宽顶堰</strong>按 h_s/H₀ 查表（线性插值）,h_s/H₀ ≤ 0.8 时 σ = 1（表值为经验值,以规范 / 手册原文为准）:</p>
       <table>
-        <tr><th>h_s/H₀</th><td>0.80</td><td>0.85</td><td>0.90</td><td>0.95</td><td>1.00</td></tr>
-        <tr><th>σ</th><td>1.00</td><td>0.96</td><td>0.84</td><td>0.65</td><td>0</td></tr>
+        <tr><th>h_s/H₀</th><td>0.80</td><td>0.82</td><td>0.84</td><td>0.86</td><td>0.88</td><td>0.90</td></tr>
+        <tr><th>σ</th><td>1.00</td><td>0.99</td><td>0.97</td><td>0.95</td><td>0.90</td><td>0.84</td></tr>
+        <tr><th>h_s/H₀</th><td>0.92</td><td>0.94</td><td>0.95</td><td>0.96</td><td>0.97</td><td>0.98</td></tr>
+        <tr><th>σ</th><td>0.78</td><td>0.70</td><td>0.65</td><td>0.59</td><td>0.50</td><td>0.40</td></tr>
       </table>
+      <p>工具按 0.01 间隔表值插值（吴持恭《水力学》宽顶堰淹没系数表，据华南农业大学水力学课件转引）;h_s/H₀ &gt; 0.98 时按 0.98→1.0 线性降至 0。</p>
 
       <h3>⑥ 常见应用场景</h3>
       <table>
@@ -826,6 +829,10 @@
   const $ = id => document.getElementById(id);
   const num = id => parseFloat($(id).value) || 0;
   const g = 9.81;
+  // 流量 Q 按 4 位有效数字显示;回写输入框时另存精确值,输入框未被改动时切换模式沿用精确值,避免舍入漂移
+  const fmtQ = v => Math.abs(v) >= 1e4 ? v.toFixed(0) : v.toPrecision(4);
+  let qExact = null;
+  const numQ = () => (qExact && $('Q').value === qExact.s) ? qExact.v : num('Q');
 
   let weir = 'rect';
   let mode = 'Q';
@@ -892,7 +899,9 @@
       let eps = 1;
       if (B > b) {
         // Francis 经验:ε = 1 - 0.1·n·H/b, n=2(两侧收缩)
-        eps = Math.max(0.5, 1 - 0.1 * 2 * H / Math.max(b, 0.001));
+        // 单侧间距 (B−b)/2 < H 时收缩不充分,收缩量按 (B−b)/(2H) 线性过渡,使 B→b 时 ε 连续趋于 1
+        const kc = Math.min(1, (B - b) / (2 * H));
+        eps = Math.max(0.5, 1 - 0.1 * 2 * H / Math.max(b, 0.001) * kc);
       }
       const Q = m0 * eps * b * Math.sqrt(2*g) * Math.pow(H, 1.5);
       const v = b > 0 ? Q / (b * H) : 0;
@@ -931,7 +940,8 @@
 
       // 侧收缩（经验式,先算出供行近流速迭代使用）
       let eps = 1;
-      if (B > b) eps = Math.max(0.7, 1 - 0.1 * 2 * H / Math.max(b, 0.001));
+      // 单侧间距 (B−b)/2 < H 时收缩量按 (B−b)/(2H) 线性过渡,使 B→b 时 ε 连续趋于 1（同矩形堰）
+      if (B > b) eps = Math.max(0.7, 1 - 0.1 * 2 * H / Math.max(b, 0.001) * Math.min(1, (B - b) / (2 * H)));
 
       // 考虑行近流速:迭代求解（Q_tmp 计入 ε,使 H₀ 与最终 Q 自洽）
       let H0 = H, v0 = 0;
@@ -962,7 +972,8 @@
       const ratio = hs / Math.max(H0, 1e-9);
       if (ratio <= 0.8) return 1;
       if (ratio >= 1) return 0;
-      const tbl = [[0.80,1.00],[0.85,0.96],[0.90,0.84],[0.95,0.65],[1.0,0]];
+      const tbl = [[0.80,1.00],[0.81,0.995],[0.82,0.99],[0.83,0.98],[0.84,0.97],[0.85,0.96],[0.86,0.95],[0.87,0.93],[0.88,0.90],[0.89,0.87],
+                   [0.90,0.84],[0.91,0.82],[0.92,0.78],[0.93,0.74],[0.94,0.70],[0.95,0.65],[0.96,0.59],[0.97,0.50],[0.98,0.40],[1.0,0]];
       for (let i = 0; i < tbl.length - 1; i++) {
         const [x1,y1] = tbl[i], [x2,y2] = tbl[i+1];
         if (ratio >= x1 && ratio <= x2) return y1 + (y2 - y1) * (ratio - x1) / (x2 - x1);
@@ -1138,7 +1149,8 @@
       const r = Q_free(H_val);
       const sigma = submergenceSigma(H_val, weir, r.H0);
       Q_val = r.Q * sigma;
-      $('Q').value = Q_val.toFixed(4);
+      $('Q').value = fmtQ(Q_val);
+      qExact = {s: $('Q').value, v: Q_val};
 
       // 显示详细
       $('r_m0').textContent = r.m0.toFixed(3);
@@ -1147,9 +1159,9 @@
       $('r_v').textContent = r.v.toFixed(3);
       $('r_v0').textContent = (r.v0 || 0).toFixed(3);
     } else {
-      Q_val = num('Q');
+      Q_val = numQ();
       H_val = H_from_Q(Q_val);
-      $('H').value = H_val.toFixed(4);
+      $('H').value = +H_val.toPrecision(4);
 
       const r = Q_free(H_val);
       const sigma = submergenceSigma(H_val, weir, r.H0);
@@ -1168,7 +1180,7 @@
       $('r_v0').textContent = v0.toFixed(3);
     }
 
-    $('r_Q').textContent = Q_val.toFixed(4);
+    $('r_Q').textContent = fmtQ(Q_val);
     $('r_Q_h').textContent = (Q_val * 3600).toFixed(1);
     $('r_H').textContent = H_val.toFixed(4);
     $('r_H2').textContent = (H_val * 1000).toFixed(0);
@@ -1198,11 +1210,37 @@
     }
 
     // 矩形薄壁堰 Rehbock 适用范围 H/P ≤ 1（ISO 1438）
+    if (weir === 'broad') {
+      const side = (num('B') - num('b')) / 2;
+      if (side > 0 && side < H_val) {
+        if (ck1.className.indexOf('check-ok') >= 0) ck1.className = 'check-box check-warn';
+        ck1.innerHTML += `<br>⚠ <b>侧收缩不充分</b> · 单侧间距 (B − b)/2 = ${+side.toFixed(4)} m &lt; H = ${H_val.toFixed(3)} m,ε 按间距线性折减,经验式适用性下降,结果仅供参考。`;
+      }
+    }
     if (weir === 'rect') {
       const hp = H_val / num('P');
       if (hp > 1) {
         if (ck1.className.indexOf('check-ok') >= 0) ck1.className = 'check-box check-warn';
         ck1.innerHTML += `<br>⚠ <b>超出 Rehbock 适用范围</b> · H/P = ${hp.toFixed(2)} &gt; 1（ISO 1438 要求 H/P ≤ 1）,流量系数 m₀ 外推,结果仅供参考,建议加高堰板 P。`;
+      }
+      if (num('P') < 0.1) {
+        if (ck1.className.indexOf('check-ok') >= 0) ck1.className = 'check-box check-warn';
+        ck1.innerHTML += `<br>⚠ <b>堰高偏低</b> · P = ${num('P')} m &lt; 0.1 m,不满足 Rehbock 公式适用条件,行近流速影响增大,结果仅供参考,建议加高堰板。`;
+      }
+      const side = (num('B') - num('b')) / 2;
+      if (side > 0 && side < H_val) {
+        if (ck1.className.indexOf('check-ok') >= 0) ck1.className = 'check-box check-warn';
+        ck1.innerHTML += `<br>⚠ <b>侧收缩不充分</b> · 单侧间距 (B − b)/2 = ${+side.toFixed(4)} m &lt; H = ${H_val.toFixed(3)} m,ε 按间距线性折减,经验式适用性下降,结果仅供参考。`;
+      }
+    }
+    // Cipoletti 堰适用条件:b ≥ 3H、P ≥ 2H
+    if (weir === 'trap') {
+      const geo = [];
+      if (num('b') < 3 * H_val) geo.push(`b = ${num('b')} m &lt; 3H = ${(3 * H_val).toFixed(3)} m`);
+      if (num('P') < 2 * H_val) geo.push(`P = ${num('P')} m &lt; 2H = ${(2 * H_val).toFixed(3)} m`);
+      if (geo.length) {
+        if (ck1.className.indexOf('check-ok') >= 0) ck1.className = 'check-box check-warn';
+        ck1.innerHTML += `<br>⚠ <b>不满足 Cipoletti 适用条件</b> · ${geo.join('; ')},公式系数 1.86 的适用性下降,结果仅供参考,建议加宽堰口或加高堰板。`;
       }
     }
     // 三角堰 Kindsvater-Shen 拟合式适用 20°–100°

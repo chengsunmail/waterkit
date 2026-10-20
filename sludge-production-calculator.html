@@ -526,6 +526,7 @@
           <option value="PFS">PFS（聚合硫酸铁）</option>
           <option value="lime">石灰</option>
         </select>
+        <span style="font-size:11.5px;color:#9ca3af;margin-top:4px;">石灰按所填 Ca/P 估算；实际投量由碱度决定（Ca/P 常远高于 1.5），石灰污泥可达数十 kgDS/kgP</span>
       </div>
       <div class="field">
         <label for="mole_ratio">投药比（摩尔比 Me/P） <span class="unit">—</span></label>
@@ -656,9 +657,9 @@
       <code>ΔX_chem = ΔP · [122/31 + (Al/P − 1) · 78/31]</code>
       <p><strong>FeCl₃/PFS 铁系</strong>：</p>
       <code>ΔX_chem = ΔP · [150.8/31 + (Fe/P − 1) · 106.87/31]</code>
-      <p><strong>石灰</strong>（经验值，不随摩尔比线性；石灰除磷主要受 pH 控制）：</p>
+      <p><strong>石灰</strong>（经验式，按所填 Ca/P 摩尔比计算；石灰除磷主要受 pH 控制）：</p>
       <code>ΔX_chem ≈ ΔP · (5.0 + 2.0 · Ca/P)</code>
-      <p>Me/P 摩尔比一般取 1.2-2.0。摩尔比 1.5 时：PAC ≈ 5.19 kgDS/kgP，铁盐 ≈ 6.59 kgDS/kgP。石灰除磷同时生成 CaCO₃ 等副产物，与水的碱度强相关，此处仅为经验估算。</p>
+      <p>Me/P 摩尔比一般取 1.2-2.0。摩尔比 1.5 时：PAC ≈ 5.19 kgDS/kgP，铁盐 ≈ 6.59 kgDS/kgP。石灰式仅按所填 Ca/P 计算，未单独计入与碱度反应生成的 CaCO₃；实际石灰投量由碱度（需将 pH 提至约 10 以上）决定，Ca/P 常远高于 1.5，石灰污泥可达数十 kgDS/kgP，宜按碱度核算投量后输入相应 Ca/P。</p>
 
       <h3>④ 污泥浓缩脱水换算</h3>
       <code>M_wet = M_dry / (1 − w)  [kg/d]</code>
@@ -885,7 +886,7 @@
         // Fe基：1 mol P → 1 mol FePO4 + (mole−1) mol Fe(OH)3
         factor = 150.8/31 + (mole - 1) * 106.87/31; // mole=1.5 时 ≈ 6.59 kg/kgP
       } else {
-        factor = 5.0 + 2.0 * mole;   // 石灰系：经验值（含 CaCO3 等副产物，与碱度相关）
+        factor = 5.0 + 2.0 * mole;   // 石灰系：经验式，仅按所填 Ca/P 计算，未单独计入碱度生成的 CaCO3（实际投量由碱度决定，可达数十 kgDS/kgP）
       }
       X_chem = dP * factor;
     }

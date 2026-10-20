@@ -438,14 +438,16 @@
       <input type="number" id="d_Q" value="3" step="0.5" oninput="calc()"></div>
     <div class="field"><label for="d_T">T <span class="unit">°C</span></label>
       <input type="number" id="d_T" value="20" step="1" oninput="calc()"></div>
-    <div class="field"><label for="d_COD0">COD₀ <span class="unit">mg/L</span></label>
-      <input type="number" id="d_COD0" value="400" step="10" oninput="calc()"></div>
+    <div class="field"><label for="d_COD0">COD₀ <span class="unit">mg/L（仅校核）</span></label>
+      <input type="number" id="d_COD0" value="400" step="10" oninput="calc()">
+      <div class="helper">仅校核 COD₀ > COD出；需氧量与污泥按 BOD₅ 计</div></div>
     <div class="field"><label for="d_BOD0">BOD₅₀ <span class="unit">mg/L</span></label>
       <input type="number" id="d_BOD0" value="180" step="5" oninput="calc()"></div>
     <div class="field"><label for="d_TN0">TN₀ <span class="unit">mg/L</span></label>
       <input type="number" id="d_TN0" value="45" step="1" oninput="calc()"></div>
-    <div class="field"><label for="d_NH40">NH₄-N₀ <span class="unit">mg/L</span></label>
-      <input type="number" id="d_NH40" value="35" step="1" oninput="calc()"></div>
+    <div class="field"><label for="d_NH40">NH₄-N₀ <span class="unit">mg/L（仅记录）</span></label>
+      <input type="number" id="d_NH40" value="35" step="1" oninput="calc()">
+      <div class="helper">不参与计算：硝化量按 TN₀ 代 TKN₀ 计</div></div>
     <div class="field"><label for="d_TP0">TP₀ <span class="unit">mg/L</span></label>
       <input type="number" id="d_TP0" value="5" step="0.2" oninput="calc()"></div>
     <div class="field"><label for="d_SS0">SS₀ <span class="unit">mg/L</span></label>
@@ -464,7 +466,7 @@
         <option value="custom">自定义</option>
       </select>
       <div class="helper" id="d_std_helper">准 IV 类为地方标准，限值按项目所在地调整</div></div>
-    <div class="field"><label for="d_CODe">COD出</label><input type="number" id="d_CODe" value="30" step="1" oninput="calc()"></div>
+    <div class="field"><label for="d_CODe">COD出 <span class="unit">（仅校核）</span></label><input type="number" id="d_CODe" value="30" step="1" oninput="calc()"></div>
     <div class="field"><label for="d_BODe">BOD出</label><input type="number" id="d_BODe" value="6" step="0.5" oninput="calc()"></div>
     <div class="field"><label for="d_NH4e">NH₄-N出</label><input type="number" id="d_NH4e" value="1.5" step="0.5" oninput="calc()"></div>
     <div class="field"><label for="d_TNe">TN出</label><input type="number" id="d_TNe" value="10" step="0.5" oninput="calc()"></div>
@@ -550,6 +552,9 @@
       <div class="field"><label for="d_Hd">扩散器淹没深度 H_d <span class="unit">m</span></label>
         <input type="number" id="d_Hd" value="5.5" step="0.1" oninput="calc()">
         <div class="helper">用于 SOR 水深修正（Pb = Pa + 9.81·H_d）与曝气效率</div></div>
+      <div class="field"><label for="d_alt">海拔 <span class="unit">m</span></label>
+        <input type="number" id="d_alt" value="0" step="100" oninput="calc()">
+        <div class="helper">SOR 的 P_b 与鼓风机进气压力按当地大气压计；默认 0 = 海平面</div></div>
       <div class="field"><label for="d_OTE">氧传质效率 OTE <span class="unit">%/m</span></label>
         <input type="number" id="d_OTE" value="6" step="0.5" oninput="calc()">
         <div class="helper">微孔 5-7 %/m；EE = OTE × H_d</div></div>
@@ -597,6 +602,8 @@
         <span><span class="result-value" id="d_r_Ndn">—</span><span class="result-unit">kg N/d</span></span></div>
       <div class="result-row" id="row_Cext2"><span class="result-label">外加碳源（以 COD 计，按甲醇 Y≈0.3 kgVSS/kgCOD，经验值）</span>
         <span><span class="result-value" id="d_r_Cext">—</span><span class="result-unit">kg COD/d</span></span></div>
+      <div class="result-row"><span class="result-label">预计出水 TN（单好氧 = TN₀ − 同化氮；AO/AAO 回流限值 = NH₄-N出 + 有机氮 1.5 + 硝化氮/(1+R_内+R_膜)，不超过目标时取目标）</span>
+        <span><span class="result-value" id="d_r_TNpred">—</span><span class="result-unit">mg/L</span></span></div>
     </div>
 
     <div class="result-group">
@@ -623,9 +630,9 @@
       <div class="result-group-title"><span class="ic">💨</span> 需氧量 & 污泥</div>
       <div class="result-row highlight-row"><span class="result-label"><b>AOR</b></span>
         <span><span class="result-value big" id="d_r_AOR">—</span><span class="result-unit">kg O₂/d</span></span></div>
-      <div class="result-row"><span class="result-label">SOR (标准氧)</span>
+      <div class="result-row"><span class="result-label">SOR (标准氧；P_b 按海拔大气压 + 水深)</span>
         <span><span class="result-value" id="d_r_SOR">—</span><span class="result-unit">kg O₂/d</span></span></div>
-      <div class="result-row"><span class="result-label">生物曝气量 G = SOR/(24·0.28·EE)，EE = OTE×H_d</span>
+      <div class="result-row"><span class="result-label">生物曝气量 G = SOR/(24·0.28·EE)，EE = OTE×H_d（0.28 kg O₂/m³ 为 20 °C 标态）</span>
         <span><span class="result-value" id="d_r_bioAir">—</span><span class="result-unit">m³/h（20°C 标态）</span></span></div>
       <div class="result-row highlight-row"><span class="result-label"><b>剩余污泥 ΔX</b>（生物污泥 + 进水惰性 SS + 化学污泥 + 外加碳源产泥）</span>
         <span><span class="result-value big" id="d_r_dX">—</span><span class="result-unit">kg DS/d</span></span></div>
@@ -1182,7 +1189,7 @@
       <div class="helper">来自 Tab 1 主设计</div></div>
     <div class="field"><label for="e_SADm">SADm <span class="unit">m³空气/m²膜·h</span></label>
       <input type="number" id="e_SADm" value="0.20" step="0.02" oninput="calcEnergy()">
-      <div class="helper">HF 0.15-0.30；FS 0.30-0.75；不同步时切换膜类型会带入该膜型默认值；生物曝气出口压力按 Tab 1 高级参数 H_d 计</div></div>
+      <div class="helper">HF 0.15-0.30；FS 0.30-0.75；不同步时切换膜类型会带入该膜型默认值；生物曝气出口压力按 Tab 1 高级参数 H_d 计；鼓风机进气压力按 Tab 1 海拔计</div></div>
     <div class="field"><label for="e_TMP">设计 TMP <span class="unit">kPa</span></label>
       <input type="number" id="e_TMP" value="25" step="5" oninput="calcEnergy()"></div>
     <div class="field"><label for="e_pumpEff">产水泵效率 <span class="unit">%</span></label>
@@ -1672,7 +1679,7 @@ function toggleAdv() {
 const FLUX_LIMIT = { hf: 30, fs: 50 };          // 与页面「HJ 2010-2011 范围」文字一致
 const PEAK_FLUX_RATIO = 1.5;                     // 短时峰值允许通量 = 1.5 × 冬季设计通量 J(T_min)，且不超过膜型上限
 const MEM_NAME = { hf: '中空纤维膜', fs: '平板膜' };
-const RESULT_IDS_D = ['d_r_V','d_r_HRT','d_r_VAN','d_r_VAX','d_r_VO','d_r_saveV','d_r_SRTmin','d_r_VAXreq','d_r_Am','d_r_ctrl','d_r_JT','d_r_Javg','d_r_modules','d_r_Jpeak','d_r_Jlim','d_r_Tfactor','d_r_AOR','d_r_SOR','d_r_bioAir','d_r_dX','d_r_MLSS_ratio','d_r_Pchem','d_r_PAC','d_r_PACmg','d_r_chemSl','d_r_chemShare','d_r_Ndn','d_r_Cext','d_r_eBio','d_r_eMem','d_r_ePump','d_r_eRecirc','d_r_eMemRecirc','d_r_eTotal'];
+const RESULT_IDS_D = ['d_r_V','d_r_HRT','d_r_VAN','d_r_VAX','d_r_VO','d_r_saveV','d_r_SRTmin','d_r_VAXreq','d_r_Am','d_r_ctrl','d_r_JT','d_r_Javg','d_r_modules','d_r_Jpeak','d_r_Jlim','d_r_Tfactor','d_r_AOR','d_r_SOR','d_r_bioAir','d_r_dX','d_r_MLSS_ratio','d_r_Pchem','d_r_PAC','d_r_PACmg','d_r_chemSl','d_r_chemShare','d_r_Ndn','d_r_Cext','d_r_TNpred','d_r_eBio','d_r_eMem','d_r_ePump','d_r_eRecirc','d_r_eMemRecirc','d_r_eTotal'];
 
 // 输入校验：rules = [[id, 名称, 'pos'(>0) | 'nn'(≥0) | 'num'(任意数)]]，返回错误提示数组
 function validateInputs(rules) {
@@ -1723,26 +1730,32 @@ function syncTabs() {
 // 饱和溶解氧 Cs(T)（清水、101.325 kPa），Cs(20) 与 Cs(T) 用同一式
 function csSat(T) { return 14.652 - 0.41022 * T + 0.007991 * T * T - 0.000077774 * T * T * T; }
 // 标准需氧量 SOR = AOR·Cs(20) / [α·(β·Csm(T) − C)·1.024^(T−20)]
-// 鼓风曝气水深修正：Csm = Cs(T)·(Pb/2.026×10⁵ + Ot/42)，Pb = 101325 + 9810·H_d (Pa)，Ot = 21(1−E_A)/[79+21(1−E_A)]×100
-function calcSORstd(AOR, T, alpha, beta, Hd, CL, EA) {
+// 鼓风曝气水深修正：Csm = Cs(T)·(Pb/2.026×10⁵ + Ot/42)，Pb = Pa + 9810·H_d (Pa)，Ot = 21(1−E_A)/[79+21(1−E_A)]×100
+// 海拔修正（标准大气式，与曝气量/鼓风机选型页一致）：Pa = 101.325·(1 − 2.25577×10⁻⁵·h)^5.25588 kPa，h = 0 时为海平面
+function atmRatio(alt) { return Math.pow(1 - 2.25577e-5 * (alt || 0), 5.25588); } // P/P₀
+function calcSORstd(AOR, T, alpha, beta, Hd, CL, EA, alt) {
   const Cs20 = csSat(20), CsT = csSat(T);
-  const Pb = 101325 + 9810 * Hd;
+  const Pb = 101325 * atmRatio(alt) + 9810 * Hd;
   const Ot = 21 * (1 - EA) / (79 + 21 * (1 - EA)) * 100;
   const Csm = CsT * (Pb / 2.026e5 + Ot / 42);
   const den = alpha * (beta * Csm - CL) * Math.pow(1.024, T - 20);
   return den > 0 ? AOR * Cs20 / den : NaN;
 }
 // 吨水能耗（Tab 1 与 Tab 4 共用）：鼓风机绝热压缩功率 P = p1·q/(0.283·η)·[(p2/p1)^0.283 − 1]
+// p1 = 当地大气压 Pa，p2 = Pa + 出口表压；q 为实际进气量 = 标态气量（20 ℃、101.325 kPa）× 101.325/Pa（进气温度按 20 ℃，同鼓风机选型页）
 // 生物池出口表压 = 9.81×H_d + 6 kPa（管路/扩散器损失；H_d 5.5 m 时约 60 kPa），膜池取 50 kPa；回流泵 H = 2 m、η = 0.65；其他（仪控/照明）0.05
 const E_OTHER = 0.05;
-function blowerKW(air_m3h, pOut_kPa, eff) {
-  return 101.325e3 * (air_m3h / 3600) / (0.283 * eff) * (Math.pow((101.325 + pOut_kPa) / 101.325, 0.283) - 1) / 1000;
+function blowerKW(air_m3h, pOut_kPa, eff, alt) {
+  const r = atmRatio(alt), p1 = 101.325 * r;                    // kPa(abs)
+  const q = air_m3h / r;                                        // 实际进气量 m³/h
+  return p1 * 1e3 * (q / 3600) / (0.283 * eff) * (Math.pow((p1 + pOut_kPa) / p1, 0.283) - 1) / 1000;
 }
 // 统计范围：生化 + 膜段（生物曝气、膜曝气、产水泵、内回流、膜池回流、仪控照明），不含进水提升、格栅、厌氧/缺氧搅拌、污泥处理
-function energyBreakdown({ Q, bioAir, Am, SADm, TMP, pumpEff, blowerEff, recirc, memRecirc, Hd }) {
+function energyBreakdown({ Q, bioAir, Am, SADm, TMP, pumpEff, blowerEff, recirc, memRecirc, Hd, alt }) {
   const pBio = 9.81 * (Hd > 0 ? Hd : 5.5) + 6;                  // kPa
-  const eBio = blowerKW(bioAir, pBio, blowerEff) * 24 / Q;
-  const eMem = blowerKW(SADm * Am, 50, blowerEff) * 24 / Q;
+  const h = isFinite(alt) && alt > -500 && alt < 6000 ? alt : 0; // 海拔 m（无效时按海平面）
+  const eBio = blowerKW(bioAir, pBio, blowerEff, h) * 24 / Q;
+  const eMem = blowerKW(SADm * Am, 50, blowerEff, h) * 24 / Q;
   const ePump = TMP * 1000 / (pumpEff * 3.6e6);                 // kWh/m³
   const eRecirc = recirc * 1000 * 9.81 * 2 / (0.65 * 3.6e6);    // kWh/m³（好氧→缺氧内回流）
   const eMemRecirc = memRecirc * 1000 * 9.81 * 2 / (0.65 * 3.6e6); // kWh/m³（膜池→生物池回流）
@@ -1759,7 +1772,7 @@ function calc() {
     ['d_MLSS','MLSS','pos'], ['d_VSS_SS','MLVSS/MLSS','pos'], ['d_SRT','SRT','pos'], ['d_SF','安全系数 SF','pos'], ['d_HRT_AN','厌氧段 HRT','nn'],
     ['d_J20','设计通量 J₂₀','pos'], ['d_peakFactor','峰值系数','pos'], ['d_Tmin','最低设计水温 T_min','num'], ['d_runRatio','运行时间比','pos'], ['d_moduleArea','单组件膜面积','pos'], ['d_TMP','设计 TMP','nn'],
     ['d_Y','Y','nn'], ['d_Kd','Kd','nn'], ['d_fss','SS 污泥转换率 f','nn'], ['d_Kn','K_N','pos'], ['d_SDNR20','SDNR₂₀','pos'], ['d_bioP','生物除磷量','nn'], ['d_alpha','α','pos'], ['d_beta','β','pos'],
-    ['d_SADm','膜曝气强度 SADm','nn'], ['d_Hd','淹没深度 H_d','pos'], ['d_OTE','OTE','pos'], ['d_blowerEff','鼓风机效率','pos'], ['d_recirc','内回流比','nn'], ['d_memRecirc','膜池回流比','nn'], ['d_cleanCycle','化学清洗周期','pos'],
+    ['d_SADm','膜曝气强度 SADm','nn'], ['d_Hd','淹没深度 H_d','pos'], ['d_alt','海拔','num'], ['d_OTE','OTE','pos'], ['d_blowerEff','鼓风机效率','pos'], ['d_recirc','内回流比','nn'], ['d_memRecirc','膜池回流比','nn'], ['d_cleanCycle','化学清洗周期','pos'],
   ]);
   // 进出水逻辑校验：COD₀ > 0，且进水须高于出水
   const pv = id => parseFloat($(id).value);
@@ -1768,6 +1781,7 @@ function calc() {
     relRule(pv('d_COD0') > 0, ['d_COD0'], '请输入大于 0 的 COD₀');
     relRule(pv('d_COD0') > pv('d_CODe'), ['d_COD0', 'd_CODe'], '进水 COD₀ 须大于出水 COD');
     relRule(pv('d_BOD0') > pv('d_BODe'), ['d_BOD0', 'd_BODe'], '进水 BOD₅ 须大于出水 BOD');
+    relRule(pv('d_alt') > -500 && pv('d_alt') < 6000, ['d_alt'], '海拔应在 −500 ~ 6000 m 之间');
     relRule(pv('d_OTE') * pv('d_Hd') < 100, ['d_OTE', 'd_Hd'], '曝气效率 EE = OTE × H_d 须小于 100%');
     relRule(pv('d_Tmin') <= pv('d_T') + 1e-6, ['d_Tmin', 'd_T'], '最低设计水温 T_min 须不高于平均水温 T');
   }
@@ -1789,7 +1803,7 @@ function calc() {
   const moduleArea = g('d_moduleArea'), TMP = g('d_TMP');
   const Y = g('d_Y'), Kd = g('d_Kd'), alpha = g('d_alpha'), beta = g('d_beta');
   const SDNR20 = g('d_SDNR20');
-  const SADm = g('d_SADm'), Hd = g('d_Hd'), OTE = g('d_OTE'), blowerEff = g('d_blowerEff') / 100;
+  const SADm = g('d_SADm'), Hd = g('d_Hd'), alt = g('d_alt'), OTE = g('d_OTE'), blowerEff = g('d_blowerEff') / 100;
   const Tmin = g('d_Tmin'), Kn = g('d_Kn');
   // 单好氧无缺氧段，不设内回流（能耗与同步值均按 0 计）
   const recircPct = bioConfig === 'single_o' ? 0 : g('d_recirc'), recirc = recircPct / 100;
@@ -1891,7 +1905,7 @@ function calc() {
   const AOR = Math.max(0, AOR_carb + AOR_nitrif + AOR_dentrif);
   // SOR：GB 50014 口径，含扩散器水深修正；E_A 取 EE = OTE × H_d
   const EE = OTE * Hd / 100;
-  const SOR = calcSORstd(AOR, T, alpha, beta, Hd, DO_run, EE);
+  const SOR = calcSORstd(AOR, T, alpha, beta, Hd, DO_run, EE, alt);
   // 生物曝气量 G = SOR / (24 × 0.28 × EE)，0.28 kg O₂/m³ 为 20°C 标态空气含氧量 → m³/h
   const bioAir = SOR / (24 * 0.28 * EE);
 
@@ -1899,9 +1913,16 @@ function calc() {
   const SDNR_T = SDNR20 * Math.pow(1.08, T - 20);
   const V_AX_req = N_need * 1e3 / (SDNR_T * MLVSS); // m³
 
+  // 预计出水 TN（mg/L，简化）：单好氧无反硝化 → TN₀ − 同化氮；
+  //   AO/AAO：回流可达 NO₃ₑ ≈ 硝化氮/(1 + R)，R = 内回流比 + 膜池回流比（膜池回流按回到缺氧段计）
+  const TN_single = TN0 - N_assim * 1e3 / Q;
+  const R_tot = recirc + memRecirc;
+  const TN_rec = NH4e + ON_E + N_nit * 1e3 / Q / (1 + R_tot);
+  const TN_pred = bioConfig === 'single_o' ? TN_single : Math.max(TNe, TN_rec);
+
   // === 能耗 ===
   // 与 Tab 4 同一函数：生物曝气量 G、膜曝气 SADm×A_m 均按鼓风机绝热压缩功率计
-  const E = energyBreakdown({ Q, bioAir, Am: A_m, SADm, TMP, pumpEff: PUMP_EFF_D, blowerEff, recirc, memRecirc, Hd });
+  const E = energyBreakdown({ Q, bioAir, Am: A_m, SADm, TMP, pumpEff: PUMP_EFF_D, blowerEff, recirc, memRecirc, Hd, alt });
   const eBio = E.eBio, eMem_val = E.eMem, ePump = E.ePump, eRecirc = E.eRecirc, eMemRecirc = E.eMemRecirc, eTotal = E.eTotal;
 
   // === 渲染结果 ===
@@ -1936,6 +1957,7 @@ function calc() {
   $('row_Cext2').style.display = bioConfig === 'single_o' ? 'none' : '';
   $('d_r_Ndn').textContent = bioConfig === 'single_o' ? '—' : `${N_denit.toFixed(0)} / ${N_ext.toFixed(0)}`;
   $('d_r_Cext').textContent = bioConfig === 'single_o' ? '—' : COD_ext.toFixed(0);
+  $('d_r_TNpred').textContent = Math.max(0, TN_pred).toFixed(1);
   $('d_r_eBio').textContent = eBio.toFixed(2);
   $('d_r_eMem').textContent = eMem_val.toFixed(2);
   $('d_r_ePump').textContent = ePump.toFixed(2);
@@ -1951,7 +1973,7 @@ function calc() {
   drawFlow(bioConfig, { Q_wan, V_total, V_AN, A_m, modules });
 
   // 校核
-  const checks = checkDesign({ J_pkAllow, J_T, J20, T, Tmin, A_m, V_total, HRT_total, MLSS, SRT, SRT_O, AOR, dX, eBio, eMem_val, ePump, eRecirc, eMemRecirc, eTotal, Tmin_factor, memType, J_peak, J_lim, SF, SRT_min, SRT_req, V_AX, V_AX_req, BOD0, TN0, T_nit, N_ext, COD_ext, N_DN_max });
+  const checks = checkDesign({ J_pkAllow, J_T, J20, T, Tmin, A_m, V_total, HRT_total, MLSS, SRT, SRT_O, AOR, dX, eBio, eMem_val, ePump, eRecirc, eMemRecirc, eTotal, Tmin_factor, memType, J_peak, J_lim, SF, SRT_min, SRT_req, V_AX, V_AX_req, BOD0, TN0, T_nit, N_ext, COD_ext, N_DN_max, TNe, TN_pred, R_tot });
   $('d_checkList').innerHTML = checks.items.map(c => `<div class="check-item check-${c.type}"><span class="ic">${c.ic}</span><span>${c.text}</span></div>`).join('');
   const scoreNum = checks.score;
   $('d_scoreNum').textContent = scoreNum;
@@ -1960,7 +1982,7 @@ function calc() {
   $('d_scoreDesc').textContent = sd;
 }
 
-function checkDesign({ J_pkAllow, J_T, J20, T, Tmin, A_m, V_total, HRT_total, MLSS, SRT, SRT_O, AOR, dX, eBio, eMem_val, ePump, eRecirc, eMemRecirc, eTotal, Tmin_factor, memType, J_peak, J_lim, SF, SRT_min, SRT_req, V_AX, V_AX_req, BOD0, TN0, T_nit, N_ext, COD_ext, N_DN_max }) {
+function checkDesign({ J_pkAllow, J_T, J20, T, Tmin, A_m, V_total, HRT_total, MLSS, SRT, SRT_O, AOR, dX, eBio, eMem_val, ePump, eRecirc, eMemRecirc, eTotal, Tmin_factor, memType, J_peak, J_lim, SF, SRT_min, SRT_req, V_AX, V_AX_req, BOD0, TN0, T_nit, N_ext, COD_ext, N_DN_max, TNe, TN_pred, R_tot }) {
   const items = []; let score = 100;
   const memName = MEM_NAME[memType] || '中空纤维膜';
   if (J_T < 12) { items.push({type:'warn',ic:'⚠',text:`<b>通量偏低</b>: 当前 T=${T}°C 下通量 ${J_T.toFixed(1)} LMH < 12，膜面积偏大，可适当提高 J₂₀ 设计值`}); score -= 10; }
@@ -1975,6 +1997,8 @@ function checkDesign({ J_pkAllow, J_T, J20, T, Tmin, A_m, V_total, HRT_total, ML
   if (SRT < 20) { items.push({type:'warn',ic:'⚠',text:`<b>SRT 偏短</b>: ${SRT}d < 20d，MBR 通常 SRT 20-30d 以保证硝化和低污泥量`}); score -= 8; }
   if (HRT_total < 4) { items.push({type:'warn',ic:'⚠',text:`<b>HRT 偏短</b>: ${HRT_total.toFixed(1)}h < 4h，生物反应不充分`}); score -= 12; }
   if (V_AX > 0 && V_AX < V_AX_req) { items.push({type:'info',ic:'ℹ',text:`<b>缺氧池容提示</b>: 按 SDNR 所需缺氧池容 ${V_AX_req.toFixed(0)} m³ > 当前分配 ${V_AX.toFixed(0)} m³，反硝化可能不完全，可考虑增大缺氧段比例或补充碳源（仅提示）`}); }
+  if (bioConfig === 'single_o') { if (TN_pred > TNe + 1e-6) { items.push({type:'warn',ic:'⚠',text:`<b>出水 TN 不达标</b>: 单好氧工艺无反硝化，出水 TN 约 ${TN_pred.toFixed(1)} mg/L（TN₀ − 同化氮），达不到目标 ${TNe} mg/L；需脱氮请选 AO/AAO`}); score -= 10; } }
+  else if (TN_pred > TNe + 1e-6) { items.push({type:'warn',ic:'⚠',text:`<b>回流比不足</b>: 内回流 + 膜池回流 R = ${(R_tot * 100).toFixed(0)}% 时，出水 NO₃-N 约为硝化氮的 1/(1+R)，预计出水 TN 约 ${TN_pred.toFixed(1)} mg/L > 目标 ${TNe} mg/L，宜加大回流比或核对出水目标`}); score -= 8; }
   if (N_ext > 1e-6) { items.push({type:'warn',ic:'⚠',text:`<b>反硝化碳源不足</b>: 内碳源最多支持反硝化 ${N_DN_max.toFixed(0)} kg N/d（ΔBOD·(1−1.42·Yobs)/2.86），仍差 ${N_ext.toFixed(0)} kg N/d，需外加碳源约 ${COD_ext.toFixed(0)} kg COD/d（甲醇计，已计入剩余污泥；外加碳源脱氮不计入需氧量抵扣），或采用短程/厌氧氨氧化等工艺`}); score -= 5; }
   else if (V_AX > 0 && TN0 > 0 && BOD0 / TN0 < 4) { items.push({type:'info',ic:'ℹ',text:`<b>碳源校核</b>: 进水 BOD₅/TN = ${(BOD0 / TN0).toFixed(2)} 偏低（< 4），但按计算内碳源可满足反硝化（上限 ${N_DN_max.toFixed(0)} kg N/d），运行中宜关注进水碳源波动（仅提示）`}); }
   if (eTotal > 1.2) {
@@ -2135,10 +2159,10 @@ function calcEnergy() {
   const memRecirc = v('e_memRecirc') / 100;
   const price = v('e_price');
 
-  // 与 Tab 1 同一函数 energyBreakdown：生物曝气（出口表压 9.81×H_d + 6 kPa，H_d 取 Tab 1 高级参数）、膜曝气 SADm×A_m（50 kPa）按鼓风机绝热压缩功率，
+  // 与 Tab 1 同一函数 energyBreakdown：生物曝气（出口表压 9.81×H_d + 6 kPa，H_d 与海拔取 Tab 1 高级参数）、膜曝气 SADm×A_m（50 kPa）按鼓风机绝热压缩功率，
   // 产水泵 TMP/η，内回流与膜池回流泵 ρgH·R/η（H = 2 m、η = 0.65），其他 0.05 kWh/m³
   // 统计范围仅生化 + 膜段，不含进水提升、格栅、厌氧/缺氧搅拌、污泥处理
-  const { eBio, eMem, ePump, eRecirc, eMemRecirc, eTotal } = energyBreakdown({ Q, bioAir, Am, SADm, TMP, pumpEff, blowerEff, recirc, memRecirc, Hd: parseFloat($('d_Hd').value) });
+  const { eBio, eMem, ePump, eRecirc, eMemRecirc, eTotal } = energyBreakdown({ Q, bioAir, Am, SADm, TMP, pumpEff, blowerEff, recirc, memRecirc, Hd: parseFloat($('d_Hd').value), alt: parseFloat($('d_alt').value) });
   // MBR 相对传统工艺的额外能耗 = 膜系统专有项（膜曝气 + 产水泵 + 膜池回流）；
   // 不再用 eTotal − 0.4（0.4 为传统全厂电耗，而 eTotal 只含生化 + 膜段，口径不一致）
   const eExtra = eMem + ePump + eMemRecirc;
@@ -2217,7 +2241,8 @@ function copyDesignResult() {
 总膜面积: ${r('d_r_Am')} m²（控制工况: ${r('d_r_ctrl')}）  允许通量 J(T)/J(T_min): ${r('d_r_JT')} LMH
 运行通量 平均/峰值: ${r('d_r_Javg')} / ${r('d_r_Jpeak')} LMH（峰值允许 ${r('d_r_Jlim')}）
 膜组件数: ${r('d_r_modules')} 个
-AOR: ${r('d_r_AOR')} kg O₂/d  SOR: ${r('d_r_SOR')} kg O₂/d  生物曝气量: ${r('d_r_bioAir')} m³/h  污泥: ${r('d_r_dX')} kg DS/d（含化学污泥 ${r('d_r_chemSl')}）
+AOR: ${r('d_r_AOR')} kg O₂/d  SOR: ${r('d_r_SOR')} kg O₂/d  生物曝气量: ${r('d_r_bioAir')} m³/h（20 °C 标态）  污泥: ${r('d_r_dX')} kg DS/d（含化学污泥 ${r('d_r_chemSl')}）
+预计出水 TN: ${r('d_r_TNpred')} mg/L（目标 ${$('d_TNe').value}）  海拔: ${$('d_alt').value} m（SOR 与鼓风机按当地大气压）
 PAC（扣同化磷与生物除磷）: ${r('d_r_PAC')} kg/d（${r('d_r_PACmg')} mg/L）
 生化 + 膜段能耗: 生物曝气 ${r('d_r_eBio')} + 膜曝气 ${r('d_r_eMem')} + 产水泵 ${r('d_r_ePump')} + 内回流 ${r('d_r_eRecirc')} + 膜池回流 ${r('d_r_eMemRecirc')} + 其他 0.05 = ${r('d_r_eTotal')} kWh/m³（不含提升、格栅、搅拌、污泥处理）
 设计评分: ${r('d_scoreNum')} / 100

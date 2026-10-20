@@ -1717,6 +1717,9 @@ body {
       <div class="field"><label for="st_poolH">好氧池有效水深 H <span class="unit">m</span></label>
         <input type="number" id="st_poolH" value="5.0" step="0.5" onchange="calcStages()">
         <div class="helper">影响鼓风机静压与供氧气量（淹没深度 H − 0.2 m）；MBBR 常 4-6 m</div></div>
+      <div class="field"><label for="st_alt">海拔 <span class="unit">m</span></label>
+        <input type="number" id="st_alt" value="0" step="100" onchange="calcStages()">
+        <div class="helper">SOR 的 P_b 与鼓风机进气压力按当地大气压计；默认 0 = 海平面（P = 101.325·(1 − 2.25577×10⁻⁵·h)^5.25588 kPa，−500 ~ 6000 m）</div></div>
     </div>
 
     <!-- 高级参数（折叠） -->
@@ -1862,7 +1865,7 @@ body {
         <div class="helper">后缺氧按需投碳的控制值 = 出水 TN 目标 − 余量（默认 1.0）；后缺氧进入 NO₃-N 与 TN 模型同口径，按 r_postDN 1.5 g/m²·d（10 ℃）定面积</div></div>
       <div class="field"><label for="st_c_n_ratio">等效碳氮比 C/N <span class="unit">g COD/g NO₃-N</span></label>
         <input type="number" id="st_c_n_ratio" value="4.3" step="0.1" readonly tabindex="-1" style="background:#f1f5f9;">
-        <div class="helper">只读：甲醇 = (2.47 × 后缺氧去除 NO₃-N + 1.0 × 进入 DO) × 1.15，折 COD 1.5 g/g；其他碳源按 COD 当量换算（甲醇化学计量与工程系数为文献值）</div></div>
+        <div class="helper">只读：甲醇 = (2.47 × 后缺氧去除 NO₃-N + 1.0 × 进入 DO) × 1.15，折 COD 1.5 g/g；其他碳源按 COD 当量换算（甲醇化学计量与工程系数为文献值）。本页 C/N 含溶解氧消耗与 1.15 安全系数（不计 DO 时 2.47 × 1.15 × 1.5 = 4.26）；IFAS 页按 4.98 g COD/g N（2.86/(1−1.42×0.3)，未计 DO 消耗），口径不同</div></div>
       <div class="field"><label for="st_PAC">PAC 投加量 <span class="unit">mg/L（留空按化学计量自动）</span></label>
         <input type="number" id="st_PAC" value="" placeholder="自动" step="5" onchange="calcStages()">
         <div class="helper">化学计量：PAC = ΔTP_chem × (Al/P) × 27/31 ÷ 0.0529（PAC 含 Al₂O₃ 10% → Al 5.29%）</div></div>
@@ -1973,7 +1976,7 @@ body {
           <span><span class="result-value" id="ar_airO2">—</span><span class="result-unit">Nm³/h</span></span></div>
         <div class="result-row"><span class="result-label">填料搅拌所需气量</span>
           <span><span class="result-value" id="ar_airMix">—</span><span class="result-unit">Nm³/h</span></span></div>
-        <div class="result-row highlight-row"><span class="result-label"><b>设计气量(控制性)</b></span>
+        <div class="result-row highlight-row"><span class="result-label"><b>设计气量(控制性)</b> <span class="sub">Nm³ 指 0 °C、101.325 kPa；换算为 20 °C 标态（鼓风机选型页口径）×1.073</span></span>
           <span><span class="result-value big" id="ar_airDesign">—</span><span class="result-unit">Nm³/h</span></span></div>
         <div class="result-row"><span class="result-label">装机气量（单台额定 × 总台数，含富余与备用台）</span>
           <span><span class="result-value" id="ar_airInstalled">—</span><span class="result-unit">Nm³/h</span></span></div>
@@ -2018,7 +2021,7 @@ body {
       <!-- 能耗 -->
       <div class="result-group">
         <div class="result-group-title"><span class="ic">⚡</span> 能耗计算</div>
-        <div class="result-row highlight-row"><span class="result-label"><b>风机轴功率 N_s</b> <span class="sub">绝热压缩 · 运行工况（设计气量 ÷ 工作台数）· 进气 20 °C、101.325 kPa · 采用效率 <span id="ar_effUsed">—</span></span></span>
+        <div class="result-row highlight-row"><span class="result-label"><b>风机轴功率 N_s</b> <span class="sub">绝热压缩 · 运行工况（设计气量 ÷ 工作台数）· 进气 20 °C、当地大气压（海拔 0 m = 101.325 kPa）· 采用效率 <span id="ar_effUsed">—</span></span></span>
           <span><span class="result-value big" id="ar_Ns">—</span><span class="result-unit">kW</span></span></div>
         <div class="result-row"><span class="result-label">电机功率(配备) <span class="sub">(额定流量轴功率 × 1.1，圆整到 5 kW)</span></span>
           <span><span class="result-value" id="ar_Nmotor">—</span><span class="result-unit">kW</span></span></div>
@@ -2121,13 +2124,13 @@ body {
           <span><span class="result-value" id="st_r_O_N">—</span><span class="result-unit">kg O₂/d</span></span></div>
         <div class="result-row"><span class="result-label">反硝化回收 O_DN <span class="sub" id="st_r_O_DN_basis">（2.86·N_DN，仅计预缺氧利用进水碳源的脱氮）</span></span>
           <span><span class="result-value" id="st_r_O_DN">—</span><span class="result-unit">kg O₂/d</span></span></div>
-        <div class="result-row highlight-row"><span class="result-label"><b>SOR 标准需氧量</b> <span class="sub">(α·β·θ + 扩散器水深 Csm 修正，GB 50014；仅供参考，气量按 AOR/SOFK 计)</span></span>
+        <div class="result-row highlight-row"><span class="result-label"><b>SOR 标准需氧量</b> <span class="sub">(α·β·θ + 扩散器水深 Csm 修正，P_b 按海拔当地大气压，GB 50014；仅供参考，气量按 AOR/SOFK 计)</span></span>
           <span><span class="result-value big" id="st_r_SOR">—</span><span class="result-unit">kg O₂/d</span></span></div>
         <div class="result-row"><span class="result-label">供氧空气量 <span class="sub">(AOR ÷ (SOFK × 淹没深度)，SOFK 为现场条件值，平均工况)</span></span>
           <span><span class="result-value" id="st_r_airFlow">—</span><span class="result-unit">Nm³/h</span></span></div>
         <div class="result-row"><span class="result-label">搅拌最低气量</span>
           <span><span class="result-value" id="st_r_airMin">—</span><span class="result-unit">Nm³/h</span></span></div>
-        <div class="result-row"><span class="result-label">设计供气量 (取大值)</span>
+        <div class="result-row"><span class="result-label">设计供气量 (取大值) <span class="sub">Nm³ 指 0 °C、101.325 kPa；换算为 20 °C 标态（鼓风机选型页口径）×1.073</span></span>
           <span><span class="result-value big" id="st_r_airDesign">—</span><span class="result-unit">Nm³/h</span></span></div>
         <div class="result-row"><span class="result-label">控制性因素</span>
           <span><span class="result-value" id="st_r_airControl" style="font-size:12px;">—</span></span></div>
@@ -2148,7 +2151,7 @@ body {
       <!-- 药剂消耗与成本 -->
       <div class="result-group">
         <div class="result-group-title"><span class="ic">💊</span> 药剂消耗与成本</div>
-        <div class="result-row"><span class="result-label">后缺氧所需碳源 <span class="sub">(以COD计)</span></span>
+        <div class="result-row"><span class="result-label">后缺氧所需碳源 <span class="sub">(以COD计；含进入 DO 消耗与 1.15 安全系数)</span></span>
           <span><span class="result-value" id="st_r_carbonNeed">—</span><span class="result-unit">kg COD/d</span></span></div>
         <div class="result-row highlight-row"><span class="result-label"><b>实际碳源投加量</b> <span class="sub" id="st_r_carbonType">甲醇</span></span>
           <span><span class="result-value big" id="st_r_carbonDose">—</span><span class="result-unit">kg/d</span></span></div>
@@ -3529,30 +3532,33 @@ function calcAeratorEE(OTE, H) {
 
 // 清水饱和溶解氧 Cs(T)（mg/L，1 atm）；Cs(20) 与 Cs(T) 用同一式
 function wkCs(T) { return 14.652 - 0.41022*T + 0.007991*T*T - 0.000077774*T*T*T; }
-// SOR（GB 50014 口径）：SOR = AOR·Cs(20) / [α·(β·ρ·Csm(T) − C)·θ^(T−20)]
+// SOR（GB 50014 口径）：SOR = AOR·Cs(20) / [α·(β·Csm(T) − C)·θ^(T−20)]
 //   Csm(T) = Cs(T)·(Pb/202.6 + Ot/42)，Pb = Pa + 9.81·H_d（kPa），Ot = 21(1−EA)/[79+21(1−EA)]×100
-//   H_d = 池深 − 曝气器安装高度 0.2 m；ρ = Pa/101.325（未设海拔输入，取海平面 ρ=1）
+//   H_d = 池深 − 曝气器安装高度 0.2 m；Pa 为当地大气压 = 101.325·(1 − 2.25577×10⁻⁵·h)^5.25588 kPa（o.alt = 海拔 h，m，默认 0 = 海平面）
+//   海拔只经 Pb 中的 Pa 计入（与曝气量计算器 (ρ + 9.81·H_d/101.325 + Ot/21)/2 等价），推动力不再另乘 ρ
 // 盐度修正：Cs_S/Cs_0 = exp(−S·(0.017674 − 10.754/Tk + 2140.7/Tk²))（Benson-Krause 1984 盐度项，S 以 ‰ 计；35‰、20 °C 约 0.81）
 function wkSalFactor(S, T) {
   const Tk = 273.15 + T;
   return S > 0 ? Math.exp(-S * (0.017674 - 10.754 / Tk + 2140.7 / (Tk * Tk))) : 1;
 }
 function wkSOR(AOR, o) {
-  const Pa = 101.325, rho = 1;
+  const Pa = wkPatm(o.alt || 0);
   const Hd = Math.max(0, (o.H || 0) - AERATOR_MOUNT_H);
   const Pb = Pa + 9.81 * Hd;
   const EA = Math.min(0.99, Math.max(0, o.EA || 0));
   const Ot = 21 * (1 - EA) / (79 + 21 * (1 - EA)) * 100;
   const Csm = wkCs(o.T) * wkSalFactor(o.S || 0, o.T) * (Pb / 202.6 + Ot / 42);   // 现场饱和值含盐度修正；分子 Cs(20) 为标准清水
-  const drive = o.beta * rho * Csm - o.DO;                 // 推动力 mg/L
+  const drive = o.beta * Csm - o.DO;                       // 推动力 mg/L
   const den = o.alpha * drive * Math.pow(o.theta, o.T - 20);
   return { SOR: drive > 0 ? AOR * wkCs(20) / den : NaN, Csm, drive };
 }
 // 鼓风机轴功率（绝热压缩，与鼓风机选型工具一致）：
-// P(kW) = p₁·Q₁/(0.283·η)·[(p₂/p₁)^0.283 − 1]，p 为 kPa(abs)，Q₁ 为进口 m³/s（Nm³ 按 20 °C 进气换算）
-function wkBlowerPower(Q_Nm3h, dp_kPa, eff) {
-  const p1 = 101.325, T_in = 20;
-  const Q1 = Q_Nm3h / 3600 * (273.15 + T_in) / 273.15;
+// P(kW) = p₁·Q₁/(0.283·η)·[(p₂/p₁)^0.283 − 1]，p 为 kPa(abs)，Q₁ 为进口 m³/s（Nm³ 按 20 °C、当地大气压 p₁ 进气换算）
+// p₁ = 当地大气压（alt = 海拔 m，默认 0 = 101.325 kPa），与鼓风机选型工具同式：Q₁ = Q·(273.15+T)/273.15·101.325/p₁
+function wkPatm(alt) { return 101.325 * Math.pow(1 - 2.25577e-5 * alt, 5.25588); }   // kPa(abs)，标准大气式
+function wkBlowerPower(Q_Nm3h, dp_kPa, eff, alt) {
+  const p1 = wkPatm(alt || 0), T_in = 20;
+  const Q1 = Q_Nm3h / 3600 * (273.15 + T_in) / 273.15 * (101.325 / p1);
   return eff > 0 ? p1 * Q1 / (0.283 * eff) * (Math.pow((p1 + dp_kPa) / p1, 0.283) - 1) : 0;
 }
 
@@ -3662,12 +3668,13 @@ function calcAeration() {
   const effCapped = efficiency > bEff.max / 100 + 1e-9;
 
   // ========== 轴功率（绝热压缩，与鼓风机选型工具一致，见 wkBlowerPower）==========
-  // 进气按 20 °C、101.325 kPa（海平面）：Nm³(0 °C) → 进口 m³ 乘 293.15/273.15；按运行气量计
-  const Ns_single = wkBlowerPower(blowerQ_run, dp_total, actEfficiency);  // kW
+  // 进气按 20 °C、当地大气压 p₁（海拔 st_alt，默认 0 = 101.325 kPa）：Nm³(0 °C) → 进口 m³ 乘 293.15/273.15 × 101.325/p₁；按运行气量计
+  const alt = gNum('st_alt', 0);
+  const Ns_single = wkBlowerPower(blowerQ_run, dp_total, actEfficiency, alt);  // kW
   const Ns_total = Ns_single * working;
 
   // 电机配备：额定流量下轴功率 × 1.1，圆整到 5 kW
-  const Nmotor_single = Math.ceil(wkBlowerPower(blowerQ, dp_total, actEfficiency) * 1.1 / 5) * 5;
+  const Nmotor_single = Math.ceil(wkBlowerPower(blowerQ, dp_total, actEfficiency, alt) * 1.1 / 5) * 5;
   const Nmotor_total = Nmotor_single * working;
 
   // 日耗电量(24小时运行)
@@ -3859,12 +3866,12 @@ function drawAerLayout(r) {
 function copyAeration() {
   const txt = `纯 MBBR 曝气系统设计
 曝气器类型: ${AERATOR_DB[currentAerator].name}
-设计气量: ${$('ar_airDesign').textContent} Nm³/h(${$('ar_control').textContent})
+设计气量: ${$('ar_airDesign').textContent} Nm³/h(${$('ar_control').textContent})（Nm³ 指 0 °C、101.325 kPa，换算为 20 °C 标态 ×1.073）
 装机气量(含备用): ${$('ar_airInstalled').textContent} Nm³/h
 曝气器数量: ${$('ar_count').textContent} 个（单个实际气量 ${$('ar_perDeviceAct')?.textContent} Nm³/h）· 间距 ${$('ar_actSpacing').textContent} m · 投资 ${$('ar_cost').textContent} 万元
 风机: ${$('ar_blowerModel').textContent} × ${$('ar_blowerCount').textContent}
 风机总压: ${$('ar_dp').textContent} kPa
-轴功率: ${$('ar_Ns').textContent} kW（效率 ${$('ar_effUsed')?.textContent}）· 电机配备 ${$('ar_Nmotor').textContent} kW
+轴功率: ${$('ar_Ns').textContent} kW（效率 ${$('ar_effUsed')?.textContent}；海拔 ${$('st_alt')?.value || 0} m）· 电机配备 ${$('ar_Nmotor').textContent} kW
 日耗电: ${$('ar_daily_kwh').textContent} kWh/d(吨水 ${$('ar_kwh_per_m3').textContent} kWh/m³)
 年电费: ${$('ar_yearly_cost').textContent} 万元
 —— 由 WaterKit MBBR 工程设计平台生成`;
@@ -4332,10 +4339,14 @@ function calcStages() {
   const peEl = $('st_pumpEff'), peV = parseFloat(peEl?.value);
   const peBad = peEl && (isNaN(peV) || peV <= 0);
   if (peEl) peEl.classList.toggle('invalid', !!peBad);
+  const altEl = $('st_alt'), altV = parseFloat(altEl?.value);
+  const altBad = altEl && !(altV > -500 && altV < 6000);
+  if (altEl) altEl.classList.toggle('invalid', !!altBad);
   const badAll = [...badPos.map(x => '大于 0 的' + x), ...badNN.map(x => '不小于 0 的' + x)];
   if (mcBad) badAll.push('0-100 之间的泥饼含水率');
   if (tnLtNH) badAll.push('不小于进水 NH₄-N 的进水 TN（TN 包含 NH₄-N）');
   if (peBad) badAll.push('大于 0 的回流泵效率');
+  if (altBad) badAll.push('−500 ~ 6000 m 之间的海拔');
   if (badAll.length) {
     stCalcResult.V_total = 0;
     wkShowInvalid('panel-stages', ['stagesCheckList', 'aerCheckList'], `<b>输入无效</b>：请输入${badAll.join('、')}`);
@@ -4776,8 +4787,8 @@ function calcStages() {
   const O_DN  = 2.86 * N_DN_kg;
   const AOR   = Math.max(0, O_BOD + O_N - O_DN);    // kg O₂/d
 
-  // SOR（GB 50014 口径，见 wkSOR）：Csm 含扩散器水深修正，Cs(20) 与 Cs(T) 同一式；EA 取上方 EE
-  const sorR  = wkSOR(AOR, { alpha: alpha_p, beta: beta_p, DO: DO_set_p, T, theta: theta_o2, H: poolH_EE, EA: EE_p, S: salinity });
+  // SOR（GB 50014 口径，见 wkSOR）：Csm 含扩散器水深修正，Cs(20) 与 Cs(T) 同一式；EA 取上方 EE；P_b 按海拔 st_alt 的当地大气压
+  const sorR  = wkSOR(AOR, { alpha: alpha_p, beta: beta_p, DO: DO_set_p, T, theta: theta_o2, H: poolH_EE, EA: EE_p, S: salinity, alt: gNum('st_alt', 0) });
   const SOR   = sorR.SOR;
 
   // 供氧气量 = AOR ÷ (SOFK × 淹没深度)：SOFK 为现场条件下的氧转移值，
@@ -5316,9 +5327,9 @@ TP 去除率:  ${t('st_r_TPrm')}%(出水 ${t('st_r_TPout')} mg/L)
 AOR: ${t('st_r_AOR')} kg O₂/d(碳化 ${t('st_r_O_BOD')} + 硝化 ${t('st_r_O_N')} − 反硝化回收 ${t('st_r_O_DN')})
 经验校核需氧: ${t('st_r_O2BF')} kg O₂/d
 SOR: ${t('st_r_SOR')} kg O₂/d（SOFK ${(parseFloat($('st_SOFK')?.value) > 0) ? $('st_SOFK').value : ($('st_carrierType')?.value === 'coin' ? 6.25 : 8)} g O₂/Nm³·m）
-供氧气量 ${t('st_r_airFlow')} · 搅拌气量 ${t('st_r_airMin')} → 设计供气量 ${t('st_r_airDesign')} Nm³/h(${t('st_r_airControl')})
+供氧气量 ${t('st_r_airFlow')} · 搅拌气量 ${t('st_r_airMin')} → 设计供气量 ${t('st_r_airDesign')} Nm³/h(${t('st_r_airControl')})（Nm³ 指 0 °C、101.325 kPa，换算为 20 °C 标态 ×1.073）
 装机气量(含备用): ${t('ar_airInstalled')} Nm³/h · 风机轴功率 ${t('ar_Ns')} kW · 曝气吨水电耗 ${t('st_r_airPower')} kWh/m³
-好氧池水深: ${$('st_poolH')?.value || 5} m · 气水比 ${t('st_r_airRatio')} · 气量强度 ${t('st_r_airIntensity')} Nm³/m²·h
+好氧池水深: ${$('st_poolH')?.value || 5} m · 海拔 ${$('st_alt')?.value || 0} m · 气水比 ${t('st_r_airRatio')} · 气量强度 ${t('st_r_airIntensity')} Nm³/m²·h
 缺氧段搅拌: ${t('st_r_mixPower')} kW · 生物段电耗合计（曝气 + 搅拌）${t('st_r_totalPower')} kWh/m³
 
 ─── 药剂消耗 ───
