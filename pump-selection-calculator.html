@@ -417,6 +417,8 @@
     .result-value { font-size: 17px; }
     .result-value.big { font-size: 20px; }
   }
+  /* 移动端输入框字号 ≥ 16px：避免 iOS Safari / 微信聚焦输入框时页面自动放大 */
+  @media (max-width: 768px) { input, select, textarea { font-size: 16px !important; } }
 </style>
 </head>
 <body>
@@ -1013,6 +1015,11 @@
     const badT = isNaN(T) || T <= -50 || T >= 200;
     $('T').classList.toggle('invalid', badT);
     if (badT) errs.push('介质温度 T 应在 -50 ~ 200 ℃ 之间');
+    // 海拔：留空按 0 m（海平面）；填写时限 −500–6000 m（与其他工具一致）
+    const altRaw = $('altitude').value.trim(), alt = raw('altitude');
+    const badAlt = altRaw !== '' && !(alt >= -500 && alt <= 6000);
+    $('altitude').classList.toggle('invalid', badAlt);
+    if (badAlt) errs.push('海拔高度应在 −500–6000 m 之间（与其他工具一致）');
     return errs;
   }
 

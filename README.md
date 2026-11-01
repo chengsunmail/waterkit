@@ -20,7 +20,7 @@
 
 | 工具 | 说明 |
 |------|------|
-| [管道水力](pipe-hydraulic-calculator.html) | Q/v/D 互算 · Colebrook-White 迭代 · 9 种管材粗糙度 |
+| [管道水力](pipe-hydraulic-calculator.html) | Q/v/D 互算 · Colebrook-White 迭代 · 8 种管材粗糙度（可自定义） |
 | [管道水力（加强版）](pipe-hydraulic-pro.html) | 9 种管材真实内径 · 管件局部阻力清单 · Manning 重力流定径 · PN 承压校核 |
 | [明渠水力](open-channel-calculator.html) | Manning 公式 · 梯形/矩形/圆形断面 · 临界水深 · Fr 判流 |
 | [堰流计算](weir-flow-calculator.html) | 矩形 / 三角 / 梯形 / 宽顶 四种堰型 · 淹没出流修正 |

@@ -340,6 +340,8 @@
     .grid { grid-template-columns: 1fr 1fr; }
     .membrane-cards { grid-template-columns: 1fr; }
   }
+  /* 移动端输入框字号 ≥ 16px：避免 iOS Safari / 微信聚焦输入框时页面自动放大 */
+  @media (max-width: 768px) { input, select, textarea { font-size: 16px !important; } }
 </style>
 </head>
 <body>
@@ -460,7 +462,7 @@
       <select id="d_standard" onchange="applyStandard()">
         <option value="1A">一级 A (GB18918)</option>
         <option value="grade4" selected>准 IV 类（地方标准）</option>
-        <option value="grade3">地表 III 类</option>
+        <option value="grade3">地表 III 类（TP 按河流 0.2；湖库为 0.05，需另行校核）</option>
         <option value="reuse">城市杂用水</option>
         <option value="gb16889">GB 16889 渗滤液（后接 NF/RO）</option>
         <option value="custom">自定义</option>
@@ -1731,14 +1733,14 @@ function syncTabs() {
 // 饱和溶解氧 Cs(T)（清水、101.325 kPa），Cs(20) 与 Cs(T) 用同一式
 function csSat(T) { return 14.652 - 0.41022 * T + 0.007991 * T * T - 0.000077774 * T * T * T; }
 // 标准需氧量 SOR = AOR·Cs(20) / [α·(β·Csm(T) − C)·1.024^(T−20)]
-// 鼓风曝气水深修正：Csm = Cs(T)·(Pb/2.026×10⁵ + Ot/42)，Pb = Pa + 9810·H_d (Pa)，Ot = 21(1−E_A)/[79+21(1−E_A)]×100
+// 鼓风曝气水深修正：Csm = Cs(T)·(Pb/2.026×10⁵ + (Pa/101325)·Ot/42)，Pb = Pa + 9810·H_d (Pa)（池面出气在当地气压下），Ot = 21(1−E_A)/[79+21(1−E_A)]×100
 // 海拔修正（标准大气式，与曝气量/鼓风机选型页一致）：Pa = 101.325·(1 − 2.25577×10⁻⁵·h)^5.25588 kPa，h = 0 时为海平面
 function atmRatio(alt) { return Math.pow(1 - 2.25577e-5 * (alt || 0), 5.25588); } // P/P₀
 function calcSORstd(AOR, T, alpha, beta, Hd, CL, EA, alt) {
   const Cs20 = csSat(20), CsT = csSat(T);
   const Pb = 101325 * atmRatio(alt) + 9810 * Hd;
   const Ot = 21 * (1 - EA) / (79 + 21 * (1 - EA)) * 100;
-  const Csm = CsT * (Pb / 2.026e5 + Ot / 42);
+  const Csm = CsT * (Pb / 2.026e5 + atmRatio(alt) * Ot / 42);
   const den = alpha * (beta * Csm - CL) * Math.pow(1.024, T - 20);
   return den > 0 ? AOR * Cs20 / den : NaN;
 }
@@ -1784,7 +1786,10 @@ function calc() {
     relRule(pv('d_BOD0') > pv('d_BODe'), ['d_BOD0', 'd_BODe'], '进水 BOD₅ 须大于出水 BOD');
     relRule(pv('d_alt') > -500 && pv('d_alt') < 6000, ['d_alt'], '海拔应在 −500 ~ 6000 m 之间');
     relRule(pv('d_OTE') * pv('d_Hd') < 100, ['d_OTE', 'd_Hd'], '曝气效率 EE = OTE × H_d 须小于 100%');
-    relRule(pv('d_Tmin') <= pv('d_T') + 1e-6, ['d_Tmin', 'd_T'], '最低设计水温 T_min 须不高于平均水温 T');
+    relRule(pv('d_T') >= 0 && pv('d_T') <= 40, ['d_T'], '平均水温 T 应在 0–40 ℃ 之间');
+    relRule(pv('d_Tmin') >= 0 && pv('d_Tmin') <= 40, ['d_Tmin'], '最低设计水温 T_min 应在 0–40 ℃ 之间');
+    const tIn = t => t >= 0 && t <= 40;   // 两者都在范围内时才比较大小，避免重复报错
+    relRule(!(tIn(pv('d_T')) && tIn(pv('d_Tmin'))) || pv('d_Tmin') <= pv('d_T') + 1e-6, ['d_Tmin', 'd_T'], '最低设计水温 T_min 须不高于平均水温 T');
   }
   if (bad.length) {
     RESULT_IDS_D.forEach(id => { if ($(id)) $(id).textContent = '—'; });

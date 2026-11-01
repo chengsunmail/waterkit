@@ -1479,6 +1479,8 @@ body {
   .flow-diagram svg { min-width: 0 !important; }
   a { color: inherit; text-decoration: none; }
 }
+  /* 移动端输入框字号 ≥ 16px：避免 iOS Safari / 微信聚焦输入框时页面自动放大 */
+  @media (max-width: 768px) { input, select, textarea { font-size: 16px !important; } }
 </style>
 </head>
 <body>
@@ -1607,7 +1609,7 @@ body {
         <select id="st_standard" onchange="applyStStandard()">
           <option value="1A">一级 A (GB 18918)</option>
           <option value="grade4">准 IV 类（地方标准）</option>
-          <option value="grade3">地表 III 类</option>
+          <option value="grade3">地表 III 类（TP 按河流 0.2；湖库为 0.05，需另行校核）</option>
           <option value="custom">自定义</option>
         </select>
         <div class="helper">准 IV 类为地方标准（TN 10 等），限值按项目所在地调整</div></div>
@@ -3021,7 +3023,7 @@ const ST_PRESETS = {
 const ST_STANDARDS = {
   '1A':    { BODe:10, NH4e:5,   TNe:15, TPe:0.5  },
   'grade4':{ BODe:6,  NH4e:1.5, TNe:10, TPe:0.3  },
-  'grade3':{ BODe:4,  NH4e:1.0, TNe:5,  TPe:0.05 },
+  'grade3':{ BODe:4,  NH4e:1.0, TNe:5,  TPe:0.2  },   // GB 3838 III 类 TP：河流 0.2、湖库 0.05；全站统一按河流（与活性污泥、MBR、IFAS 一致）
 };
 // 预设/案例切换时恢复为页面默认值的设计参数（避免沿用上一个案例的 α、SALR、填充率等）
 const ST_DESIGN_KEYS = ['st_V_total','st_Tmin','st_nitClass','st_rNit','st_rBOD','st_fillRatio','st_specArea','st_carrierType','st_settleHRT','st_poolH',
@@ -3534,9 +3536,9 @@ function calcAeratorEE(OTE, H) {
 // 清水饱和溶解氧 Cs(T)（mg/L，1 atm）；Cs(20) 与 Cs(T) 用同一式
 function wkCs(T) { return 14.652 - 0.41022*T + 0.007991*T*T - 0.000077774*T*T*T; }
 // SOR（GB 50014 口径）：SOR = AOR·Cs(20) / [α·(β·Csm(T) − C)·θ^(T−20)]
-//   Csm(T) = Cs(T)·(Pb/202.6 + Ot/42)，Pb = Pa + 9.81·H_d（kPa），Ot = 21(1−EA)/[79+21(1−EA)]×100
+//   Csm(T) = Cs(T)·(Pb/202.6 + (Pa/101.325)·Ot/42)，Pb = Pa + 9.81·H_d（kPa），Ot = 21(1−EA)/[79+21(1−EA)]×100
 //   H_d = 池深 − 曝气器安装高度 0.2 m；Pa 为当地大气压 = 101.325·(1 − 2.25577×10⁻⁵·h)^5.25588 kPa（o.alt = 海拔 h，m，默认 0 = 海平面）
-//   海拔只经 Pb 中的 Pa 计入（与曝气量计算器 (ρ + 9.81·H_d/101.325 + Ot/21)/2 等价），推动力不再另乘 ρ
+//   海拔经 Pb 中的 Pa（池底）和 Pa/101.325（池面出气）计入，与曝气量计算器 (ρ + 9.81·H_d/101.325 + ρ·Ot/21)/2 等价
 // 盐度修正：Cs_S/Cs_0 = exp(−S·(0.017674 − 10.754/Tk + 2140.7/Tk²))（Benson-Krause 1984 盐度项，S 以 ‰ 计；35‰、20 °C 约 0.81）
 function wkSalFactor(S, T) {
   const Tk = 273.15 + T;
@@ -3548,7 +3550,7 @@ function wkSOR(AOR, o) {
   const Pb = Pa + 9.81 * Hd;
   const EA = Math.min(0.99, Math.max(0, o.EA || 0));
   const Ot = 21 * (1 - EA) / (79 + 21 * (1 - EA)) * 100;
-  const Csm = wkCs(o.T) * wkSalFactor(o.S || 0, o.T) * (Pb / 202.6 + Ot / 42);   // 现场饱和值含盐度修正；分子 Cs(20) 为标准清水
+  const Csm = wkCs(o.T) * wkSalFactor(o.S || 0, o.T) * (Pb / 202.6 + (Pa / 101.325) * Ot / 42);   // 现场饱和值含盐度修正；分子 Cs(20) 为标准清水
   const drive = o.beta * Csm - o.DO;                       // 推动力 mg/L
   const den = o.alpha * drive * Math.pow(o.theta, o.T - 20);
   return { SOR: drive > 0 ? AOR * wkCs(20) / den : NaN, Csm, drive };
@@ -4348,6 +4350,12 @@ function calcStages() {
   if (tnLtNH) badAll.push('不小于进水 NH₄-N 的进水 TN（TN 包含 NH₄-N）');
   if (peBad) badAll.push('大于 0 的回流泵效率');
   if (altBad) badAll.push('−500 ~ 6000 m 之间的海拔');
+  // 水温 0–40 ℃（与曝气量页一致）；T_min 不高于 T
+  const tEl = $('st_T'), tmEl = $('st_Tmin'), tV = parseFloat(tEl?.value), tmV = parseFloat(tmEl?.value);
+  // 负值与空值已由「不小于 0」校验报出，这里只补上限与 T_min ≤ T
+  if (tEl && tV > 40) { tEl.classList.add('invalid'); badAll.push('不高于 40 ℃ 的水温 T'); }
+  if (tmEl && tmV > 40) { tmEl.classList.add('invalid'); badAll.push('不高于 40 ℃ 的最低设计水温 T_min'); }
+  else if (tmEl && tmV >= 0 && tV >= 0 && tV <= 40 && tmV > tV) { tmEl.classList.add('invalid'); badAll.push('不高于水温 T 的最低设计水温 T_min'); }
   if (badAll.length) {
     stCalcResult.V_total = 0;
     wkShowInvalid('panel-stages', ['stagesCheckList', 'aerCheckList'], `<b>输入无效</b>：请输入${badAll.join('、')}`);

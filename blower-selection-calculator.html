@@ -468,6 +468,8 @@
   .site-footer ul, .site-footer h4, .site-footer p { margin-top: 0; padding: 0; }
   .site-footer ul { margin-bottom: 0; }
   .footer-about { margin-bottom: 0; }
+  /* 移动端输入框字号 ≥ 16px：避免 iOS Safari / 微信聚焦输入框时页面自动放大 */
+  @media (max-width: 768px) { input, select, textarea { font-size: 16px !important; } }
 </style>
 </head>
 <body>
@@ -522,7 +524,7 @@
     <div class="field">
       <label for="Kh">最大时系数 K<sub>h</sub></label>
       <input type="number" id="Kh" value="1.5" step="0.1" oninput="calc()">
-      <div class="helper">典型 1.3-2.0，GB 50014 建议 ≥1.5</div>
+      <div class="helper">典型 1.3–2.0，工程上常取 ≥ 1.5（经验值）</div>
     </div>
     <div class="field">
       <label for="n_run">鼓风机台数（运行）<span class="unit">台</span></label>

@@ -327,6 +327,8 @@
   .beta-bar { background: #fffbeb; border-bottom: 1px solid #fcd34d; color: #92400e; font-size: 12.5px; line-height: 1.6; padding: 8px 16px; text-align: center; }
   .beta-bar b { color: #b45309; }
   @media print { .beta-bar { display: none; } }
+  /* 移动端输入框字号 ≥ 16px：避免 iOS Safari / 微信聚焦输入框时页面自动放大 */
+  @media (max-width: 768px) { input, select, textarea { font-size: 16px !important; } }
 </style>
 </head>
 <body>
