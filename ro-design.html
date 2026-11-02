@@ -538,11 +538,12 @@
       <h3 id="g7">7. 精度与局限</h3>
       <ul>
         <li>对照 ROSA 原始报告（2000 mg/L NaCl，BW30-400，2:1×4，70%），进水压力相差 0.4%，产水 TDS 相差 1.4%，逐支元件产水相差 ≤ 6%。</li>
-        <li>对照 TWDB 2014 的三家软件比较算例（苦咸地下水，29 °C，新膜与污染膜共 4 种工况），进水压力相差 −3% 至 +6%。</li>
+        <li>对照 TWDB 2014 的三家软件比较算例（苦咸地下水，29 °C，新膜与污染膜共 4 种工况），进水压力相差 −3% 至 +6%，产水 TDS 比 ROSA 8 低 14–17%。</li>
         <li>对照 IWA 教材海水手算（40%），进水压力相差 −3%，产水 TDS 相差 −6%。</li>
         <li>另对照 4 个公开设计算例（Hydranautics AMTA 2010 苦咸水两例、IMSDesign 海水、ERI PX Q400 白皮书），进水压力多数在 ±10% 内（−11% 至 +15%），各段通量吻合；海水带 PX 比能耗 1.8–2.1 kWh/m³，公布值 2.1。</li>
         <li>元件参数来自样本标称值，实际元件产水量公差约 ±15%；硼与各离子透过为估算。硼的 pH、温度影响按形态与经验系数估算：海水一级产水硼在 15–20 °C 时可能比实测偏高（偏安全），地中海进水 pH 7.0 → 8.6 的降幅偏小（36% vs 实测 54%）。二级加碱后浓水的 Mg(OH)₂、CaCO₃ 结垢未校核（二级进水硬度很低，一般不控制）。</li>
-        <li>三段高回收率设计中，前段通量可能偏高、末段偏低，产水 TDS 比厂家软件偏乐观约 30%（对照一例 IMSDesign 回用水算例，进水离子组成为推定）。</li>
+        <li>元件压降按 FilmTec 手算式，与 ROSA 8 和 TWDB 2014 三家软件接近（为其 1.0–1.4 倍），但约为 ROSA 9.1 一例的 3 倍、Toray DS2 一例的 1.3–1.7 倍，且未随水温修正（低温时实际压降更大）。对照 ROSA 9.1 三段算例（5:3:1×6，回收率 84%），25 °C 时本工具进水压力偏高 19%、第三段产水少约一半，10 °C 时分别为 +4%、−28%。三段高回收率设计中末段产水可能偏少，宜留压力余量，并用厂家软件复核分段通量。</li>
+        <li>产水 TDS 的偏差主要与水温和离子组成有关，现有对照中未见与段数相关：7–10 °C 时与厂家软件相差 10% 以内（Toray DS2 三段 +4%，ROSA 9.1 三段 −7%）；25–30 °C 的混合离子水可能偏低约 15–45%（TWDB 两段比 ROSA 8 低 14–17%、比 TorayDS 低 21–44%，ROSA 9.1 三段低 30%）。可能的原因是厂家软件中盐透过随水温和浓水浓度上升更快、二价离子透过更高。产水水质要求严格时，按最高水温工况的结果再留余量。</li>
         <li>NH₄⁺ 按全部离子态计；pH &gt; 8.5 时部分为 NH₃，可透过膜，产水氨氮会偏低。</li>
         <li>产水 pH 按电荷平衡计算，CO₂ 全部透过、未计脱气；每级只能选一种元件（不支持分段混装）。</li>
         <li>未计段间管路压损（一般 0.2–0.5 bar）、元件间产水管压损和通量年衰减；流量因子 FF 用于综合反映污染和老化。</li>
@@ -1656,6 +1657,23 @@ function ROTests(T, test, assert) {
     cases.forEach(([C, pH, pHt, acid, t, ref]) => near(T.acidDose(T.balance(C).C, pH, pHt, t, acid).doseMgL, ref, 0.015, acid + ' ' + pH + '→' + pHt));
     const sw = T.acidDose(T.balance({ Ca: 412, Mg: 1290, Na: 10770, K: 399, Sr: 7.9, HCO3: 142, SO4: 2712, Cl: 19354, F: 1.3 }).C, 8.1, 6.5, 35, 'H2SO4').doseMgL;
     near(sw, 35.86, 0.05, '海水');
+  });
+  test('对照: ROSA 9.1 三段 (5:3:1×6, 84%) 与 Toray DS2 三段 (2:2:1×6, 75%), 记录已知偏差 (11-02)', () => {
+    // 来源与数据见 claude/audit-ro-3stage-2026-11-02.md §3。偏差来自元件压降 (约为 ROSA 9.1 的 3 倍) 与暖水盐透过; 本测试锁定现状, 改动压降或透盐模型时需同步更新
+    const gpm = 0.227125, e = T.getElement('ECOPRO440');
+    const A = T.balance({ NH4: 5.65, K: 10.85, Na: 15.31, Mg: 62.28, Ca: 142.08, Sr: 8.46, CO3: 0.12, HCO3: 208.69, NO3: 144.59, Cl: 53.39, F: 0.88, SO4: 305.15, SiO2: 1.22 }).C;
+    const A10 = {}; Object.keys(A).forEach(k => A10[k] = A[k] * 949.33 / 958.67);
+    const runA = (C, t, pp1, qf, qp) => T.solvePass({ elem: e, FF: 0.85, stages: [{ nv: 5, ne: 6, Pp: pp1 * psi }, { nv: 3, ne: 6, booster: -5 * psi, Pp: 30 * psi }, { nv: 1, ne: 6, booster: -5 * psi, Pp: 15 * psi }] }, qf * gpm, C, qp * gpm, t);
+    const a25 = runA(A, 25, 50, 287.81, 242.49), a10 = runA(A10, 10, 40, 287.86, 242.54);
+    const within = (v, ref, lo, hi, m) => assert.ok(v / ref > lo && v / ref < hi, m + ' ' + (v / ref).toFixed(3));
+    within(a25.Pf / psi, 138.38, 1.10, 1.26, 'ROSA 25 °C 进水压力');  within(a10.Pf / psi, 201.15, 0.98, 1.10, 'ROSA 10 °C 进水压力');
+    within(a25.stages[2].Qp / gpm, 20.42, 0.40, 0.65, 'ROSA 25 °C 三段产水'); within(a10.stages[2].Qp / gpm, 21.41, 0.60, 0.85, 'ROSA 10 °C 三段产水');
+    within(T.tds(T.neutralize(a25.Cp)), 16.36, 0.60, 0.80, 'ROSA 25 °C 产水 TDS'); within(T.tds(T.neutralize(a10.Cp)), 6.86, 0.85, 1.02, 'ROSA 10 °C 产水 TDS');
+    const eB = Object.assign({}, T.getElement('TMG20D400')); eB.B *= 1.331;          // 膜龄 3 年, 透盐率增加 33.1%
+    const b = T.solvePass({ elem: eB, FF: 0.848, stages: [{ nv: 2, ne: 6 }, { nv: 2, ne: 6 }, { nv: 1, ne: 6 }] }, 98.04 * gpm,
+      T.balance({ Ca: 27.41, Mg: 5.946, Na: 454.3, K: 2.533, HCO3: 400.6, Cl: 528.6, SO4: 3.528, NO3: 0.0476, SiO2: 18.055, CO3: 3.425 }).C, 73.53 * gpm, 13 / 1.8);
+    within(b.Pf / psi, 119.3, 1.0, 1.15, 'Toray 进水压力'); within(b.stages[2].Qp / gpm, 8.8, 0.9, 1.1, 'Toray 三段产水');
+    within(T.tds(T.neutralize(b.Cp)), 18.34, 0.95, 1.12, 'Toray 产水 TDS');
   });
   test('设计校核: 超通量、超压、结垢能报出', () => {
     const tight = baseDesign(); tight.pass1.stages = [{ nv: 6, ne: 6 }, { nv: 3, ne: 6 }];
