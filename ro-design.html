@@ -505,7 +505,7 @@
         浓水侧平均浓度 C<sub>fc</sub> = C<sub>f</sub> · ln[1/(1 − r)] / r<br>
         温度修正 TCF = exp[3020·(1/298 − 1/T)]（T ≤ 25 °C），exp[2640·(1/298 − 1/T)]（T &gt; 25 °C）<br>
         渗透压 π = 1.12 psi/K · (273 + t) · Σm<sub>i</sub><br>
-        元件压降 ΔP = 0.01 · q̄<sup>1.7</sup> psi（q̄ 为进浓水平均流量 gpm；34 mil 隔网取 0.7 倍）</div>
+        元件压降 ΔP = 0.0213 · q̄<sup>1.23</sup> psi（q̄ 为进浓水平均流量 gpm；按 ROSA 9.1 三段算例逐支压力拟合，与 WAVE 1.82、Toray DS2 吻合；不区分 28/34 mil 隔网）</div>
       <ul>
         <li><b>A、B 值</b>：由所选元件规格书的测试条件（测试 NaCl 浓度、压力、单支回收率、产水量、稳定脱盐率）用同一模型反算，不使用厂家保密参数。</li>
         <li><b>离子透过</b>：二价离子 B 值取 NaCl 的 0.15 倍，硝酸根 5 倍，HCO₃⁻ 1.2 倍，硅 1.0 倍（回用厂实测 0.2–1.2）。产水最后修正为电中性。</li>
@@ -537,13 +537,14 @@
 
       <h3 id="g7">7. 精度与局限</h3>
       <ul>
-        <li>对照 ROSA 原始报告（2000 mg/L NaCl，BW30-400，2:1×4，70%），进水压力相差 0.4%，产水 TDS 相差 1.4%，逐支元件产水相差 ≤ 6%。</li>
-        <li>对照 TWDB 2014 的三家软件比较算例（苦咸地下水，29 °C，新膜与污染膜共 4 种工况），进水压力相差 −3% 至 +6%，产水 TDS 比 ROSA 8 低 14–17%。</li>
-        <li>对照 IWA 教材海水手算（40%），进水压力相差 −3%，产水 TDS 相差 −6%。</li>
-        <li>另对照 4 个公开设计算例（Hydranautics AMTA 2010 苦咸水两例、IMSDesign 海水、ERI PX Q400 白皮书），进水压力多数在 ±10% 内（−11% 至 +15%），各段通量吻合；海水带 PX 比能耗 1.8–2.1 kWh/m³，公布值 2.1。</li>
+        <li>对照 ROSA 8 原始报告（2000 mg/L NaCl，BW30-400，2:1×4，70%），进水压力相差 −2%，产水 TDS 相差 −2%，逐支元件产水相差 ≤ 12%（ROSA 8 的元件压降比新式大，后段元件产水比它多 5–12%）。</li>
+        <li>对照 WAVE 1.82 单段算例（BW30XFR-400/34，1×6，20 °C）：进水压力、容器压降、首末支产水和产水 TDS 相差均在 ±2% 内。对照 ROSA 9.1 三段算例（5:3:1×6，84%，25/10 °C）：进水压力 +4% / −6%，第三段产水 −2% / +2%。对照 Toray DS2 三段算例（7 °C）：进水压力 +1%，第三段产水 +9%。</li>
+        <li>对照 TWDB 2014 的三家软件比较算例（苦咸地下水，29 °C，ROSA 8 / IMSDesign 2012 / TorayDS2 2.0）：这一代软件的元件压降约为本工具的 1.5–2 倍，本工具的进水压力比它们低 14–18%；产水 TDS 比 ROSA 8 低 21–23%。</li>
+        <li>对照 IWA 教材海水手算（40%），进水压力相差 −4%，产水 TDS 相差 −6%。</li>
+        <li>另对照 4 个公开设计算例（Hydranautics AMTA 2010 苦咸水两例、IMSDesign 海水、ERI PX Q400 白皮书），进水压力多数在 ±10% 内（−11% 至 +15%），各段通量吻合；海水带 PX 比能耗 1.8–2.1 kWh/m³，公布值 2.1（2026-11 压降改式前的对照结果）。</li>
         <li>元件参数来自样本标称值，实际元件产水量公差约 ±15%；硼与各离子透过为估算。硼的 pH、温度影响按形态与经验系数估算：海水一级产水硼在 15–20 °C 时可能比实测偏高（偏安全），地中海进水 pH 7.0 → 8.6 的降幅偏小（36% vs 实测 54%）。二级加碱后浓水的 Mg(OH)₂、CaCO₃ 结垢未校核（二级进水硬度很低，一般不控制）。</li>
-        <li>元件压降按 FilmTec 手算式，与 ROSA 8 和 TWDB 2014 三家软件接近（为其 1.0–1.4 倍），但约为 ROSA 9.1 一例的 3 倍、Toray DS2 一例的 1.3–1.7 倍，且未随水温修正（低温时实际压降更大）。对照 ROSA 9.1 三段算例（5:3:1×6，回收率 84%），25 °C 时本工具进水压力偏高 19%、第三段产水少约一半，10 °C 时分别为 +4%、−28%。三段高回收率设计中末段产水可能偏少，宜留压力余量，并用厂家软件复核分段通量。</li>
-        <li>产水 TDS 的偏差主要与水温和离子组成有关，现有对照中未见与段数相关：7–10 °C 时与厂家软件相差 10% 以内（Toray DS2 三段 +4%，ROSA 9.1 三段 −7%）；25–30 °C 的混合离子水可能偏低约 15–45%（TWDB 两段比 ROSA 8 低 14–17%、比 TorayDS 低 21–44%，ROSA 9.1 三段低 30%）。可能的原因是厂家软件中盐透过随水温和浓水浓度上升更快、二价离子透过更高。产水水质要求严格时，按最高水温工况的结果再留余量。</li>
+        <li>元件压降按现代软件拟合（2015 年后的 ROSA 9.x、WAVE、Toray DS2 给出的苦咸水元件压降约为 FilmTec 609-02057 手算式 0.01·q̄<sup>1.7</sup> 的 1/3–1/2，旧式只与 ROSA 8 一代吻合）。未计水温（黏度）修正：ROSA 9.1 在 10 °C 时压降约为 25 °C 的 1.35 倍，加入后低温对照反而变差，暂未采用；也未计段前约 0.3 bar 的管路压损。</li>
+        <li>产水 TDS 的偏差主要与水温和离子组成有关，现有对照中未见与段数相关：7–10 °C 时与厂家软件相差约 15% 以内（Toray DS2 三段 +2%，ROSA 9.1 三段 −13%）；25–30 °C 的混合离子水可能偏低约 20–45%（TWDB 两段比 ROSA 8 低 21–23%，ROSA 9.1 三段低 37%）。可能的原因是厂家软件中盐透过随水温和浓水浓度上升更快、二价离子透过更高。产水水质要求严格时，按最高水温工况的结果再留余量。</li>
         <li>NH₄⁺ 按全部离子态计；pH &gt; 8.5 时部分为 NH₃，可透过膜，产水氨氮会偏低。</li>
         <li>产水 pH 按电荷平衡计算，CO₂ 全部透过、未计脱气；每级只能选一种元件（不支持分段混装）。</li>
         <li>未计段间管路压损（一般 0.2–0.5 bar）、元件间产水管压损和通量年衰减；流量因子 FF 用于综合反映污染和老化。</li>
@@ -742,8 +743,10 @@
   }
 
   /* ---------------- 3. 膜元件 ---------------- */
-  // 元件压降 (FilmTec 609-02057 Eq.27c): ΔP = 0.01·q̄^1.7 psi, q̄ 为进浓水侧平均流量 gpm → 换算为 bar 与 m³/h
-  var DP_N = 1.7, DP_K = 0.01 * 0.0689476 * Math.pow(1 / 0.227125, DP_N);   // ≈ 0.00857 bar/(m³/h)^1.7
+  // 元件压降: ΔP = 0.0213·q̄^1.23 psi (q̄ 为进浓水侧平均流量 gpm), 按 ROSA 9.1 三段算例逐支压力拟合 (11-02e),
+  // 与 WAVE 1.82 单段、Toray DS2 2.3 三段吻合; 原 FilmTec 609-02057 Eq.27c (0.01·q̄^1.7) 约为现代软件的 2–3 倍, 只与 ROSA 8 一代吻合。
+  // 不再区分 28/34 mil 隔网 (34 mil 的 WAVE、Toray 算例按同一式吻合); 未计水温 (黏度) 修正与段前压损 (见 audit-ro-3stage §9)
+  var DP_N = 1.23, DP_K = 0.0213 * 0.0689476 * Math.pow(1 / 0.227125, DP_N);   // ≈ 0.00911 bar/(m³/h)^1.23
   function elemDP(Qavg) { return DP_K * Math.pow(Math.max(0, Qavg), DP_N); }
 
   /* 单支元件模拟: 对单支回收率 r ∈ [0, 0.5] 二分求解 r·Qf = A·S·max(0, NDP(r))/1000 (单调, 必收敛) */
@@ -792,7 +795,7 @@
     var Cnacl = spec.testNaCl, na = Cnacl * IONS.Na.M / (IONS.Na.M + IONS.Cl.M), cl = Cnacl - na;
     var C = { Na: na, Cl: cl };
     var Qp = spec.testFlow / 24, Qf = Qp / spec.testRecovery;
-    var e = { area: spec.area, A: 1, B: 0.01, dpFactor: spec.spacer >= 34 ? 0.7 : 1 };
+    var e = { area: spec.area, A: 1, B: 0.01, dpFactor: 1 };
     var target = Cnacl * (1 - spec.testRejection / 100), lo, hi;
     for (var round = 0; round < 3; round++) {        // A 与 B 相互影响 (产水渗透压), 交替求解 3 轮
       // A: 二分使 Q_p 等于样本产水量
@@ -824,7 +827,7 @@
 
   /* ---------------- 3b. 元件库 ----------------
    * 数据均取自厂家公开规格书 (测试条件下的产水量与稳定脱盐率), 来源见页面元件库; 面积 m², 产水 m³/d, 压力 bar
-   * spacer: 进水隔网 mil; 34 mil 压降取 28 mil 的 0.7 倍 (TWDB 2014: 约低 50%, 取偏保守值)
+   * spacer: 进水隔网 mil (仅作说明; 11-02e 起压降不再按隔网区分)
    * boronRej: 样本给出的硼脱除率 (%); 样本未给时苦咸水按 65%、海水按 90% 估算 (工程经验)  */
   var ELEMENTS = [
     { id: 'BW30PRO400',  brand: 'DuPont FilmTec', model: 'BW30 PRO-400',       type: 'bw', area: 37,   testFlow: 42,   testRejection: 99.6,  testNaCl: 2000,  testP: 15.5,  testRecovery: 0.15, spacer: 28, pmax: 41, note: '标准苦咸水' },
@@ -841,10 +844,12 @@
     { id: 'TML20D400',   brand: 'Toray',          model: 'TML20D-400',         type: 'bw', area: 37,   testFlow: 39.7, testRejection: 99.8,  testNaCl: 2000,  testP: 15.51, testRecovery: 0.15, spacer: 34, pmax: 41, note: '低压' },
     { id: 'TMG20D400',   brand: 'Toray',          model: 'TMG20D-400',         type: 'bw', area: 37,   testFlow: 45.8, testRejection: 99.7,  testNaCl: 2000,  testP: 10.34, testRecovery: 0.15, spacer: 34, pmax: 25, note: '超低压，最高 25 bar' },
     { id: 'TM820V440',   brand: 'Toray',          model: 'TM820V-440',         type: 'sw', area: 41,   testFlow: 37.5, testRejection: 99.8,  testNaCl: 32000, testP: 55.16, testRecovery: 0.08, spacer: 28, pmax: 83, boronRej: 92, note: '海水' },
-    { id: 'ULP228040',   brand: '时代沃顿 Vontron', model: 'ULP22-8040',       type: 'bw', area: 37.2, testFlow: 45.8, testRejection: 99.0,  testNaCl: 1500,  testP: 10.34, testRecovery: 0.15, spacer: 28, pmax: 41, note: '超低压；官网与样本：12 100 gpd，150 psi，pH 7.5' },
-    { id: 'LP218040',    brand: '时代沃顿 Vontron', model: 'LP21-8040',        type: 'bw', area: 37,   testFlow: 36.3, testRejection: 99.5,  testNaCl: 2000,  testP: 15.51, testRecovery: 0.15, spacer: 28, pmax: 41, note: '低压；已不在官网在售列表，测试条件取自经销商型录', unverified: true },
-    { id: 'FR118040',    brand: '时代沃顿 Vontron', model: 'FR11-8040',        type: 'bw', area: 37,   testFlow: 36.3, testRejection: 99.5,  testNaCl: 2000,  testP: 15.51, testRecovery: 0.15, spacer: 34, pmax: 41, note: '抗污染；官网现行为 FR12/FR22 等，测试条件取自经销商型录', unverified: true },
-    { id: 'SW228040',    brand: '时代沃顿 Vontron', model: 'SW22-8040',        type: 'sw', area: 37,   testFlow: 22.7, testRejection: 99.7,  testNaCl: 32800, testP: 55.16, testRecovery: 0.08, spacer: 28, pmax: 83, note: '海水；已不在官网在售列表，测试条件未核实', unverified: true }
+    { id: 'ULP228040',   brand: '时代沃顿 Vontron', model: 'ULP22-8040',       type: 'bw', area: 37.2, testFlow: 45.8, testRejection: 99.0,  testNaCl: 1500,  testP: 10.34, testRecovery: 0.15, spacer: 28, pmax: 41, note: '超低压；2023 产品目录与样本：12 100 gpd，150 psi' },
+    { id: 'LP228040',    brand: '时代沃顿 Vontron', model: 'LP22-8040',        type: 'bw', area: 37.2, testFlow: 39.7, testRejection: 99.7,  testNaCl: 2000,  testP: 15.51, testRecovery: 0.15, spacer: 28, pmax: 41, note: '低压；2023 产品目录：10 500 gpd，225 psi（取代 LP21-8040）' },
+    { id: 'FR128040',    brand: '时代沃顿 Vontron', model: 'FR12-8040',        type: 'bw', area: 37.2, testFlow: 39.7, testRejection: 99.5,  testNaCl: 2000,  testP: 15.51, testRecovery: 0.15, spacer: 34, pmax: 41, note: '抗污染；样本：10 500 gpd，225 psi（取代 FR11-8040）' },
+    { id: 'SW8040HR400', brand: '时代沃顿 Vontron', model: 'SW8040HR-400',     type: 'sw', area: 37.2, testFlow: 28.4, testRejection: 99.8,  testNaCl: 32000, testP: 55.16, testRecovery: 0.08, spacer: 28, pmax: 83, boronRej: 92, note: '海水；2023 产品目录：7 500 gpd，800 psi，32 000 ppm（单型号样本为 32 800 ppm）；取代 SW22-8040' },
+    { id: 'OWBWFR400',   brand: '碧水源 OriginWater', model: 'FLM-BW8040-FR(400)', type: 'bw', area: 37, testFlow: 41.6, testRejection: 99.75, testNaCl: 2000,  testP: 15.51, testRecovery: 0.15, spacer: 34, pmax: 41, note: '抗污染；官网：11 000 gpd，225 psi；最高压力等限值厂家未给，按同类取值' },
+    { id: 'OWSWHR400',   brand: '碧水源 OriginWater', model: 'FLM-SW8040-HR(400)', type: 'sw', area: 37, testFlow: 26.5, testRejection: 99.82, testNaCl: 32000, testP: 55.16, testRecovery: 0.08, spacer: 34, pmax: 83, boronRej: 93, note: '海水；官网：7 000 gpd，800 psi；最高压力等限值厂家未给，按同类取值' }
   ];
   var BORON_REJ_DEFAULT = { bw: 65, sw: 90 };
   /* 硼的形态: B(OH)₃ (中性, 透过高) ⇌ B(OH)₄⁻ (带电, 按一价离子透过)。
@@ -860,7 +865,7 @@
     return (e.boronAcidFactor * (1 - a) + 1 * a) * Math.exp(0.02 * (T - 25));
   }
   function buildElement(spec) {
-    var e = { id: spec.id, area: spec.area, type: spec.type, pmax: spec.pmax, dpFactor: spec.spacer >= 34 ? 0.7 : 1 };
+    var e = { id: spec.id, area: spec.area, type: spec.type, pmax: spec.pmax, dpFactor: 1 };
     var ab = fitElement(spec); e.A = ab.A; e.B = ab.B;
     // 回代测试条件: 测试点不可达 (压力低于渗透压、A/B 撞到搜索边界) 时标记
     var Cn = spec.testNaCl, naT = Cn * IONS.Na.M / (IONS.Na.M + IONS.Cl.M), chk = element(e, spec.testFlow / 24 / spec.testRecovery, { Na: naT, Cl: Cn - naT }, spec.testP, 0, 25, 1);
@@ -1423,8 +1428,9 @@ function ROTests(T, test, assert) {
     near(T.osmotic(NaCl(2000), 25), 1.61, 0.03);
     near(T.osmotic(NaCl(4000), 25) / T.osmotic(NaCl(2000), 25), 2, 1e-9);
   });
-  test('元件压降: 0.01·q^1.7 psi (q gpm)', () => {
-    near(T.elemDP(50 * 0.227125), 0.01 * Math.pow(50, 1.7) * psi, 1e-9);
+  test('元件压降: 0.0213·q^1.23 psi (q gpm, 按 ROSA 9.1 拟合, 11-02e)', () => {
+    near(T.elemDP(50 * 0.227125), 0.0213 * Math.pow(50, 1.23) * psi, 1e-9);
+    near(T.elemDP(54.8 * 0.227125) / psi, 2.93, 0.06, 'ROSA 9.1 ECO-440i 首支 q̄ 54.8 gpm 压降 2.93 psi');
   });
   test('溶度积与硅溶解度 (PHREEQC, 25 °C)', () => {
     near(T.logKsp('CaSO4', 25), -4.58, 0.005); near(T.logKsp('BaSO4', 25), -9.97, 0.005); near(T.logKsp('BaSO4', 5), -10.357, 0.002);
@@ -1432,8 +1438,8 @@ function ROTests(T, test, assert) {
     near(T.logKsp('Calcite', 25), -8.48, 0.005);
     near(T.silicaSol(25), 117, 0.01); near(T.silicaSol(5), 78, 0.02); near(T.silicaSol(45), 166, 0.02);
   });
-  test('元件库: 18 个型号均能复现样本测试条件', () => {
-    assert.ok(T.ELEMENTS.length >= 18);
+  test('元件库: 20 个型号均能复现样本测试条件', () => {
+    assert.ok(T.ELEMENTS.length >= 20);
     T.ELEMENTS.forEach(sp => {
       const e = T.getElement(sp.id);
       const r = T.element(e, sp.testFlow / 24 / sp.testRecovery, NaCl(sp.testNaCl), sp.testP, 0, 25, 1);
@@ -1451,22 +1457,23 @@ function ROTests(T, test, assert) {
   test('基准: ROSA 8.0.3, 2000 mg/L NaCl, BW30-400, 2:1×4, 70%, 25 °C, FF 0.85', () => {
     const e = Object.assign({ area: 445.92 / 12, type: 'bw' }, T.fitElement({ area: 445.92 / 12, testFlow: 39.7, testRejection: 99.5, testNaCl: 2000, testP: 15.5, testRecovery: 0.15 }));
     const r = T.solvePass({ elem: e, FF: 0.85, stages: [{ nv: 2, ne: 4 }, { nv: 1, ne: 4 }] }, 15.71, NaCl(2000), 11.0, 25);
-    near(r.Pf, 12.46, 0.015, '一段进水压力');
+    near(r.Pf, 12.46, 0.03, '一段进水压力');   // 11-02e 压降改按现代软件拟合后约 −2% (ROSA 8 的元件压降约为新式的 1.9–2.1 倍)
     near(T.tds(r.Cp), 30.43, 0.05, '产水 TDS');
-    near(r.stages[0].flux, 27.44, 0.03, '一段通量'); near(r.stages[1].flux, 19.13, 0.05, '二段通量');
-    near(T.tds(r.stages[0].Cp), 22.12, 0.05); near(T.tds(r.stages[1].Cp), 54.28, 0.05);
+    near(r.stages[0].flux, 27.44, 0.03, '一段通量'); near(r.stages[1].flux, 19.13, 0.08, '二段通量');   // 11-02e 起约 +7% (压降减小, 后段压力多)
+    near(T.tds(r.stages[0].Cp), 22.12, 0.05); near(T.tds(r.stages[1].Cp), 54.28, 0.08);   // 二段通量偏高, 产水浓度相应偏低约 7% (11-02e)
     const rosaQp = [1.12, 1.06, 0.99, 0.91, 0.82, 0.75, 0.67, 0.59];
-    r.elems.forEach((x, i) => near(x.Qp, rosaQp[i], 0.06, '元件 ' + x.stage + '-' + x.pos));
+    r.elems.forEach((x, i) => near(x.Qp, rosaQp[i], 0.13, '元件 ' + x.stage + '-' + x.pos));   // 11-02e 前 ≤ 6%; ROSA 8 的元件压降约为新式的 1.9–2.1 倍, 二段元件产水现高 5–12%
     near(T.osmotic(r.Cc, 25), 5.20, 0.02, '浓水渗透压');
   });
-  test('基准: TWDB 2014 苦咸地下水, LE-440i, 38:18×7, 29 °C (四种工况 ±8%)', () => {
+  test('对照: TWDB 2014 苦咸地下水, LE-440i, 38:18×7, 29 °C (记录已知偏差: 旧版软件压降大, 本工具进水压力低 14–18%)', () => {
     const e = Object.assign({ area: 41, type: 'bw' }, T.fitElement({ area: 41, testFlow: 47.9, testRejection: 99.3, testNaCl: 2000, testP: 10.34, testRecovery: 0.15 }));
     const C1 = { Ca: 134, Mg: 102, Na: 508, NH4: 0.5, Ba: 0.053, Sr: 25.8, HCO3: 141, CO3: 0.98, SO4: 269, Cl: 1057, F: 1, NO3: 0.1, SiO2: 15.4 };
     const C2 = { Ca: 146, Mg: 153, Na: 946, K: 16.3, NH4: 0.5, Ba: 0.059, Sr: 25.8, HCO3: 141, CO3: 0.96, SO4: 373, Cl: 1840, F: 1, NO3: 0.1, SiO2: 15.4 };
     const Qp = 1733 * 0.227125;
     [[C1, 1, 0.75, 70, 113], [C1, 1, 0.80, 76, 113], [C2, 0.75, 0.75, 97, 165], [C2, 0.75, 0.80, 112, 166]].forEach(([C, FF, R, boost, ref]) => {
       const r = T.solvePass({ elem: e, FF, stages: [{ nv: 38, ne: 7, Pp: 0 }, { nv: 18, ne: 7, booster: boost * psi, Pp: 1.0 }] }, Qp / R, T.balance(C).C, Qp, 29);
-      near(r.Pf / psi, ref, 0.08, `FF ${FF} R ${R}`);
+      const k = r.Pf / psi / ref;   // 11-02e 前 −3%～+6%; 新压降式下 −14%～−18% (TWDB 用 ROSA 8 / IMSDesign 2012 / TorayDS2 2.0, 段间增压按其设计值固定输入)
+      assert.ok(k > 0.78 && k < 0.90, `FF ${FF} R ${R} 进水压力比 ${k}`);
       near(r.flux / 1.6996, 14.5, 0.02, '平均通量 gfd');
     });
   });
@@ -1566,7 +1573,7 @@ function ROTests(T, test, assert) {
     assert.ok(d.pass1.converged && d.pass1.Pf < 35, '可求出进水压力 ' + d.pass1.Pf);
   });
   test('设计校核: 负压/无产水元件、段前增压超压报出 (A2/A3)', () => {
-    const b = baseDesign(); b.pass1.stages = [{ nv: 14, ne: 6 }, { nv: 1, ne: 6 }];
+    const b = baseDesign(); b.pass1.stages = [{ nv: 14, ne: 6 }, { nv: 7, ne: 6, Pp: 15 }];   // 二段产水背压过高 → 二段无产水 (11-02e 压降减小后改用此例)
     assert.ok(T.designAll(b).check.items.some(x => x.type === 'bad' && /无产水或出现负压/.test(x.text)), '负压未报');
     const c = baseDesign(); for (const k in c.feed) c.feed[k] *= 4; c.T = 5; c.pass1.FF = 0.65;
     c.pass1.elem = T.getElement('TMG20D400'); c.pass1.stages = [{ nv: 14, ne: 6 }, { nv: 7, ne: 6, booster: 20 }];
@@ -1658,22 +1665,32 @@ function ROTests(T, test, assert) {
     const sw = T.acidDose(T.balance({ Ca: 412, Mg: 1290, Na: 10770, K: 399, Sr: 7.9, HCO3: 142, SO4: 2712, Cl: 19354, F: 1.3 }).C, 8.1, 6.5, 35, 'H2SO4').doseMgL;
     near(sw, 35.86, 0.05, '海水');
   });
+  test('对照: WAVE 1.82 单段 1×6, BW30XFR-400/34, 20 °C (压降拟合式验证, 11-02e)', () => {
+    // 意大利招标附件 WAVE 报告: 进水 8.99 m³/h, 产水 6.00 m³/h, 进水 12.0 bar, 容器压降 0.5 bar, 产水 9.04 mg/L; 首/末支产水 1.07/0.91 m³/h
+    const e = Object.assign({ area: 37.2, type: 'bw' }, T.fitElement({ area: 37.2, testFlow: 43.5, testRejection: 99.65, testNaCl: 2000, testP: 15.5, testRecovery: 0.15, spacer: 34 }));
+    const C = T.balance({ K: 7, Na: 297.8, Mg: 22, Ca: 33, CO3: 4.39, HCO3: 362.1, NO3: 10.4, F: 0.31, Cl: 325, SO4: 55 }).C;
+    const r = T.solvePass({ elem: e, FF: 0.85, stages: [{ nv: 1, ne: 6 }] }, 8.99, C, 6.0, 20);
+    near(r.Pf, 12.0, 0.03, '进水压力'); near(r.Pf - r.Pc, 0.5, 0.2, '容器压降 (WAVE 取 0.1 bar 精度)');
+    near(r.elems[0].Qp, 1.07, 0.04, '首支产水'); near(r.elems[5].Qp, 0.91, 0.04, '末支产水');
+    near(T.tds(T.neutralize(r.Cp)), 9.04, 0.1, '产水 TDS');
+  });
   test('对照: ROSA 9.1 三段 (5:3:1×6, 84%) 与 Toray DS2 三段 (2:2:1×6, 75%), 记录已知偏差 (11-02)', () => {
-    // 来源与数据见 claude/audit-ro-3stage-2026-11-02.md §3。偏差来自元件压降 (约为 ROSA 9.1 的 3 倍) 与暖水盐透过; 本测试锁定现状, 改动压降或透盐模型时需同步更新
+    // 来源与数据见 claude/audit-ro-3stage-2026-11-02.md §3、claude/research-ro-sources-2026-11-02.md。11-02e 起压降按 ROSA 9.1 拟合, 压力与分段产水吻合;
+    // 暖水产水 TDS 仍偏低 (盐透过模型), 本测试锁定现状, 改动压降或透盐模型时需同步更新
     const gpm = 0.227125, e = T.getElement('ECOPRO440');
     const A = T.balance({ NH4: 5.65, K: 10.85, Na: 15.31, Mg: 62.28, Ca: 142.08, Sr: 8.46, CO3: 0.12, HCO3: 208.69, NO3: 144.59, Cl: 53.39, F: 0.88, SO4: 305.15, SiO2: 1.22 }).C;
     const A10 = {}; Object.keys(A).forEach(k => A10[k] = A[k] * 949.33 / 958.67);
     const runA = (C, t, pp1, qf, qp) => T.solvePass({ elem: e, FF: 0.85, stages: [{ nv: 5, ne: 6, Pp: pp1 * psi }, { nv: 3, ne: 6, booster: -5 * psi, Pp: 30 * psi }, { nv: 1, ne: 6, booster: -5 * psi, Pp: 15 * psi }] }, qf * gpm, C, qp * gpm, t);
     const a25 = runA(A, 25, 50, 287.81, 242.49), a10 = runA(A10, 10, 40, 287.86, 242.54);
     const within = (v, ref, lo, hi, m) => assert.ok(v / ref > lo && v / ref < hi, m + ' ' + (v / ref).toFixed(3));
-    within(a25.Pf / psi, 138.38, 1.10, 1.26, 'ROSA 25 °C 进水压力');  within(a10.Pf / psi, 201.15, 0.98, 1.10, 'ROSA 10 °C 进水压力');
-    within(a25.stages[2].Qp / gpm, 20.42, 0.40, 0.65, 'ROSA 25 °C 三段产水'); within(a10.stages[2].Qp / gpm, 21.41, 0.60, 0.85, 'ROSA 10 °C 三段产水');
-    within(T.tds(T.neutralize(a25.Cp)), 16.36, 0.60, 0.80, 'ROSA 25 °C 产水 TDS'); within(T.tds(T.neutralize(a10.Cp)), 6.86, 0.85, 1.02, 'ROSA 10 °C 产水 TDS');
+    within(a25.Pf / psi, 138.38, 0.98, 1.10, 'ROSA 25 °C 进水压力');  within(a10.Pf / psi, 201.15, 0.88, 1.00, 'ROSA 10 °C 进水压力');
+    within(a25.stages[2].Qp / gpm, 20.42, 0.90, 1.08, 'ROSA 25 °C 三段产水'); within(a10.stages[2].Qp / gpm, 21.41, 0.94, 1.10, 'ROSA 10 °C 三段产水');
+    within(T.tds(T.neutralize(a25.Cp)), 16.36, 0.55, 0.72, 'ROSA 25 °C 产水 TDS'); within(T.tds(T.neutralize(a10.Cp)), 6.86, 0.78, 0.95, 'ROSA 10 °C 产水 TDS');
     const eB = Object.assign({}, T.getElement('TMG20D400')); eB.B *= 1.331;          // 膜龄 3 年, 透盐率增加 33.1%
     const b = T.solvePass({ elem: eB, FF: 0.848, stages: [{ nv: 2, ne: 6 }, { nv: 2, ne: 6 }, { nv: 1, ne: 6 }] }, 98.04 * gpm,
       T.balance({ Ca: 27.41, Mg: 5.946, Na: 454.3, K: 2.533, HCO3: 400.6, Cl: 528.6, SO4: 3.528, NO3: 0.0476, SiO2: 18.055, CO3: 3.425 }).C, 73.53 * gpm, 13 / 1.8);
-    within(b.Pf / psi, 119.3, 1.0, 1.15, 'Toray 进水压力'); within(b.stages[2].Qp / gpm, 8.8, 0.9, 1.1, 'Toray 三段产水');
-    within(T.tds(T.neutralize(b.Cp)), 18.34, 0.95, 1.12, 'Toray 产水 TDS');
+    within(b.Pf / psi, 119.3, 0.95, 1.08, 'Toray 进水压力'); within(b.stages[2].Qp / gpm, 8.8, 1.0, 1.18, 'Toray 三段产水');
+    within(T.tds(T.neutralize(b.Cp)), 18.34, 0.93, 1.10, 'Toray 产水 TDS');
   });
   test('设计校核: 超通量、超压、结垢能报出', () => {
     const tight = baseDesign(); tight.pass1.stages = [{ nv: 6, ne: 6 }, { nv: 3, ne: 6 }];
@@ -1784,6 +1801,8 @@ if (typeof module === 'object' && module.exports) module.exports = ROTests;
     try { o = JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); } catch (e) { o = null; }
     if (!o || typeof o !== 'object' || !Array.isArray(o.st1)) return false;
     applyPreset('tap');
+    var RENAMED = { LP218040: 'LP228040', FR118040: 'FR128040', SW228040: 'SW8040HR400' };   // 11-02e 停产型号换为替代型号
+    ['elem1', 'elem2'].forEach(function (k) { if (o[k] && RENAMED[o[k]]) o[k] = RENAMED[o[k]]; });
     FIELDS.forEach(function (k) { if (o[k] != null && $(k)) { var old = $(k).value; $(k).value = o[k]; if ($(k).tagName === 'SELECT' && $(k).value === '') $(k).value = old; } });   // 已删除的选项 (如旧元件型号) 保持缺省
     ION_ORDER.forEach(function (k) { if (o['ion_' + k] != null) $('ion_' + k).value = o['ion_' + k]; });
     if (o.Tmax == null && isFinite(+o.T)) $('Tmax').value = Math.max(+o.T, +$('Tmax').value);   // 旧版存档没有最高水温
@@ -2065,7 +2084,7 @@ if (typeof module === 'object' && module.exports) module.exports = ROTests;
         '</td><td>' + fmt(sp.area, 1) + '</td><td>' + fmt(sp.testFlow, 1) + '</td><td>' + fmt(sp.testRejection, 2) + '%</td><td class="l">' + fmt(sp.testNaCl, 0) + ' mg/L NaCl，' + fmt(sp.testP, 1) + ' bar，回收率 ' + fmt(sp.testRecovery * 100, 0) + '%，25 °C</td><td>' + fmt(e.A, 2) + '</td><td>' + fmt(e.B, 3) + '</td><td>' + sp.pmax + ' bar</td></tr>');
     });
     h.push('</tbody></table></div>');
-    h.push('<div class="src">A（水透过系数）、B（盐透过系数）由样本测试条件用本工具同一模型反算，每个型号都能复现样本的产水量和脱盐率。产水量公差通常为 ±15%。来源：DuPont FilmTec、Hydranautics、Toray 现行规格书。ULP22-8040 按官网与样本；其余时代沃顿型号已不在官网在售列表，取自经销商翻印型录，面积按 400 ft² 推定。汇通、碧水源未找到公开规格书，可用「自定义元件」输入。</div>');
+    h.push('<div class="src">A（水透过系数）、B（盐透过系数）由样本测试条件用本工具同一模型反算，每个型号都能复现样本的产水量和脱盐率。产水量公差通常为 ±15%。来源：DuPont FilmTec、Hydranautics、Toray 现行规格书；时代沃顿（国内亦称「汇通膜」）按 2023 产品目录与单型号样本；碧水源按官网产品页（最高压力等限值厂家未给，按同类元件取值）。其他型号可用「自定义元件」输入。</div>');
     if (!last) { $('outElem').innerHTML = h.join(''); return; }
     var d = last.d, spec1 = specOf(cur1), big = spec1 && spec1.area > 39;
     var big1 = d.pass1.stages.concat(d.pass2 ? d.pass2.stages : []).reduce(function (a, s) { return s.nv * s.ne > a.nv * a.ne ? s : a; });   // 按元件数最多的一段
